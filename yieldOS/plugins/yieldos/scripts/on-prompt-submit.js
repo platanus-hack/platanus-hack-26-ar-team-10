@@ -102,18 +102,21 @@ function buildCredentialsWarning(findings, prompt, projectRoot) {
     '```',
   ].join('\n');
 
+  // Single-fence green block. Every line is prefixed with "+ " so the diff
+  // syntax paints it green. NO nested ``` fences allowed inside — a nested
+  // fence would close the outer diff block and the rest would lose color.
   const guideBlock = [
     '```diff',
     '+ ╔════════════════════════════════════════════════════════════════╗',
     '+ ║   ✓  CAMINO CORRECTO  ·  cómo guardar la credencial bien        ║',
     '+ ╚════════════════════════════════════════════════════════════════╝',
     '+',
-    ...guide.split('\n').map((l) => l.startsWith('```') ? l : '+ ' + l),
+    ...guide.split('\n').map((l) => '+ ' + l),
     '+',
     '+ Cuando ya esté en .env, decile al agente:',
-    '+   "leé la credencial desde .env"',
+    '+     "leé la credencial desde .env"',
     '+ y autorizá con la frase exacta:',
-    '+   AUTORIZO A LEER LAS CREDENCIALES',
+    '+     AUTORIZO A LEER LAS CREDENCIALES',
     '```',
   ].join('\n');
 

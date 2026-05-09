@@ -28,9 +28,10 @@ function gitignoreCoversEnv(projectRoot) {
 }
 
 // Given the credential variable names extracted from the prompt, build a
-// guided remediation block: where the .env is, how to add the keys, how to
-// protect the file. Values are NEVER echoed — only the variable name is used,
-// with a placeholder.
+// guided remediation as PLAIN LINES (no nested fences). Each line is later
+// wrapped with a "+ " prefix and shoved inside a single ```diff block, so it
+// renders fully green without losing color when code samples appear.
+// Values are NEVER echoed — only the variable name is used, with a placeholder.
 function buildRemediationGuide(projectRoot, varNames) {
   const env = findEnvFile(projectRoot);
   const ignoreOk = gitignoreCoversEnv(projectRoot);
@@ -38,37 +39,31 @@ function buildRemediationGuide(projectRoot, varNames) {
 
   const lines = [];
   if (env.exists) {
-    lines.push(`✓ Tu proyecto YA tiene un \`${env.name}\` en: ${env.path}`);
+    lines.push(`Tu proyecto YA tiene un .env en:`);
+    lines.push(`  ${env.path}`);
     lines.push('');
-    lines.push('Camino A — abrí el archivo y pegá la credencial allí (no en el chat):');
-    lines.push('```bash');
-    lines.push(`! open ${env.name}        # macOS: lo abre en tu editor por defecto`);
-    lines.push(`! code ${env.name}        # si usás VS Code / Cursor`);
-    lines.push('```');
+    lines.push('Camino A — abrilo en tu editor y pegá la credencial allí');
+    lines.push('(NO la pegues más en el chat):');
+    lines.push(`    ! open ${env.name}      # macOS: editor por defecto`);
+    lines.push(`    ! code ${env.name}      # VS Code / Cursor`);
     lines.push('');
-    lines.push('Camino B — agregá la línea con un solo comando (el valor lo escribís vos al final):');
-    lines.push('```bash');
+    lines.push('Camino B — agregá la línea con un solo comando');
+    lines.push('(el valor lo escribís vos directo al shell, no en el chat):');
     for (const n of names) {
-      lines.push(`! echo '${n}=PEGÁ_TU_VALOR_AQUÍ' >> ${env.name}`);
+      lines.push(`    ! echo '${n}=PEGÁ_TU_VALOR_AQUÍ' >> ${env.name}`);
     }
-    lines.push('```');
   } else {
-    lines.push(`⚠ Tu proyecto NO tiene un \`.env\` todavía. Creá uno así:`);
-    lines.push('');
-    lines.push('```bash');
-    lines.push('! touch .env');
+    lines.push('Tu proyecto NO tiene un .env todavía. Creá uno así:');
+    lines.push('    ! touch .env');
     for (const n of names) {
-      lines.push(`! echo '${n}=PEGÁ_TU_VALOR_AQUÍ' >> .env`);
+      lines.push(`    ! echo '${n}=PEGÁ_TU_VALOR_AQUÍ' >> .env`);
     }
-    lines.push('```');
   }
 
   if (!ignoreOk) {
     lines.push('');
-    lines.push('Y blindá `.env` contra commits accidentales:');
-    lines.push('```bash');
-    lines.push("! grep -qxF '.env' .gitignore 2>/dev/null || echo '.env' >> .gitignore");
-    lines.push('```');
+    lines.push('Y blindá .env contra commits accidentales:');
+    lines.push("    ! grep -qxF '.env' .gitignore 2>/dev/null || echo '.env' >> .gitignore");
   }
 
   return lines.join('\n');
