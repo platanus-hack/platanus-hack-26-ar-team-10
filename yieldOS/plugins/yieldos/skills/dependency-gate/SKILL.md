@@ -1,11 +1,11 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent runs install commands, edits dependency manifests, activates skills, adds MCPs, or edits instruction files. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands, reads credentials files, edits dependency manifests, activates skills, adds MCPs, edits instruction files, runs git commit/push, or receives credential-looking prompts. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate
 
-You are operating in a project protected by **yieldOS**, a security gate that intercepts dependency installations, skill activations, MCP additions, and instruction-file changes.
+You are operating in a project protected by **yieldOS**, a security gate that intercepts dependency installations, skill activations, MCP additions, credentials reads, credential-looking prompts, instruction-file changes, and git commit/push source-code audits.
 
 ## Core principles
 
@@ -24,6 +24,20 @@ When yieldOS blocks a `Bash` / `Write` / `Edit` action, it returns a structured 
 - `large-lib-analysis` — large package; yieldOS will run manifest/script/OSV/static analysis. Wait for the analyzer verdict. Do not retry the install.
 - `verification-failed` — analysis flagged the package. Inform the user and do not retry.
 - `verification-passed` — package is safe; retry the install once.
+- `credentials-read-blocked` — the agent tried to read `.env`, `.ssh`, `.aws`, `.kube`, or another credentials path without the user's exact authorization phrase. Surface the colored warning returned in `hookSpecificOutput.additionalContext` and do not retry the read.
+- `prompt-credentials-blocked` — the user prompt contained credential-looking material. The prompt was blocked before reaching the model. Tell the user to retry with environment-variable references instead of raw secrets.
+
+## Credentials flow
+
+Never ask the user to paste secrets into chat. If a prompt contains credentials, yieldOS blocks it and returns a red `diff` alert panel with short ASCII art and redacted samples. Copy that warning verbatim when it is present.
+
+If the agent needs to read credentials from a local file, the user must reply with exactly:
+
+```text
+AUTORIZO A LEER LAS CREDENCIALES
+```
+
+The phrase must be the whole prompt. When accepted, yieldOS writes a local authorization flag under `security/` that expires after 30 minutes. Do not retry a blocked credentials read until the user has sent that exact phrase.
 
 ## Rewrite flow (Category A only)
 
@@ -71,6 +85,8 @@ Each stamp is a markdown `diff` code block so the line renders with color: `+` g
 | `build-script-not-approved` | `- ▎ 🛡  yieldOS  ·  Bloqueado · build script no aprobado` |
 | `injection-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada` |
 | `self-defense-block` | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido` |
+| `credentials-read-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · lectura de credenciales sin autorización` |
+| `credentials-read-authorized` | `+ ▎ 🛡  yieldOS  ·  Validado · lectura de credenciales autorizada` |
 | `native-suggest` | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa` |
 | `code-audit-clean` | `+ ▎ 🛡  yieldOS  ·  Validado · code audit limpio` |
 | `code-audit-warning` | `! ▎ 🛡  yieldOS  ·  Advertencia · code audit` |
@@ -96,4 +112,6 @@ Use a brief body only when the user needs context:
 - Rewritten: say yieldOS optimized the install locally, then stamp.
 - Verification failed: say yieldOS found suspicious signals and blocked the install, then stamp.
 - Code audit fixed or blocked a commit/push: explain the one-line hook message and tell the user to rerun the git command only after reviewing staged changes.
+- Credentials read blocked: copy the returned red warning panel verbatim, then stamp.
+- Prompt credentials blocked: tell the user to replace raw secrets with environment-variable names, then stamp if the hook provided one.
 - CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.

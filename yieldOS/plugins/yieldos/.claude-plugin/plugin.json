@@ -1,7 +1,7 @@
 {
   "name": "yieldos",
-  "version": "0.2.8",
-  "description": "Security gate for Claude Code. Intercepts dependency installs, manifest edits, skill activations, MCP additions, instruction edits, and git commit/push source-code audits before allowing the action.",
+  "version": "0.3.1",
+  "description": "Security gate for Claude Code. Intercepts dependency installs, manifest edits, skill activations, MCP additions, credentials reads, instruction edits, and git commit/push source-code audits before allowing the action.",
   "author": {
     "name": "platanus-hack-26-ar-team-10"
   },
