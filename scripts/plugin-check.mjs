@@ -88,10 +88,17 @@ for (const relativePath of [
   'policy/README.md',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
   'yieldOS/plugins/yieldos/commands/audit.md',
+  'yieldOS/plugins/yieldos/commands/init.md',
+  'yieldOS/plugins/yieldos/commands/pentest.md',
   'yieldOS/plugins/yieldos/commands/update.md',
   'yieldOS/plugins/yieldos/bin/yieldos-audit',
+  'yieldOS/plugins/yieldos/bin/yieldos-init',
+  'yieldOS/plugins/yieldos/bin/yieldos-pentest',
   'yieldOS/plugins/yieldos/bin/yieldos-update',
   'yieldOS/plugins/yieldos/CHANGELOG.md',
+  'yieldOS/plugins/yieldos/scripts/audit-command.js',
+  'yieldOS/plugins/yieldos/scripts/init-command.js',
+  'yieldOS/plugins/yieldos/scripts/init-profiles.js',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
   'yieldOS/plugins/yieldos/scripts/post-install-audit.js',
   'yieldOS/plugins/yieldos/scripts/on-session-start.js',
@@ -102,6 +109,10 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/ui.js',
   'yieldOS/plugins/yieldos/scripts/code-audit/index.js',
   'yieldOS/plugins/yieldos/scripts/code-audit/ci-verify.js',
+  'yieldOS/plugins/yieldos/scripts/code-audit/pentest-loop/auto-launcher.js',
+  'yieldOS/plugins/yieldos/scripts/code-audit/pentest-loop/event-reader.js',
+  'yieldOS/plugins/yieldos/scripts/code-audit/pentest-loop/orchestrator.js',
+  'yieldOS/plugins/yieldos/scripts/yieldos-pentest.js',
   'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
   'landing/package.json',
@@ -118,6 +129,8 @@ for (const file of policyFiles) {
 
 assertExecutable('install.sh');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-audit');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-init');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-pentest');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-update');
 
 console.log('plugin structure OK');

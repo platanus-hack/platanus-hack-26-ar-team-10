@@ -1,5 +1,17 @@
 # Changelog
 
+## yieldOS v0.8.1 - 2026-05-09
+
+- Add detached pentest launch/watch/stop commands with project-local live logs.
+- Surface pentest red/blue events in Claude Code chat via JSONL and markdown diff blocks.
+- Keep SessionStart pentest auto-launch opt-in instead of default to avoid surprise project edits.
+
+## yieldOS v0.6.1 - 2026-05-09
+
+- Add preview-first /yieldos:init instructions for AGENTS.md and CLAUDE.md.
+- Add explicit /yieldos:pentest red-team and blue-team loop with persistent project memory and colored terminal feed.
+- Harden pentest edit application and command parsing for safer project-local operation.
+
 ## yieldOS v0.5.0 - 2026-05-09
 
 - Add pen-test hardening for credential authorization, plugin self-defense, skills/MCP policies, race handling, and npm provenance signals.

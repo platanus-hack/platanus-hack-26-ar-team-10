@@ -15,11 +15,13 @@ This directory captures every design decision behind yieldOS, why it exists, and
 9. [Decision log](09-decision-log.md) — *every decision in order, with rationale*
 10. [Code audit](10-code-audit.md) — *commit/push red-team and blue-team loop for source code*
 11. [Audit command](13-audit-command.md) — *on-demand Deepsec source-code audit*
+12. [Custom agent instructions](14-custom-instructions.md) — *preview-first AGENTS.md / CLAUDE.md generation*
+13. [Adversarial pentest loop](15-pentest-loop.md) — *continuous red-team / blue-team review with persistent memory*
 
 ## Planning docs (not yet implemented)
 
-12. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
-13. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+14. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
+15. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
 
 ## Reading order for AI agents
 
@@ -46,3 +48,5 @@ Every doc here was written by capturing the conversation that produced yieldOS. 
 - **Decision log** → numbered list of every decision, in the order they were made, with the *why* attached.
 - **Code audit** → how yieldOS audits source-code diffs separately from dependency policy.
 - **Audit command** → how users invoke Deepsec review explicitly without changing hook behavior.
+- **Custom agent instructions** → how teams generate reviewable AGENTS.md / CLAUDE.md safety defaults.
+- **Adversarial pentest loop** → how red-team and blue-team agent rounds persist lessons, stream terminal colors, and surface chat-rendered events across runs.
