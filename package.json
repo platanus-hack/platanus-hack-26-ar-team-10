@@ -1,0 +1,12 @@
+{
+  "name": "platanus-hack-26-ar-team-10-root",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix ./landing run dev",
+    "build": "npm --prefix ./landing run build",
+    "start": "npm --prefix ./landing run start",
+    "lint": "npm --prefix ./landing run lint",
+    "test": "npm --prefix ./landing test"
+  }
+}
