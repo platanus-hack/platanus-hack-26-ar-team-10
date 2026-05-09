@@ -204,6 +204,16 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes("--acid: #e8ff00"), "Expected acid accent");
   assert.ok(globals.includes(".pitch-section"), "Expected full-screen sections");
   assert.ok(
+    existsSync(join(root, "public/yieldos-ascii-bg.webp")),
+    "Expected optimized ascii background asset",
+  );
+  assert.ok(page.includes("ascii-backdrop"), "Expected decorative ascii background layer");
+  assert.ok(
+    globals.includes('url("/yieldos-ascii-bg.webp")'),
+    "Expected ascii asset to be used as background",
+  );
+  assert.ok(globals.includes("@keyframes ascii-drift"), "Expected ascii background drift");
+  assert.ok(
     globals.includes("min-height: max(100vh, 100dvh)"),
     "Expected desktop full-screen section height",
   );

@@ -225,9 +225,36 @@ html {
   color: rgba(232, 255, 0, 0.78);
 }
 
+.ascii-backdrop {
+  --ascii-opacity-low: 0.28;
+  --ascii-opacity-high: 0.4;
+
+  position: absolute;
+  inset: -8% -6% -2%;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("/yieldos-ascii-bg.webp");
+  background-repeat: no-repeat;
+  background-position: center 42%;
+  background-size: min(1180px, 100vw) auto;
+  filter: brightness(0.9) contrast(1.08);
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    black 18%,
+    black 76%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: var(--ascii-opacity-low);
+  transform: translate3d(0, 0, 0) scale(1.04);
+  animation: ascii-drift 18s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
 .security-hero::before {
   position: absolute;
   inset: 0;
+  z-index: 1;
   content: "";
   pointer-events: none;
   background-image:
@@ -241,6 +268,7 @@ html {
 .security-hero::after {
   position: absolute;
   inset: 0;
+  z-index: 2;
   content: "";
   pointer-events: none;
   background:
@@ -251,7 +279,12 @@ html {
 
 .security-hero > * {
   position: relative;
-  z-index: 1;
+  z-index: 3;
+}
+
+.security-hero > .ascii-backdrop {
+  position: absolute;
+  z-index: 0;
 }
 
 .flow-rail {
@@ -687,6 +720,19 @@ html {
   }
 }
 
+@keyframes ascii-drift {
+  0%,
+  100% {
+    opacity: var(--ascii-opacity-low);
+    transform: translate3d(-1.2%, -0.8%, 0) scale(1.04);
+  }
+
+  45% {
+    opacity: var(--ascii-opacity-high);
+    transform: translate3d(1.2%, 0.8%, 0) scale(1.065);
+  }
+}
+
 @keyframes hero-caret-blink {
   0%,
   46% {
@@ -835,6 +881,22 @@ html {
     padding-top: 5.75rem;
   }
 
+  .ascii-backdrop {
+    --ascii-opacity-low: 0.1;
+    --ascii-opacity-high: 0.18;
+
+    inset: 0 -44%;
+    background-position: center 36%;
+    background-size: 760px auto;
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      black 14%,
+      black 48%,
+      transparent 74%
+    );
+  }
+
   .hero-title {
     font-size: clamp(2rem, 8.2vw, 2.45rem);
     max-width: 15ch;
@@ -955,6 +1017,12 @@ html {
 
   html {
     scroll-snap-type: none;
+  }
+
+  .ascii-backdrop {
+    opacity: var(--ascii-opacity-low);
+    transform: translate3d(0, 0, 0) scale(1.04);
+    animation: none;
   }
 
   .intro-header .command-bar,

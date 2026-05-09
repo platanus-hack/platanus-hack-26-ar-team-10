@@ -98,6 +98,7 @@ export default function Home() {
         id="hero"
         className="pitch-section security-hero relative overflow-hidden bg-[#0e0e10] text-white"
       >
+        <div className="ascii-backdrop" aria-hidden="true" />
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
             <MotionReveal
