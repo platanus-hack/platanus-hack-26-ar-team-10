@@ -12,8 +12,10 @@ const go = require('./go');
 const skills = require('./skills');
 const vendoring = require('./vendoring');
 const binaries = require('./binaries');
+const manifests = require('./manifests');
 
 const ALL = [npm, pnpm, yarn, bun, pip, poetry, uv, cargo, go, skills, vendoring, binaries];
+const MANIFEST_FILENAMES = /^(?:package\.json|requirements.*\.txt|pyproject\.toml|Pipfile|Cargo\.toml|go\.mod)$/i;
 
 function classifyBashCommand(command) {
   if (typeof command !== 'string' || command.trim().length === 0) {
@@ -76,20 +78,36 @@ function splitChained(cmd) {
   return out;
 }
 
-function classifyWriteOrEdit(filePath, content = '') {
-  // Only instruction files are actionable on Write/Edit.
-  // Manifest edits (package.json, requirements.txt, Cargo.toml, go.mod, etc.) are
-  // intentionally NOT classified here: they have no reliable package name to look up,
-  // and the actual install command (npm install, pip install, etc.) is gated separately
-  // when the agent runs it via Bash. Adding a dep to a manifest without running install
-  // is a no-op until that install fires, so we let the file edit pass through.
+function classifyWriteOrEdit(filePath, content = '', oldContent = null) {
   if (!filePath) return [];
   const base = filePath.split('/').pop();
-  const candidates = [];
+
   if (/^CLAUDE\.md$/i.test(base) || /^AGENTS\.md$/i.test(base) || /^\.cursorrules$/i.test(base)) {
-    candidates.push({ type: 'instruction-file', name: base, version: 'unknown', source: filePath, manager: 'instruction' });
+    return [{
+      type: 'instruction-file',
+      name: base,
+      version: 'unknown',
+      source: filePath,
+      manager: 'instruction',
+      content,
+      requested_by: 'agent',
+    }];
   }
-  return candidates.map((c) => ({ ...c, content, requested_by: 'agent' }));
+
+  if (MANIFEST_FILENAMES.test(base)) {
+    return manifests.diffManifest(filePath, content, oldContent).map((pkg) => ({
+      type: pkg.exotic ? 'vendored-code' : 'library',
+      name: pkg.name,
+      version: pkg.version,
+      source: pkg.source,
+      manager: pkg.manager,
+      exotic: pkg.exotic === true,
+      command: `manifest-edit:${base}`,
+      requested_by: 'agent',
+    }));
+  }
+
+  return [];
 }
 
 module.exports = {

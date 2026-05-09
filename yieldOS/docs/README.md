@@ -15,6 +15,11 @@ This directory captures every design decision behind yieldOS, why it exists, and
 9. [Decision log](09-decision-log.md) — *every decision in order, with rationale*
 10. [Code audit](10-code-audit.md) — *commit/push red-team and blue-team loop for source code*
 
+## Planning docs (not yet implemented)
+
+11. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
+12. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+
 ## Reading order for AI agents
 
 If you are an agent operating in a project protected by yieldOS, read in this order:

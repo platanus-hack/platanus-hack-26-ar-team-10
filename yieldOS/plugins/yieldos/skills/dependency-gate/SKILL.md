@@ -1,6 +1,6 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent encounters install commands, skill activations, MCP additions, or instruction-file edits. Provides context on yieldOS policy and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands, edits dependency manifests, activates skills, adds MCPs, or edits instruction files. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate
@@ -52,11 +52,48 @@ Do not try to bypass these blocks. They are a feature, not a bug.
 
 ## What to tell the user
 
-Keep messages short, in their language, and informative — never asking. Examples:
+Keep messages short, in their language, and informative — never asking.
 
-- Allowed: silent (no message).
-- Blocked (denylist): `[yieldOS] BLOCK bloqueó {package}: {reason}`.
-- Blocked (Category D): `[yieldOS] BLOCK bloqueó {package}: categoría crítica, requiere aprobación del equipo de seguridad`.
-- Rewritten: `[yieldOS] REWRITE realizó una optimización de la instalación de {package}`.
-- Verification failed: `[yieldOS] BLOCK detectó señales sospechosas en {package} y bloqueó la instalación`.
-- CVE on transitive: `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
+### Visual stamp
+
+Whenever a tool call was processed by yieldOS, close your reply with the matching shield stamp on its own final block. The hook also returns the exact stamp in `hookSpecificOutput.additionalContext`; when present, copy it verbatim.
+
+Each stamp is a markdown `diff` code block so the line renders with color: `+` green for allowed/safe, `-` red for blocked/unsafe, and `!` orange for suggestions.
+
+| Verdict in stderr | Stamp line inside the `diff` block |
+| --- | --- |
+| `allowlist-match` | `+ ▎ 🛡  yieldOS  ·  Validado · allowlist` |
+| `verification-passed` | `+ ▎ 🛡  yieldOS  ·  Validado · análisis OK` |
+| `category-a-rewrite` | `+ ▎ 🛡  yieldOS  ·  Optimizado · rewrite local` |
+| `denylist-match` | `- ▎ 🛡  yieldOS  ·  Bloqueado · denylist` |
+| `category-d-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · categoría crítica` |
+| `verification-failed` | `- ▎ 🛡  yieldOS  ·  Bloqueado · señales sospechosas` |
+| `build-script-not-approved` | `- ▎ 🛡  yieldOS  ·  Bloqueado · build script no aprobado` |
+| `injection-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada` |
+| `self-defense-block` | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido` |
+| `native-suggest` | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa` |
+| `code-audit-clean` | `+ ▎ 🛡  yieldOS  ·  Validado · code audit limpio` |
+| `code-audit-warning` | `! ▎ 🛡  yieldOS  ·  Advertencia · code audit` |
+| `code-audit-fix-applied` | `+ ▎ 🛡  yieldOS  ·  Corregido · code audit` |
+| `code-audit-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · code audit` |
+| `code-audit-verification-failed` | `- ▎ 🛡  yieldOS  ·  Bloqueado · verificación code audit` |
+
+Example:
+
+````
+Agregué numpy a requirements.txt. Para instalarlo, ejecutá pip install -r requirements.txt.
+
+```diff
++ ▎ 🛡  yieldOS  ·  Validado · allowlist
+```
+````
+
+Use a brief body only when the user needs context:
+
+- Allowed: silent body, just the stamp.
+- Blocked (denylist): explain the reason in one line, then stamp.
+- Blocked (Category D): say it requires security-team approval, then stamp.
+- Rewritten: say yieldOS optimized the install locally, then stamp.
+- Verification failed: say yieldOS found suspicious signals and blocked the install, then stamp.
+- Code audit fixed or blocked a commit/push: explain the one-line hook message and tell the user to rerun the git command only after reviewing staged changes.
+- CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.

@@ -27,6 +27,29 @@ test('allowlisted package returns ALLOW_ALLOWLIST', async () => {
   assert.equal(d.action, 'allow');
 });
 
+test('name-only allowlist allows existing concrete version', async () => {
+  const candidate = { manager: 'npm', name: 'next', version: '14.2.0', command: 'npm install next@14.2.0' };
+  const localPolicy = {
+    ...policy,
+    'allowlist.json': { entries: [{ key: 'npm:next', category: 'framework' }] },
+  };
+  const d = await decide(candidate, localPolicy, { ...opts, versionExists: async () => true });
+  assert.equal(d.verdict, VERDICT.ALLOW_ALLOWLIST);
+  assert.equal(d.action, 'allow');
+});
+
+test('name-only allowlist blocks confirmed fake concrete version', async () => {
+  const candidate = { manager: 'npm', name: 'next', version: '99.99.99', command: 'npm install next@99.99.99' };
+  const localPolicy = {
+    ...policy,
+    'allowlist.json': { entries: [{ key: 'npm:next', category: 'framework' }] },
+  };
+  const d = await decide(candidate, localPolicy, { ...opts, versionExists: async () => false });
+  assert.equal(d.verdict, VERDICT.BLOCK_VERIFICATION);
+  assert.equal(d.action, 'block');
+  assert.equal(d.meta.reason, 'fake-version');
+});
+
 test('denylisted package returns BLOCK_DENYLIST', async () => {
   const candidate = { manager: 'npm', name: 'event-stream', version: '3.3.6', command: 'npm install event-stream@3.3.6' };
   const d = await decide(candidate, policy, opts);

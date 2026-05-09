@@ -1,11 +1,16 @@
 {
   "name": "yieldos",
-  "version": "0.2.3",
-  "description": "Security gate for Claude Code. Intercepts dependency installs, skill activations, MCP additions, instruction edits, and git commit/push source-code audits before allowing the action.",
+  "version": "0.2.8",
+  "description": "Security gate for Claude Code. Intercepts dependency installs, manifest edits, skill activations, MCP additions, instruction edits, and git commit/push source-code audits before allowing the action.",
   "author": {
     "name": "platanus-hack-26-ar-team-10"
   },
   "homepage": "https://github.com/platanus-hack/platanus-hack-26-ar-team-10",
   "license": "MIT",
-  "keywords": ["security", "supply-chain", "dependency-management", "claude-code"]
+  "keywords": [
+    "security",
+    "supply-chain",
+    "dependency-management",
+    "claude-code"
+  ]
 }

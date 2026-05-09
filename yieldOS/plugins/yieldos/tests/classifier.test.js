@@ -191,19 +191,47 @@ test('echo command produces no candidates', () => {
   assert.equal(out.length, 0);
 });
 
-test('Write to package.json produces no candidate (gated at install time)', () => {
-  const out = classifyWriteOrEdit('/some/path/package.json', '{"dependencies": {"foo": "1.0.0"}}');
+test('Edit to package.json with new dependency yields candidate', () => {
+  const oldContent = '{"dependencies": {"foo": "1.0.0"}}';
+  const newContent = '{"dependencies": {"foo": "1.0.0", "bar": "2.0.0"}}';
+  const out = classifyWriteOrEdit('/some/path/package.json', newContent, oldContent);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].name, 'bar');
+  assert.equal(out[0].manager, 'npm');
+  assert.equal(out[0].version, '2.0.0');
+});
+
+test('Edit to package.json with version change yields candidate', () => {
+  const oldContent = '{"dependencies": {"react": "18.2.0"}}';
+  const newContent = '{"dependencies": {"react": "18.3.1"}}';
+  const out = classifyWriteOrEdit('/some/path/package.json', newContent, oldContent);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].name, 'react');
+  assert.equal(out[0].version, '18.3.1');
+});
+
+test('Edit to requirements.txt with no diff yields no candidates', () => {
+  const out = classifyWriteOrEdit('/some/path/requirements.txt', 'pandas\nnumpy', 'pandas\nnumpy');
   assert.equal(out.length, 0);
 });
 
-test('Write to requirements.txt produces no candidate', () => {
-  const out = classifyWriteOrEdit('/some/path/requirements.txt', 'matplotlib==3.8.0');
-  assert.equal(out.length, 0);
+test('Write to requirements.txt yields candidates for each new package', () => {
+  const out = classifyWriteOrEdit('/some/path/requirements.txt', 'matplotlib==3.8.0\nnumpy', '');
+  assert.equal(out.length, 2);
+  assert.equal(out.find((c) => c.name === 'matplotlib').version, '3.8.0');
+  assert.equal(out.find((c) => c.name === 'numpy').version, 'latest');
 });
 
-test('Write to Cargo.toml produces no candidate', () => {
-  const out = classifyWriteOrEdit('/some/path/Cargo.toml', '[dependencies]\nserde = "1.0"');
-  assert.equal(out.length, 0);
+test('Write to Cargo.toml yields candidates for crates', () => {
+  const out = classifyWriteOrEdit('/some/path/Cargo.toml', '[dependencies]\nserde = "1.0"\ntokio = "1.35"', '');
+  assert.equal(out.length, 2);
+  assert.deepEqual(out.map((c) => c.name).sort(), ['serde', 'tokio']);
+});
+
+test('Write to pyproject.toml yields PEP 621 dependency candidates', () => {
+  const out = classifyWriteOrEdit('/some/path/pyproject.toml', '[project]\ndependencies = ["fastapi==0.110.0", "uvicorn"]', '');
+  assert.equal(out.length, 2);
+  assert.equal(out.find((c) => c.name === 'fastapi').version, '0.110.0');
 });
 
 test('Write to CLAUDE.md is instruction-file candidate', () => {

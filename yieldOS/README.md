@@ -21,18 +21,57 @@ yieldOS makes the trust decision **before** the install runs, deterministically,
 ## Quickstart
 
 ```bash
-# 1. Add the marketplace and install
-claude plugin marketplace add /path/to/vibeOS
-claude plugin install yieldos@yieldos-marketplace
+# 1. Install from the public marketplace
+curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+```
 
-# 2. (Optional) Run the test suite
+Manual install:
+
+```bash
+claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
+claude plugins install yieldos@yieldos
+
+# Optional: run the test suite
 cd plugins/yieldos
-node --test tests/
+node --test tests/*.test.js
 ```
 
 That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` tool call.
 
 Requires Node.js 18+ for `fetch` and `node:test`.
+
+---
+
+## Updates and releases
+
+Users can update yieldOS from Claude Code:
+
+```text
+/yieldos:update
+```
+
+Equivalent terminal commands:
+
+```bash
+claude plugins marketplace update yieldos
+claude plugins update yieldos@yieldos
+```
+
+After updating, run `/reload-plugins` or restart Claude Code so hooks switch from the old cache path to the new version.
+
+Maintainers should release through the version helper from the repository root:
+
+```bash
+node scripts/release.mjs bump patch --note "Describe the change"
+node scripts/plugin-check.mjs
+(cd yieldOS/plugins/yieldos && node --test tests/*.test.js)
+git add .
+git commit -m "Release yieldOS vX.Y.Z"
+git tag yieldos--vX.Y.Z
+git push origin main yieldos--vX.Y.Z
+```
+
+That keeps the root marketplace, nested marketplace, plugin manifest, changelog, and GitHub Release tag aligned.
 
 ---
 
@@ -322,7 +361,7 @@ Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacte
 
 ```bash
 cd plugins/yieldos
-node --test tests/
+node --test tests/*.test.js
 ```
 
 Zero external dependencies (uses `node:test`). Coverage:
@@ -339,7 +378,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `ui.test.js` — terminal labels, color gating, exact machine-readable verdicts.
 - `e2e.test.js` — end-to-end runs of the pre-install gate with realistic inputs.
 
-151/151 passing.
+160/160 passing.
 
 ---
 
