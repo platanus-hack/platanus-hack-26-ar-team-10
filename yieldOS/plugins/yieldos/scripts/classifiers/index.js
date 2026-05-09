@@ -14,6 +14,9 @@ const vendoring = require('./vendoring');
 const binaries = require('./binaries');
 
 const ALL = [npm, pnpm, yarn, bun, pip, poetry, uv, cargo, go, skills, vendoring, binaries];
+const manifests = require('./manifests');
+
+const MANIFEST_FILENAMES = /^(?:package\.json|pnpm-workspace\.ya?ml|requirements.*\.txt|pyproject\.toml|Pipfile|Cargo\.toml|go\.mod)$/;
 
 function classifyBashCommand(command) {
   if (typeof command !== 'string' || command.trim().length === 0) {
@@ -76,20 +79,41 @@ function splitChained(cmd) {
   return out;
 }
 
-function classifyWriteOrEdit(filePath, content = '') {
-  // Only instruction files are actionable on Write/Edit.
-  // Manifest edits (package.json, requirements.txt, Cargo.toml, go.mod, etc.) are
-  // intentionally NOT classified here: they have no reliable package name to look up,
-  // and the actual install command (npm install, pip install, etc.) is gated separately
-  // when the agent runs it via Bash. Adding a dep to a manifest without running install
-  // is a no-op until that install fires, so we let the file edit pass through.
+function classifyWriteOrEdit(filePath, content = '', oldContent = null) {
   if (!filePath) return [];
   const base = filePath.split('/').pop();
-  const candidates = [];
+
+  // Instruction files: handled by handleInstructionEdit / injection scanner upstream.
   if (/^CLAUDE\.md$/i.test(base) || /^AGENTS\.md$/i.test(base) || /^\.cursorrules$/i.test(base)) {
-    candidates.push({ type: 'instruction-file', name: base, version: 'unknown', source: filePath, manager: 'instruction' });
+    return [{
+      type: 'instruction-file',
+      name: base,
+      version: 'unknown',
+      source: filePath,
+      manager: 'instruction',
+      content,
+      requested_by: 'agent',
+    }];
   }
-  return candidates.map((c) => ({ ...c, content, requested_by: 'agent' }));
+
+  // Manifest files: parse the diff and return only NEWLY-added packages as candidates.
+  // Each new package goes through the full decide flow exactly as if the user had run
+  // `npm install <pkg>` or `pip install <pkg>`.
+  if (MANIFEST_FILENAMES.test(base)) {
+    const added = manifests.diffManifest(filePath, content, oldContent);
+    return added.map((p) => ({
+      type: 'library',
+      name: p.name,
+      version: p.version,
+      source: p.source,
+      manager: p.manager,
+      exotic: false,
+      command: `manifest-edit:${base}`,
+      requested_by: 'agent',
+    }));
+  }
+
+  return [];
 }
 
 module.exports = {

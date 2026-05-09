@@ -162,7 +162,13 @@ async function main() {
   if (tool === 'Bash') {
     candidates = classifiers.classifyBashCommand(ti.command || '');
   } else if (tool === 'Write' || tool === 'Edit') {
-    candidates = classifiers.classifyWriteOrEdit(ti.file_path || ti.path || '', ti.content || ti.new_string || '');
+    // For Edit: the new content equals (file content with old_string -> new_string).
+    // For our manifest diff we approximate by using new_string vs old_string.
+    // For Write: the whole file is replaced; oldContent comes from disk.
+    const filePath = ti.file_path || ti.path || '';
+    const newContent = ti.content || ti.new_string || '';
+    const oldContent = tool === 'Edit' ? (ti.old_string || '') : null;
+    candidates = classifiers.classifyWriteOrEdit(filePath, newContent, oldContent);
   }
 
   if (candidates.length === 0) {
