@@ -67,7 +67,9 @@ test('real repo benchmark compares control commits against yieldOS-gated commits
       assert.equal(result.yieldos.stdout, undefined);
       assert.equal(result.yieldos.stderr, undefined);
       assert.equal(result.yieldos.raw_logs, undefined);
-      assert.equal(typeof result.yieldos.output.stderr_sha256, 'string');
+      assert.equal(typeof result.yieldos.output.stderr_bytes, 'number');
+      assert.equal(result.yieldos.output.stderr_sha256, undefined);
+      assert.equal(result.yieldos.output.stdout_sha256, undefined);
       for (const finding of result.yieldos.findings) {
         assert.equal(path.isAbsolute(finding.file), false);
         assert.deepEqual(Object.keys(finding).sort(), ['file', 'rule_id', 'severity', 'status', 'title']);

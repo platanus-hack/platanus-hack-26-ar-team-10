@@ -1,0 +1,518 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-09T17:49:59.420Z",
+  "summary": {
+    "total_templates": 35,
+    "by_status": {
+      "benchmarked": 11,
+      "template-only": 21,
+      "active-adapter": 3
+    },
+    "by_kind": {
+      "cdsc-http": 4,
+      "static-diff": 20,
+      "dependency-policy": 2,
+      "instruction-policy": 2,
+      "agent-permission": 7
+    }
+  },
+  "runnable_oracles": [
+    {
+      "id": "code-audit-state",
+      "kind": "evidence",
+      "maturity": "active-adapter",
+      "description": "Verifies committed code-audit state for the current diff."
+    },
+    {
+      "id": "agent-pack-lock",
+      "kind": "policy",
+      "maturity": "active-adapter",
+      "description": "Verifies generated agent-pack files against yield.agent-pack.lock.json."
+    },
+    {
+      "id": "instruction-policy",
+      "kind": "policy",
+      "maturity": "active-adapter",
+      "description": "Scans instruction files for policy-downgrade and prompt-injection patterns."
+    },
+    {
+      "id": "project-tests",
+      "kind": "test",
+      "maturity": "active-adapter",
+      "description": "Runs detected project checks in commit/push/manual oracle contexts."
+    },
+    {
+      "id": "cdsc-replay",
+      "kind": "counterexample",
+      "maturity": "active-demo",
+      "description": "Replays scoped counterexamples for supported security contracts."
+    },
+    {
+      "id": "cdsc-proof",
+      "kind": "counterexample",
+      "maturity": "active-demo",
+      "description": "Requires baseline fail plus fixed pass for supported CDSC contracts."
+    }
+  ],
+  "templates": [
+    {
+      "id": "missing-authz",
+      "title": "Sensitive route without authorization guard",
+      "severity": "high",
+      "kind": "cdsc-http",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
+        "cwe:CWE-862 Missing Authorization"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "idor-bola",
+      "title": "Broken object level authorization",
+      "severity": "high",
+      "kind": "cdsc-http",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "owasp-api-top-10-2023:API1 Broken Object Level Authorization",
+        "cwe:CWE-639 Authorization Bypass Through User-Controlled Key",
+        "cwe:CWE-863 Incorrect Authorization"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "removed-security-guard",
+      "title": "Authentication, authorization, or validation guard removed",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
+        "cwe:CWE-862 Missing Authorization"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "sql-injection",
+      "title": "SQL query built with attacker-controlled string interpolation",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A03 Injection",
+        "owasp-api-top-10-2023:API8 Security Misconfiguration",
+        "cwe:CWE-89 SQL Injection"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "nosql-injection",
+      "title": "NoSQL selector or operator injection",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A03 Injection",
+        "owasp-api-top-10-2023:API8 Security Misconfiguration",
+        "cwe:CWE-943 Improper Neutralization of Special Elements in Data Query Logic"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "shell-injection",
+      "title": "OS command execution with attacker-controlled argument",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A03 Injection",
+        "owasp-cheat-sheet:OS Command Injection Defense",
+        "cwe:CWE-78 OS Command Injection"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "path-traversal",
+      "title": "User-controlled filesystem path escapes project boundary",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "cwe:CWE-22 Path Traversal"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "unsafe-file-mutation",
+      "title": "User-controlled file write or delete",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "cwe:CWE-73 External Control of File Name or Path"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "dangerous-file-upload",
+      "title": "Dangerous file upload stored or served as executable content",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A05 Security Misconfiguration",
+        "owasp-api-top-10-2023:API8 Security Misconfiguration",
+        "cwe:CWE-434 Unrestricted Upload of File with Dangerous Type"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "ssrf",
+      "title": "Server-side request forgery",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A10 SSRF",
+        "owasp-api-top-10-2023:API7 SSRF",
+        "owasp-cheat-sheet:SSRF Prevention",
+        "cwe:CWE-918 SSRF"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "open-redirect",
+      "title": "User-controlled redirect target",
+      "severity": "medium",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "cwe:CWE-601 Open Redirect"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "xss-unsafe-html",
+      "title": "Untrusted HTML rendered without sanitization",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A03 Injection",
+        "cwe:CWE-79 Cross-site Scripting"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "csrf-missing-token",
+      "title": "State-changing browser request without CSRF defense",
+      "severity": "medium",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "owasp-cheat-sheet:CSRF Prevention",
+        "cwe:CWE-352 CSRF"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "sensitive-logging",
+      "title": "Sensitive value written to logs",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A09 Security Logging and Monitoring Failures",
+        "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
+        "cwe:CWE-200 Exposure of Sensitive Information"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "hardcoded-secret",
+      "title": "Hardcoded credential or API key",
+      "severity": "critical",
+      "kind": "static-diff",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-top-10-2021:A02 Cryptographic Failures",
+        "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
+        "cwe:CWE-798 Hard-coded Credentials"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "weak-crypto-random",
+      "title": "Weak cryptography or predictable security token",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A02 Cryptographic Failures",
+        "owasp-api-top-10-2023:API2 Broken Authentication",
+        "cwe:CWE-338 Weak PRNG"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "security-misconfiguration",
+      "title": "Dangerous production security configuration",
+      "severity": "medium",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A05 Security Misconfiguration",
+        "owasp-api-top-10-2023:API8 Security Misconfiguration",
+        "cwe:CWE-16 Configuration"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "vulnerable-outdated-component",
+      "title": "Known-vulnerable or risky dependency introduced",
+      "severity": "high",
+      "kind": "dependency-policy",
+      "status": "active-adapter",
+      "standards": [
+        "owasp-top-10-2021:A06 Vulnerable and Outdated Components",
+        "owasp-api-top-10-2023:API9 Improper Inventory Management",
+        "cwe:CWE-1104 Unmaintained Third Party Components"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "software-integrity-postinstall",
+      "title": "Install-time script or unsigned generated code changes trust boundary",
+      "severity": "high",
+      "kind": "dependency-policy",
+      "status": "active-adapter",
+      "standards": [
+        "owasp-top-10-2021:A08 Software and Data Integrity Failures",
+        "owasp-llm-top-10-2025:LLM03 Supply Chain",
+        "cwe:CWE-494 Download of Code Without Integrity Check"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "unrestricted-resource-consumption",
+      "title": "Unbounded resource consumption or missing rate limit",
+      "severity": "medium",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-api-top-10-2023:API4 Unrestricted Resource Consumption",
+        "owasp-llm-top-10-2025:LLM10 Unbounded Consumption",
+        "cwe:CWE-400 Uncontrolled Resource Consumption",
+        "cwe:CWE-770 Allocation of Resources Without Limits or Throttling"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "unsafe-consumption-of-apis",
+      "title": "Unsafe trust of third-party API response",
+      "severity": "medium",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-api-top-10-2023:API10 Unsafe Consumption of APIs",
+        "owasp-top-10-2021:A08 Software and Data Integrity Failures",
+        "cwe:CWE-345 Insufficient Verification of Data Authenticity"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "dangerous-instruction-edit",
+      "title": "Agent instruction file attempts to disable controls",
+      "severity": "critical",
+      "kind": "instruction-policy",
+      "status": "benchmarked",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM01 Prompt Injection",
+        "owasp-llm-top-10-2025:LLM06 Excessive Agency",
+        "cwe:CWE-94 Code Injection"
+      ],
+      "benchmark_case": true
+    },
+    {
+      "id": "prompt-injection",
+      "title": "Direct or indirect prompt injection reaches agent/tool decision",
+      "severity": "high",
+      "kind": "instruction-policy",
+      "status": "active-adapter",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM01 Prompt Injection",
+        "owasp-llm-top-10-2025:LLM05 Improper Output Handling",
+        "cwe:CWE-20 Improper Input Validation"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "persistent-memory-prompt-injection",
+      "title": "Persistent memory or retrieved content poisons future agent behavior",
+      "severity": "high",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM01 Prompt Injection",
+        "owasp-llm-top-10-2025:LLM08 Vector and Embedding Weaknesses",
+        "cwe:CWE-284 Improper Access Control"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "excessive-agency",
+      "title": "Agent has excessive tool functionality, permissions, or autonomy",
+      "severity": "high",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM06 Excessive Agency",
+        "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
+        "cwe:CWE-266 Incorrect Privilege Assignment"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "system-prompt-leakage",
+      "title": "System/developer prompt or hidden policy disclosed",
+      "severity": "medium",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM07 System Prompt Leakage",
+        "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
+        "cwe:CWE-200 Exposure of Sensitive Information"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "rag-vector-poisoning",
+      "title": "RAG/vector content poisoning or cross-tenant retrieval leak",
+      "severity": "high",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM08 Vector and Embedding Weaknesses",
+        "owasp-llm-top-10-2025:LLM01 Prompt Injection",
+        "cwe:CWE-284 Improper Access Control"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "broken-authentication",
+      "title": "Broken authentication or session verification",
+      "severity": "critical",
+      "kind": "cdsc-http",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A07 Identification and Authentication Failures",
+        "owasp-api-top-10-2023:API2 Broken Authentication",
+        "cwe:CWE-287 Improper Authentication"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "mass-assignment-bopla",
+      "title": "Broken object property authorization or mass assignment",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-api-top-10-2023:API3 Broken Object Property Level Authorization",
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "cwe:CWE-915 Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "excessive-data-exposure",
+      "title": "Excessive sensitive data exposure in API response",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-api-top-10-2023:API3 Broken Object Property Level Authorization",
+        "owasp-top-10-2021:A01 Broken Access Control",
+        "cwe:CWE-200 Exposure of Sensitive Information"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "business-flow-abuse",
+      "title": "Unrestricted access to sensitive business flow",
+      "severity": "medium",
+      "kind": "cdsc-http",
+      "status": "template-only",
+      "standards": [
+        "owasp-api-top-10-2023:API6 Unrestricted Access to Sensitive Business Flows",
+        "owasp-top-10-2021:A04 Insecure Design",
+        "cwe:CWE-840 Business Logic Errors"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "insecure-deserialization",
+      "title": "Unsafe deserialization of untrusted data",
+      "severity": "high",
+      "kind": "static-diff",
+      "status": "template-only",
+      "standards": [
+        "owasp-top-10-2021:A08 Software and Data Integrity Failures",
+        "cwe:CWE-502 Deserialization of Untrusted Data"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "llm-output-to-sensitive-sink",
+      "title": "LLM output reaches sensitive sink without validation",
+      "severity": "high",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM05 Improper Output Handling",
+        "owasp-top-10-2021:A03 Injection",
+        "cwe:CWE-20 Improper Input Validation"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "llm-data-model-poisoning",
+      "title": "Training, fine-tuning, model, or embedding data poisoning",
+      "severity": "high",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM04 Data and Model Poisoning",
+        "owasp-llm-top-10-2025:LLM03 Supply Chain",
+        "cwe:CWE-345 Insufficient Verification of Data Authenticity"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "llm-misinformation-critical-decision",
+      "title": "LLM misinformation used for critical decision",
+      "severity": "medium",
+      "kind": "agent-permission",
+      "status": "template-only",
+      "standards": [
+        "owasp-llm-top-10-2025:LLM09 Misinformation",
+        "owasp-top-10-2021:A04 Insecure Design",
+        "cwe:CWE-20 Improper Input Validation"
+      ],
+      "benchmark_case": false
+    }
+  ],
+  "limits": [
+    "benchmarked means covered by a committed benchmark case, not whole-class proof",
+    "active-demo means there is a runnable demo/proof path for at least one fixture",
+    "active-adapter means a policy/evidence adapter exists, but not every template in that family is benchmarked",
+    "template-only means the oracle contract is defined but needs an executable fixture or adapter before product claims"
+  ]
+}

@@ -1,0 +1,691 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-09T17:53:51.645Z",
+  "benchmark": {
+    "id": "code-audit-fixtures",
+    "hook": "yieldOS/plugins/yieldos/scripts/pre-install-gate.js",
+    "raw_logs_included": false
+  },
+  "cases": [
+    {
+      "id": "hardcoded-secret",
+      "description": "Hardcoded provider-looking API key",
+      "file": "src/config.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 108,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "hardcoded-secret",
+            "severity": "critical",
+            "file": "src/config.js",
+            "title": "Hardcoded secret introduced"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 204,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "missing-authz",
+      "description": "Sensitive route without auth guard",
+      "file": "src/routes.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 105,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "missing-authz",
+            "severity": "high",
+            "file": "src/routes.js",
+            "title": "Sensitive route without auth guard"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 200,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "sql-injection",
+      "description": "Interpolated SQL query",
+      "file": "src/db.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 101,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "sql-injection",
+            "severity": "high",
+            "file": "src/db.js",
+            "title": "Interpolated SQL query"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 184,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "shell-injection",
+      "description": "Interpolated shell command",
+      "file": "src/tasks.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 106,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "shell-injection",
+            "severity": "high",
+            "file": "src/tasks.js",
+            "title": "Interpolated shell command"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 193,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "path-traversal",
+      "description": "User-controlled filesystem path",
+      "file": "src/files.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 105,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "path-traversal",
+            "severity": "high",
+            "file": "src/files.js",
+            "title": "User-controlled filesystem path"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 197,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "unsafe-file-mutation",
+      "description": "User-controlled file mutation",
+      "file": "src/mutate.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 112,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "unsafe-file-mutation",
+            "severity": "high",
+            "file": "src/mutate.js",
+            "title": "User-controlled file mutation"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 202,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "ssrf",
+      "description": "User-controlled outbound request",
+      "file": "src/importer.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 98,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "ssrf",
+            "severity": "high",
+            "file": "src/importer.js",
+            "title": "User-controlled outbound request"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 191,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "dangerous-instruction-edit",
+      "description": "Agent instruction policy downgrade",
+      "file": "AGENTS.md",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 114,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "dangerous-instruction-edit",
+            "severity": "critical",
+            "file": "AGENTS.md",
+            "title": "Dangerous agent instruction edit"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 1,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 215,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "id": "removed-security-guard",
+      "description": "Existing authorization guard is removed from a sensitive route.",
+      "file": "src/routes.js",
+      "expected": "blocked",
+      "observed": "blocked",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 95,
+          "stderr_bytes": 0,
+          "stdout_lines": 2,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "removed-security-guard",
+            "severity": "high",
+            "file": "src/routes.js",
+            "title": "Security guard removed"
+          },
+          {
+            "rule_id": "missing-authz",
+            "severity": "high",
+            "file": "src/routes.js",
+            "title": "Sensitive route without auth guard"
+          }
+        ],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 2,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 279,
+          "stdout_lines": 1,
+          "stderr_lines": 5
+        }
+      }
+    },
+    {
+      "id": "sensitive-logging",
+      "description": "Sensitive value logged and removed by deterministic fixer",
+      "file": "src/logging.js",
+      "expected": "fixed",
+      "observed": "fixed",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 111,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-fix-applied",
+        "action": "block",
+        "findings": [],
+        "patch": {
+          "fixed": true,
+          "iterations": 1,
+          "files": [
+            "src/logging.js"
+          ],
+          "applied_findings": [
+            "sensitive-logging"
+          ],
+          "sources": [
+            "deterministic"
+          ]
+        },
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": true,
+          "remaining_findings": 0,
+          "patch_recorded": true,
+          "unsafe_pattern_removed": true
+        },
+        "output": {
+          "stdout_bytes": 354,
+          "stderr_bytes": 118,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "id": "open-redirect",
+      "description": "User-controlled redirect replaced by deterministic fixer",
+      "file": "src/redirect.js",
+      "expected": "fixed",
+      "observed": "fixed",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 108,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 2,
+        "verdict": "code-audit-fix-applied",
+        "action": "block",
+        "findings": [],
+        "patch": {
+          "fixed": true,
+          "iterations": 1,
+          "files": [
+            "src/redirect.js"
+          ],
+          "applied_findings": [
+            "open-redirect"
+          ],
+          "sources": [
+            "deterministic"
+          ]
+        },
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": true,
+          "remaining_findings": 0,
+          "patch_recorded": true,
+          "unsafe_pattern_removed": true
+        },
+        "output": {
+          "stdout_bytes": 354,
+          "stderr_bytes": 118,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "id": "safe-guarded-admin-route",
+      "description": "Admin route includes explicit auth guard",
+      "file": "src/routes.js",
+      "expected": "allowed",
+      "observed": "allowed",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 116,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 0,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 0,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "id": "safe-parameterized-sql",
+      "description": "SQL query uses placeholders and value array",
+      "file": "src/db.js",
+      "expected": "allowed",
+      "observed": "allowed",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 110,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 0,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 0,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "id": "safe-execfile-argv",
+      "description": "Command uses argv separation instead of shell interpolation",
+      "file": "src/tasks.js",
+      "expected": "allowed",
+      "observed": "allowed",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 109,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 0,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 0,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "id": "safe-agent-instruction-edit",
+      "description": "Instruction file preserves controls",
+      "file": "AGENTS.md",
+      "expected": "allowed",
+      "observed": "allowed",
+      "passed": true,
+      "control": {
+        "commit_exit_code": 0,
+        "committed": true,
+        "output": {
+          "stdout_bytes": 115,
+          "stderr_bytes": 0,
+          "stdout_lines": 3,
+          "stderr_lines": 0
+        }
+      },
+      "yieldos": {
+        "hook_exit_code": 0,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "patch": null,
+        "verification": {
+          "outcome_verified": true,
+          "file_changed": false,
+          "remaining_findings": 0,
+          "patch_recorded": false,
+          "unsafe_pattern_removed": null
+        },
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "total_cases": 15,
+    "passed_cases": 15,
+    "failed_cases": 0,
+    "expected": {
+      "blocked": 9,
+      "fixed": 2,
+      "allowed": 4
+    },
+    "observed": {
+      "blocked": 9,
+      "fixed": 2,
+      "allowed": 4
+    },
+    "expected_outcome_rate": 1,
+    "control_commit_success_rate": 1
+  }
+}

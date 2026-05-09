@@ -32,6 +32,7 @@ const WEB_TEMPLATES = [
     standards: [
       s('owasp-top-10-2021', 'A01 Broken Access Control', 'https://owasp.org/Top10/en/A01_2021-Broken_Access_Control/'),
       s('owasp-api-top-10-2023', 'API1 Broken Object Level Authorization', 'https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/'),
+      s('cwe', 'CWE-639 Authorization Bypass Through User-Controlled Key', 'https://cwe.mitre.org/data/definitions/639.html'),
       s('cwe', 'CWE-863 Incorrect Authorization', 'https://cwe.mitre.org/data/definitions/863.html'),
     ],
     signals: ['req.params.id or req.query.id used in data lookup', 'no owner/tenant predicate in query or post-fetch check'],
@@ -155,6 +156,25 @@ const WEB_TEMPLATES = [
     fixtures: ['delete arbitrary file attempt', 'write protected security evidence attempt', 'safe upload name'],
     metrics: ['protected_path_block_rate'],
     fixPatterns: ['server-generate storage keys', 'use safe path resolver and operation allowlist'],
+  }),
+  template({
+    id: 'dangerous-file-upload',
+    title: 'Dangerous file upload stored or served as executable content',
+    severity: 'high',
+    summary: 'A user-controlled upload can store scriptable or executable content in a public or trusted path without type, extension, content, and storage policy checks.',
+    standards: [
+      s('owasp-top-10-2021', 'A05 Security Misconfiguration', 'https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/'),
+      s('owasp-api-top-10-2023', 'API8 Security Misconfiguration', 'https://owasp.org/API-Security/editions/2023/en/0xa8-security-misconfiguration/'),
+      s('cwe', 'CWE-434 Unrestricted Upload of File with Dangerous Type', 'https://cwe.mitre.org/data/definitions/434.html'),
+    ],
+    signals: ['multipart upload writes original filename', 'public/static storage accepts html/svg/js/php', 'content type is trusted without sniffing or allowlist'],
+    evidence: ['upload field and filename', 'storage path', 'type/extension/content policy'],
+    pass: ['dangerous extensions and active content are rejected', 'stored files use server-generated names outside executable paths'],
+    fail: ['attacker uploads active content that can be served or executed by clients or infrastructure'],
+    negativeControls: ['image upload with validated magic bytes', 'private object storage with download-only content disposition'],
+    fixtures: ['svg with script payload', 'html upload to public directory', 'validated png control'],
+    metrics: ['dangerous_type_block_rate', 'safe_upload_pass_rate'],
+    fixPatterns: ['allowlist extensions and MIME after content inspection', 'store outside web root', 'serve with attachment disposition'],
   }),
   template({
     id: 'ssrf',

@@ -181,6 +181,7 @@ test('oracle template catalog covers current red-team rules and researched stand
     'shell-injection',
     'path-traversal',
     'unsafe-file-mutation',
+    'dangerous-file-upload',
     'ssrf',
     'open-redirect',
     'removed-security-guard',
@@ -193,12 +194,26 @@ test('oracle template catalog covers current red-team rules and researched stand
     'llm-output-to-sensitive-sink',
     'llm-data-model-poisoning',
     'llm-misinformation-critical-decision',
+    'persistent-memory-prompt-injection',
   ].forEach((id) => assert.equal(ids.has(id), true, `missing template for ${id}`));
 
   ['owasp-top-10-2021', 'owasp-api-top-10-2023', 'owasp-llm-top-10-2025', 'cwe'].forEach((family) => {
     assert.equal(standards.has(family), true, `missing standard family ${family}`);
   });
   assert.equal(catalog.length >= 30, true);
+});
+
+test('oracle template catalog includes expanded benchmark-hardening mappings', () => {
+  const idor = oracleTemplates.getTemplate('idor-bola');
+  const resource = oracleTemplates.getTemplate('unrestricted-resource-consumption');
+  const upload = oracleTemplates.getTemplate('dangerous-file-upload');
+  const memory = oracleTemplates.getTemplate('persistent-memory-prompt-injection');
+
+  assert.equal(idor.standards.some((standard) => standard.id.includes('CWE-639')), true);
+  assert.equal(resource.standards.some((standard) => standard.id.includes('CWE-770')), true);
+  assert.equal(upload.standards.some((standard) => standard.id.includes('CWE-434')), true);
+  assert.equal(memory.standards.some((standard) => standard.id.includes('LLM08')), true);
+  assert.equal(memory.kind, 'agent-permission');
 });
 
 test('oracle templates are benchmarkable acceptance contracts, not prose only', () => {

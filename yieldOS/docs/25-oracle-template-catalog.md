@@ -27,16 +27,16 @@ This is deliberately stricter than a scanner rule. A scanner can report a suspic
 
 ## Covered Families
 
-The current catalog has 33 templates:
+The current catalog has 35 templates:
 
 - Web/API authorization: `missing-authz`, `idor-bola`, `removed-security-guard`, `broken-authentication`.
 - API object properties and data exposure: `mass-assignment-bopla`, `excessive-data-exposure`.
 - Injection: `sql-injection`, `nosql-injection`, `shell-injection`, `xss-unsafe-html`.
-- File/network abuse: `path-traversal`, `unsafe-file-mutation`, `ssrf`, `open-redirect`, `csrf-missing-token`.
+- File/network abuse: `path-traversal`, `unsafe-file-mutation`, `dangerous-file-upload`, `ssrf`, `open-redirect`, `csrf-missing-token`.
 - Secrets and configuration: `sensitive-logging`, `hardcoded-secret`, `weak-crypto-random`, `security-misconfiguration`.
 - Supply chain and integrity: `vulnerable-outdated-component`, `software-integrity-postinstall`, `unsafe-consumption-of-apis`, `insecure-deserialization`.
 - Resource/cost/business controls: `unrestricted-resource-consumption`, `business-flow-abuse`.
-- Agentic/LLM risks: `dangerous-instruction-edit`, `prompt-injection`, `excessive-agency`, `system-prompt-leakage`, `rag-vector-poisoning`, `llm-output-to-sensitive-sink`, `llm-data-model-poisoning`, `llm-misinformation-critical-decision`.
+- Agentic/LLM risks: `dangerous-instruction-edit`, `prompt-injection`, `persistent-memory-prompt-injection`, `excessive-agency`, `system-prompt-leakage`, `rag-vector-poisoning`, `llm-output-to-sensitive-sink`, `llm-data-model-poisoning`, `llm-misinformation-critical-decision`.
 
 ## Research Sources
 
@@ -70,4 +70,4 @@ The catalog is not a claim that every template has a complete runnable oracle to
 - `cdsc-replay`
 - `cdsc-proof`
 
-Templates that are not yet runnable should still be used for benchmark design. A benchmark should clearly label each case as `active-adapter`, `active-demo`, or `template-only`.
+Templates that are not yet runnable should still be used for benchmark design. A benchmark should clearly label each case as `benchmarked`, `active-adapter`, `active-demo`, or `template-only`.

@@ -2,7 +2,6 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
@@ -339,8 +338,6 @@ function commandOutputEvidence(result) {
     stderr_bytes: Buffer.byteLength(stderr),
     stdout_lines: lineCount(stdout),
     stderr_lines: lineCount(stderr),
-    stdout_sha256: sha256(stdout),
-    stderr_sha256: sha256(stderr),
   };
 }
 
@@ -410,10 +407,6 @@ function lineCount(value) {
   const text = String(value || '');
   if (!text) return 0;
   return text.split('\n').filter(Boolean).length;
-}
-
-function sha256(value) {
-  return crypto.createHash('sha256').update(String(value || '')).digest('hex');
 }
 
 function truncate(value, max = 4000) {
