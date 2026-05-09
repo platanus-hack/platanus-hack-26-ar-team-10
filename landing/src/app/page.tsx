@@ -85,7 +85,7 @@ export default function Home() {
               command={installCommand}
               label="Install plugin"
               variant="dark"
-              className="command-pill command-pulse hidden h-9 max-w-[min(32vw,420px)] overflow-hidden px-3 py-2 font-mono text-xs text-zinc-300 lg:inline-flex"
+              className="command-pill command-pulse hidden h-8 max-w-[min(28vw,220px)] overflow-hidden px-2.5 py-1.5 font-mono text-[11px] text-zinc-300 lg:inline-flex"
             />
           </div>
         </div>
