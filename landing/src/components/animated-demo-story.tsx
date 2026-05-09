@@ -27,7 +27,7 @@ export function AnimatedDemoStory() {
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          <span className="absolute left-0 top-3 h-6 w-px bg-[linear-gradient(180deg,var(--signal-blue),var(--signal-red))] opacity-70 sm:top-4 sm:h-8" />
+          <span className="absolute left-0 top-3 h-6 w-px bg-[linear-gradient(180deg,var(--signal-bright),var(--signal-muted))] opacity-70 sm:top-4 sm:h-8" />
           <h3 className="font-mono text-[10px] leading-4 text-white sm:text-sm sm:leading-5">
             {item.step}. {item.title}
           </h3>

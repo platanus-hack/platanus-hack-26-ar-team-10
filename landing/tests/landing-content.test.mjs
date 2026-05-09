@@ -256,18 +256,24 @@ test("cinematic motion components and reduced motion styles are configured", () 
   );
   assert.ok(!scrollAwareHeader.includes("showArrow={false}"), "Expected install button arrow to be restored");
   assert.ok(!scrollAwareHeader.includes("install-marks"), "Expected icon marks to be removed from the install pill");
-  assert.ok(globals.includes("--signal-blue: #168cff"), "Expected blue security accent");
-  assert.ok(globals.includes("--signal-red: #ff2d45"), "Expected red security accent");
+  assert.ok(globals.includes("--signal-bright: #f4f4f5"), "Expected monochrome bright accent");
+  assert.ok(globals.includes("--signal-muted: #a1a1aa"), "Expected monochrome muted accent");
+  assert.ok(!globals.includes("#168cff"), "Expected blue accent value to be removed");
+  assert.ok(!globals.includes("#ff2d45"), "Expected red accent value to be removed");
+  assert.ok(!globals.includes("--signal-blue"), "Expected old blue variable names to be removed");
+  assert.ok(!globals.includes("--signal-red"), "Expected old red variable names to be removed");
   assert.ok(!globals.includes("--acid"), "Expected old acid accent variable to be removed");
   assert.ok(!globals.includes("e8ff00"), "Expected old acid yellow value to be removed");
   assert.ok(globals.includes(".pitch-section"), "Expected full-screen sections");
-  assert.ok(page.includes("theme-surface-blue"), "Expected blue-tinted surface sections");
-  assert.ok(page.includes("theme-surface-red"), "Expected red-tinted surface sections");
+  assert.ok(page.includes("theme-surface-light"), "Expected monochrome light surface sections");
+  assert.ok(page.includes("theme-surface-smoke"), "Expected monochrome smoke surface sections");
+  assert.ok(!page.includes("theme-surface-blue"), "Expected blue-tinted surface classes to be removed");
+  assert.ok(!page.includes("theme-surface-red"), "Expected red-tinted surface classes to be removed");
   assert.ok(globals.includes(".snap-deck::before"), "Expected page-wide grid layer");
   assert.ok(!globals.includes(".snap-deck::after"), "Expected page-wide random color grid cells to be removed");
   assert.ok(
-    globals.includes(".pitch-section:not(.security-hero)::before"),
-    "Expected section-level grid layer",
+    globals.includes(".pitch-section::before"),
+    "Expected section-level grid layer across every section",
   );
   assert.ok(
     !globals.includes(".pitch-section:not(.security-hero)::after"),
@@ -281,16 +287,12 @@ test("cinematic motion components and reduced motion styles are configured", () 
     !globals.includes("144px 72px"),
     "Expected varied active grid cell sizes to be removed",
   );
+  assert.ok(!page.includes("ascii-backdrop"), "Expected hero ascii background layer to be removed");
   assert.ok(
-    existsSync(join(root, "public/yieldos-ascii-bg.webp")),
-    "Expected optimized ascii background asset",
+    !globals.includes('url("/yieldos-ascii-bg.webp")'),
+    "Expected hero ascii asset to be removed from CSS",
   );
-  assert.ok(page.includes("ascii-backdrop"), "Expected decorative ascii background layer");
-  assert.ok(
-    globals.includes('url("/yieldos-ascii-bg.webp")'),
-    "Expected ascii asset to be used as background",
-  );
-  assert.ok(globals.includes("@keyframes ascii-presence"), "Expected static ascii background reveal");
+  assert.ok(!globals.includes("@keyframes ascii-presence"), "Expected ascii reveal keyframes to be removed");
   assert.ok(!globals.includes("ascii-drift"), "Expected lateral ascii background drift to be removed");
   assert.ok(
     globals.includes("min-height: max(100vh, 100dvh)"),
@@ -342,18 +344,18 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(!globals.includes(".orbital-dot"), "Expected endpoint orbit dot styling to be removed");
   assert.ok(!globals.includes("@keyframes orbital-roll"), "Expected roll-axis orbit animation to be removed");
   assert.ok(!globals.includes("rotateX(66deg)"), "Expected tilted roll-axis rotation to be removed");
-  assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
+  assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected monochrome pill sheen cycling");
   assert.ok(
-    globals.includes("rgba(var(--signal-blue-rgb), 0.34) 0%"),
-    "Expected liquid glass nav to start with blue",
+    globals.includes("rgba(var(--signal-bright-rgb), 0.34) 0%"),
+    "Expected liquid glass nav to start with a bright monochrome edge",
   );
   assert.ok(
     globals.includes("transparent 50%"),
     "Expected liquid glass nav to stay transparent in the center",
   );
   assert.ok(
-    globals.includes("rgba(var(--signal-red-rgb), 0.34) 100%"),
-    "Expected liquid glass nav to end with red",
+    globals.includes("rgba(var(--signal-muted-rgb), 0.34) 100%"),
+    "Expected liquid glass nav to end with a muted monochrome edge",
   );
   assert.ok(globals.includes("-webkit-backdrop-filter: blur(34px)"), "Expected Safari liquid glass blur");
   assert.ok(globals.includes("contrast(1.08)"), "Expected refractive liquid glass contrast");
