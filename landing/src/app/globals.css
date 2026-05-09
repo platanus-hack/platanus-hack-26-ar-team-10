@@ -77,44 +77,6 @@ html {
     linear-gradient(90deg, rgba(255, 255, 255, 0.052) 1px, transparent 1px);
 }
 
-.pitch-section:not(.security-hero)::after {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  content: "";
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.046), rgba(var(--signal-blue-rgb), 0.046)),
-    linear-gradient(rgba(var(--signal-red-rgb), 0.038), rgba(var(--signal-red-rgb), 0.038)),
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.032), rgba(var(--signal-blue-rgb), 0.032)),
-    linear-gradient(rgba(var(--signal-red-rgb), 0.03), rgba(var(--signal-red-rgb), 0.03)),
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.028), rgba(var(--signal-blue-rgb), 0.028));
-  background-position:
-    calc(50% - 360px) 18%,
-    calc(50% + 216px) 31%,
-    calc(50% + 504px) 57%,
-    calc(50% - 144px) 74%,
-    calc(50% - 576px) 46%;
-  background-repeat: no-repeat;
-  background-size:
-    72px 72px,
-    72px 72px,
-    144px 72px,
-    72px 144px,
-    72px 72px;
-  mask-image: linear-gradient(180deg, transparent, black 13%, black 88%, transparent);
-  mix-blend-mode: multiply;
-}
-
-.pitch-section.text-white:not(.security-hero)::after {
-  background-image:
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.046), rgba(var(--signal-blue-rgb), 0.046)),
-    linear-gradient(rgba(var(--signal-red-rgb), 0.04), rgba(var(--signal-red-rgb), 0.04)),
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.032), rgba(var(--signal-blue-rgb), 0.032)),
-    linear-gradient(rgba(var(--signal-red-rgb), 0.03), rgba(var(--signal-red-rgb), 0.03));
-  mix-blend-mode: screen;
-}
-
 .theme-surface-blue {
   background:
     radial-gradient(circle at 12% 18%, rgba(var(--signal-blue-rgb), 0.16), transparent 34%),
@@ -149,33 +111,6 @@ html {
   background-size: 72px 72px;
   mask-image: linear-gradient(180deg, transparent, black 10%, black 92%, transparent);
   opacity: 0.62;
-}
-
-.snap-deck::after {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  content: "";
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.048), rgba(var(--signal-blue-rgb), 0.048)),
-    linear-gradient(rgba(var(--signal-red-rgb), 0.042), rgba(var(--signal-red-rgb), 0.042)),
-    linear-gradient(rgba(var(--signal-blue-rgb), 0.03), rgba(var(--signal-blue-rgb), 0.03)),
-    linear-gradient(rgba(var(--signal-red-rgb), 0.028), rgba(var(--signal-red-rgb), 0.028));
-  background-position:
-    calc(50% - 504px) 144px,
-    calc(50% + 360px) 288px,
-    calc(50% + 72px) 648px,
-    calc(50% - 216px) 504px;
-  background-repeat: no-repeat;
-  background-size:
-    72px 72px,
-    144px 72px,
-    72px 144px,
-    72px 72px;
-  mask-image: linear-gradient(180deg, transparent, black 11%, black 88%, transparent);
-  mix-blend-mode: screen;
-  opacity: 0.58;
 }
 
 .snap-deck > section {
