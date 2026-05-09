@@ -10,6 +10,7 @@ const settingsValidator = require('./analyzers/settings-validator');
 const injectionScanner = require('./injection-scanner');
 const logger = require('./logger');
 const ui = require('./ui');
+const pentestAutoLauncher = require('./code-audit/pentest-loop/auto-launcher');
 
 function readStdinSync() {
   try { return fs.readFileSync(0, 'utf8'); }
@@ -89,6 +90,21 @@ async function main() {
       if (findings.length > 0) {
         ui.writeMessage(`AGENTS/CLAUDE.md cambió y contiene patrones sospechosos: ${c.file}`, { action: 'block' });
       }
+    }
+  }
+
+  // Auto-launch the adversarial pentest loop in the background.
+  // Disable with YIELDOS_PENTEST=off (e.g. in CI or while debugging).
+  if (process.env.YIELDOS_PENTEST !== 'off') {
+    try {
+      const r = pentestAutoLauncher.launch(projectRoot, { maxRounds: 50, convergenceClean: 5 });
+      if (r.status === 'launched') {
+        ui.writeMessage(`pentest loop launched in background (pid=${r.pid}). tail -f ${path.relative(projectRoot, r.log)} para ver el feed con colores.`);
+      } else if (r.status === 'already-running') {
+        ui.writeMessage(`pentest loop already running (pid=${r.pid}).`);
+      }
+    } catch (err) {
+      ui.writeMessage(`pentest auto-launch failed: ${err.message}`);
     }
   }
 
