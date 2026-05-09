@@ -46,7 +46,7 @@ export function ScrollAwareHeader() {
       className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-3 text-white"
       data-visible={visible}
     >
-      <div className="command-bar mx-auto grid h-14 w-full max-w-[min(940px,calc(100vw-2rem))] grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-hidden rounded-[23px] border border-white/15 bg-white/[0.075] px-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:h-[58px] sm:px-4">
+      <div className="command-bar liquid-glass-nav mx-auto grid h-14 w-full max-w-[min(940px,calc(100vw-2rem))] grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-hidden rounded-[23px] border border-white/15 bg-white/[0.075] px-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:h-[58px] sm:px-4">
         <nav
           className="intro-nav nav-left hidden items-center gap-1 text-xs font-semibold sm:flex"
           aria-label="Primary navigation"

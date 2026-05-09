@@ -345,16 +345,22 @@ html {
 
 .command-bar {
   position: relative;
+  isolation: isolate;
+  border-color: rgba(255, 255, 255, 0.34);
   color: #18181b;
   background:
-    linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.055), rgba(var(--signal-red-rgb), 0.045)),
-    rgba(255, 255, 255, 0.52);
-  backdrop-filter: blur(30px) saturate(165%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.18) 46%, rgba(255, 255, 255, 0.34)),
+    radial-gradient(circle at 15% 24%, rgba(var(--signal-blue-rgb), 0.2), transparent 32%),
+    radial-gradient(circle at 88% 46%, rgba(var(--signal-red-rgb), 0.16), transparent 30%),
+    rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(34px) saturate(190%) contrast(1.08);
+  backdrop-filter: blur(34px) saturate(190%) contrast(1.08);
   box-shadow:
-    0 16px 52px -44px rgba(0, 0, 0, 0.72),
-    0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    inset 0 -1px 0 rgba(24, 24, 27, 0.06);
+    0 18px 54px -42px rgba(0, 0, 0, 0.78),
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 24px rgba(255, 255, 255, 0.1);
 }
 
 .command-bar > * {
@@ -365,30 +371,33 @@ html {
 .command-bar::before,
 .command-bar::after {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 7.5rem;
   content: "";
   pointer-events: none;
-  opacity: 0.28;
 }
 
 .command-bar::before {
-  left: 0;
-  border-radius: inherit;
+  inset: -42% -5%;
+  z-index: 0;
   background:
-    radial-gradient(circle at 24% 38%, rgba(var(--signal-blue-rgb), 0.24), transparent 35%),
-    linear-gradient(135deg, rgba(var(--signal-blue-rgb), 0.18), transparent 72%);
-  mask-image: linear-gradient(90deg, black, transparent 82%);
+    radial-gradient(ellipse at 22% 18%, rgba(255, 255, 255, 0.72), transparent 19%),
+    radial-gradient(ellipse at 72% 86%, rgba(255, 255, 255, 0.28), transparent 22%),
+    linear-gradient(105deg, transparent 22%, rgba(255, 255, 255, 0.34) 37%, transparent 48%),
+    linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), transparent 45%, rgba(var(--signal-red-rgb), 0.1));
+  filter: blur(9px);
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  transform: translate3d(-1%, 0, 0);
 }
 
 .command-bar::after {
-  right: 0;
+  inset: 1px;
+  z-index: 0;
   border-radius: inherit;
   background:
-    radial-gradient(circle at 74% 42%, rgba(var(--signal-red-rgb), 0.2), transparent 38%),
-    linear-gradient(225deg, rgba(var(--signal-red-rgb), 0.16), transparent 72%);
-  mask-image: linear-gradient(270deg, black, transparent 82%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), transparent 18%),
+    linear-gradient(92deg, transparent 4%, rgba(255, 255, 255, 0.2) 18%, transparent 35%, transparent 64%, rgba(255, 255, 255, 0.22) 84%, transparent 96%);
+  opacity: 0.54;
+  mask-image: linear-gradient(180deg, black, transparent 72%);
 }
 
 .nav-left {
