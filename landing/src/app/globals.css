@@ -61,7 +61,7 @@ html {
 
 .hero-title {
   font-size: clamp(2.7rem, 5.4vw, 4.8rem);
-  max-width: 11ch;
+  max-width: 15ch;
   margin-right: auto;
   margin-left: auto;
 }
@@ -786,8 +786,8 @@ html {
   }
 
   .hero-title {
-    font-size: clamp(2.45rem, 10.4vw, 3rem);
-    max-width: 9.2ch;
+    font-size: clamp(2rem, 8.2vw, 2.45rem);
+    max-width: 15ch;
   }
 
   .review-path::before,
@@ -850,7 +850,7 @@ html {
   }
 
   .hero-title {
-    font-size: clamp(3.25rem, 4.3vw, 4.5rem);
+    font-size: clamp(3.15rem, 4.1vw, 4.35rem);
   }
 
 }

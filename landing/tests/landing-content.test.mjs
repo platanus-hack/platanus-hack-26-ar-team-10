@@ -25,8 +25,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
 
   [
     "yieldOS",
-    "A security gate for AI agent installs.",
-    "Claude Code tries to run something. yieldOS decides first.",
+    "A security gate before your AI agent runs anything.",
+    "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
     "PH26 Buenos Aires",
     "Install yieldOS",
     "View decision demo",
@@ -128,6 +128,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "PreToolUse gate",
     "allowlist-match",
     "npm install nanoid",
+    "A security gate for AI agent installs.",
+    "Claude Code tries to run something. yieldOS decides first.",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
@@ -264,7 +266,7 @@ test("layout metadata and Geist theme are configured for yieldOS", () => {
   const layout = read("src/app/layout.tsx");
   const globals = read("src/app/globals.css");
 
-  assert.ok(layout.includes("yieldOS — security gate for AI agent installs"));
+  assert.ok(layout.includes("yieldOS — security gate for AI agent actions"));
   assert.ok(
     layout.includes(
       "yieldOS allows, blocks or rewrites Claude Code dependency actions before execution.",

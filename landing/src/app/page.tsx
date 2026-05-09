@@ -7,7 +7,7 @@ import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
   "claude plugin marketplace add /path/to/vibeOS\nclaude plugin install yieldos@yieldos-marketplace";
-const heroTitle = "A security gate for AI agent installs.";
+const heroTitle = "A security gate before your AI agent runs anything.";
 
 const gatedVectors = [
   { title: "Packages", detail: "npm, pnpm, yarn, bun, pip, uv, cargo, go." },
@@ -81,12 +81,14 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex items-center justify-end gap-2">
-            <CopyCommandButton
-              command={installCommand}
-              label="Install plugin"
-              variant="dark"
-              className="command-pill command-pulse hidden h-8 max-w-[min(28vw,220px)] overflow-hidden px-2.5 py-1.5 font-mono text-[11px] text-zinc-300 lg:inline-flex"
-            />
+            <div className="hidden lg:block">
+              <CopyCommandButton
+                command={installCommand}
+                label="Install plugin"
+                variant="dark"
+                className="command-pill command-pulse h-8 max-w-[min(28vw,220px)] overflow-hidden px-2.5 py-1.5 font-mono text-[11px] text-zinc-300"
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -97,7 +99,7 @@ export default function Home() {
         className="pitch-section security-hero relative overflow-hidden bg-[#0e0e10] text-white"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="mx-auto flex min-w-0 max-w-3xl flex-col items-center text-center">
+          <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
             <MotionReveal
               className="mb-4 flex flex-wrap items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:mb-6 sm:text-[11px]"
               delay={0.06}
@@ -116,16 +118,16 @@ export default function Home() {
             </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
-              lines={["A security", "gate for", "AI agent", "installs."]}
+              lines={["A security gate", "before your AI", "agent runs", "anything."]}
               className="hero-title font-semibold leading-[0.92]"
             />
             <MotionReveal delay={0.72} immediate y={12}>
-              <p className="mx-auto mt-5 max-w-full text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-7">
-                Claude Code tries to run something. yieldOS decides first.
+              <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
+                Claude Code asks to install, edit or run tooling. yieldOS decides first.
               </p>
             </MotionReveal>
             <MotionReveal
-              className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-8"
+              className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-8 sm:flex-row"
               delay={0.86}
               immediate
               y={14}

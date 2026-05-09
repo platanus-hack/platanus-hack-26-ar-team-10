@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "yieldOS — security gate for AI agent installs",
+  title: "yieldOS — security gate for AI agent actions",
   description:
     "yieldOS allows, blocks or rewrites Claude Code dependency actions before execution.",
 };
