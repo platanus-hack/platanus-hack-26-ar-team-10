@@ -7,7 +7,6 @@ import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
   "claude plugin marketplace add /path/to/vibeOS\nclaude plugin install yieldos@yieldos-marketplace";
-const compactCommand = "claude plugin install yieldos@yieldos-marketplace";
 const heroTitle = "A security gate for AI agent installs.";
 
 const gatedVectors = [
@@ -84,7 +83,7 @@ export default function Home() {
           <div className="flex items-center justify-end gap-2">
             <div className="command-pill command-pulse hidden max-w-[min(32vw,420px)] items-center gap-2 overflow-hidden rounded-md border border-white/10 bg-white/[0.055] px-3 py-2 font-mono text-xs text-zinc-400 lg:flex">
               <span className="text-zinc-600">$</span>
-              <code className="truncate whitespace-nowrap">{compactCommand}</code>
+              <code className="truncate whitespace-nowrap">Install plugin</code>
             </div>
           </div>
         </div>
