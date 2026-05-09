@@ -86,7 +86,7 @@ export function CopyCommandButton({
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex h-11 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium transition ${focusStyle} ${variants[variant]} ${className}`}
+      className={`inline-flex h-11 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition ${focusStyle} ${variants[variant]} ${className}`}
       aria-label={`${label}: copy ${command}`}
     >
       <span aria-live="polite">{copied ? "Copied" : label}</span>

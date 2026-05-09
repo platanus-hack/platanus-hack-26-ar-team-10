@@ -172,6 +172,7 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
     "Expected clipboard write behavior",
   );
   assert.ok(component.includes("-&gt;"), "Expected install button arrow rendering");
+  assert.ok(component.includes("rounded-full"), "Expected softer install button corners");
   assert.ok(!component.includes("prefix?: ReactNode"), "Expected navbar-only prefix experiment to be removed");
   assert.ok(!component.includes("showArrow"), "Expected arrow toggle experiment to be removed");
 });
@@ -313,7 +314,10 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(!page.includes("$ claude plugin install yieldos@yieldos-marketplace"), "Expected raw hero command text to be replaced");
   assert.ok(globals.includes(".orbital-install-pill"), "Expected orbital install pill styling");
   assert.ok(globals.includes(".orbital-pill-aura"), "Expected orbiting texture layer");
-  assert.ok(globals.includes("@keyframes orbital-spin"), "Expected orbit animation");
+  assert.ok(!orbitalInstall.includes("orbital-dot"), "Expected endpoint orbit dots to be removed");
+  assert.ok(!globals.includes(".orbital-dot"), "Expected endpoint orbit dot styling to be removed");
+  assert.ok(globals.includes("@keyframes orbital-roll"), "Expected roll-axis orbit animation");
+  assert.ok(globals.includes("rotateX(66deg) rotateZ(360deg)"), "Expected tilted roll-axis rotation");
   assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
   assert.ok(
     globals.includes("linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075))"),

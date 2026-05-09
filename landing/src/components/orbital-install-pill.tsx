@@ -58,11 +58,7 @@ export function OrbitalInstallPill({ command }: OrbitalInstallPillProps) {
       onClick={handleCopy}
       aria-label="Copy yieldOS install command"
     >
-      <span className="orbital-pill-aura" aria-hidden="true">
-        <span className="orbital-dot orbital-dot-blue" />
-        <span className="orbital-dot orbital-dot-red" />
-        <span className="orbital-dot orbital-dot-quiet" />
-      </span>
+      <span className="orbital-pill-aura" aria-hidden="true" />
       <span className="orbital-pill-core">
         <span className="orbital-pill-prompt" aria-hidden="true">
           $
