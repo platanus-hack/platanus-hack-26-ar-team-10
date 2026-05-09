@@ -229,6 +229,42 @@ test('redTeam ignores markdown prose but keeps instruction policy coverage', () 
   assert.deepEqual(findings.map((finding) => finding.ruleId), ['dangerous-instruction-edit']);
 });
 
+test('redTeam ignores removed prose and string data that mention validation', () => {
+  const findings = codeAudit.redTeam({
+    files: ['landing/src/page.tsx', 'plugin.json', 'scripts/agent-pack-command.js'],
+    diff: [
+      'diff --git a/landing/src/page.tsx b/landing/src/page.tsx',
+      '+++ b/landing/src/page.tsx',
+      '@@',
+      '-still validates it against policy before it creates repo files.',
+      'diff --git a/plugin.json b/plugin.json',
+      '+++ b/plugin.json',
+      '@@',
+      '-  "description": "policy-validated team agent packs",',
+      'diff --git a/scripts/agent-pack-command.js b/scripts/agent-pack-command.js',
+      '+++ b/scripts/agent-pack-command.js',
+      '@@',
+      "-  description: 'Validate candidate security findings with bounded evidence.',",
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
+test('redTeam ignores removed scanner regex literals that mention guard words', () => {
+  const findings = codeAudit.redTeam({
+    files: ['scripts/code-audit/red-team.js'],
+    diff: [
+      'diff --git a/scripts/code-audit/red-team.js b/scripts/code-audit/red-team.js',
+      '+++ b/scripts/code-audit/red-team.js',
+      '@@',
+      '-  if (!/(req\\\\.user|requireAuth|authorize|isAdmin|requireRole|validate|schema\\\\.parse|z\\\\.object|permission|role)/i.test(item.code)) return null;',
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
 test('redTeam does not treat regex exec calls as shell execution', () => {
   const findings = codeAudit.redTeam({
     files: ['parser.js'],

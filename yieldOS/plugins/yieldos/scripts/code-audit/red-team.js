@@ -192,7 +192,11 @@ function openRedirect(item) {
 
 function removedValidation(item) {
   if (item.sign !== '-') return null;
-  if (!/(req\.user|requireAuth|authorize|isAdmin|requireRole|validate|schema\.parse|z\.object|permission|role)/i.test(item.code)) return null;
+  const code = codeShape(item.code);
+  const hasGuardToken = /(req\.user|requireAuth|authorize|isAdmin|requireRole|schema\.parse|z\.object|permission|role)/i.test(code)
+    || /\bvalidate[A-Za-z0-9_]*\s*\(/.test(code);
+  if (!hasGuardToken) return null;
+  if (!/(?:\bif\s*\(|\breturn\b|=>|[;{}()])/.test(code)) return null;
   return makeFinding(item, 'removed-security-guard', 'high', 'Security guard removed', {
     attackerControlledInput: 'External input may reach downstream code without validation.',
     vulnerableSink: 'Removed authentication, authorization, or validation guard.',
@@ -224,11 +228,15 @@ function isAuditExemptFile(file) {
 }
 
 function codeShape(code) {
-  return stripQuotedStrings(String(code || ''));
+  return stripRegexLiterals(stripQuotedStrings(String(code || '')));
 }
 
 function stripQuotedStrings(code) {
   return code.replace(/(['"])(?:\\.|(?!\1)[\s\S])*\1/g, '$1$1');
 }
 
-module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence, isAuditExemptFile, stripQuotedStrings };
+function stripRegexLiterals(code) {
+  return code.replace(/(^|[=(:,\[{!&|?;]\s*)\/(?:\\.|[^/\\\n])+\/[dgimsuy]*/g, '$1//');
+}
+
+module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence, isAuditExemptFile, stripQuotedStrings, stripRegexLiterals };
