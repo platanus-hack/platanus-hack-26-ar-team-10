@@ -9,6 +9,7 @@ const PROTECTED_PATTERNS = [
   /(?:^|\/)security\/dependency-events\.md$/,
   /(?:^|\/)security\/code-audit-events\.md$/,
   /(?:^|\/)security\/code-audit-state\.json$/,
+  /(?:^|\/)security\/audit-events\.md$/,
   /(?:^|\/)security\/yieldos-rewrites\.json$/,
   /(?:^|\/)security\/\.yieldos-instruction-hashes\.json$/,
 ];

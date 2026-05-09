@@ -2,7 +2,7 @@
 
 **One security gate for every dependency, skill, and instruction your AI agent touches — built for humans and AI agents.**
 
-yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy.
+yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec.
 
 → Full design documentation in [`docs/`](docs/README.md).
 
@@ -93,6 +93,24 @@ then yieldOS validates and verifies the result deterministically. CI never needs
 an LLM or model API key.
 
 Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
+
+## Audit command
+
+Run changed-code source review from Claude Code:
+
+```text
+/yieldos:audit
+```
+
+The default maps to Deepsec PR mode, `deepsec process --diff origin/main`.
+Use `/yieldos:audit --staged`, `--working`, `--base <ref>`, or explicit
+`--full` for full-repo scans. Deepsec is external tooling; `/yieldos:audit
+setup` prints setup instructions if it is not already installed.
+
+Audit command summaries are appended to `security/audit-events.md` without raw
+findings, prompts, full diffs, or secrets.
+
+Detail: [docs/13-audit-command.md](docs/13-audit-command.md).
 
 ---
 

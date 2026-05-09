@@ -8,7 +8,7 @@ yieldOS is a Claude Code security plugin that gates the risky things AI agents d
 
 It also protects credentials: prompts that look like they contain API keys trigger a no-echo security directive with a guided `.env` remediation panel, and reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar credential paths require the exact local authorization phrase `AUTORIZO A LEER LAS CREDENCIALES`.
 
-It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`.
+It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`. For user-invoked review, `/yieldos:audit` runs Deepsec on demand, scoped to changed code by default, and keeps a small command log at `security/audit-events.md`.
 
 Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
 
@@ -41,6 +41,25 @@ claude plugins update yieldos@yieldos
 ```
 
 Run `/reload-plugins` or restart Claude Code after updating so hooks switch to the new cached version.
+
+## Audit
+
+Run a changed-code source audit from Claude Code:
+
+```text
+/yieldos:audit
+```
+
+Useful variants:
+
+```text
+/yieldos:audit --staged
+/yieldos:audit --working
+/yieldos:audit --base origin/main
+/yieldos:audit --full
+```
+
+Deepsec is external tooling. If it is not installed, `/yieldos:audit setup` prints the setup steps.
 
 Maintainers publish a new plugin version from the repository root with:
 
