@@ -215,6 +215,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
   assert.ok(page.includes("intro-header"), "Expected staged topbar intro class");
   assert.ok(page.includes("intro-brand"), "Expected staged brand intro class");
+  assert.ok(page.includes("!h-7"), "Expected compact topbar install button");
+  assert.ok(page.includes("max-w-[132px]"), "Expected constrained topbar install button");
   assert.ok(globals.includes(".intro-header .command-bar"), "Expected topbar entry animation");
   assert.ok(globals.includes("@keyframes intro-topbar"), "Expected topbar keyframes");
   assert.ok(
