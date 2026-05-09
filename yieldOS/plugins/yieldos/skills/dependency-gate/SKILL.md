@@ -60,13 +60,18 @@ Whenever a tool call you ran was processed by the yieldOS gate (regardless of al
 
 The hook also returns the exact stamp string in `hookSpecificOutput.additionalContext` — when you receive that context, copy the stamp verbatim at the end of your reply.
 
-### Special handling for `prompt-credentials-blocked`
+### Special handling for `prompt-credentials-detected`
 
-If `additionalContext` contains the credential warning + remediation guide, your reply MUST:
-1. Surface the **alert block** (red) and the **camino correcto block** (green) **verbatim**, in that order.
-2. Do NOT mention or echo any value from the user's original prompt — even if Claude Code already showed the "Original prompt:" line on its own. Treat that value as compromised and never reproduce it in your own text.
-3. Do NOT offer to "fix" or "configure" anything for the user that requires the secret value to be in the conversation. Only suggest actions that put the value into `.env` directly (via `! open .env` / `! code .env` / `! echo 'NAME=VALOR' >> .env`, where the user types the value themselves at the shell, not in chat).
-4. End the reply with the stamp `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial`.
+When yieldOS detects a credential in a user prompt, the hook does NOT block the prompt — blocking would let the harness re-print the original prompt verbatim and re-leak the secret. Instead, the prompt passes and the hook injects a CRITICAL SECURITY DIRECTIVE in `additionalContext`.
+
+When you receive that directive, your reply MUST:
+1. Start with the two visual blocks (red ALERT + green GUIDE) surfaced verbatim, in order. They come pre-rendered in the directive.
+2. NEVER echo, quote, paraphrase, summarize, base64, hex, or otherwise reveal any portion of the credential value. Only the variable NAME is allowed in your reply.
+3. NEVER use the credential value in any tool call (Bash, Edit, Write). The value must not leave the chat.
+4. NEVER offer to "save", "configure", "test" or "use" the value. Only suggest the shell commands the directive provides (`! open .env`, `! echo '...' >> .env`, etc.) so the user types the value at the shell, not in chat.
+5. End with the stamp `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial` on its own diff block.
+
+If you fail any of rules 2-4, you have leaked the credential. Treat as non-negotiable.
 
 Format reference per verdict:
 

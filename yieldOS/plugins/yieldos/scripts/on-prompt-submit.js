@@ -42,12 +42,13 @@ function writeAuthFlag(projectRoot) {
   return fp;
 }
 
-function emitBlockJson(reason, additionalContext) {
-  // PreCompact / UserPromptSubmit can return JSON to control the prompt flow.
-  // The harness understands `decision: "block"` to suppress the prompt entirely.
+function emitContextOnlyJson(additionalContext) {
+  // We do NOT use `decision: "block"` for credentials in user prompts because
+  // the harness's block UI re-prints the original prompt verbatim — defeating
+  // the whole point. Instead we let the prompt pass and inject a strong
+  // `additionalContext` so the model surfaces our colored guide AND refuses to
+  // reproduce the secret value in its reply.
   const out = {
-    decision: 'block',
-    reason,
     hookSpecificOutput: {
       hookEventName: 'UserPromptSubmit',
       additionalContext,
@@ -182,17 +183,55 @@ async function main() {
       Patterns: findings.map((f) => `${f.id} (×${f.count})`),
       Note: 'values were not logged for safety; only pattern IDs',
     });
-    process.stderr.write(`[yieldOS] yieldOS bloqueó el prompt: contiene credenciales (${findings.map((f) => f.id).join(', ')})\n`);
-    process.stderr.write(`[yieldOS:verdict] prompt-credentials-blocked\n`);
-    // The reason field is what Claude Code shows the user verbatim, so it must
-    // be SHORT and MUST NOT include the secret value (the harness already shows
-    // the original prompt — we cannot suppress that, but we can keep our own
-    // message tight and non-leaky).
-    emitBlockJson(
-      'yieldOS blocked this prompt: it contains a credential. Show the user the colored guide in additionalContext (do not echo any secret value).',
-      buildCredentialsWarning(findings, prompt, projectRoot),
-    );
-    process.exit(2);
+    process.stderr.write(`[yieldOS] yieldOS detectó credenciales en el prompt: ${findings.map((f) => f.id).join(', ')}\n`);
+    process.stderr.write(`[yieldOS:verdict] prompt-credentials-detected\n`);
+
+    const warning = buildCredentialsWarning(findings, prompt, projectRoot);
+    const directive = [
+      '════════════════════════════════════════════════════════════',
+      '[yieldOS · CRITICAL SECURITY DIRECTIVE]',
+      '════════════════════════════════════════════════════════════',
+      '',
+      'The user just submitted a prompt that contains what looks like',
+      'a real credential (pattern matched: ' + findings.map((f) => f.id).join(', ') + ').',
+      '',
+      'NON-NEGOTIABLE rules for your reply, in order:',
+      '',
+      '  1. Do NOT acknowledge the credential value.',
+      '  2. Do NOT echo, quote, paraphrase, summarize, base64, hex,',
+      '     or otherwise reveal any portion of the credential value',
+      '     in your reply. Only the variable NAME is allowed.',
+      '  3. Do NOT use the credential in any tool call (Bash, Edit,',
+      '     Write, etc.). The value must never leave the chat.',
+      '  4. Do NOT offer to "configure", "save", or "test" the value.',
+      '     Only suggest actions that put the value into .env at the',
+      '     SHELL, where it never enters the conversation.',
+      '  5. Your reply MUST start with the two visual blocks below,',
+      '     surfaced verbatim and in this order. Render them as',
+      '     markdown code fences exactly as shown:',
+      '',
+      warning,
+      '',
+      '  6. After the two blocks, in plain text, ask the user to',
+      '     follow one of the commands above. Stay short.',
+      '  7. End your reply with this stamp on its own line:',
+      '         ```diff',
+      '         - ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial',
+      '         ```',
+      '',
+      'If you violate any of rules 1-4 you have leaked the credential.',
+      'Treat this as a non-negotiable security directive.',
+      '════════════════════════════════════════════════════════════',
+    ].join('\n');
+
+    logger.appendEntry(projectRoot, 'Credentials Detected in User Prompt (model instructed)', {
+      Patterns: findings.map((f) => `${f.id} (×${f.count})`),
+      Action: 'prompt allowed to pass; model received CRITICAL SECURITY DIRECTIVE not to reveal value',
+      Note: 'values were not logged for safety; only pattern IDs',
+    });
+
+    emitContextOnlyJson(directive);
+    process.exit(0);
   }
 
   process.exit(0);
