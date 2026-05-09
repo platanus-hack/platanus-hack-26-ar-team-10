@@ -52,18 +52,17 @@ const proofStats = [
 export default function Home() {
   return (
     <main className="snap-deck min-h-dvh bg-[#0e0e10] text-zinc-950">
-      <header className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-2 text-white">
-        <div className="command-bar mx-auto grid h-12 w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl sm:gap-3 sm:px-4 md:grid-cols-[1fr_auto_1fr]">
-          <div className="flex min-w-0 items-center gap-3">
-            <a
-              href="#hero"
-              className="intro-brand rounded-sm text-lg font-semibold leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10]"
-            >
-              yieldOS
-            </a>
-          </div>
+      <header className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-3 text-white">
+        <div className="command-bar mx-auto flex h-16 w-fit max-w-[calc(100vw-1.5rem)] items-center gap-2 overflow-hidden rounded-[22px] border border-white/15 bg-white/[0.075] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:gap-4 sm:px-2.5">
+          <a
+            href="#hero"
+            className="intro-brand brand-mark flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.1] font-mono text-[13px] font-semibold tracking-tight text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10]"
+            aria-label="yieldOS home"
+          >
+            y
+          </a>
           <nav
-            className="intro-nav hidden items-center gap-1 rounded-md border border-white/10 bg-white/[0.035] p-1 text-xs font-medium text-zinc-400 md:flex"
+            className="intro-nav hidden items-center gap-5 px-2 text-sm font-semibold text-zinc-300 md:flex"
             aria-label="Primary navigation"
           >
             {[
@@ -73,22 +72,20 @@ export default function Home() {
             ].map(([label, href]) => (
               <a
                 key={href}
-                className="rounded px-3 py-1.5 transition hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+                className="rounded px-1 py-2 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
                 href={href}
               >
                 {label}
               </a>
             ))}
           </nav>
-          <div className="flex items-center justify-end gap-2">
-            <div className="intro-install hidden lg:block">
-              <CopyCommandButton
-                command={installCommand}
-                label="Install plugin"
-                variant="dark"
-                className="command-pill command-pulse !h-7 max-w-[132px] !gap-1.5 overflow-hidden !rounded !px-2 !py-0 font-mono !text-[10px] leading-none text-zinc-300 [&_[aria-hidden=true]]:!text-[10px]"
-              />
-            </div>
+          <div className="intro-install flex items-center">
+            <CopyCommandButton
+              command={installCommand}
+              label="Install plugin"
+              variant="dark"
+              className="command-pill command-pulse !h-11 !w-[166px] max-w-none !gap-2 overflow-hidden whitespace-nowrap !rounded-xl !border-white/15 bg-[#1f1f25] !px-3 !py-0 font-mono !text-[12px] leading-none text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] [&>span]:whitespace-nowrap [&_[aria-hidden=true]]:!text-[12px]"
+            />
           </div>
         </div>
       </header>

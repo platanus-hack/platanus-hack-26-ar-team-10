@@ -105,19 +105,19 @@ html {
 .site-header {
   background: linear-gradient(
     180deg,
-    rgba(14, 14, 16, 0.72),
-    rgba(14, 14, 16, 0.32) 58%,
+    rgba(14, 14, 16, 0.24),
+    rgba(14, 14, 16, 0.1) 58%,
     rgba(14, 14, 16, 0)
   );
 }
 
 .command-bar {
-  background-color: rgba(22, 22, 25, 0.38);
-  backdrop-filter: blur(22px) saturate(145%);
+  background-color: rgba(82, 92, 122, 0.24);
+  backdrop-filter: blur(24px) saturate(150%);
   box-shadow:
-    0 20px 52px -42px rgba(0, 0, 0, 0.82),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.035);
+    0 18px 58px -32px rgba(0, 0, 0, 0.82),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.045);
 }
 
 .intro-header .command-bar {
@@ -803,9 +803,9 @@ html {
   }
 
   .command-bar {
-    width: calc(100vw - 1.5rem);
+    width: fit-content;
     max-width: calc(100vw - 1.5rem);
-    background-color: rgba(22, 22, 25, 0.34);
+    background-color: rgba(82, 92, 122, 0.22);
   }
 
   .security-hero .pitch-shell > * {
