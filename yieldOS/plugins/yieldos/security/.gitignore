@@ -1,0 +1,5 @@
+# yieldOS runtime artifacts — never commit these.
+# They are written by the plugin while running (locks, logs, events,
+# instruction-hashes, etc.) and are specific to one machine / one session.
+*
+!.gitignore
