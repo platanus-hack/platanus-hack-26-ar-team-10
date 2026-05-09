@@ -311,6 +311,11 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(scrollAwareHeader.includes("nav-brand"), "Expected centered brand region");
   assert.ok(scrollAwareHeader.includes("nav-right"), "Expected right nav action region");
   assert.ok(scrollAwareHeader.includes("nav-demo-button"), "Expected compact right-side demo CTA");
+  assert.ok(
+    globals.includes(".nav-demo-button {\n  border: 1px solid"),
+    "Expected demo nav CTA to be outline-only",
+  );
+  assert.ok(globals.includes(".nav-demo-button {\n  border: 1px solid") && globals.includes("background: transparent;"), "Expected demo nav CTA background to be removed");
   assert.ok(scrollAwareHeader.includes("liquid-glass-nav"), "Expected liquid glass nav styling hook");
   assert.ok(scrollAwareHeader.includes("max-w-[min(940px"), "Expected less dominant panoramic nav width");
   assert.ok(scrollAwareHeader.includes("h-14"), "Expected more compact panoramic nav height");

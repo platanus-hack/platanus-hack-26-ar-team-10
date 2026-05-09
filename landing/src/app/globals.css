@@ -418,13 +418,12 @@ html {
 }
 
 .nav-demo-button {
-  color: #ffffff;
-  background:
-    linear-gradient(100deg, rgba(var(--signal-blue-rgb), 0.68), rgba(var(--signal-violet-rgb), 0.34), rgba(var(--signal-red-rgb), 0.62)),
-    rgba(17, 17, 19, 0.78);
+  border: 1px solid rgba(24, 24, 27, 0.18);
+  color: rgba(17, 17, 19, 0.9);
+  background: transparent;
   box-shadow:
-    0 10px 26px -22px rgba(0, 0, 0, 0.72),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(24, 24, 27, 0.06);
 }
 
 .nav-demo-button span {
@@ -432,8 +431,9 @@ html {
   width: 1.15rem;
   height: 1.15rem;
   place-items: center;
+  border: 1px solid rgba(24, 24, 27, 0.18);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+  background: transparent;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   line-height: 1;
@@ -441,9 +441,11 @@ html {
 
 .nav-demo-button:hover {
   transform: translateY(-1px);
+  border-color: rgba(24, 24, 27, 0.28);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 14px 34px -24px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(24, 24, 27, 0.08);
 }
 
 .intro-header .command-bar {
