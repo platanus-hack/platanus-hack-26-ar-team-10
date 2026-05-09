@@ -72,7 +72,12 @@ export function ScrollAwareHeader({ installCommand }: ScrollAwareHeaderProps) {
             command={installCommand}
             label="Install plugin"
             variant="dark"
-            className="command-pill command-pulse !h-11 !w-[166px] max-w-none !gap-2 overflow-hidden whitespace-nowrap !rounded-xl !border-white/15 bg-[#1f1f25] !px-3 !py-0 font-mono !text-[12px] leading-none text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] [&>span]:whitespace-nowrap [&_[aria-hidden=true]]:!text-[12px]"
+            prefix={
+              <span className="install-prompt" aria-hidden="true">
+                $
+              </span>
+            }
+            className="install-nav-button command-pill command-pulse !h-11 !w-[184px] max-w-none !justify-between !gap-2 overflow-hidden whitespace-nowrap !rounded-full !px-2.5 !py-0 font-mono !text-[12px] leading-none text-zinc-100 [&>span]:whitespace-nowrap"
           />
         </div>
       </div>

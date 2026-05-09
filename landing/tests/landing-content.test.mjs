@@ -167,8 +167,8 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
     component.includes("navigator.clipboard.writeText"),
     "Expected clipboard write behavior",
   );
+  assert.ok(component.includes("prefix?: ReactNode"), "Expected optional button prefix");
   assert.ok(component.includes("-&gt;"), "Expected install button arrow rendering");
-  assert.ok(!component.includes("prefix?: ReactNode"), "Expected prefix-only install experiment to be removed");
   assert.ok(!component.includes("showArrow"), "Expected arrow toggle experiment to be removed");
 });
 
@@ -281,10 +281,13 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(scrollAwareHeader.includes("intro-header"), "Expected staged topbar intro class");
   assert.ok(!scrollAwareHeader.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
   assert.ok(!scrollAwareHeader.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
-  assert.ok(scrollAwareHeader.includes("!h-11"), "Expected previous compact topbar install button");
-  assert.ok(scrollAwareHeader.includes("!w-[166px]"), "Expected previous fixed install pill");
+  assert.ok(scrollAwareHeader.includes("install-nav-button"), "Expected custom install CTA styling hook");
+  assert.ok(scrollAwareHeader.includes("install-prompt"), "Expected terminal prompt inside install CTA");
+  assert.ok(scrollAwareHeader.includes("!h-11"), "Expected compact topbar install button");
+  assert.ok(scrollAwareHeader.includes("!w-[184px]"), "Expected refined fixed install pill");
   assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
   assert.ok(!globals.includes(".install-marks"), "Expected install pill mark styling to be removed");
+  assert.ok(globals.includes(".install-prompt"), "Expected install CTA prompt mark styling");
   assert.ok(
     globals.includes("linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075))"),
     "Expected capsule glass nav to use blue/red theme",
