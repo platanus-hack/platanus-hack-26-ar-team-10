@@ -141,6 +141,16 @@ function buildPentestLiveDirective(markdown) {
   ].join('\n');
 }
 
+function pentestLoopActive(projectRoot) {
+  try {
+    const statePath = path.join(projectRoot, 'security', 'pentest-state.json');
+    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    return state && state.active === true;
+  } catch (_) {
+    return false;
+  }
+}
+
 async function main() {
   const input = parseInput(readStdinSync());
   const projectRoot = projectCwd(input);
@@ -188,6 +198,12 @@ async function main() {
 
   try {
     const { events, offset } = pentestEventReader.readNewEvents(projectRoot);
+    if (!pentestLoopActive(projectRoot)) {
+      if (events.length > 0) {
+        pentestEventReader.writeCursor(projectRoot, offset);
+      }
+      process.exit(0);
+    }
     if (pentestEventReader.hasUserVisibleContent(events)) {
       const markdown = pentestEventReader.formatForChat(events);
       pentestEventReader.writeCursor(projectRoot, offset);
