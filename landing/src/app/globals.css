@@ -120,6 +120,32 @@ html {
     inset 0 -1px 0 rgba(255, 255, 255, 0.035);
 }
 
+.intro-header .command-bar {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.985);
+  animation: intro-topbar 640ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+}
+
+.intro-brand,
+.intro-nav,
+.intro-install {
+  opacity: 0;
+  transform: translateY(-5px);
+  animation: intro-part 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.intro-brand {
+  animation-delay: 300ms;
+}
+
+.intro-nav {
+  animation-delay: 380ms;
+}
+
+.intro-install {
+  animation-delay: 460ms;
+}
+
 .command-pill {
   position: relative;
 }
@@ -672,6 +698,30 @@ html {
   }
 }
 
+@keyframes intro-topbar {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes intro-part {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes frame-breathe {
   0%,
   100% {
@@ -878,5 +928,14 @@ html {
 
   html {
     scroll-snap-type: none;
+  }
+
+  .intro-header .command-bar,
+  .intro-brand,
+  .intro-nav,
+  .intro-install {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }

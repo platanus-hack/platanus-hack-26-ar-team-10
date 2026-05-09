@@ -181,8 +181,16 @@ test("cinematic motion components and reduced motion styles are configured", () 
     "Expected calmer typewriter timing",
   );
   assert.ok(
+    page.includes("startDelayMs={900}"),
+    "Expected hero typewriter to wait for the intro hierarchy",
+  );
+  assert.ok(
     typewriterTitle.includes('displayLines.join("\\n")'),
     "Expected stable pre-defined typewriter lines",
+  );
+  assert.ok(
+    reveal.includes("animate={reduceMotion || !immediate ? undefined : { opacity: 1, y: 0 }}"),
+    "Expected immediate reveals to animate on page load",
   );
   assert.ok(
     globals.includes(".hero-typewriter-line"),
@@ -205,6 +213,10 @@ test("cinematic motion components and reduced motion styles are configured", () 
   );
   assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
+  assert.ok(page.includes("intro-header"), "Expected staged topbar intro class");
+  assert.ok(page.includes("intro-brand"), "Expected staged brand intro class");
+  assert.ok(globals.includes(".intro-header .command-bar"), "Expected topbar entry animation");
+  assert.ok(globals.includes("@keyframes intro-topbar"), "Expected topbar keyframes");
   assert.ok(
     globals.includes("backdrop-filter: blur"),
     "Expected glass topbar backdrop blur",

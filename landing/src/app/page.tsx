@@ -52,18 +52,18 @@ const proofStats = [
 export default function Home() {
   return (
     <main className="snap-deck min-h-dvh bg-[#0e0e10] text-zinc-950">
-      <header className="site-header fixed inset-x-0 top-0 z-50 px-3 py-2 text-white">
+      <header className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-2 text-white">
         <div className="command-bar mx-auto grid h-12 w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl sm:gap-3 sm:px-4 md:grid-cols-[1fr_auto_1fr]">
           <div className="flex min-w-0 items-center gap-3">
             <a
               href="#hero"
-              className="rounded-sm text-lg font-semibold leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10]"
+              className="intro-brand rounded-sm text-lg font-semibold leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10]"
             >
               yieldOS
             </a>
           </div>
           <nav
-            className="hidden items-center gap-1 rounded-md border border-white/10 bg-white/[0.035] p-1 text-xs font-medium text-zinc-400 md:flex"
+            className="intro-nav hidden items-center gap-1 rounded-md border border-white/10 bg-white/[0.035] p-1 text-xs font-medium text-zinc-400 md:flex"
             aria-label="Primary navigation"
           >
             {[
@@ -81,7 +81,7 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex items-center justify-end gap-2">
-            <div className="hidden lg:block">
+            <div className="intro-install hidden lg:block">
               <CopyCommandButton
                 command={installCommand}
                 label="Install plugin"
@@ -102,7 +102,7 @@ export default function Home() {
           <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
             <MotionReveal
               className="mb-4 flex flex-wrap items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:mb-6 sm:text-[11px]"
-              delay={0.06}
+              delay={0.38}
               immediate
               y={10}
             >
@@ -115,15 +115,16 @@ export default function Home() {
               text={heroTitle}
               lines={["A security gate", "before your AI", "agent runs", "anything."]}
               className="hero-title font-semibold leading-[0.92]"
+              startDelayMs={900}
             />
-            <MotionReveal delay={0.72} immediate y={12}>
+            <MotionReveal delay={3.05} immediate y={12}>
               <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
                 Claude Code asks to install, edit or run tooling. yieldOS decides first.
               </p>
             </MotionReveal>
             <MotionReveal
               className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-8 sm:flex-row"
-              delay={0.86}
+              delay={3.28}
               immediate
               y={14}
             >
