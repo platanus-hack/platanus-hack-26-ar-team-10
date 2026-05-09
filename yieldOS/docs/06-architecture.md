@@ -26,6 +26,11 @@ plugins/yieldos/
 │   ├── post-install-audit.js          PostToolUse entrypoint
 │   ├── on-session-start.js            SessionStart entrypoint
 │   ├── on-prompt-submit.js            UserPromptSubmit entrypoint
+│   ├── yieldos-impact-trigger.js      PostToolUse impact event bridge
+│   ├── audit-command.js               /yieldos:audit Deepsec wrapper
+│   ├── oracle-command.js              /yieldos:oracle runner
+│   ├── init-command.js                /yieldos:init generator
+│   ├── agent-pack-command.js          /yieldos:pack compiler
 │   ├── decide.js                      Decision tree (5-check flow)
 │   ├── policy-fetcher.js              Online → runtime cache → shipped
 │   ├── policy-lookup.js               Allowlist/denylist/native lookups
@@ -74,8 +79,9 @@ plugins/yieldos/
 Registered in `hooks/hooks.json`:
 
 ```
-PreToolUse        Bash | Write | Edit  → pre-install-gate.js
-PostToolUse       Bash                 → post-install-audit.js
+PreToolUse        Bash | Write | Edit | Read  → pre-install-gate.js
+PostToolUse       Bash                        → post-install-audit.js, yieldos-impact-trigger.js
+PostToolUse       Write | Edit | NotebookEdit → yieldos-impact-trigger.js
 SessionStart                           → on-session-start.js
 UserPromptSubmit                       → on-prompt-submit.js
 ```
@@ -162,6 +168,23 @@ PostToolUse hook fires
   └─► logger.logTransitiveAudit()
 ```
 
+## Runtime sequence — credential read
+
+```
+agent: Read({file_path: "/proj/.env"})
+  │
+  ↓
+PreToolUse hook
+  │
+  ├─► credentials-scanner.isCredentialsPath() → yes
+  │
+  ├─► authorization flag active?
+  │       yes → allow, log credentials-read-authorized
+  │       no  → block, tell the user the exact local authorization phrase
+  │
+  └─► exit 2 unless user has explicitly authorized the read
+```
+
 ## Runtime sequence — instruction file edit
 
 ```
@@ -217,6 +240,8 @@ Headings used:
 - `Blocked Instruction File Edit (injection)`
 - `Required Settings Applied`
 - `Instruction File Change Detected`
+- `Credentials Read Blocked (no authorization)`
+- `Credentials Read Allowed (under active authorization)`
 
 Secret patterns redacted before write:
 - `password|secret|token|api_key|access_key|private_key=...`

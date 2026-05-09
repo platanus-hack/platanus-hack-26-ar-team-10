@@ -32,9 +32,10 @@ export default function AgentPacksPage() {
             </h1>
           </div>
           <p className="max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base sm:leading-7">
-            Select the agents, skills, MCPs, and safety profiles your team wants
-            approved. The download is only a source manifest; the yieldOS CLI
-            still validates it against policy before it creates repo files.
+            Select the agents, skills, MCPs, safety profiles, playbooks, and
+            approved oracles your team wants. The download is only a source
+            manifest; the yieldOS CLI validates it before writing repo files,
+            and oracles run through yieldos-oracle, hooks, or CI.
           </p>
         </div>
 

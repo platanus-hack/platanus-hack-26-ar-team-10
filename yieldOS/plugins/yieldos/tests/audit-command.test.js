@@ -108,6 +108,20 @@ test('runAudit prints setup guidance when deepsec is missing', () => {
   assert.equal(result.message.includes('npx deepsec init'), true);
 });
 
+test('findDeepsec ignores repo-local Deepsec unless explicitly trusted', () => {
+  const root = tmpProject();
+  const localBin = path.join(root, '.deepsec', 'node_modules', '.bin', 'deepsec');
+  fs.mkdirSync(path.dirname(localBin), { recursive: true });
+  fs.writeFileSync(localBin, '#!/bin/sh\nexit 0\n');
+
+  const untrusted = audit.findDeepsec(root, { PATH: '' });
+  const trusted = audit.findDeepsec(root, { PATH: '', YIELDOS_TRUST_PROJECT_DEEPSEC: '1' });
+
+  assert.equal(untrusted, null);
+  assert.equal(trusted.source, '.deepsec');
+  assert.equal(trusted.command, localBin);
+});
+
 test('runAudit emits full-scan notice before running deepsec', () => {
   const root = tmpProject();
   const events = [];

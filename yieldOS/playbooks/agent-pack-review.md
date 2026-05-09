@@ -43,7 +43,8 @@ Use this playbook when a change introduces or modifies `yield.agent-pack.yaml`, 
 4. Verify generated adapter files match the target agent's real capability. Mark guidance-only outputs separately from hook-enforced outputs.
 5. Scan instruction text for policy weakening, prompt-injection language, secret-handling regressions, and hidden bypass instructions.
 6. Confirm the pack lock records policy version, generated file hashes, skill hashes where available, MCP approved tools, and generated timestamp.
-7. If vector recommendations are referenced, verify they resolved to explicit reviewed manifest entries before becoming active.
+7. Run or require `yieldos-pack verify --pack yield.agent-pack.yaml` so active generated files require a lock and are compared against lock metadata plus recorded hashes.
+8. If vector recommendations are referenced, verify they resolved to explicit reviewed manifest entries before becoming active.
 
 ## Output Contract
 

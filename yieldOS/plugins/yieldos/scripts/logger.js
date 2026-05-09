@@ -11,7 +11,7 @@ const SECRET_PATTERNS = [
   /Bearer\s+[A-Za-z0-9._\-]+/g,
   /https?:\/\/[^\s/]*:[^\s/@]+@[^\s]+/g,
   /xox[abprs]-[A-Za-z0-9-]+/g,
-  /sk-[A-Za-z0-9]{20,}/g,
+  /sk-[A-Za-z0-9_-]{16,}/g,
   /ghp_[A-Za-z0-9]{20,}/g,
 ];
 
@@ -32,14 +32,39 @@ function nowStamp() {
 
 function ensureLogDir(projectRoot) {
   const logPath = path.join(projectRoot, DEFAULTS.log.path);
+  assertSafeProjectLogPath(projectRoot, logPath);
   fs.mkdirSync(path.dirname(logPath), { recursive: true });
   return logPath;
 }
 
 function ensureSecurityLog(projectRoot, filename) {
   const logPath = path.join(projectRoot, 'security', filename);
+  assertSafeProjectLogPath(projectRoot, logPath);
   fs.mkdirSync(path.dirname(logPath), { recursive: true });
   return logPath;
+}
+
+function assertSafeProjectLogPath(projectRoot, logPath) {
+  const root = path.resolve(projectRoot);
+  const target = path.resolve(logPath);
+  const prefix = root.endsWith(path.sep) ? root : `${root}${path.sep}`;
+  if (target !== root && !target.startsWith(prefix)) throw new Error('security log path must stay inside the project');
+  assertNoSymlinkTraversal(root, target, 'security log path');
+}
+
+function assertNoSymlinkTraversal(root, target, label) {
+  const relative = path.relative(root, target);
+  if (!relative) return;
+  let current = root;
+  for (const part of relative.split(path.sep).filter(Boolean)) {
+    current = path.join(current, part);
+    try {
+      if (fs.lstatSync(current).isSymbolicLink()) throw new Error(`${label} must not traverse a symlink`);
+    } catch (err) {
+      if (err.code === 'ENOENT') break;
+      throw err;
+    }
+  }
 }
 
 function stringifyItem(v) {

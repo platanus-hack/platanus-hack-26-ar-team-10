@@ -18,6 +18,7 @@ function redTeam(input) {
   const lines = parseChangedLines(input.diff || '');
   const findings = [];
   for (const item of lines) {
+    if (isAuditExemptFile(item.file)) continue;
     for (const finder of FINDERS) {
       const finding = finder(item, input);
       if (finding && hasExploitEvidence(finding)) findings.push(finding);
@@ -93,10 +94,10 @@ function hardcodedSecret(item) {
 
 function missingAuthz(item) {
   if (item.sign !== '+') return null;
-  const route = /\b(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/.exec(item.code);
+  const route = /^\s*(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/.exec(item.code);
   if (!route) return null;
   if (!/(admin|private|settings|billing|users|account|dashboard)/i.test(route[1])) return null;
-  if (/(requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)/.test(item.code)) return null;
+  if (hasRouteAuthGuard(item.code)) return null;
   return makeFinding(item, 'missing-authz', 'high', 'Sensitive route without auth guard', {
     attackerControlledInput: 'Any unauthenticated HTTP client can request the new sensitive route.',
     vulnerableSink: 'Route handler for privileged application data or actions.',
@@ -104,6 +105,82 @@ function missingAuthz(item) {
     impact: 'Unauthorized access to administrative or private user data.',
     fixStrategy: 'manual',
   });
+}
+
+const AUTH_GUARD_RE = /\b(?:requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)\b/;
+
+function hasRouteAuthGuard(line) {
+  const args = routeCallArgs(line);
+  if (!args || args.length < 2) return false;
+
+  for (const arg of args.slice(1)) {
+    if (isRouteHandler(arg)) return false;
+    if (AUTH_GUARD_RE.test(arg)) return true;
+  }
+  return false;
+}
+
+function isRouteHandler(arg) {
+  const text = String(arg || '').trim();
+  return text.includes('=>') || /^async\s+function\b/.test(text) || /^function\b/.test(text);
+}
+
+function routeCallArgs(line) {
+  const match = /\b(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(/i.exec(line || '');
+  if (!match) return null;
+  return splitTopLevelArgs(String(line).slice(match.index + match[0].length));
+}
+
+function splitTopLevelArgs(input) {
+  const args = [];
+  let current = '';
+  let depth = 0;
+  let quote = '';
+  let escaped = false;
+
+  for (const ch of input) {
+    if (escaped) {
+      current += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && quote) {
+      current += ch;
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      current += ch;
+      if (ch === quote) quote = '';
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      quote = ch;
+      current += ch;
+      continue;
+    }
+    if (ch === '(' || ch === '[' || ch === '{') {
+      depth += 1;
+      current += ch;
+      continue;
+    }
+    if (ch === ')' || ch === ']' || ch === '}') {
+      if (depth === 0 && ch === ')') {
+        if (current.trim()) args.push(current.trim());
+        return args;
+      }
+      depth = Math.max(0, depth - 1);
+      current += ch;
+      continue;
+    }
+    if (ch === ',' && depth === 0) {
+      args.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  return args;
 }
 
 function sqlInjection(item) {
@@ -121,8 +198,9 @@ function sqlInjection(item) {
 
 function shellInjection(item) {
   if (item.sign !== '+') return null;
-  if (!/\b(?:exec|execSync)\s*\(/.test(item.code)) return null;
-  if (!/(\+|\$\{|\breq\.|\bprocess\.argv\b)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/(?:^|[^\w.])(?:exec|execSync)\s*\(/.test(code)) return null;
+  if (!/(\+|\$\{|\breq\.|\bprocess\.argv\b)/.test(code)) return null;
   return makeFinding(item, 'shell-injection', 'high', 'Interpolated shell command', {
     attackerControlledInput: 'Request, argument, or variable data can reach a shell command.',
     vulnerableSink: 'child_process shell execution.',
@@ -134,8 +212,9 @@ function shellInjection(item) {
 
 function pathTraversal(item) {
   if (item.sign !== '+') return null;
-  if (!/\bpath\.join\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bpath\.join\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'path-traversal', 'high', 'User-controlled filesystem path', {
     attackerControlledInput: 'Route, query, body, or CLI input controls a path segment.',
     vulnerableSink: 'Filesystem path construction.',
@@ -147,8 +226,9 @@ function pathTraversal(item) {
 
 function unsafeFileMutation(item) {
   if (item.sign !== '+') return null;
-  if (!/\bfs\.(?:writeFile|writeFileSync|rm|rmSync|unlink|unlinkSync)\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bfs\.(?:writeFile|writeFileSync|rm|rmSync|unlink|unlinkSync)\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'unsafe-file-mutation', 'high', 'User-controlled file mutation', {
     attackerControlledInput: 'Route, query, body, or CLI input controls the file target.',
     vulnerableSink: 'Filesystem write or delete operation.',
@@ -160,8 +240,9 @@ function unsafeFileMutation(item) {
 
 function ssrf(item) {
   if (item.sign !== '+') return null;
-  if (!/\bfetch\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bfetch\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'ssrf', 'high', 'User-controlled outbound request', {
     attackerControlledInput: 'Request or argument data controls the outbound URL.',
     vulnerableSink: 'Server-side HTTP request.',
@@ -173,8 +254,9 @@ function ssrf(item) {
 
 function openRedirect(item) {
   if (item.sign !== '+') return null;
-  if (!/\bres\.redirect\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bres\.redirect\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'open-redirect', 'medium', 'User-controlled redirect target', {
     attackerControlledInput: 'Request data controls the redirect destination.',
     vulnerableSink: 'HTTP redirect response.',
@@ -186,7 +268,11 @@ function openRedirect(item) {
 
 function removedValidation(item) {
   if (item.sign !== '-') return null;
-  if (!/(req\.user|requireAuth|authorize|isAdmin|requireRole|validate|schema\.parse|z\.object|permission|role)/i.test(item.code)) return null;
+  const code = codeShape(item.code);
+  const hasGuardToken = /(req\.user|requireAuth|authorize|isAdmin|requireRole|schema\.parse|z\.object|permission|role)/i.test(code)
+    || /\bvalidate[A-Za-z0-9_]*\s*\(/.test(code);
+  if (!hasGuardToken) return null;
+  if (!/(?:\bif\s*\(|\breturn\b|=>|[;{}()])/.test(code)) return null;
   return makeFinding(item, 'removed-security-guard', 'high', 'Security guard removed', {
     attackerControlledInput: 'External input may reach downstream code without validation.',
     vulnerableSink: 'Removed authentication, authorization, or validation guard.',
@@ -209,4 +295,33 @@ function dangerousInstructionEdit(item) {
   });
 }
 
-module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence };
+function isAuditExemptFile(file) {
+  const normalized = String(file || '').replace(/\\/g, '/');
+  if (/(?:^|\/)(?:AGENTS|CLAUDE)\.md$/i.test(normalized) || /\.cursorrules$/i.test(normalized)) return false;
+  return /(?:^|\/)(?:tests?|__tests__|fixtures?)\//.test(normalized)
+    || /\.test\.[cm]?[jt]sx?$/.test(normalized)
+    || /\.(?:md|mdx|txt)$/i.test(normalized);
+}
+
+function codeShape(code) {
+  return stripRegexLiterals(stripQuotedStrings(String(code || '')));
+}
+
+function stripQuotedStrings(code) {
+  return code.replace(/(['"])(?:\\.|(?!\1)[\s\S])*\1/g, '$1$1');
+}
+
+function stripRegexLiterals(code) {
+  return code.replace(/(^|[=(:,\[{!&|?;]\s*)\/(?:\\.|[^/\\\n])+\/[dgimsuy]*/g, '$1//');
+}
+
+module.exports = {
+  redTeam,
+  parseAddedLines,
+  parseChangedLines,
+  hasExploitEvidence,
+  hasRouteAuthGuard,
+  isAuditExemptFile,
+  stripQuotedStrings,
+  stripRegexLiterals,
+};

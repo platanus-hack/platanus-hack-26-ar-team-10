@@ -193,12 +193,12 @@ function statusResult(projectRoot, options) {
 }
 
 function findDeepsec(projectRoot, env = process.env) {
-  const localBin = path.join(projectRoot, '.deepsec', 'node_modules', '.bin', 'deepsec');
-  if (fs.existsSync(localBin)) {
-    return { command: localBin, argsPrefix: [], cwd: path.join(projectRoot, '.deepsec'), source: '.deepsec' };
-  }
   const found = findOnPath('deepsec', env.PATH || process.env.PATH || '');
   if (found) return { command: found, argsPrefix: [], cwd: projectRoot, source: 'PATH' };
+  const localBin = path.join(projectRoot, '.deepsec', 'node_modules', '.bin', 'deepsec');
+  if (env.YIELDOS_TRUST_PROJECT_DEEPSEC === '1' && fs.existsSync(localBin)) {
+    return { command: localBin, argsPrefix: [], cwd: path.join(projectRoot, '.deepsec'), source: '.deepsec' };
+  }
   return null;
 }
 
@@ -266,6 +266,7 @@ function setupGuidance() {
     '  cd .deepsec',
     '  pnpm install',
     'Then complete .deepsec/data/<id>/INFO.md.',
+    'Repo-local .deepsec binaries are ignored unless YIELDOS_TRUST_PROJECT_DEEPSEC=1 is set.',
   ].join('\n');
 }
 

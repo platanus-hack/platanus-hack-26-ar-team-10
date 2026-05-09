@@ -184,7 +184,7 @@ Any keyword match → category D → block. False positives are accepted (a pack
 The user does not edit `categories.json` locally. The process is:
 
 1. Identify the missing or wrong category via `security/dependency-events.md`.
-2. Open a PR to the official policy repo proposing the change.
+2. Open a PR against the reviewed root `policy/` files proposing the change.
 3. The maintainer reviews and merges.
 4. Next `SessionStart` (or `UserPromptSubmit` if cache is stale) pulls the change.
 

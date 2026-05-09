@@ -103,6 +103,30 @@ skills:
   assert.equal(result.message.includes('skill:not-approved is not approved'), true);
 });
 
+test('runPack verify rejects unsupported manifest fields instead of ignoring them', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: unknown-fields
+profiles:
+  - code-audit
+agents:
+  claude-code:
+    enabled: true
+    outputs:
+      - SHOULD-NOT-BE-IGNORED.md
+skills:
+  allow: []
+  require_review: true
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('unsupported field'), true);
+});
+
 test('runPack verify rejects playbooks that are not reviewed by yieldOS', () => {
   const root = tmpProject();
   writePack(root, `
@@ -123,6 +147,28 @@ playbooks:
 
   assert.equal(result.exitCode, 2);
   assert.equal(result.message.includes('unreviewed-workflow is not a reviewed yieldOS playbook'), true);
+});
+
+test('runPack verify rejects oracles that are not reviewed by yieldOS', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-oracle
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+oracles:
+  include:
+    - unreviewed-oracle
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('unreviewed-oracle is not a reviewed yieldOS oracle'), true);
 });
 
 test('runPack verify rejects MCP tools outside the approved surface', () => {
@@ -150,6 +196,29 @@ mcps:
   assert.equal(result.message.includes('mcp:filesystem requests unapproved tool: write_file'), true);
 });
 
+test('runPack verify rejects MCPs blocked by policy scope', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: blocked-mcp
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+mcps:
+  allow:
+    - key: mcp:claude-in-chrome
+      approved_tools: []
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('mcp:claude-in-chrome is blocked by policy scope'), true);
+});
+
 test('runPack rejects pack lock paths outside the project', () => {
   const root = tmpProject();
   writePack(root, `
@@ -171,6 +240,27 @@ evidence:
   assert.equal(result.message.includes('pack_lock must stay inside the project'), true);
 });
 
+test('runPack rejects pack lock paths that collide with generated files', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-lock-collision
+profiles:
+  - secrets-safe
+agents:
+  codex:
+    enabled: true
+evidence:
+  pack_lock: AGENTS.md
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack_lock must not collide with generated file: AGENTS.md'), true);
+});
+
 test('runPack rejects pack files outside the project', () => {
   const root = tmpProject();
   const outside = path.join(tmpProject(), 'yield.agent-pack.yaml');
@@ -180,6 +270,120 @@ test('runPack rejects pack files outside the project', () => {
 
   assert.equal(result.exitCode, 2);
   assert.equal(result.message.includes('pack path must stay inside the project'), true);
+});
+
+test('runPack write rejects generated paths that traverse symlinks outside the project', () => {
+  if (process.platform === 'win32') return;
+  const root = tmpProject();
+  const outside = tmpProject();
+  copyFixture(root);
+  fs.symlinkSync(outside, path.join(root, '.yield'), 'dir');
+
+  const result = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('generated file path must not traverse a symlink'), true);
+  assert.equal(fs.existsSync(path.join(outside, 'pack-report.md')), false);
+});
+
+test('runPack verify detects tampered generated files when a pack lock exists', () => {
+  const root = tmpProject();
+  copyFixture(root);
+  const written = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+  assert.equal(written.exitCode, 0);
+  fs.appendFileSync(path.join(root, 'AGENTS.md'), '\n# tampered\n');
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('generated file hash mismatch: AGENTS.md'), true);
+});
+
+test('runPack verify rejects active generated files without a pack lock', () => {
+  const root = tmpProject();
+  copyFixture(root);
+  const written = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+  assert.equal(written.exitCode, 0);
+  fs.rmSync(path.join(root, 'yield.agent-pack.lock.json'));
+  fs.appendFileSync(path.join(root, 'AGENTS.md'), '\n# tampered\n');
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack lock missing while generated files exist: AGENTS.md'), true);
+});
+
+test('runPack verify rejects tampered pack lock metadata', () => {
+  const root = tmpProject();
+  copyFixture(root);
+  const written = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+  assert.equal(written.exitCode, 0);
+  const lockPath = path.join(root, 'yield.agent-pack.lock.json');
+  const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+  lock.skills[0].policy_entry_sha256 = 'sha256:tampered';
+  lock.mcps[0].approved_tools = ['read_file', 'write_file'];
+  fs.writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack lock metadata mismatch'), true);
+});
+
+test('runPack verify rejects duplicate YAML keys', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: duplicate-keys
+name: hidden-rewrite
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('duplicate key on line 4: name'), true);
+});
+
+test('runPack verify rejects dangerous YAML keys', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: dangerous-key
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+__proto__: polluted
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('dangerous key on line 9: __proto__'), true);
+});
+
+test('runPack verify rejects JSON pack manifests', () => {
+  const root = tmpProject();
+  writePack(root, JSON.stringify({
+    version: '0.1',
+    kind: 'yield.agent-pack',
+    name: 'json-pack',
+    profiles: ['secrets-safe'],
+    agents: { 'claude-code': { enabled: true } },
+  }));
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack manifests must use YAML, not JSON'), true);
 });
 
 test('pack lock records hashes for generated files', () => {
@@ -198,6 +402,8 @@ test('pack lock records hashes for generated files', () => {
   assert.equal(lock.skills[0].policy_entry_sha256.startsWith('sha256:'), true);
   assert.equal(Object.hasOwn(lock.skills[0], 'content_sha256'), false);
   assert.equal(lock.mcps[0].key, 'mcp:filesystem');
+  assert.deepEqual(lock.oracles.include, ['code-audit-state', 'agent-pack-lock', 'instruction-policy']);
+  assert.equal(lock.oracles.registry_version, '0.1');
   assert.equal(lock.generated_files.some((file) => file.path === '.cursor/rules/yieldos-security.mdc'), true);
   assert.equal(lock.generated_files.some((file) => file.path === '.cursor/skills/agent-pack-review/SKILL.md'), true);
 });
@@ -241,6 +447,7 @@ playbooks:
   const cursorSkill = result.files.find((file) => file.path === '.cursor/skills/agent-pack-review/SKILL.md');
 
   assert.equal(result.exitCode, 0);
+  assert.equal(result.message.includes('This pack declares approved oracles. Run yieldos-oracle or CI to execute them.'), true);
   [
     '.cursor/rules/yieldos-security.mdc',
     '.github/copilot-instructions.md',
@@ -256,6 +463,79 @@ playbooks:
   });
   assert.equal(cursorSkill.content.includes('name: agent-pack-review'), true);
   assert.equal(cursorSkill.content.includes('Check every MCP reference against `policy/mcps.json`.'), true);
+});
+
+test('generated skills include actionable harness procedure and evidence sections', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: actionable-skills
+profiles:
+  - secrets-safe
+agents:
+  codex:
+    enabled: true
+playbooks:
+  include:
+    - security-audit
+    - mcp-review
+`);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+  const auditSkill = result.files.find((file) => file.path === '.agents/skills/security-audit/SKILL.md');
+  const mcpSkill = result.files.find((file) => file.path === '.agents/skills/mcp-review/SKILL.md');
+
+  assert.equal(result.exitCode, 0);
+  [
+    '## Trigger',
+    '## Deterministic Checks',
+    '## Stop Conditions',
+    '## Evidence',
+    'source/control/sink/impact',
+  ].forEach((text) => {
+    assert.equal(auditSkill.content.includes(text), true, `security-audit missing: ${text}`);
+  });
+  [
+    'announced tool surface',
+    'denied_tools',
+    'Block the MCP if it exposes any tool outside the approved list.',
+  ].forEach((text) => {
+    assert.equal(mcpSkill.content.includes(text), true, `mcp-review missing: ${text}`);
+  });
+});
+
+test('guidance-only adapters state their enforcement boundary', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: adapter-boundaries
+profiles:
+  - secrets-safe
+agents:
+  cursor:
+    enabled: true
+  github-copilot:
+    enabled: true
+  windsurf:
+    enabled: true
+playbooks:
+  include:
+    - agent-pack-review
+`);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+
+  [
+    '.cursor/rules/yieldos-security.mdc',
+    '.github/copilot-instructions.md',
+    '.windsurf/rules/yieldos-security.md',
+  ].forEach((expectedPath) => {
+    const file = result.files.find((candidate) => candidate.path === expectedPath);
+    assert.ok(file, `expected generated file: ${expectedPath}`);
+    assert.equal(file.content.includes('This adapter is guidance-only'), true, `${expectedPath} must state guidance-only boundary`);
+  });
 });
 
 test('generated guidance carries the non-technical safe-coding contract', () => {

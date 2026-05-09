@@ -51,6 +51,10 @@ const STAMP_BY_VERDICT = {
   'category-d-blocked': shieldBlock('-', 'Bloqueado · categoría crítica'),
   'verification-failed': shieldBlock('-', 'Bloqueado · señales sospechosas'),
   'build-script-not-approved': shieldBlock('-', 'Bloqueado · build script no aprobado'),
+  'skill-approved': shieldBlock('+', 'Validado · skill aprobada'),
+  'skill-blocked': shieldBlock('-', 'Bloqueado · skill no aprobada'),
+  'mcp-approved': shieldBlock('+', 'Validado · MCP aprobado'),
+  'mcp-blocked': shieldBlock('-', 'Bloqueado · MCP no aprobado'),
   'native-suggest': shieldBlock('!', 'Sugerencia · usar API nativa'),
   'category-a-rewrite': shieldBlock('+', 'Optimizado · rewrite local'),
   'injection-blocked': shieldBlock('-', 'Bloqueado · inyección detectada'),
@@ -68,6 +72,8 @@ const VERDICT_PRIORITY = [
   'credentials-read-blocked',
   'code-audit-verification-failed',
   'code-audit-blocked',
+  'skill-blocked',
+  'mcp-blocked',
   'denylist-match',
   'category-d-blocked',
   'verification-failed',
@@ -79,6 +85,8 @@ const VERDICT_PRIORITY = [
   'code-audit-warning',
   'native-suggest',
   'credentials-read-authorized',
+  'skill-approved',
+  'mcp-approved',
   'code-audit-clean',
   'verification-passed',
   'allowlist-match',
@@ -193,16 +201,52 @@ async function handleSelfDefense(input, projectRoot) {
       logger.logSelfDefense(projectRoot, { action: 'Bash:rm', target: cmd });
       emitDecision('self-defense-block', 'yieldOS bloqueó eliminación de archivos protegidos', 2);
     }
+    if (isProtectedBashMutation(cmd, projectRoot)) {
+      logger.logSelfDefense(projectRoot, { action: 'Bash:protected-mutation', target: cmd });
+      emitDecision('self-defense-block', 'yieldOS bloqueó modificación de evidencia protegida', 2);
+    }
   }
 }
 
+function isProtectedBashMutation(command, projectRoot = process.cwd()) {
+  const cmd = String(command || '').replace(/\\/g, '/');
+  if (!referencesProtectedSecurityPath(cmd, projectRoot)) {
+    return false;
+  }
+  return /(?:^|\s)(?:rm|mv|cp|tee|truncate|sed|dd)\b|>{1,2}|\b(?:writeFileSync|appendFileSync|createWriteStream|openSync|rmSync|unlinkSync|renameSync|copyFileSync|writeFile|appendFile|unlink|rename)\b|\bwrite_text\s*\(|\bopen\s*\([^)]*,\s*['"][wa]/.test(cmd);
+}
+
+function referencesProtectedSecurityPath(command, projectRoot) {
+  const cmd = String(command || '').replace(/\\/g, '/');
+  const protectedLeaf = '(?:oracles/|code-audit-state\\.json|code-audit-events\\.md|dependency-events\\.md|audit-events\\.md|yieldos-rewrites\\.json)';
+  const boundary = '(?:^|[\\s"\'`=:(])';
+  const relativePattern = new RegExp(`${boundary}(?:\\./)?security/${protectedLeaf}`);
+  if (relativePattern.test(cmd)) return true;
+
+  const root = path.resolve(projectRoot || process.cwd()).replace(/\\/g, '/').replace(/\/+$/, '');
+  if (root && cmd.includes(`${root}/security/`)) {
+    const absoluteProjectPattern = new RegExp(escapeRegExp(`${root}/security/`) + protectedLeaf);
+    if (absoluteProjectPattern.test(cmd)) return true;
+  }
+
+  const pathToken = '/[^\\s"\'`<>|;&]*';
+  const absoluteSecurityPattern = new RegExp(`${boundary}${pathToken}/security/${protectedLeaf}`);
+  return absoluteSecurityPattern.test(cmd);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 async function handleInstructionEdit(input, projectRoot, policy) {
+  const tool = input.tool_name;
   const ti = input.tool_input || {};
   const target = ti.file_path || ti.path;
   if (!target) return false;
   const base = path.basename(target);
   if (!/^(?:CLAUDE\.md|AGENTS\.md|\.cursorrules)$/i.test(base)) return false;
-  const content = ti.content || ti.new_string || '';
+  const edit = contentForWriteOrEdit(tool, ti);
+  const content = edit.newContent || '';
   if (typeof content !== 'string' || content.length === 0) return false;
   const findings = injectionScanner.scan(content, (policy['injection-patterns.json'] || {}).patterns);
   if (findings.length === 0) return false;
@@ -391,7 +435,7 @@ function handleCodeAuditCommand(projectRoot, command) {
       handled: true,
       verdict: 'code-audit-verification-failed',
       action: 'block',
-      mode: /^\s*git\s+push/.test(command) ? 'push' : 'commit',
+      mode: codeAudit.gitSubcommand(command) === 'push' ? 'push' : 'commit',
       files: [],
       findings: [],
       patch: null,
@@ -399,10 +443,11 @@ function handleCodeAuditCommand(projectRoot, command) {
     };
   }
 
+  const auditRoot = audit.projectRoot || projectRoot;
   if (audit.files && audit.files.length > 0) {
     try {
       const shouldStageState = audit.mode === 'commit' || (audit.mode === 'push' && audit.action !== 'block');
-      const stateWrite = codeAudit.writeAuditState(projectRoot, audit, { stage: shouldStageState });
+      const stateWrite = codeAudit.writeAuditState(auditRoot, audit, { stage: shouldStageState });
       if (audit.mode === 'push' && audit.action !== 'block' && !stateWrite.committed) {
         audit = {
           ...audit,
@@ -421,7 +466,7 @@ function handleCodeAuditCommand(projectRoot, command) {
     }
   }
 
-  logger.logCodeAudit(projectRoot, audit);
+  logger.logCodeAudit(auditRoot, audit);
   ui.writeAudit(audit);
   emitHookOutput([{
     candidate: { type: 'git', name: `git-${audit.mode}`, version: 'unknown' },
@@ -475,5 +520,5 @@ async function main() {
 
 main().catch((err) => {
   process.stderr.write(`[yieldOS:fatal] ${err.message}\n`);
-  process.exit(0);
+  process.exit(2);
 });

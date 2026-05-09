@@ -12,60 +12,40 @@ function read(path) {
 test("home page pivots to the yieldOS source-of-truth story", () => {
   const page = read("src/app/page.tsx");
   const agentPackSection = read("src/components/agent-pack-section.tsx");
-  const animatedDemo = read("src/components/animated-demo-flow.tsx");
-  const animatedStory = read("src/components/animated-demo-story.tsx");
+  const oracleFlow = read("src/components/oracle-demo-flow.tsx");
   const orbitalInstall = read("src/components/orbital-install-pill.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
-  const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
   const source = [
     page,
     agentPackSection,
-    animatedDemo,
-    animatedStory,
+    oracleFlow,
     orbitalInstall,
     scrollAwareHeader,
     scrollProgress,
-    typewriterTitle,
   ].join("\n");
 
   [
     "yieldOS",
-    "Safe coding for AI agent teams",
-    "Safe coding for",
-    "AI agent teams",
-    "hero-safe-label",
-    "hero-safe-arrow",
-    "yieldOS checks what AI agents install, edit, and run before anything happens.",
-    "AI-agent security gate",
+    "Oracle-driven security harness for AI coding agents",
+    "Oracle-driven",
+    "security harness",
+    "yieldOS wraps protected Claude Code repos and CI-verified workflows with executable oracles.",
+    "The model can propose. The oracle decides.",
     "Install yieldOS",
-    "View decision demo",
+    "View oracle demo",
     "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh",
     "curl ... | sh",
     "OrbitalInstallPill",
     "Copy yieldOS install command",
-    "Verdict",
-    "Allow",
-    "Block",
-    "Rewrite",
     "AGENTS.md",
     "curl | sh",
-    "Decision demo",
-    "Before it runs.",
-    "Call",
-    "Classify",
-    "Policy",
-    "Verdict",
-    "npm install colors",
-    "denylist-match",
-    "npm install node-fetch",
-    "native-suggest",
-    "npm install clsx",
-    "category-a-rewrite",
-    "Write AGENTS.md",
-    "injection-blocked",
+    "Oracle proof demo",
+    "Baseline fail. Fixed pass.",
+    "CONTRACT created",
+    "REPLAY baseline got 200",
+    "REPLAY fixed got 401",
     "security/dependency-events.md",
-    "[yieldOS:verdict] category-a-rewrite",
     "ScrollProgress",
     "ScrollAwareHeader",
     "Hero",
@@ -75,7 +55,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Packs",
     "Audit",
     "Proof",
-    "TypewriterHeroTitle",
+    "FAIL missing-authz",
+    "PASS scoped acceptance",
   ].forEach((text) => {
     assert.ok(source.includes(text), `Expected landing source to include: ${text}`);
   });
@@ -94,15 +75,21 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Deny",
     "Exotic",
     "Analyze",
-    "250+",
+    "0",
+    "CI model calls in verifier",
+    "3",
+    "oracle result states",
+    "2",
+    "CDSC proof sides",
     "7",
-    "9",
-    "1163",
     "Team agent packs",
     "Package company rules once.",
-    "Choose approved skills, MCPs, safety profiles, and playbooks.",
+    "Choose approved skills, MCPs, safety profiles, playbooks, and",
+    "oracles. Packs distribute company rules; run yieldos-oracle,",
+    "installed hooks, or CI verification to execute checks.",
     "yield.agent-pack.yaml",
     "yield.agent-pack.lock.json",
+    "code-audit-state + cdsc-proof",
     ".yield/pack-report.md",
     "Preview pack",
     "yieldos-pack preview --pack yield.agent-pack.yaml",
@@ -183,6 +170,17 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "PH26 Buenos Aires",
     "AI Security",
     "SAFE -&gt;",
+    "Decision demo",
+    "Before it runs.",
+    "npm install colors",
+    "denylist-match",
+    "npm install node-fetch",
+    "native-suggest",
+    "npm install clsx",
+    "category-a-rewrite",
+    "Write AGENTS.md",
+    "injection-blocked",
+    "[yieldOS:verdict] category-a-rewrite",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
@@ -236,6 +234,11 @@ test("agent packs page provides a downloadable pack builder", () => {
     "Build an agent pack",
     "Download yield.agent-pack.yaml",
     "yield.agent-pack.yaml",
+    "Safety presets",
+    "Non-technical safe",
+    "Engineering team",
+    "Security review",
+    "non-technical-safe",
     "Claude Code",
     "Codex",
     "Cursor",
@@ -255,10 +258,21 @@ test("agent packs page provides a downloadable pack builder", () => {
     "skill:review",
     "skill:dependency-gate",
     "skill:security-review",
+    "skill:think",
+    "skill:feature",
+    "skill:conductor",
+    "skill:compound",
     "Custom skills require policy review",
     "source URL",
     "content hash",
     "mcp:filesystem",
+    "Approved oracles",
+    "code-audit-state",
+    "agent-pack-lock",
+    "instruction-policy",
+    "project-tests",
+    "cdsc-proof",
+    "yieldos-oracle",
     "URL.createObjectURL",
     "download",
   ].forEach((text) => {
@@ -275,51 +289,52 @@ test("agent packs page provides a downloadable pack builder", () => {
   );
 });
 
+test("oracle demo page explains baseline fail plus fixed pass proof", () => {
+  const page = read("src/app/oracle-demo/page.tsx");
+  const flow = read("src/components/oracle-demo-flow.tsx");
+  const source = `${page}\n${flow}`;
+
+  [
+    "Oracle proof demo",
+    "The model can propose. The oracle decides.",
+    "baseline failed and the fixed runtime",
+    "FAIL missing-authz",
+    "CONTRACT created",
+    "REPLAY baseline got 200",
+    "FIX applied",
+    "REPLAY fixed got 401",
+    "PASS scoped acceptance",
+    "This proves this route and replay, not the whole repo.",
+    "Unauthenticated GET /admin/users returns 200",
+    "Unauthenticated request must receive 401 or 403.",
+    "observes denial",
+  ].forEach((text) => {
+    assert.ok(source.includes(text), `Expected oracle demo copy: ${text}`);
+  });
+});
+
 test("cinematic motion components and reduced motion styles are configured", () => {
   const packageJson = read("package.json");
   const page = read("src/app/page.tsx");
   const reveal = read("src/components/motion-reveal.tsx");
-  const demo = read("src/components/animated-demo-flow.tsx");
-  const story = read("src/components/animated-demo-story.tsx");
+  const oracleFlow = read("src/components/oracle-demo-flow.tsx");
   const orbitalInstall = read("src/components/orbital-install-pill.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
-  const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
   const globals = read("src/app/globals.css");
 
   assert.ok(packageJson.includes('"motion"'), "Expected motion dependency");
-  [reveal, demo, story, scrollProgress, typewriterTitle].forEach((source) => {
+  [reveal, scrollProgress].forEach((source) => {
     assert.ok(source.startsWith('"use client";'), "Expected client boundary");
     assert.ok(source.includes('"motion/react"'), "Expected Motion import");
     assert.ok(source.includes("useReducedMotion"), "Expected reduced motion hook");
   });
   assert.ok(
-    typewriterTitle.includes("setVisibleCharacters"),
-    "Expected typewriter character reveal",
-  );
-  assert.ok(
-    typewriterTitle.includes("speedMs = 52"),
-    "Expected calmer typewriter timing",
-  );
-  assert.ok(
-    page.includes("startDelayMs={900}"),
-    "Expected hero typewriter to wait for the intro hierarchy",
-  );
-  assert.ok(
-    typewriterTitle.includes('displayLines.join("\\n")'),
-    "Expected stable pre-defined typewriter lines",
-  );
-  assert.ok(
     reveal.includes("animate={reduceMotion || !immediate ? undefined : { opacity: 1, y: 0 }}"),
     "Expected immediate reveals to animate on page load",
   );
-  assert.ok(
-    globals.includes(".hero-typewriter-line"),
-    "Expected fixed line styling for hero typewriter",
-  );
-  assert.ok(typewriterTitle.includes("hero-safe-marker"), "Expected SAFE marker in hero title");
-  assert.ok(globals.includes(".hero-safe-word"), "Expected SAFE marker word anchor styling");
-  assert.ok(globals.includes(".hero-safe-marker"), "Expected SAFE marker visual styling");
+  assert.ok(!existsSync(join(root, "src/components/typewriter-hero-title.tsx")), "Expected unused typewriter hero component to stay removed");
+  assert.ok(!globals.includes(".hero-typewriter"), "Expected unused typewriter CSS to stay removed");
   assert.ok(scrollProgress.includes("useScroll"), "Expected scroll-driven progress");
   assert.ok(
     scrollProgress.includes("useTransform"),
@@ -400,8 +415,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
     "Expected compact mobile policy rows",
   );
   assert.ok(
-    demo.includes("grid-cols-[minmax(0,1fr)_124px]"),
-    "Expected compact mobile demo verdict rows",
+    oracleFlow.includes("PASS scoped acceptance"),
+    "Expected compact oracle proof flow",
   );
   assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
@@ -478,14 +493,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
     "Expected temporary hero gate mockup to be removed",
   );
   assert.ok(!page.includes("AnimatedSecurityMockup"), "Expected hero mockup render removed");
-  assert.ok(
-    globals.includes(".hero-typewriter"),
-    "Expected hero typewriter styling",
-  );
-  assert.ok(
-    globals.includes(".hero-typewriter-caret"),
-    "Expected hero typewriter caret",
-  );
+  assert.ok(!globals.includes(".hero-typewriter"), "Expected unused hero typewriter styling to stay removed");
+  assert.ok(!globals.includes(".hero-typewriter-caret"), "Expected unused hero typewriter caret to stay removed");
   assert.ok(!globals.includes(".gate-flow"), "Expected removed gate flow CSS");
   assert.ok(
     !globals.includes(".gate-pulse"),
@@ -520,16 +529,15 @@ test("cinematic motion components and reduced motion styles are configured", () 
   );
 });
 
-test("layout metadata and Geist theme are configured for yieldOS", () => {
+test("layout metadata and offline-safe font theme are configured for yieldOS", () => {
   const layout = read("src/app/layout.tsx");
   const globals = read("src/app/globals.css");
 
-  assert.ok(layout.includes("yieldOS - security gate for AI agent installs"));
+  assert.ok(layout.includes("yieldOS - oracle-driven security harness"));
   assert.ok(
-    layout.includes(
-      "yieldOS allows, blocks, rewrites, and audits Claude Code actions before execution.",
-    ),
+    layout.includes("yieldOS wraps AI coding agents with scoped pass, fail, and unknown oracles for risky repo actions."),
   );
-  assert.ok(globals.includes('"Geist"'));
-  assert.ok(globals.includes('"Geist Mono"'));
+  assert.ok(!layout.includes("next/font/google"));
+  assert.ok(globals.includes("ui-sans-serif"));
+  assert.ok(globals.includes("ui-monospace"));
 });

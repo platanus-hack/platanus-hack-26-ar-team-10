@@ -1,11 +1,11 @@
 # Coverage — what yieldOS gates
 
-yieldOS gates **seven distinct vectors**. The classifiers detect each; the decide module routes them through the appropriate flow.
+yieldOS gates dependency acquisition, agent-tool expansion, instruction changes, credential reads, protected evidence, and source-code audit boundaries. The classifiers detect each candidate; the decide module routes it through the appropriate flow.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │                          Tool call intercepted                        │
-│                       (Bash / Write / Edit)                           │
+│                    (Bash / Write / Edit / Read)                       │
 └─────────────────────────────────┬─────────────────────────────────────┘
                                   ↓
         ┌──────────────────┬──────┴───────┬──────────────┬───────────────┐
@@ -49,9 +49,13 @@ claude plugin add <name>
 
 ## 3. MCP additions
 
-Detectors: same patterns as skills (today, MCPs added via `claude plugin add` or similar).
+Detectors:
+```
+claude mcp add <name> ...
+claude mcp add-json <name> ...
+```
 
-**Routing**: MCPs are processes. Listing in `policy/mcps.json` requires both a binary/source hash and per-tool approval.
+**Routing**: direct MCP additions are blocked by default, even when the name exists in `policy/mcps.json`, because a name alone does not prove the server binary, source, or announced tool surface. Reviewed MCPs are activated through `yieldos-pack verify/write`, where the pack compiler checks requested tools against `policy/mcps.json` and records generated-file hashes in the pack lock.
 
 ## 4. Instruction file edits
 
@@ -97,22 +101,37 @@ Reason: unsigned remote shell execution is the worst-case install pattern. Even 
 ## 7. Manifest file edits
 
 Detectors: `Write` / `Edit` to:
-- `package.json`, `package-lock.json`
+- `package.json`
 - `requirements.txt`, `pyproject.toml`, `Pipfile`
 - `Cargo.toml`
 - `go.mod`
-- `pnpm-workspace.yaml`
 
-**Routing**: **pass-through**. Editing the manifest is not the same as installing. The actual install command (npm install, pip install, etc.) is gated separately when the agent runs it via Bash.
+**Routing**: dependency additions or version changes are reconstructed from the edit and sent through the same policy decision flow as install commands. No-op edits produce no candidates.
 
-This was a deliberate decision after a real bug (matplotlib false positive) — see [09-decision-log.md](09-decision-log.md) decision #18.
+This replaced the earlier pass-through model after manifest edits became a practical way to introduce unreviewed dependencies without running an install command first.
+
+## 8. Credential-file reads
+
+Detector: `Read` against credential-looking paths:
+
+- `.env`, `.env.*`, `.npmrc`, `.pypirc`
+- `.ssh/`, `.aws/`, `.kube/`, `.gcloud/`, `.docker/`
+- private-key filenames such as `id_rsa`
+
+**Routing**: blocked unless the user has just replied with the exact phrase `AUTORIZO A LEER LAS CREDENCIALES`. The authorization window is local to the project and expires after 30 minutes.
+
+## 9. Git commit and push audit
+
+Detector: `Bash` commands that execute `git commit` or `git push`, including common shell wrappers such as `cd app && git commit`, `git -C app commit`, `command git push`, `env ... git push`, `bash -lc "git commit"`, `sh -c "git push"`, and absolute `.../git commit` paths.
+
+**Routing**: staged or outgoing source-code diffs are audited by the code-audit loop. Blocking findings stop the command; safe deterministic fixes are applied and the original commit is blocked so the user can review and rerun.
 
 ## What is NOT gated
 
 - **README.md / docs** — pure data, not instructions to the agent. Reading them is fine; if the agent considers acting on a command found inside, that command goes through the normal Bash gate when executed.
-- **Code edits** to project files (e.g., `src/index.ts`) — yieldOS does not gate code itself. It gates the *acquisition* of foreign code.
+- **Ordinary code edits** to project files (e.g., `src/index.ts`) — yieldOS does not block every edit. Source-code security review happens at `git commit` / `git push` and through `/yieldos:audit`.
 - **`.gitignore`, `LICENSE`, `Dockerfile`, etc.** — out of scope.
-- **Git operations other than `clone`** (commit, push, pull) — not relevant to dependency security.
+- **Git operations other than `clone`, `commit`, and `push`** — not part of the shipped gate.
 
 ## Coverage matrix
 
@@ -120,11 +139,13 @@ This was a deliberate decision after a real bug (matplotlib false positive) — 
 |---|---|---|---|
 | Package install (npm/pip/etc.) | classifiers/* | run 5-check flow | allowlist, denylist, categories, native-equivalents |
 | Skill activation | skills classifier | block | skills.json |
-| MCP addition | (planned) | block | mcps.json |
+| MCP addition | mcps classifier | block direct add; verify through packs | mcps.json |
 | Instruction file edit | injection scanner | allow if clean, block if tier1/tier2 | injection-patterns.json |
 | `git clone` | vendoring classifier | block | (no per-repo allowlist today) |
 | `curl ... \| sh` | binaries classifier | block | (no per-host allowlist today) |
-| Manifest edit | classifyWriteOrEdit | pass-through | n/a |
+| Manifest dependency edit | classifyWriteOrEdit | run decision flow | allowlist, denylist, categories, native-equivalents |
+| Credential-file read | credentials scanner | block without exact user authorization | n/a |
+| `git commit` / `git push` | code-audit command detector | audit/fix/block | code-audit rules |
 
 ## Why these seven and no more
 

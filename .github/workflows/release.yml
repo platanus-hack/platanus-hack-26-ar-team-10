@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
       - name: Validate plugin release files
         run: node scripts/plugin-check.mjs
+      - name: Validate policy structure
+        run: node scripts/policy-check.mjs
       - name: Run release helper tests
         run: node --test scripts/*.test.mjs
       - name: Run plugin tests

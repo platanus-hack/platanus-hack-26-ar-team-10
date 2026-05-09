@@ -38,6 +38,12 @@ playbooks:
     - instruction-file-review
     - agent-pack-review
 
+oracles:
+  include:
+    - code-audit-state
+    - agent-pack-lock
+    - instruction-policy
+
 evidence:
   decisions_dir: .yield/decisions
   audit_state: security/code-audit-state.json

@@ -6,6 +6,7 @@ function ecosystemFor(candidate) {
   if (candidate.manager === 'cargo') return 'cargo';
   if (candidate.manager === 'go') return 'go';
   if (candidate.manager === 'skills') return 'skill';
+  if (candidate.manager === 'mcp') return 'mcp';
   if (candidate.manager === 'git') return 'repo';
   if (candidate.manager === 'curl-pipe-shell') return 'binary';
   return candidate.manager || 'unknown';

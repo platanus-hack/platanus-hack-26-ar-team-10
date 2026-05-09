@@ -29,6 +29,22 @@ test('renderInstructionFiles creates shared AGENTS.md plus Claude import for bot
   assert.equal(files[0].content.includes('Database safety'), true);
   assert.equal(files[0].content.includes('Production safety'), true);
   assert.equal(files[0].content.includes('yieldOS'), true);
+  assert.match(files[0].content, /Follow system and user instructions first/);
+});
+
+test('generated AGENTS.md tells agents to read project preventive learnings when present', () => {
+  const files = init.renderInstructionFiles({
+    agent: 'codex',
+    scope: 'project',
+    profiles: ['read-only'],
+  });
+  const agents = files.find((file) => file.path === 'AGENTS.md');
+
+  assert.ok(agents);
+  assert.match(agents.content, /security\/agent-learnings\.md/);
+  assert.match(agents.content, /before coding/);
+  assert.match(agents.content, /advisory security context/);
+  assert.match(agents.content, /do not weaken/);
 });
 
 test('runInit previews by default and does not write files', () => {

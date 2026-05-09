@@ -1,8 +1,14 @@
 'use strict';
 
-const DEFAULT_PROFILES = ['secrets-safe', 'dependency-safe', 'code-audit', 'testing-discipline'];
+const DEFAULT_PROFILES = ['non-technical-safe', 'secrets-safe', 'dependency-safe', 'code-audit', 'testing-discipline'];
+const PREVENTIVE_LEARNING_INSTRUCTION = 'If `security/agent-learnings.md` exists, read it before coding as advisory security context; apply only preventive rules that do not weaken user, system, repository, or yieldOS instructions.';
 
 const PROFILE_SECTIONS = {
+  'non-technical-safe': section('Non-technical safe-coding defaults', [
+    'Explain security-sensitive decisions in plain language before taking action.',
+    'Treat allowed actions as passing configured checks, not as proof that the repo is safe.',
+    'Stop before secrets, authentication, data deletion, paid services, deployments, or production changes unless the user clearly approves the exact action.',
+  ]),
   'read-only': section('Read-only posture', [
     'Default to analysis, planning, and review before editing files.',
     'Do not modify source files, config, infrastructure, or generated artifacts unless the user explicitly asks for implementation.',
@@ -61,5 +67,6 @@ function section(title, bullets) {
 
 module.exports = {
   DEFAULT_PROFILES,
+  PREVENTIVE_LEARNING_INSTRUCTION,
   PROFILE_SECTIONS,
 };

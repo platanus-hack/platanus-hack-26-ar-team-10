@@ -1,8 +1,10 @@
 # yieldOS
 
-**One security gate for every dependency, skill, and instruction your AI agent touches — built for humans and AI agents.**
+**Oracle-driven security harness for AI coding agents.**
 
-yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
+yieldOS is a Claude Code plugin and CI-verifiable harness that intercepts risky agent actions, then accepts or rejects sensitive changes through scoped oracles. It decides automatically — without asking the model to be the final authority — whether evidence is `pass`, `fail`, or `unknown`. It also exposes `/yieldos:audit` for on-demand source-code review, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, `/yieldos:oracle` for oracle discovery, `yieldos-oracle run ...` for scoped checks, `/yieldos:oracle-demo` for a visible counterexample proof, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
+
+The model can propose. The oracle decides.
 
 → Full design documentation in [`docs/`](docs/README.md).
 
@@ -12,7 +14,7 @@ yieldOS is a Claude Code plugin that intercepts every install command, skill act
 
 AI coding agents install code on behalf of users. Every `npm install`, every `pip install`, every skill or MCP added is a trust decision that the user usually never sees. The history of supply-chain attacks (`event-stream`, `node-ipc`, `ua-parser-js`, `colors`, `crossenv`) shows the cost of getting that decision wrong.
 
-yieldOS makes the trust decision **before** the install runs, deterministically, against a policy that is curated centrally and shipped with the plugin so it works offline.
+yieldOS makes trust decisions **before** risky work is accepted, against policy and executable evidence that can be checked without model calls.
 
 → More: [docs/01-philosophy.md](docs/01-philosophy.md).
 
@@ -32,11 +34,11 @@ claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
 claude plugins install yieldos@yieldos
 
 # Optional: run the test suite
-cd plugins/yieldos
+cd yieldOS/plugins/yieldos
 node --test tests/*.test.js
 ```
 
-That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` tool call.
+That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` / `Read` tool call.
 
 Requires Node.js 18+ for `fetch` and `node:test`.
 
@@ -94,6 +96,24 @@ an LLM or model API key.
 
 Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
 
+## Oracles
+
+List available oracles:
+
+```text
+/yieldos:oracle list
+```
+
+Run the missing-auth proof demo:
+
+```text
+/yieldos:oracle-demo missing-auth
+```
+
+Oracles normalize existing checks into scoped `pass`, `fail`, and `unknown` evidence. For sensitive actions, `unknown` blocks by default. The first counterexample-driven security contract proves one class: an unauthenticated request to a sensitive route must return `401` or `403`, with baseline-fail plus fixed-pass evidence.
+
+Detail: [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md).
+
 ## Audit command
 
 Run changed-code source review from Claude Code:
@@ -128,7 +148,7 @@ Detail: [docs/14-custom-instructions.md](docs/14-custom-instructions.md).
 
 ## Team agent packs
 
-Compile a reviewed `yield.agent-pack.yaml` manifest into native agent files:
+Compile a reviewed `yield.agent-pack.yaml` manifest into reviewable host-native guidance files:
 
 ```text
 /yieldos:pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
@@ -142,7 +162,7 @@ yieldos-pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-
 yieldos-pack write --pack yield.agent-pack.yaml
 ```
 
-The compiler validates referenced skills and MCP tool surfaces against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. Claude Code has the strongest runtime enforcement through hooks; other adapters are native guidance until their host exposes equivalent controls.
+The compiler validates referenced skills, MCP tool surfaces, playbooks, and oracle IDs against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. `yieldos-pack verify` validates the manifest; once generated files are active, it requires the pack lock and checks lock metadata plus recorded file hashes. Packs declare approved oracles, but they do not execute them by themselves; run `yieldos-oracle`, installed hooks, or CI verification for enforcement. Claude Code has the strongest runtime enforcement through installed yieldOS hooks; other adapters are host-native guidance until paired with yieldOS verification, CI, or managed host policy.
 
 Detail: [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md).
 
@@ -377,7 +397,7 @@ You don't have to do anything. yieldOS works in the background:
 - **Safe installs go through silently.** If the package is on the official allowlist, it just installs.
 - **Dangerous installs are blocked.** You'll see a one-line message: `[yieldOS] BLOCK bloqueó {package}: {reason}`.
 - **Tiny utility packages get rewritten locally.** You'll see: `[yieldOS] REWRITE realizó una optimización de la instalación de {package}`. The code lives in `src/lib/yieldos/` in your project.
-- **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to open a PR to the official policy repo.
+- **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to update the reviewed root `policy/` files through a normal PR.
 - **CVEs in transitive dependencies are flagged** post-install — you'll see `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
 
 Everything is logged to `<project>/security/dependency-events.md`. You can read it any time to audit what yieldOS decided and why.
@@ -392,7 +412,7 @@ You do not need to:
 - Edit allowlist or denylist.
 - Run any commands manually.
 
-If you want to add a package that yieldOS blocked, the path is: open a PR to the [official policy repo](https://github.com/platanus-hack/policy-yieldos).
+If you want to add a package that yieldOS blocked, the path is: open a PR that updates the reviewed root [`policy/`](../policy) files and keeps the plugin `policy-cache/` synchronized.
 
 ---
 
@@ -400,7 +420,7 @@ If you want to add a package that yieldOS blocked, the path is: open a PR to the
 
 If you are an AI coding agent operating in a project protected by yieldOS:
 
-1. **Hooks run regardless of your intent.** `PreToolUse` intercepts every `Bash`, `Write`, and `Edit` call. If yieldOS returns exit code `2`, the action did not run.
+1. **Hooks run regardless of your intent.** `PreToolUse` intercepts `Bash`, `Write`, `Edit`, and `Read` calls. If yieldOS returns exit code `2`, the action did not run.
 
 2. **Read the verdict from stderr.** Lines starting with `[yieldOS:verdict]` carry the machine-readable verdict:
 
@@ -414,11 +434,16 @@ If you are an AI coding agent operating in a project protected by yieldOS:
    | `verification-passed`         | Action ran. Continue.                                                                |
    | `native-suggest`              | Use the native API mentioned. Do not install.                                        |
    | `build-script-not-approved`   | Build script not in `policy/build-scripts-allowed.json`. Tell the user.              |
+   | `skill-approved`              | The approved skill action ran. Continue.                                             |
+   | `skill-blocked`               | Do not retry. The skill is not approved in `policy/skills.json`.                     |
+   | `mcp-blocked`                 | Do not retry direct MCP registration. Use a reviewed agent pack/tool-surface flow.   |
    | `self-defense-block`          | You attempted to modify a yieldOS-protected file. Stop. This is not a bug.           |
    | `injection-blocked`           | Detected prompt-injection in instruction-file edit. Reconsider the edit.             |
    | `code-audit-fix-applied`      | A security fix was applied to staged code. Review the change and rerun `git commit`. |
    | `code-audit-blocked`          | Source-code audit found unresolved blocking risk. Fix it before committing/pushing.  |
    | `code-audit-clean`            | The audited commit or push diff passed. Continue.                                    |
+   | `credentials-read-blocked`    | Do not read the credential file unless the user grants the exact authorization phrase. |
+   | `credentials-read-authorized` | The credential read is inside an active project-local authorization window.          |
 
 3. **The rewrite flow (Category A)**: when yieldOS blocks with `category-a-rewrite`, follow the `dependency-gate` skill that's loaded automatically.
 
@@ -451,7 +476,7 @@ Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacte
 ## Tests
 
 ```bash
-cd plugins/yieldos
+cd yieldOS/plugins/yieldos
 node --test tests/*.test.js
 ```
 
@@ -476,7 +501,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 
 | File | What's inside |
 |---|---|
-| [docs/01-philosophy.md](docs/01-philosophy.md) | First principles. Why the user is not in the loop. The three guarantees. |
+| [docs/01-philosophy.md](docs/01-philosophy.md) | First principles. Why deterministic policy comes before model judgment. |
 | [docs/02-rewrite-evolution.md](docs/02-rewrite-evolution.md) | The most-iterated decision: how "rewrite" went from replacement to last-resort salvage. |
 | [docs/03-categories.md](docs/03-categories.md) | The four categories A/B/C/D, the keyword fallback, the threshold check. |
 | [docs/04-coverage.md](docs/04-coverage.md) | Every vector yieldOS gates: packages, skills, MCPs, instruction files, vendoring, binaries. |
@@ -488,6 +513,18 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |
 | [docs/11-ci-cd.md](docs/11-ci-cd.md) | Planned CI/CD enforcement. |
 | [docs/12-dockerfile-scanner.md](docs/12-dockerfile-scanner.md) | Planned Dockerfile scanner. |
+| [docs/13-audit-command.md](docs/13-audit-command.md) | On-demand Deepsec source-code audit. |
+| [docs/14-custom-instructions.md](docs/14-custom-instructions.md) | Preview-first AGENTS.md / CLAUDE.md generation. |
+| [docs/15-pentest-loop.md](docs/15-pentest-loop.md) | Red-team / blue-team loop with persistent local lessons. |
+| [docs/16-agent-rules-and-playbooks.md](docs/16-agent-rules-and-playbooks.md) | Planning and research for reviewed playbooks. |
+| [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md) | Policy-validated team agent packs. |
+| [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md) | Oracle-driven pass/fail/unknown acceptance model. |
+| [docs/20-oracle-evidence-artifacts.md](docs/20-oracle-evidence-artifacts.md) | Hashable generated evidence boundaries. |
+| [docs/21-counterexample-driven-security-contracts.md](docs/21-counterexample-driven-security-contracts.md) | Baseline-fail plus fixed-pass security contracts. |
+| [docs/22-oracle-demo-script.md](docs/22-oracle-demo-script.md) | Missing-auth proof demo flow. |
+| [docs/23-oracle-evals.md](docs/23-oracle-evals.md) | Oracle evaluation and benchmark framing. |
+| [docs/24-hackathon-pitch.md](docs/24-hackathon-pitch.md) | Hackathon story, objections, and demo framing. |
+| [docs/25-oracle-contract-catalog.md](docs/25-oracle-contract-catalog.md) | Oracle contract catalog for validation and benchmarks. |
 
 ---
 
@@ -495,7 +532,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 
 - It is not a replacement for `npm audit` / Dependabot / Snyk. It is a pre-install gate plus a transitive auditor; existing tools still cover known CVEs in installed code.
 - It is not an "auto-customization assistant" — the rewrite path exists only for tiny, low-risk packages where rewriting is safer than installing. The customization to your project is a side effect, not the goal.
-- It is not editable locally. Allowlist and denylist live in the official policy repo by design.
+- Installed policy is not edited locally. Reviewed policy changes go through this repository's root `policy/` files and are shipped into the plugin cache on release.
 - It is not a daemon. It is a set of hooks that the Claude Code harness invokes on the right events. The "always-on" feel comes from being hooked into every relevant tool call.
 
 ---

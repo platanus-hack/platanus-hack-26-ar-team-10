@@ -10,13 +10,14 @@ const packOutputs = [
   ["Adapters", ".cursor + .github + .windsurf"],
   ["Skills", ".claude + .agents + .cursor + .windsurf"],
   ["Evidence", "yield.agent-pack.lock.json"],
+  ["Oracles", "code-audit-state + cdsc-proof"],
   ["Report", ".yield/pack-report.md"],
 ];
 
 const targetAgents = [
   ["Claude Code", "enforced via hooks"],
   ["Codex", "instructions + approvals"],
-  ["Cursor", "native rules guidance"],
+  ["Cursor", "guidance-only rules"],
   ["Copilot", "repository instructions"],
   ["Windsurf", "rules + skills guidance"],
 ];
@@ -37,9 +38,9 @@ export function AgentPackSection() {
               Package company rules once.
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-6 text-zinc-600 sm:text-base sm:leading-7">
-              Choose approved skills, MCPs, safety profiles, and playbooks.
-              yieldOS compiles them into native agent files and records what
-              became active.
+              Choose approved skills, MCPs, safety profiles, playbooks, and
+              oracles. Packs distribute company rules; run yieldos-oracle,
+              installed hooks, or CI verification to execute checks.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <CopyCommandButton
@@ -100,7 +101,7 @@ export function AgentPackSection() {
                 </div>
                 <p className="mt-4 text-sm leading-6 text-zinc-400">
                   One reviewed source of truth. Strongest enforcement where the
-                  host exposes hooks or policy controls.
+                  host exposes hooks, CI, or managed policy controls.
                 </p>
               </div>
             </MotionReveal>
