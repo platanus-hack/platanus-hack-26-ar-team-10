@@ -60,6 +60,34 @@ export function TypewriterHeroTitle({
   const caretLineIndex = isComplete
     ? displayLines.length - 1
     : Math.min(typedLines.length - 1, displayLines.length - 1);
+  const safeWord = "coding";
+
+  function renderLineWithSafeMarker(value: string) {
+    const safeIndex = value.indexOf(safeWord);
+
+    if (safeIndex === -1) {
+      return value;
+    }
+
+    return (
+      <>
+        {value.slice(0, safeIndex)}
+        <span className="hero-safe-word">
+          {safeWord}
+          <span className="hero-safe-marker">SAFE -&gt;</span>
+        </span>
+        {value.slice(safeIndex + safeWord.length)}
+      </>
+    );
+  }
+
+  function renderTypedLine(line: string, value: string) {
+    if (!line.includes(safeWord) || !value.includes(safeWord)) {
+      return value;
+    }
+
+    return renderLineWithSafeMarker(value);
+  }
 
   return (
     <motion.h1
@@ -71,15 +99,21 @@ export function TypewriterHeroTitle({
     >
       <span className="hero-typewriter-layout" aria-hidden="true">
         {displayLines.map((line) => (
-          <span key={line} className="hero-typewriter-line">
-            {line}
+          <span
+            key={line}
+            className={`hero-typewriter-line ${line.includes("coding") ? "hero-safe-line" : ""}`}
+          >
+            {renderLineWithSafeMarker(line)}
           </span>
         ))}
       </span>
       <span className="hero-typewriter-copy" aria-hidden="true">
         {displayLines.map((line, index) => (
-          <span key={line} className="hero-typewriter-line">
-            {typedLines[index] ?? ""}
+          <span
+            key={line}
+            className={`hero-typewriter-line ${line.includes("coding") ? "hero-safe-line" : ""}`}
+          >
+            {renderTypedLine(line, typedLines[index] ?? "")}
             {index === caretLineIndex ? (
               <span
                 className="hero-typewriter-caret"

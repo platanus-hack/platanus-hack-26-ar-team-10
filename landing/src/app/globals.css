@@ -150,6 +150,38 @@ html {
   white-space: nowrap;
 }
 
+.hero-safe-word {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-safe-marker {
+  position: absolute;
+  bottom: calc(100% - 0.18em);
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 0.28em 0.46em;
+  color: rgba(255, 255, 255, 0.88);
+  background:
+    linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.24), rgba(var(--signal-red-rgb), 0.2)),
+    rgba(8, 10, 14, 0.36);
+  font-family: var(--font-mono);
+  font-size: clamp(0.48rem, 0.16em, 0.68rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    0 0 24px rgba(var(--signal-blue-rgb), 0.18),
+    0 0 28px rgba(var(--signal-red-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transform: translateX(-12%);
+}
+
 .hero-typewriter-caret {
   display: inline-block;
   width: 0.075em;

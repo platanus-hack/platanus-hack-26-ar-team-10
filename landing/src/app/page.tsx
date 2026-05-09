@@ -9,7 +9,7 @@ import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
   "claude plugin marketplace add /path/to/vibeOS\nclaude plugin install yieldos@yieldos-marketplace";
-const heroTitle = "Safe coding for non-tech people.";
+const heroTitle = "Unlock coding for non technical talent";
 
 const gatedVectors = [
   { title: "Packages", detail: "9 managers." },
@@ -77,7 +77,7 @@ export default function Home() {
             </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
-              lines={["Safe coding for", "non-tech people."]}
+              lines={["Unlock coding for", "non technical talent"]}
               className="hero-title font-semibold leading-[0.92]"
               startDelayMs={900}
             />

@@ -29,7 +29,10 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
 
   [
     "yieldOS",
-    "Safe coding for non-tech people.",
+    "Unlock coding for non technical talent",
+    "Unlock coding for",
+    "non technical talent",
+    "SAFE -&gt;",
     "yieldOS checks what AI agents install, edit, and run before anything happens.",
     "PH26 Buenos Aires",
     "Install yieldOS",
@@ -151,6 +154,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "A security gate before your AI agent runs anything.",
     "AI agent actions, gated.",
     "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
+    "Safe coding for non-tech people.",
     "$ claude plugin install yieldos@yieldos-marketplace",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
@@ -221,6 +225,9 @@ test("cinematic motion components and reduced motion styles are configured", () 
     globals.includes(".hero-typewriter-line"),
     "Expected fixed line styling for hero typewriter",
   );
+  assert.ok(typewriterTitle.includes("hero-safe-marker"), "Expected SAFE marker in hero title");
+  assert.ok(globals.includes(".hero-safe-word"), "Expected SAFE marker word anchor styling");
+  assert.ok(globals.includes(".hero-safe-marker"), "Expected SAFE marker visual styling");
   assert.ok(scrollProgress.includes("useScroll"), "Expected scroll-driven progress");
   assert.ok(
     scrollProgress.includes("useTransform"),
