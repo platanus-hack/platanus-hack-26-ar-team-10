@@ -156,5 +156,6 @@
     converged: playConverged,
     setEnabled,
     isEnabled,
+    unlock: unlock,
   };
 })();

@@ -49,7 +49,15 @@ function serveStatic(res, abs, fallbackContentType) {
   fs.stat(abs, (err, st) => {
     if (err || !st.isFile()) { res.writeHead(404); res.end('not found'); return; }
     const ext = path.extname(abs).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME[ext] || fallbackContentType || 'application/octet-stream' });
+    // The dashboard is served from a long-running detached process and we
+    // ship updates by editing files in place — never let the browser cache
+    // a stale copy.
+    res.writeHead(200, {
+      'Content-Type': MIME[ext] || fallbackContentType || 'application/octet-stream',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    });
     fs.createReadStream(abs).pipe(res);
   });
 }

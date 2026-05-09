@@ -7,6 +7,20 @@
   <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 <body>
+  <!-- Audio unlock veil. Browsers refuse to start AudioContext without a
+       user gesture, so we make that gesture obvious. -->
+  <div class="audio-veil" id="audio-veil">
+    <div class="audio-veil-card">
+      <div class="audio-veil-emoji">🔊</div>
+      <div class="audio-veil-title">Click para activar el sonido de batalla</div>
+      <div class="audio-veil-sub">El navegador requiere un gesto para desbloquear el audio. Sin click, no se escuchan las trompetas medievales.</div>
+      <button class="audio-veil-btn" id="audio-veil-btn">⚔  ENTRAR A LA BATALLA  🛡</button>
+    </div>
+  </div>
+
+  <!-- Continuous particle layer (idle drift + on-event bursts) -->
+  <canvas class="particle-layer" id="particles"></canvas>
+
   <header class="banner">
     <div class="banner-row">
       <h1>🛡️ yieldOS · Pentest Live Battle</h1>
@@ -15,28 +29,74 @@
         <span id="round-pill" class="pill">round —</span>
         <span id="strategy-pill" class="pill">strategy —</span>
         <button id="sound-toggle" class="pill pill-btn" title="toggle sound">🔊 ON</button>
+        <button id="sound-test" class="pill pill-btn" title="test sound">🎺 test</button>
       </div>
     </div>
-    <div class="banner-row">
+
+    <!-- Scoreboard — sport-style: red attacks vs blue defenses -->
+    <div class="scoreboard">
+      <div class="score-side score-red">
+        <div class="score-team">🔴 RED TEAM</div>
+        <div class="score-num" id="score-red">0</div>
+        <div class="score-label">findings</div>
+      </div>
+      <div class="score-vs">
+        <div class="score-vs-glyph">⚔</div>
+        <div class="score-vs-label">VS</div>
+      </div>
+      <div class="score-side score-blue">
+        <div class="score-team">🛡️ BLUE TEAM</div>
+        <div class="score-num" id="score-blue">0</div>
+        <div class="score-label">fixes aplicados</div>
+      </div>
+    </div>
+
+    <div class="banner-row banner-totals">
       <div class="totals">
+        <span class="totals-row"><span class="dot dot-yellow"></span>rounds <strong id="t-rounds">0</strong></span>
+        <span class="totals-row"><span class="dot dot-green"></span>streak <strong id="t-streak">0/5</strong></span>
         <span class="totals-row"><span class="dot dot-red"></span>findings <strong id="t-findings">0</strong></span>
         <span class="totals-row"><span class="dot dot-blue"></span>fixes <strong id="t-fixes">0</strong></span>
-        <span class="totals-row"><span class="dot dot-yellow"></span>rounds <strong id="t-rounds">0</strong></span>
-        <span class="totals-row"><span class="dot dot-green"></span>streak <strong id="t-streak">0</strong></span>
       </div>
+      <div class="combo" id="combo" aria-hidden="true"></div>
     </div>
   </header>
 
-  <section class="tug">
-    <div class="tug-label tug-label-red">🔴 RED TEAM</div>
-    <div class="tug-track">
-      <div class="tug-rope" id="tug-rope">
-        <div class="tug-flag tug-flag-red">⚔</div>
-        <div class="tug-flag tug-flag-blue">🛡</div>
-      </div>
-      <div class="tug-marker" id="tug-marker"></div>
+  <!-- BATTLEFIELD — two castles with HP bars, central clash zone -->
+  <section class="battlefield" id="battlefield">
+    <div class="castle castle-red" id="castle-red">
+      <div class="hp-bar"><div class="hp-fill hp-fill-red" id="hp-red" style="width:100%"></div></div>
+      <div class="castle-art" id="castle-red-art">🏰</div>
+      <div class="castle-flag castle-flag-red">⚔</div>
+      <div class="castle-name">RED TEAM</div>
     </div>
-    <div class="tug-label tug-label-blue">🛡️ BLUE TEAM</div>
+
+    <div class="battle-zone" id="battle-zone">
+      <div class="ground"></div>
+      <div class="rope-track">
+        <div class="rope-marker"></div>
+        <div class="rope-rope" id="tug-rope">
+          <div class="rope-flag rope-flag-red">⚔</div>
+          <div class="rope-flag rope-flag-blue">🛡</div>
+        </div>
+        <div class="rope-marker" id="tug-marker"></div>
+      </div>
+      <div class="clash" id="clash">
+        <span class="clash-spark">✦</span>
+        <span class="clash-spark">✺</span>
+        <span class="clash-spark">✸</span>
+      </div>
+      <div class="cloud cloud-1">☁</div>
+      <div class="cloud cloud-2">☁</div>
+      <div class="cloud cloud-3">☁</div>
+    </div>
+
+    <div class="castle castle-blue" id="castle-blue">
+      <div class="hp-bar"><div class="hp-fill hp-fill-blue" id="hp-blue" style="width:100%"></div></div>
+      <div class="castle-art" id="castle-blue-art">🏯</div>
+      <div class="castle-flag castle-flag-blue">🛡</div>
+      <div class="castle-name">BLUE TEAM</div>
+    </div>
   </section>
 
   <main class="grid">
@@ -56,6 +116,9 @@
       <ol class="history" id="history"></ol>
     </section>
   </main>
+
+  <!-- Full-screen attack/defense flash -->
+  <div class="screen-flash" id="screen-flash"></div>
 
   <div class="overlay" id="overlay" aria-hidden="true">
     <div class="overlay-card" id="overlay-card">
