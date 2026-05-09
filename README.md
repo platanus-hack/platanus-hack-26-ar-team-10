@@ -6,7 +6,7 @@ Track: AI Security
 
 yieldOS is a Claude Code security plugin that gates the risky things AI agents do before they happen: dependency installs, skill/plugin/MCP additions, vendored code, remote bootstrap commands, and instruction-file edits.
 
-It also protects credentials: prompts that look like they contain API keys are blocked before reaching the model, and reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar credential paths require the exact local authorization phrase `AUTORIZO A LEER LAS CREDENCIALES`.
+It also protects credentials: prompts that look like they contain API keys trigger a no-echo security directive with a guided `.env` remediation panel, and reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar credential paths require the exact local authorization phrase `AUTORIZO A LEER LAS CREDENCIALES`.
 
 ## Install
 

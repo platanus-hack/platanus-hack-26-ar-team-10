@@ -271,6 +271,17 @@ async function handleCredentialsRead(input, projectRoot) {
     });
     process.stderr.write(`${terminalArt.statusLine('[yieldOS] lectura de credenciales autorizada (ventana activa)', 'success')}\n`);
     process.stderr.write('[yieldOS:verdict] credentials-read-authorized\n');
+    writeJsonAndExit({
+      hookSpecificOutput: {
+        hookEventName: 'PreToolUse',
+        additionalContext: [
+          'yieldOS allowed a credentials-file Read under active user authorization.',
+          'Verdict: credentials-read-authorized.',
+          'End your reply to the user with this exact line on its own line, separated by a blank line:',
+          STAMP_BY_VERDICT['credentials-read-authorized'],
+        ].join('\n'),
+      },
+    }, 0);
     return true;
   }
 

@@ -7,6 +7,7 @@ const path = require('node:path');
 const policyFetcher = require('./policy-fetcher');
 const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
+const envHelper = require('./env-helper');
 const logger = require('./logger');
 
 const AUTH_TTL_MS = 30 * 60 * 1000;
@@ -44,34 +45,85 @@ function writeJsonAndExit(payload, exitCode) {
   process.stdout.write(JSON.stringify(payload), () => process.exit(exitCode));
 }
 
-function buildCredentialsWarning(findings) {
-  const art = terminalArt.randomAlertArt();
-  const summary = findings.map((finding) => {
-    const sample = finding.sample ? terminalArt.redactCredential(finding.sample) : '[redacted]';
-    return `${finding.id} x${finding.count} -> ${sample}`;
-  });
-
+function shieldBlock(prefix, label) {
   return [
+    '```diff',
+    `${prefix} ▎ 🛡  yieldOS  ·  ${label}`,
+    '```',
+  ].join('\n');
+}
+
+function extractVarNames(prompt) {
+  const names = new Set();
+  const re = /\b([A-Za-z_][A-Za-z0-9_]{1,63})\s*[:=]\s*(?:"[^"]+"|'[^']+'|[^\s'"`]+)/g;
+  let match;
+  while ((match = re.exec(prompt))) {
+    const rawName = match[1];
+    if (/(KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|API|AUTH|CRED|CREDENTIAL|PRIVATE)/i.test(rawName)) {
+      names.add(rawName.toUpperCase());
+    }
+  }
+  return [...names].slice(0, 5);
+}
+
+function buildCredentialsWarning(findings, prompt, projectRoot) {
+  const art = terminalArt.randomAlertArt();
+  const summary = findings.map((finding) => `${finding.id} x${finding.count}`);
+  const varNames = extractVarNames(prompt);
+  const guide = envHelper.buildRemediationGuide(projectRoot, varNames);
+
+  const alertBlock = [
     '```diff',
     '- ╔════════════════════════════════════════════════════════════════╗',
     '- ║   🛡  yieldOS  ·  CREDENCIAL DETECTADA EN EL PROMPT            ║',
+    '- ║   No repitas, uses ni pegues secrets en el chat                ║',
     '- ╚════════════════════════════════════════════════════════════════╝',
     '-',
     ...art.split('\n').map((line) => `- ${line}`),
     '-',
     '- Patrones detectados:',
     ...summary.map((line) => `-   ${line}`),
+    `- Variables identificadas: ${varNames.length > 0 ? varNames.join(', ') : '(sin nombre seguro)'}`,
     '-',
-    '- yieldOS bloqueó tu prompt antes de que llegara al modelo.',
-    '- El valor NO fue registrado en el log ni enviado al agente.',
-    '-',
-    '- Para reenviar el pedido, reemplazá el secreto por una referencia.',
-    '- Ejemplo: usá $OPENAI_API_KEY en vez de pegar el valor real.',
-    '-',
-    '- Si necesitás que el agente lea credenciales desde un archivo local,',
-    '- autorizá la lectura con la frase exacta:',
+    '- El valor NO fue registrado en logs por yieldOS.',
+    '- Si era una credencial real, asumila comprometida y rotala.',
+    '- No voy a repetir ni usar el valor en herramientas.',
+    '```',
+  ].join('\n');
+
+  const guideBlock = [
+    '```diff',
+    '+ ╔════════════════════════════════════════════════════════════════╗',
+    '+ ║   ✓  CAMINO CORRECTO  ·  mover credenciales a .env             ║',
+    '+ ╚════════════════════════════════════════════════════════════════╝',
+    '+',
+    ...guide.split('\n').map((line) => `+ ${line}`),
+    '+',
+    '+ Cuando la credencial ya este en .env, pedi que se lea desde archivo.',
+    '+ Para autorizar una lectura local por 30 minutos, la frase exacta es:',
     '+   AUTORIZO A LEER LAS CREDENCIALES',
     '```',
+  ].join('\n');
+
+  return `${alertBlock}\n\n${guideBlock}`;
+}
+
+function buildCredentialsDirective(findings, prompt, projectRoot) {
+  const warning = buildCredentialsWarning(findings, prompt, projectRoot);
+  const patternList = findings.map((finding) => finding.id).join(', ');
+  return [
+    '[yieldOS · CRITICAL SECURITY DIRECTIVE]',
+    '',
+    `The latest user prompt contains credential-looking material (${patternList}).`,
+    'Do not disclose, quote, paraphrase, encode, summarize, or use any part of the credential value.',
+    'Only credential variable names are allowed in your reply.',
+    'Do not put the credential value in any tool call.',
+    'Surface the two visual blocks below verbatim, then keep the reply short.',
+    '',
+    warning,
+    '',
+    'End your reply with this exact stamp:',
+    shieldBlock('-', 'Bloqueado · prompt expuso credencial'),
   ].join('\n');
 }
 
@@ -104,20 +156,19 @@ async function main() {
 
   const { findings } = credentialsScanner.scan(prompt);
   if (findings.length > 0) {
-    logger.appendEntry(projectRoot, 'Blocked Prompt (credentials in user input)', {
+    logger.appendEntry(projectRoot, 'Credentials Detected in User Prompt', {
       Patterns: findings.map((finding) => `${finding.id} (x${finding.count})`),
+      Action: 'prompt allowed with security directive to avoid Claude Code harness echoing the original prompt',
       Note: 'values were not logged for safety; only pattern IDs',
     });
-    process.stderr.write(`${terminalArt.alertLine(`prompt bloqueado: contiene credenciales (${findings.map((finding) => finding.id).join(', ')})`)}\n`);
-    process.stderr.write('[yieldOS:verdict] prompt-credentials-blocked\n');
+    process.stderr.write(`${terminalArt.alertLine(`prompt con credenciales detectado (${findings.map((finding) => finding.id).join(', ')})`)}\n`);
+    process.stderr.write('[yieldOS:verdict] prompt-credentials-detected\n');
     writeJsonAndExit({
-      decision: 'block',
-      reason: 'yieldOS blocked the user prompt because it appears to contain credentials.',
       hookSpecificOutput: {
         hookEventName: 'UserPromptSubmit',
-        additionalContext: buildCredentialsWarning(findings),
+        additionalContext: buildCredentialsDirective(findings, prompt, projectRoot),
       },
-    }, 2);
+    }, 0);
     return;
   }
 

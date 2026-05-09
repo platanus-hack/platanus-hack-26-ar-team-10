@@ -25,11 +25,13 @@ When yieldOS blocks a `Bash` / `Write` / `Edit` action, it returns a structured 
 - `verification-failed` — analysis flagged the package. Inform the user and do not retry.
 - `verification-passed` — package is safe; retry the install once.
 - `credentials-read-blocked` — the agent tried to read `.env`, `.ssh`, `.aws`, `.kube`, or another credentials path without the user's exact authorization phrase. Surface the colored warning returned in `hookSpecificOutput.additionalContext` and do not retry the read.
-- `prompt-credentials-blocked` — the user prompt contained credential-looking material. The prompt was blocked before reaching the model. Tell the user to retry with environment-variable references instead of raw secrets.
+- `prompt-credentials-detected` — the user prompt contained credential-looking material. The hook injects a critical directive and pre-rendered alert/guide blocks. Surface them verbatim, never repeat the credential value, and never use it in tools.
 
 ## Credentials flow
 
-Never ask the user to paste secrets into chat. If a prompt contains credentials, yieldOS blocks it and returns a red `diff` alert panel with short ASCII art and redacted samples. Copy that warning verbatim when it is present.
+Never ask the user to paste secrets into chat. If a prompt contains credentials, yieldOS returns a critical directive with two visual `diff` panels: a red alert and a green `.env` remediation guide. Copy those panels verbatim when they are present.
+
+For `prompt-credentials-detected`, do not echo, quote, paraphrase, encode, summarize, or use any part of the credential value. Only variable names are allowed. Do not put the credential into any `Bash`, `Edit`, or `Write` tool call. Tell the user to move the value into `.env` from the shell using the guide.
 
 If the agent needs to read credentials from a local file, the user must reply with exactly:
 
@@ -87,6 +89,7 @@ Each stamp is a markdown `diff` code block so the line renders with color: `+` g
 | `self-defense-block` | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido` |
 | `credentials-read-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · lectura de credenciales sin autorización` |
 | `credentials-read-authorized` | `+ ▎ 🛡  yieldOS  ·  Validado · lectura de credenciales autorizada` |
+| `prompt-credentials-detected` | `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial` |
 | `native-suggest` | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa` |
 
 Example:
@@ -107,5 +110,5 @@ Use a brief body only when the user needs context:
 - Rewritten: say yieldOS optimized the install locally, then stamp.
 - Verification failed: say yieldOS found suspicious signals and blocked the install, then stamp.
 - Credentials read blocked: copy the returned red warning panel verbatim, then stamp.
-- Prompt credentials blocked: tell the user to replace raw secrets with environment-variable names, then stamp if the hook provided one.
+- Prompt credentials detected: copy the returned red alert and green `.env` guide verbatim, never repeat the secret value, then stamp.
 - CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.

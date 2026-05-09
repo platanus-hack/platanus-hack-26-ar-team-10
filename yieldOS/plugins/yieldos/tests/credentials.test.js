@@ -34,7 +34,7 @@ function parseStdout(result) {
   return JSON.parse(result.stdout);
 }
 
-test('UserPromptSubmit blocks credentials and never echoes the raw value', () => {
+test('UserPromptSubmit detects credentials without decision:block and never echoes the raw value', () => {
   const root = tmpProject();
   const key = 'sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDE';
   const result = runHook(PROMPT_HOOK, {
@@ -42,19 +42,41 @@ test('UserPromptSubmit blocks credentials and never echoes the raw value', () =>
     prompt: `please use ${key} for this request`,
   });
 
-  assert.equal(result.code, 2);
-  assert.equal(result.stderr.includes('[yieldOS:verdict] prompt-credentials-blocked'), true);
+  assert.equal(result.code, 0);
+  assert.equal(result.stderr.includes('[yieldOS:verdict] prompt-credentials-detected'), true);
   assert.equal(result.stderr.includes('\x1b[31m'), true);
   assert.equal(result.stdout.includes(key), false);
 
   const parsed = parseStdout(result);
-  assert.equal(parsed.decision, 'block');
-  assert.match(parsed.reason, /credentials/i);
+  assert.equal('decision' in parsed, false);
   const context = parsed.hookSpecificOutput.additionalContext;
+  assert.match(context, /CRITICAL SECURITY DIRECTIVE/);
+  assert.match(context, /Do not disclose/);
   assert.match(context, /```diff/);
   assert.match(context, /╔════════/);
   assert.match(context, /CREDENCIAL DETECTADA/);
+  assert.match(context, /CAMINO CORRECTO/);
   assert.match(context, /openai-project-key/);
+  assert.match(context, /Bloqueado · prompt expuso credencial/);
+});
+
+test('UserPromptSubmit catches secret-named variables with arbitrary unicode values', () => {
+  const root = tmpProject();
+  const value = 'AOSDJFKÑLASJDKFJ23409ASDÑFÑASJD';
+  const result = runHook(PROMPT_HOOK, {
+    cwd: root,
+    prompt: `usa ANTHROPIC_API_KEY="${value}" para probar`,
+  });
+
+  assert.equal(result.code, 0);
+  assert.equal(result.stderr.includes('[yieldOS:verdict] prompt-credentials-detected'), true);
+  assert.equal(result.stdout.includes(value), false);
+
+  const parsed = parseStdout(result);
+  const context = parsed.hookSpecificOutput.additionalContext;
+  assert.match(context, /secret-named-var/);
+  assert.match(context, /ANTHROPIC_API_KEY/);
+  assert.doesNotMatch(context, new RegExp(value));
 });
 
 test('credentials authorization requires the exact phrase as the whole prompt', () => {
@@ -121,4 +143,7 @@ test('PreToolUse allows Read of .env while credentials authorization is active',
   assert.equal(result.code, 0);
   assert.equal(result.stderr.includes('[yieldOS:verdict] credentials-read-authorized'), true);
   assert.equal(result.stderr.includes('\x1b[32m'), true);
+  const parsed = parseStdout(result);
+  assert.match(parsed.hookSpecificOutput.additionalContext, /credentials-read-authorized/);
+  assert.match(parsed.hookSpecificOutput.additionalContext, /Validado · lectura de credenciales autorizada/);
 });
