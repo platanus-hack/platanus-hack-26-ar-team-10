@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const navItems = [
   ["Coverage", "#gated-vectors"],
   ["Policy", "#policy-flow"],
+  ["Packs", "#agent-packs"],
   ["Proof", "#proof"],
 ];
 

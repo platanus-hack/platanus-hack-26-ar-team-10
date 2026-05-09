@@ -2,11 +2,22 @@
   "name": "platanus-hack-26-ar-team-10-root",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "devDependencies": {
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
   "scripts": {
     "dev": "npm --prefix ./landing run dev --",
     "build": "npm --prefix ./landing run build --",
     "start": "npm --prefix ./landing run start --",
     "lint": "npm --prefix ./landing run lint --",
     "test": "npm --prefix ./landing test --"
+  },
+  "overrides": {
+    "postcss": "8.5.14"
   }
 }

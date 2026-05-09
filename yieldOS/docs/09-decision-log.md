@@ -344,3 +344,19 @@ plugins/yieldos/.claude-plugin/{hooks,scripts,...}
 **Decision**: the CI/CD gate and Dockerfile scanner designs live in `docs/11-ci-cd.md` and `docs/12-dockerfile-scanner.md` as plans only. They are not enabled by the plugin runtime yet.
 
 **Rationale**: both ideas extend the same policy engine beyond the current Claude Code hook surface, but shipping them requires new classifiers, reporters, and CI entrypoints. Keeping them as explicit plans prevents the docs from implying capabilities the project does not yet provide.
+
+---
+
+## D38 — Instruction generation stays separate from installation
+
+**Decision**: `/yieldos:init` generates previewable `AGENTS.md` and `CLAUDE.md` instructions for project, local, personal, and organization scopes. `install.sh` does not accept configuration flags for those files.
+
+**Rationale**: plugin installation is global, while instruction files are policy artifacts with different blast radii. A preview-first init command keeps the output reviewable and avoids surprising global install side effects.
+
+---
+
+## D39 — Agent packs are source of truth, not equal enforcement everywhere
+
+**Decision**: `yield.agent-pack.yaml` is the reviewed source of truth for team agent profiles, skills, MCPs, playbooks, and target adapters. `yieldos-pack` validates the pack against policy and generates native files, reports, and a lockfile. Claude Code has the strongest runtime enforcement through hooks; Cursor, GitHub Copilot, Windsurf, Codex-style, and universal outputs are guidance unless their host exposes equivalent controls.
+
+**Rationale**: teams need one reviewable configuration artifact instead of hand-maintained rules per agent. The product must stay honest: native outputs reduce drift and ambiguity, but they do not create hard enforcement in hosts that only support guidance.

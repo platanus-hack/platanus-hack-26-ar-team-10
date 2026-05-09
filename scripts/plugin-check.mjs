@@ -89,14 +89,18 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/hooks/hooks.json',
   'yieldOS/plugins/yieldos/commands/audit.md',
   'yieldOS/plugins/yieldos/commands/init.md',
+  'yieldOS/plugins/yieldos/commands/pack.md',
   'yieldOS/plugins/yieldos/commands/pentest.md',
   'yieldOS/plugins/yieldos/commands/update.md',
   'yieldOS/plugins/yieldos/bin/yieldos-audit',
   'yieldOS/plugins/yieldos/bin/yieldos-init',
+  'yieldOS/plugins/yieldos/bin/yieldos-pack',
   'yieldOS/plugins/yieldos/bin/yieldos-pentest',
   'yieldOS/plugins/yieldos/bin/yieldos-update',
   'yieldOS/plugins/yieldos/CHANGELOG.md',
   'yieldOS/plugins/yieldos/scripts/audit-command.js',
+  'yieldOS/plugins/yieldos/scripts/agent-pack-command.js',
+  'yieldOS/plugins/yieldos/scripts/agent-pack-yaml.js',
   'yieldOS/plugins/yieldos/scripts/init-command.js',
   'yieldOS/plugins/yieldos/scripts/init-profiles.js',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
@@ -122,8 +126,11 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/security/.gitignore',
   'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
+  'yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml',
   'landing/package.json',
+  'landing/src/app/agent-packs/page.tsx',
   'landing/src/app/page.tsx',
+  'landing/src/components/agent-pack-builder.tsx',
 ]) {
   assertFile(relativePath);
 }
@@ -137,6 +144,7 @@ for (const file of policyFiles) {
 assertExecutable('install.sh');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-audit');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-init');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-pack');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-pentest');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-update');
 

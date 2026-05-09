@@ -1,0 +1,353 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+const agentPack = require('../scripts/agent-pack-command');
+
+const PLUGIN_ROOT = path.resolve(__dirname, '..');
+const FIXTURE_PACK = path.join(__dirname, 'fixtures', 'yield.agent-pack.yaml');
+
+function tmpProject() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-pack-'));
+}
+
+function copyFixture(root) {
+  const target = path.join(root, 'yield.agent-pack.yaml');
+  fs.copyFileSync(FIXTURE_PACK, target);
+  return target;
+}
+
+function writePack(root, content) {
+  const target = path.join(root, 'yield.agent-pack.yaml');
+  fs.writeFileSync(target, content);
+  return target;
+}
+
+function sha256(content) {
+  return `sha256:${crypto.createHash('sha256').update(content).digest('hex')}`;
+}
+
+test('runPack previews generated files without writing them', () => {
+  const root = tmpProject();
+  copyFixture(root);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+  const paths = result.files.map((file) => file.path);
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(result.message.includes('yieldOS pack preview'), true);
+  assert.equal(result.message.includes('test-safe-defaults'), true);
+  assert.equal(result.message.includes('AGENTS.md'), true);
+  assert.equal(result.message.includes('CLAUDE.md'), true);
+  assert.equal(result.message.includes('.yield/pack-report.md'), true);
+  assert.equal(result.message.includes('yield.agent-pack.lock.json'), true);
+  assert.equal(result.message.includes('claude-code: enforced-via-yieldos-hooks'), true);
+  assert.equal(result.message.includes('cursor: guidance-only'), true);
+  assert.equal(paths.includes('AGENTS.md'), true);
+  assert.equal(paths.includes('CLAUDE.md'), true);
+  assert.equal(paths.includes('.yield/pack-report.md'), true);
+  assert.equal(paths.includes('yield.agent-pack.lock.json'), true);
+  assert.equal(paths.includes('.cursor/rules/yieldos-security.mdc'), true);
+  assert.equal(paths.includes('.claude/skills/agent-pack-review/SKILL.md'), true);
+  assert.equal(paths.includes('.agents/skills/agent-pack-review/SKILL.md'), true);
+  assert.equal(paths.includes('.cursor/skills/agent-pack-review/SKILL.md'), true);
+  assert.equal(fs.existsSync(path.join(root, 'AGENTS.md')), false);
+  assert.equal(fs.existsSync(path.join(root, '.yield', 'pack-report.md')), false);
+});
+
+test('runPack writes generated files and refuses overwrite without force', () => {
+  const root = tmpProject();
+  copyFixture(root);
+
+  const first = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(first.exitCode, 0);
+  assert.equal(fs.existsSync(path.join(root, 'AGENTS.md')), true);
+  assert.equal(fs.existsSync(path.join(root, 'CLAUDE.md')), true);
+  assert.equal(fs.existsSync(path.join(root, '.yield', 'pack-report.md')), true);
+  assert.equal(fs.existsSync(path.join(root, 'yield.agent-pack.lock.json')), true);
+  assert.equal(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8').includes('Secrets and credentials safety'), true);
+
+  const second = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+  assert.equal(second.exitCode, 2);
+  assert.equal(second.message.includes('refused to overwrite'), true);
+
+  const forced = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml', '--force']);
+  assert.equal(forced.exitCode, 0);
+});
+
+test('runPack verify rejects an unapproved skill', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-skill
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+skills:
+  allow:
+    - key: skill:not-approved
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('skill:not-approved is not approved'), true);
+});
+
+test('runPack verify rejects playbooks that are not reviewed by yieldOS', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-playbook
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+playbooks:
+  include:
+    - unreviewed-workflow
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('unreviewed-workflow is not a reviewed yieldOS playbook'), true);
+});
+
+test('runPack verify rejects MCP tools outside the approved surface', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-mcp
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+mcps:
+  allow:
+    - key: mcp:filesystem
+      approved_tools:
+        - read_file
+        - write_file
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('mcp:filesystem requests unapproved tool: write_file'), true);
+});
+
+test('runPack rejects pack lock paths outside the project', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-lock-path
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+evidence:
+  pack_lock: ../yield.agent-pack.lock.json
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack_lock must stay inside the project'), true);
+});
+
+test('runPack rejects pack files outside the project', () => {
+  const root = tmpProject();
+  const outside = path.join(tmpProject(), 'yield.agent-pack.yaml');
+  fs.copyFileSync(FIXTURE_PACK, outside);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', outside]);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack path must stay inside the project'), true);
+});
+
+test('pack lock records hashes for generated files', () => {
+  const root = tmpProject();
+  copyFixture(root);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+  const lockFile = result.files.find((file) => file.path === 'yield.agent-pack.lock.json');
+  const lock = JSON.parse(lockFile.content);
+  const agentsFile = result.files.find((file) => file.path === 'AGENTS.md');
+
+  assert.equal(lock.pack, 'test-safe-defaults');
+  assert.equal(lock.policy_version, '0.4.0');
+  assert.equal(lock.generated_files.some((file) => file.path === 'AGENTS.md' && file.sha256 === sha256(agentsFile.content)), true);
+  assert.equal(lock.skills[0].key, 'skill:dependency-gate');
+  assert.equal(lock.skills[0].policy_entry_sha256.startsWith('sha256:'), true);
+  assert.equal(Object.hasOwn(lock.skills[0], 'content_sha256'), false);
+  assert.equal(lock.mcps[0].key, 'mcp:filesystem');
+  assert.equal(lock.generated_files.some((file) => file.path === '.cursor/rules/yieldos-security.mdc'), true);
+  assert.equal(lock.generated_files.some((file) => file.path === '.cursor/skills/agent-pack-review/SKILL.md'), true);
+});
+
+test('runPack generates native adapters for Cursor, Copilot, and Windsurf', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: all-targets
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+  codex:
+    enabled: true
+  cursor:
+    enabled: true
+  github-copilot:
+    enabled: true
+  windsurf:
+    enabled: true
+skills:
+  allow:
+    - key: skill:dependency-gate
+mcps:
+  allow:
+    - key: mcp:filesystem
+      approved_tools:
+        - read_file
+        - list_directory
+        - search_files
+playbooks:
+  include:
+    - agent-pack-review
+`);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+  const paths = result.files.map((file) => file.path);
+  const cursorSkill = result.files.find((file) => file.path === '.cursor/skills/agent-pack-review/SKILL.md');
+
+  assert.equal(result.exitCode, 0);
+  [
+    '.cursor/rules/yieldos-security.mdc',
+    '.github/copilot-instructions.md',
+    '.github/instructions/yieldos-security.instructions.md',
+    '.github/prompts/yieldos-security-audit.prompt.md',
+    '.windsurf/rules/yieldos-security.md',
+    '.claude/skills/agent-pack-review/SKILL.md',
+    '.agents/skills/agent-pack-review/SKILL.md',
+    '.cursor/skills/agent-pack-review/SKILL.md',
+    '.windsurf/skills/agent-pack-review/SKILL.md',
+  ].forEach((expectedPath) => {
+    assert.equal(paths.includes(expectedPath), true, `expected generated file: ${expectedPath}`);
+  });
+  assert.equal(cursorSkill.content.includes('name: agent-pack-review'), true);
+  assert.equal(cursorSkill.content.includes('Check every MCP reference against `policy/mcps.json`.'), true);
+});
+
+test('generated guidance carries the non-technical safe-coding contract', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: non-technical-safe-defaults
+profiles:
+  - secrets-safe
+  - dependency-safe
+  - code-audit
+agents:
+  claude-code:
+    enabled: true
+  codex:
+    enabled: true
+  cursor:
+    enabled: true
+  github-copilot:
+    enabled: true
+  windsurf:
+    enabled: true
+skills:
+  allow:
+    - key: skill:dependency-gate
+mcps:
+  allow:
+    - key: mcp:filesystem
+      approved_tools:
+        - read_file
+        - list_directory
+        - search_files
+playbooks:
+  include:
+    - agent-pack-review
+`);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 0);
+  [
+    'AGENTS.md',
+    '.cursor/rules/yieldos-security.mdc',
+    '.github/copilot-instructions.md',
+    '.github/instructions/yieldos-security.instructions.md',
+    '.windsurf/rules/yieldos-security.md',
+    '.agents/skills/agent-pack-review/SKILL.md',
+  ].forEach((expectedPath) => {
+    const file = result.files.find((candidate) => candidate.path === expectedPath);
+    assert.ok(file, `expected generated file: ${expectedPath}`);
+    [
+      'Non-technical user safety contract',
+      'Allowed means configured checks passed, not proven safe.',
+      'Do not install or enable unapproved skills, MCPs, dependencies, remote scripts, or binaries.',
+      'Stop and explain in plain language when a request could expose secrets, weaken auth, delete data, spend money, deploy, or change production.',
+      'Use deterministic yieldOS policy before model judgment.',
+    ].forEach((text) => {
+      assert.equal(file.content.includes(text), true, `${expectedPath} missing: ${text}`);
+    });
+  });
+});
+
+test('claude-only packs include the safety contract in CLAUDE.md', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: claude-only-safe-defaults
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+`);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+  const claudeFile = result.files.find((file) => file.path === 'CLAUDE.md');
+
+  assert.equal(result.exitCode, 0);
+  assert.ok(claudeFile, 'expected CLAUDE.md');
+  assert.equal(claudeFile.content.includes('Non-technical user safety contract'), true);
+  assert.equal(claudeFile.content.includes('Use deterministic yieldOS policy before model judgment.'), true);
+});
+
+test('pack command markdown and executable are registered', () => {
+  const command = fs.readFileSync(path.join(PLUGIN_ROOT, 'commands', 'pack.md'), 'utf8');
+  const mode = fs.statSync(path.join(PLUGIN_ROOT, 'bin', 'yieldos-pack')).mode;
+
+  assert.equal(command.includes('allowed-tools: Bash(yieldos-pack:*)'), true);
+  assert.equal(command.includes('yieldos-pack $ARGUMENTS'), true);
+  if (process.platform !== 'win32') {
+    assert.equal((mode & 0o111) !== 0, true);
+  }
+});

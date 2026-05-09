@@ -1,0 +1,55 @@
+version: 0.1
+kind: yield.agent-pack
+name: yieldos-internal-security
+description: Internal yieldOS security harness pack for dogfooding agent rules, skills, MCP policy, and playbooks.
+
+profiles:
+  - secrets-safe
+  - dependency-safe
+  - code-audit
+  - network-safe
+  - git-safe
+  - testing-discipline
+
+agents:
+  claude-code:
+    enabled: true
+  codex:
+    enabled: true
+
+skills:
+  allow:
+    - key: skill:dependency-gate
+      source: policy/skills.json
+
+mcps:
+  allow:
+    - key: mcp:filesystem
+      approved_tools:
+        - read_file
+        - list_directory
+        - search_files
+    - key: mcp:git
+      approved_tools:
+        - git_log
+        - git_diff
+        - git_show
+        - git_status
+  default_unlisted: deny
+
+playbooks:
+  include:
+    - security-audit
+    - threat-model
+    - finding-discovery
+    - validation
+    - fix-finding
+    - skill-review
+    - mcp-review
+    - instruction-file-review
+    - agent-pack-review
+
+evidence:
+  decisions_dir: .yield/decisions
+  audit_state: security/code-audit-state.json
+  pack_lock: yield.agent-pack.lock.json

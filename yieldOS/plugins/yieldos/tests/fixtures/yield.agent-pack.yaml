@@ -1,0 +1,44 @@
+version: 0.1
+kind: yield.agent-pack
+name: test-safe-defaults
+description: Safe coding defaults for test teams.
+
+profiles:
+  - secrets-safe
+  - dependency-safe
+  - code-audit
+
+agents:
+  claude-code:
+    enabled: true
+  codex:
+    enabled: true
+  cursor:
+    enabled: true
+
+skills:
+  allow:
+    - key: skill:dependency-gate
+      source: policy/skills.json
+
+mcps:
+  allow:
+    - key: mcp:filesystem
+      approved_tools:
+        - read_file
+        - list_directory
+        - search_files
+  default_unlisted: deny
+
+playbooks:
+  include:
+    - security-audit
+    - skill-review
+    - mcp-review
+    - instruction-file-review
+    - agent-pack-review
+
+evidence:
+  decisions_dir: .yield/decisions
+  audit_state: security/code-audit-state.json
+  pack_lock: yield.agent-pack.lock.json

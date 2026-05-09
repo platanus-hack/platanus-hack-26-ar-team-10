@@ -2,7 +2,7 @@
 
 **One security gate for every dependency, skill, and instruction your AI agent touches — built for humans and AI agents.**
 
-yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec, `/yieldos:init` for preview-first agent instruction generation, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
+yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
 
 → Full design documentation in [`docs/`](docs/README.md).
 
@@ -125,6 +125,26 @@ Generate reviewable `AGENTS.md` and `CLAUDE.md` safety instructions:
 Default mode previews the generated files. Add `--write` only after reviewing the output.
 
 Detail: [docs/14-custom-instructions.md](docs/14-custom-instructions.md).
+
+## Team agent packs
+
+Compile a reviewed `yield.agent-pack.yaml` manifest into native agent files:
+
+```text
+/yieldos:pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+```
+
+From a terminal:
+
+```bash
+yieldos-pack verify --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+yieldos-pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+yieldos-pack write --pack yield.agent-pack.yaml
+```
+
+The compiler validates referenced skills and MCP tool surfaces against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. Claude Code has the strongest runtime enforcement through hooks; other adapters are native guidance until their host exposes equivalent controls.
+
+Detail: [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md).
 
 ## Pentest loop
 

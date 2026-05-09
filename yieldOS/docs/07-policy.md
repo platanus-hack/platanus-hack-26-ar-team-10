@@ -1,6 +1,6 @@
 # Policy management
 
-All policy lives at `github.com/platanus-hack/policy-yieldos/policy/` (the official policy repository owned by `platanus-hack-26-ar-team-10`). It is **not** editable locally.
+All policy lives at `github.com/platanus-hack/platanus-hack-26-ar-team-10/policy/`. Installed plugins fetch the raw files from that directory. Policy is **not** editable locally.
 
 ## Policy files
 
@@ -80,7 +80,7 @@ getPolicy({ forceRefresh })
 
 The user does not edit policy locally. To add a package to the allowlist or denylist:
 
-1. Open a PR to `github.com/platanus-hack/policy-yieldos`.
+1. Open a PR to `github.com/platanus-hack/platanus-hack-26-ar-team-10`.
 2. Edit the relevant `policy/*.json` file.
 3. Justify in the PR description (e.g., "this package is widely used and we have audited the postinstall script and verified the maintainer").
 4. Maintainer reviews and merges.
