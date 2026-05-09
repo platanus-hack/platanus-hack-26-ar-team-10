@@ -13,6 +13,15 @@ test('protected: dependency-events.md', () => {
   assert.equal(sd.isProtectedPath('/proj/security/dependency-events.md'), true);
 });
 
+test('protected: audit-events.md', () => {
+  assert.equal(sd.isProtectedPath('/proj/security/audit-events.md'), true);
+});
+
+test('protected: code audit state files', () => {
+  assert.equal(sd.isProtectedPath('/proj/security/code-audit-events.md'), true);
+  assert.equal(sd.isProtectedPath('/proj/security/code-audit-state.json'), true);
+});
+
 test('protected: yieldos-rewrites.json', () => {
   assert.equal(sd.isProtectedPath('/proj/security/yieldos-rewrites.json'), true);
 });

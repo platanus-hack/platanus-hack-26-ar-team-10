@@ -87,7 +87,9 @@ for (const relativePath of [
   '.github/workflows/release.yml',
   'policy/README.md',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
+  'yieldOS/plugins/yieldos/commands/audit.md',
   'yieldOS/plugins/yieldos/commands/update.md',
+  'yieldOS/plugins/yieldos/bin/yieldos-audit',
   'yieldOS/plugins/yieldos/bin/yieldos-update',
   'yieldOS/plugins/yieldos/CHANGELOG.md',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
@@ -115,6 +117,7 @@ for (const file of policyFiles) {
 }
 
 assertExecutable('install.sh');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-audit');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-update');
 
 console.log('plugin structure OK');

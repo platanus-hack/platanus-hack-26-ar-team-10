@@ -1,7 +1,7 @@
 {
   "name": "yieldos",
   "version": "0.4.0",
-  "description": "Security gate for Claude Code. Intercepts dependency installations, skill activations, MCP additions, and instruction file changes. Validates against an official policy repository before allowing the action.",
+  "description": "Security gate for Claude Code. Intercepts dependency installations, skill activations, MCP additions, instruction file changes, and source-code audits. Adds on-demand Deepsec audit commands.",
   "author": {
     "name": "platanus-hack-26-ar-team-10"
   },
