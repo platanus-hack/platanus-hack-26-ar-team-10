@@ -62,6 +62,7 @@ const STAMP_BY_VERDICT = {
   'code-audit-verification-failed': shieldBlock('-', 'Bloqueado · verificación code audit'),
   'credentials-read-blocked': shieldBlock('-', 'Bloqueado · lectura de credenciales sin autorización'),
   'credentials-read-authorized': shieldBlock('+', 'Validado · lectura de credenciales autorizada'),
+  'noop': shieldBlock('+', 'Activo · sin hallazgos'),
 };
 
 const VERDICT_PRIORITY = [
@@ -82,6 +83,7 @@ const VERDICT_PRIORITY = [
   'code-audit-clean',
   'verification-passed',
   'allowlist-match',
+  'noop',
 ];
 
 function stampFor(verdict) {
@@ -471,6 +473,10 @@ async function main() {
   }
 
   if (candidates.length === 0) {
+    emitHookOutput([{
+      candidate: { type: 'tool-call', name: tool || 'unknown', version: 'unknown' },
+      decision: { verdict: 'noop' },
+    }]);
     process.exit(0);
   }
 
