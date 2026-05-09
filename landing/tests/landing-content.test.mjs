@@ -334,8 +334,16 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(!globals.includes("rotateX(66deg)"), "Expected tilted roll-axis rotation to be removed");
   assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
   assert.ok(
-    globals.includes("rgba(255, 255, 255, 0.18)"),
-    "Expected liquid glass nav to use a highly translucent capsule surface",
+    globals.includes("rgba(var(--signal-blue-rgb), 0.34) 0%"),
+    "Expected liquid glass nav to start with blue",
+  );
+  assert.ok(
+    globals.includes("transparent 50%"),
+    "Expected liquid glass nav to stay transparent in the center",
+  );
+  assert.ok(
+    globals.includes("rgba(var(--signal-red-rgb), 0.34) 100%"),
+    "Expected liquid glass nav to end with red",
   );
   assert.ok(globals.includes("-webkit-backdrop-filter: blur(34px)"), "Expected Safari liquid glass blur");
   assert.ok(globals.includes("contrast(1.08)"), "Expected refractive liquid glass contrast");
