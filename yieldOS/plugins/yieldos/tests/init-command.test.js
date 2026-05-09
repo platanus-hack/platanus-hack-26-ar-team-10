@@ -117,5 +117,7 @@ test('init command markdown and executable are registered', () => {
 
   assert.equal(command.includes('allowed-tools: Bash(yieldos-init:*)'), true);
   assert.equal(command.includes('yieldos-init $ARGUMENTS'), true);
-  assert.equal((mode & 0o111) !== 0, true);
+  if (process.platform !== 'win32') {
+    assert.equal((mode & 0o111) !== 0, true);
+  }
 });
