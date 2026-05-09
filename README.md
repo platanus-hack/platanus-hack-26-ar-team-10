@@ -9,6 +9,12 @@ yieldOS is a Claude Code security plugin that gates the risky things AI agents d
 ## Install
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+```
+
+Manual install:
+
+```bash
 claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
 claude plugins install yieldos@yieldos
 ```
@@ -22,6 +28,7 @@ yieldOS/plugins/yieldos
 ## Validate Locally
 
 ```bash
+sh install.sh --dry-run
 claude plugins validate .
 claude plugins validate yieldOS/plugins/yieldos
 

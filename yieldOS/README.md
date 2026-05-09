@@ -21,11 +21,17 @@ yieldOS makes the trust decision **before** the install runs, deterministically,
 ## Quickstart
 
 ```bash
-# 1. Add the public marketplace and install
+# 1. Install from the public marketplace
+curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+```
+
+Manual install:
+
+```bash
 claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
 claude plugins install yieldos@yieldos
 
-# 2. (Optional) Run the test suite
+# Optional: run the test suite
 cd plugins/yieldos
 node --test tests/*.test.js
 ```

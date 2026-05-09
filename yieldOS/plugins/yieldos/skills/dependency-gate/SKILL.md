@@ -1,6 +1,6 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent encounters install commands, skill activations, MCP additions, or instruction-file edits. Provides context on yieldOS policy and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands, edits dependency manifests, activates skills, adds MCPs, or edits instruction files. Provides context on yieldOS policy, visual stamps, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate
@@ -52,11 +52,30 @@ Do not try to bypass these blocks. They are a feature, not a bug.
 
 ## What to tell the user
 
-Keep messages short, in their language, and informative — never asking. Examples:
+Keep messages short, in their language, and informative — never asking.
 
-- Allowed: silent (no message).
-- Blocked (denylist): `yieldOS bloqueó {package}: {reason}`.
-- Blocked (Category D): `yieldOS bloqueó {package}: categoría crítica, requiere aprobación del equipo de seguridad`.
-- Rewritten: `yieldOS realizó una optimización de la instalación de {package}`.
-- Verification failed: `yieldOS detectó señales sospechosas en {package} y bloqueó la instalación`.
+### Visual stamp
+
+Whenever a tool call was processed by yieldOS, close your reply with the matching one-line stamp on its own final line:
+
+| Verdict in stderr | Stamp |
+| --- | --- |
+| `allowlist-match` | `> 🛡  Validado por yieldOS` |
+| `verification-passed` | `> 🛡  Validado por yieldOS (análisis OK)` |
+| `denylist-match` | `> ⛔ Bloqueado por yieldOS — denylist` |
+| `category-d-blocked` | `> ⛔ Bloqueado por yieldOS — categoría crítica` |
+| `verification-failed` | `> ⛔ Bloqueado por yieldOS — señales sospechosas` |
+| `build-script-not-approved` | `> ⛔ Bloqueado por yieldOS — build script no aprobado` |
+| `native-suggest` | `> 💡 yieldOS sugiere usar API nativa` |
+| `category-a-rewrite` | `> ✨ yieldOS optimizó la instalación` |
+| `injection-blocked` | `> ⛔ Bloqueado por yieldOS — inyección detectada` |
+| `self-defense-block` | `> ⛔ Bloqueado por yieldOS — archivo protegido` |
+
+Use a brief body only when the user needs context:
+
+- Allowed: silent body, just the stamp.
+- Blocked (denylist): explain the reason in one line, then stamp.
+- Blocked (Category D): say it requires security-team approval, then stamp.
+- Rewritten: say yieldOS optimized the install locally, then stamp.
+- Verification failed: say yieldOS found suspicious signals and blocked the install, then stamp.
 - CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.

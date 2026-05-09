@@ -1,5 +1,7 @@
 'use strict';
 
+const https = require('node:https');
+
 const lookup = require('./policy-lookup');
 const rewriter = require('./rewriter');
 const analyzers = require('./analyzers');
@@ -15,6 +17,56 @@ const VERDICT = {
   BLOCK_BUILD_SCRIPT: 'build-script-not-approved',
 };
 
+function headRequest(url, timeoutMs = 4000) {
+  return new Promise((resolve) => {
+    const req = https.request(url, { method: 'HEAD', timeout: timeoutMs }, (res) => {
+      resolve(res.statusCode);
+      res.resume();
+    });
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(null);
+    });
+    req.end();
+  });
+}
+
+function hasConcreteRegistryVersion(candidate) {
+  const version = candidate.version;
+  if (!version || version === 'latest' || version === 'unspecified') return false;
+  if (['npm', 'pnpm', 'yarn', 'bun'].includes(candidate.manager)) {
+    return /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(version);
+  }
+  if (['pip', 'poetry', 'uv'].includes(candidate.manager)) {
+    return /^[0-9][A-Za-z0-9_.!+-]*$/.test(version) && !/[<>=~,]/.test(version);
+  }
+  return false;
+}
+
+async function versionExistsOnRegistry(candidate, timeoutMs = 4000) {
+  if (!hasConcreteRegistryVersion(candidate)) return null;
+
+  if (['npm', 'pnpm', 'yarn', 'bun'].includes(candidate.manager)) {
+    const encodedName = candidate.name.startsWith('@')
+      ? `@${encodeURIComponent(candidate.name.slice(1))}`
+      : encodeURIComponent(candidate.name);
+    const status = await headRequest(`https://registry.npmjs.org/${encodedName}/${encodeURIComponent(candidate.version)}`, timeoutMs);
+    if (status === 200) return true;
+    if (status === 404) return false;
+    return null;
+  }
+
+  if (['pip', 'poetry', 'uv'].includes(candidate.manager)) {
+    const status = await headRequest(`https://pypi.org/pypi/${encodeURIComponent(candidate.name)}/${encodeURIComponent(candidate.version)}/json`, timeoutMs);
+    if (status === 200) return true;
+    if (status === 404) return false;
+    return null;
+  }
+
+  return null;
+}
+
 async function decide(candidate, policy, opts = {}) {
   const native = lookup.nativeEquivalent(candidate, policy['native-equivalents.json']);
   if (native) {
@@ -27,10 +79,24 @@ async function decide(candidate, policy, opts = {}) {
   }
 
   if (lookup.isAllowlisted(candidate, policy['allowlist.json'])) {
+    if (lookup.matchedByNameOnly(candidate, policy['allowlist.json']) && hasConcreteRegistryVersion(candidate)) {
+      const exists = typeof opts.versionExists === 'function'
+        ? await opts.versionExists(candidate)
+        : await versionExistsOnRegistry(candidate, opts.registryTimeoutMs || 4000);
+      if (exists === false) {
+        return {
+          verdict: VERDICT.BLOCK_VERIFICATION,
+          action: 'block',
+          message: `yieldOS bloqueó ${candidate.name}@${candidate.version}: la versión no existe en el registry`,
+          meta: { reason: 'fake-version', candidate },
+        };
+      }
+    }
+
     return {
       verdict: VERDICT.ALLOW_ALLOWLIST,
       action: 'allow',
-      message: null,
+      message: '🛡  Validado por yieldOS (allowlist)',
       meta: {},
     };
   }
@@ -105,7 +171,7 @@ async function decide(candidate, policy, opts = {}) {
       return {
         verdict: VERDICT.ALLOW_VERIFIED,
         action: 'allow',
-        message: null,
+        message: '🛡  Validado por yieldOS (build script aprobado)',
         meta: { ...analysis, build_script_approved: true },
       };
     }
@@ -121,7 +187,7 @@ async function decide(candidate, policy, opts = {}) {
     return {
       verdict: VERDICT.ALLOW_VERIFIED,
       action: 'allow',
-      message: `yieldOS instaló ${candidate.name} con advertencias (ver log)`,
+      message: '🛡  Validado por yieldOS (con advertencias; ver log)',
       meta: analysis,
     };
   }
@@ -129,7 +195,7 @@ async function decide(candidate, policy, opts = {}) {
   return {
     verdict: VERDICT.ALLOW_VERIFIED,
     action: 'allow',
-    message: null,
+    message: '🛡  Validado por yieldOS (análisis OK)',
     meta: analysis,
   };
 }
@@ -145,4 +211,4 @@ function normalizeMetadataForEval(metadata, candidate) {
   return metadata;
 }
 
-module.exports = { decide, VERDICT };
+module.exports = { decide, VERDICT, hasConcreteRegistryVersion, versionExistsOnRegistry };

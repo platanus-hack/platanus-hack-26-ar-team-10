@@ -24,6 +24,11 @@ function assertFile(relativePath) {
   assert(fs.existsSync(path.join(repoRoot, relativePath)), `missing file: ${relativePath}`);
 }
 
+function assertExecutable(relativePath) {
+  const mode = fs.statSync(path.join(repoRoot, relativePath)).mode;
+  assert((mode & 0o111) !== 0, `${relativePath} must be executable`);
+}
+
 function assertNoUnknownMarketplaceKeys(marketplace, relativePath) {
   const allowed = new Set(['name', 'metadata', 'owner', 'plugins']);
   for (const key of Object.keys(marketplace)) {
@@ -40,7 +45,7 @@ function validateMarketplace(relativePath, expectedSource, sourceBase = '.') {
 
   const entry = marketplace.plugins.find((plugin) => plugin.name === 'yieldos');
   assert(entry, `${relativePath} must declare the yieldos plugin`);
-  assert(entry.version === '0.2.2', `${relativePath} must point at yieldos 0.2.2`);
+  assert(entry.version === '0.2.5', `${relativePath} must point at yieldos 0.2.5`);
   assert(entry.source === expectedSource, `${relativePath} has wrong source: ${entry.source}`);
   assert(entry.author?.name === 'platanus-hack-26-ar-team-10', `${relativePath} has wrong author`);
   assert(entry.category === 'security', `${relativePath} should classify yieldos as security`);
@@ -52,18 +57,22 @@ validateMarketplace('yieldOS/.claude-plugin/marketplace.json', './plugins/yieldo
 
 const plugin = readJson('yieldOS/plugins/yieldos/.claude-plugin/plugin.json');
 assert(plugin.name === 'yieldos', 'plugin manifest must be named yieldos');
-assert(plugin.version === '0.2.2', 'plugin manifest must be version 0.2.2');
+assert(plugin.version === '0.2.5', 'plugin manifest must be version 0.2.5');
 assert(plugin.author?.name === 'platanus-hack-26-ar-team-10', 'plugin manifest has wrong author');
 
 for (const relativePath of [
+  'install.sh',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
   'yieldOS/plugins/yieldos/scripts/post-install-audit.js',
   'yieldOS/plugins/yieldos/scripts/on-session-start.js',
   'yieldOS/plugins/yieldos/scripts/on-prompt-submit.js',
+  'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
 ]) {
   assertFile(relativePath);
 }
+
+assertExecutable('install.sh');
 
 console.log('plugin structure OK');
