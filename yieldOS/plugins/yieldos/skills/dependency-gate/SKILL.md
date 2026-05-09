@@ -1,6 +1,6 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent runs install commands (npm/pip/cargo/etc), edits manifest files (package.json, requirements.txt, pyproject.toml, Cargo.toml, go.mod), activates skills, adds MCPs, or edits instruction files (CLAUDE.md, AGENTS.md). Provides context on yieldOS policy, the visual stamp every reply must end with, and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands (npm/pip/cargo/etc), edits manifest files (package.json, requirements.txt, pyproject.toml, Cargo.toml, go.mod), activates skills, adds MCPs, or edits instruction files (CLAUDE.md, AGENTS.md). Provides context on yieldOS policy, the colored visual stamp every reply must end with, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate

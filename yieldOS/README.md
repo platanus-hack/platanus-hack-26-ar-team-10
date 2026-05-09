@@ -42,6 +42,39 @@ Requires Node.js 18+ for `fetch` and `node:test`.
 
 ---
 
+## Updates and releases
+
+Users can update yieldOS from Claude Code:
+
+```text
+/yieldos:update
+```
+
+Equivalent terminal commands:
+
+```bash
+claude plugins marketplace update yieldos
+claude plugins update yieldos@yieldos
+```
+
+After updating, run `/reload-plugins` or restart Claude Code so hooks switch from the old cache path to the new version.
+
+Maintainers should release through the version helper from the repository root:
+
+```bash
+node scripts/release.mjs bump patch --note "Describe the change"
+node scripts/plugin-check.mjs
+(cd yieldOS/plugins/yieldos && node --test tests/*.test.js)
+git add .
+git commit -m "Release yieldOS vX.Y.Z"
+git tag yieldos--vX.Y.Z
+git push origin main yieldos--vX.Y.Z
+```
+
+That keeps the root marketplace, nested marketplace, plugin manifest, changelog, and GitHub Release tag aligned.
+
+---
+
 ## High-level flow
 
 ```
