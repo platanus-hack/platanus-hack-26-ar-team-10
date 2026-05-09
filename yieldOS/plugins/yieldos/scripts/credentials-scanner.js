@@ -55,8 +55,15 @@ function scan(text) {
 const AUTHORIZATION_PHRASE = 'AUTORIZO A LEER LAS CREDENCIALES';
 
 function authorizationPhraseDetected(text) {
+  // Exact-match (whole prompt = phrase, ignoring surrounding whitespace).
+  // Previously this used `text.includes(AUTHORIZATION_PHRASE)`, which let an
+  // attacker grant authorization by getting the literal phrase to appear in
+  // ANY position of the prompt — including via prompt-injection through a
+  // README, an HTML comment, a tool output the agent echoed back, etc.
+  // Exact-match closes that bypass: only the user typing the phrase as the
+  // entire message will grant the 30-minute window.
   if (typeof text !== 'string') return false;
-  return text.includes(AUTHORIZATION_PHRASE);
+  return text.trim() === AUTHORIZATION_PHRASE;
 }
 
 const ENV_PATH_RE = /(?:^|\/)\.env(?:\.[\w.-]+)?$/i;

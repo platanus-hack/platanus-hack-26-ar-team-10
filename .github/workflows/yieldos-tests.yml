@@ -1,0 +1,119 @@
+name: yieldOS tests
+
+on:
+  pull_request:
+    paths:
+      - 'yieldOS/plugins/yieldos/**'
+      - 'policy/**'
+      - '.github/workflows/yieldos-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'yieldOS/plugins/yieldos/**'
+      - 'policy/**'
+
+jobs:
+  unit-tests:
+    name: unit tests · ${{ matrix.os }} · node ${{ matrix.node }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['18', '20', '22']
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run yieldOS test suite
+        working-directory: yieldOS/plugins/yieldos
+        run: node --test tests/
+
+  policy-validation:
+    name: policy JSON valid + version bumped
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate every JSON file in /policy/
+        run: |
+          set -e
+          for f in policy/*.json; do
+            echo "→ $f"
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))"
+          done
+      - name: Verify shipped policy-cache mirrors /policy/
+        run: |
+          set -e
+          for f in policy/*.json; do
+            base=$(basename "$f")
+            if ! diff -q "$f" "yieldOS/plugins/yieldos/policy-cache/$base" > /dev/null 2>&1; then
+              echo "::error::policy/$base differs from yieldOS/plugins/yieldos/policy-cache/$base — sync them before merging"
+              diff "$f" "yieldOS/plugins/yieldos/policy-cache/$base" || true
+              exit 1
+            fi
+          done
+
+  smoke:
+    name: smoke (denylist blocks, allowlist passes)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Smoke test denylist case (must exit 2)
+        working-directory: yieldOS/plugins/yieldos
+        run: |
+          set -e
+          mkdir -p /tmp/yos-ci
+          INPUT='{"tool_name":"Bash","tool_input":{"command":"npm install event-stream@3.3.6"},"cwd":"/tmp/yos-ci"}'
+          set +e
+          echo -n "$INPUT" | node scripts/pre-install-gate.js > /tmp/out.json 2> /tmp/err.txt
+          CODE=$?
+          set -e
+          if [ "$CODE" -ne 2 ]; then
+            echo "::error::expected exit 2 for denylist, got $CODE"
+            cat /tmp/err.txt
+            exit 1
+          fi
+          grep -q 'denylist-match' /tmp/err.txt || (echo "::error::denylist-match verdict missing" && cat /tmp/err.txt && exit 1)
+      - name: Smoke test allowlist case (must exit 0)
+        working-directory: yieldOS/plugins/yieldos
+        run: |
+          set -e
+          mkdir -p /tmp/yos-ci-2
+          INPUT='{"tool_name":"Bash","tool_input":{"command":"npm install react@18.3.1"},"cwd":"/tmp/yos-ci-2"}'
+          set +e
+          echo -n "$INPUT" | node scripts/pre-install-gate.js > /tmp/out.json 2> /tmp/err.txt
+          CODE=$?
+          set -e
+          if [ "$CODE" -ne 0 ]; then
+            echo "::error::expected exit 0 for allowlist, got $CODE"
+            cat /tmp/err.txt
+            exit 1
+          fi
+          grep -q 'allowlist-match' /tmp/err.txt || (echo "::error::allowlist-match verdict missing" && cat /tmp/err.txt && exit 1)
+      - name: Smoke test credentials read blocked (must exit 2)
+        working-directory: yieldOS/plugins/yieldos
+        run: |
+          set -e
+          mkdir -p /tmp/yos-ci-3
+          echo "K=v" > /tmp/yos-ci-3/.env
+          INPUT='{"tool_name":"Read","tool_input":{"file_path":"/tmp/yos-ci-3/.env"},"cwd":"/tmp/yos-ci-3"}'
+          set +e
+          echo -n "$INPUT" | node scripts/pre-install-gate.js > /tmp/out.json 2> /tmp/err.txt
+          CODE=$?
+          set -e
+          if [ "$CODE" -ne 2 ]; then
+            echo "::error::expected exit 2 for credentials read without auth, got $CODE"
+            cat /tmp/err.txt
+            exit 1
+          fi
+          grep -q 'credentials-read-blocked' /tmp/err.txt || (echo "::error::credentials-read-blocked verdict missing" && exit 1)

@@ -1,5 +1,25 @@
 {
-  "version": "0.1.0",
-  "updated_at": "2026-05-09T00:00:00Z",
-  "entries": []
+  "version": "0.4.0",
+  "updated_at": "2026-05-09T05:30:00Z",
+  "description": "Approved Claude Code skills. Match by skill:<name> for any version OR skill:<name>@<sha256-of-content> for pinned content.",
+  "entries": [
+    { "key": "skill:init", "category": "official", "vendor": "anthropic", "purpose": "initialize CLAUDE.md" },
+    { "key": "skill:review", "category": "official", "vendor": "anthropic", "purpose": "PR code review" },
+    { "key": "skill:security-review", "category": "official", "vendor": "anthropic", "purpose": "security audit on diff" },
+    { "key": "skill:dependency-gate", "category": "self", "vendor": "yieldos", "purpose": "yieldOS itself" },
+    { "key": "skill:nano", "category": "third-party", "vendor": "nanostack", "purpose": "implementation planning" },
+    { "key": "skill:nano-help", "category": "third-party", "vendor": "nanostack", "purpose": "nanostack help" },
+    { "key": "skill:nano-run", "category": "third-party", "vendor": "nanostack", "purpose": "nanostack first-time setup" },
+    { "key": "skill:nanostack", "category": "third-party", "vendor": "nanostack", "purpose": "nanostack overview" },
+    { "key": "skill:think", "category": "third-party", "vendor": "nanostack", "purpose": "strategic clarity" },
+    { "key": "skill:feature", "category": "third-party", "vendor": "nanostack", "purpose": "add feature sprint" },
+    { "key": "skill:conductor", "category": "third-party", "vendor": "nanostack", "purpose": "parallel agent orchestration" },
+    { "key": "skill:compound", "category": "third-party", "vendor": "nanostack", "purpose": "post-sprint learnings" }
+  ],
+  "rules": {
+    "default_unlisted": "block",
+    "block_message": "yieldOS bloqueó la activación de la skill: no está en el policy oficial. Para agregarla, abrí un PR a /policy/skills.json.",
+    "require_hash_for_third_party": false,
+    "require_hash_for_third_party_note": "v0.5 will require sha256 of SKILL.md content in addition to the name match"
+  }
 }
