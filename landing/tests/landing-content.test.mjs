@@ -42,7 +42,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "claude plugin install yieldos@yieldos-marketplace",
     "TerminalInstallCommand",
     "yieldOS install - zsh",
-    "yieldOS gate ready before tool execution",
+    "yieldOS gate active before tool execution",
     "Copy yieldOS install command",
     "Verdict",
     "Allow",
@@ -163,6 +163,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "SAFE -&gt;",
     "OrbitalInstallPill",
     "orbital-install-pill",
+    "hero-terminal-copy",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
@@ -344,6 +345,13 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".hero-terminal"), "Expected terminal styling");
   assert.ok(globals.includes(".hero-terminal-chrome"), "Expected terminal chrome styling");
   assert.ok(globals.includes(".hero-terminal-screen"), "Expected terminal screen styling");
+  assert.ok(globals.includes(".terminal-cmd"), "Expected terminal command token styling");
+  assert.ok(globals.includes(".terminal-subcmd"), "Expected terminal subcommand token styling");
+  assert.ok(globals.includes(".terminal-path"), "Expected terminal path token styling");
+  assert.ok(globals.includes(".terminal-package"), "Expected terminal package token styling");
+  assert.ok(globals.includes(".terminal-success"), "Expected terminal success token styling");
+  assert.ok(!globals.includes(".hero-terminal-copy"), "Expected visible terminal copy button styling to be removed");
+  assert.ok(!terminalInstall.includes("hero-terminal-copy"), "Expected visible terminal copy button to be removed");
   assert.ok(!existsSync(join(root, "src/components/orbital-install-pill.tsx")), "Expected orbital install component to be removed");
   assert.ok(!globals.includes(".orbital-pill-aura"), "Expected rotating orbit styles to be removed");
   assert.ok(!globals.includes(".orbital-dot"), "Expected endpoint orbit dot styling to be removed");

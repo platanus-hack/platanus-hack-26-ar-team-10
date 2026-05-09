@@ -52,36 +52,44 @@ export function TerminalInstallCommand({ command }: TerminalInstallCommandProps)
   }
 
   return (
-    <div className="hero-terminal" role="group" aria-label="yieldOS install terminal">
+    <button
+      type="button"
+      className="hero-terminal"
+      onClick={handleCopy}
+      aria-label="Copy yieldOS install command"
+    >
       <div className="hero-terminal-chrome">
         <div className="hero-terminal-controls" aria-hidden="true">
           <span />
           <span />
           <span />
         </div>
-        <p className="hero-terminal-title">yieldOS install - zsh</p>
-        <button
-          type="button"
-          className="hero-terminal-copy"
-          onClick={handleCopy}
-          aria-label="Copy yieldOS install command"
-        >
-          <span aria-live="polite">{copied ? "copied" : "copy"}</span>
-        </button>
+        <p className="hero-terminal-title">
+          <span>yieldOS install - zsh</span>
+          <span className="hero-terminal-status" aria-live="polite">
+            {copied ? "copied" : "click to copy"}
+          </span>
+        </p>
       </div>
       <pre className="hero-terminal-screen" aria-label="Install yieldOS command">
         <code>
           <span className="hero-terminal-line">
             <span className="hero-terminal-prompt">%</span>
-            <span>claude plugin marketplace add /path/to/vibeOS</span>
+            <span className="terminal-cmd">claude</span>{" "}
+            <span className="terminal-subcmd">plugin marketplace add</span>{" "}
+            <span className="terminal-path">/path/to/vibeOS</span>
           </span>
           <span className="hero-terminal-line">
             <span className="hero-terminal-prompt">%</span>
-            <span>claude plugin install yieldos@yieldos-marketplace</span>
+            <span className="terminal-cmd">claude</span>{" "}
+            <span className="terminal-subcmd">plugin install</span>{" "}
+            <span className="terminal-package">yieldos@yieldos-marketplace</span>
           </span>
-          <span className="hero-terminal-output">yieldOS gate ready before tool execution</span>
+          <span className="hero-terminal-output">
+            <span className="terminal-success">ready</span> yieldOS gate active before tool execution
+          </span>
         </code>
       </pre>
-    </div>
+    </button>
   );
 }
