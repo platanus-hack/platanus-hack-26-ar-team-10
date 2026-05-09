@@ -350,6 +350,10 @@ html {
   white-space: nowrap;
 }
 
+.hero-terminal-line-indent {
+  padding-left: 1.45rem;
+}
+
 .hero-terminal-prompt {
   display: inline-block;
   margin-right: 0.72rem;
@@ -369,12 +373,28 @@ html {
   color: #7dd3fc;
 }
 
+.terminal-flag {
+  color: #f9a8d4;
+}
+
 .terminal-path {
+  color: #fde68a;
+}
+
+.terminal-url {
   color: #fde68a;
 }
 
 .terminal-package {
   color: #86efac;
+}
+
+.terminal-pipe {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.terminal-continuation {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .terminal-success {

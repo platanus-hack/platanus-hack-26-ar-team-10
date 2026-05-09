@@ -8,7 +8,7 @@ import { TerminalInstallCommand } from "@/components/terminal-install-command";
 import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
-  "claude plugin marketplace add /path/to/vibeOS\nclaude plugin install yieldos@yieldos-marketplace";
+  "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh";
 const heroTitle = "Unlock coding for non technical talent";
 
 const gatedVectors = [

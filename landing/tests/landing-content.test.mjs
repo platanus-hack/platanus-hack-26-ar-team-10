@@ -38,11 +38,10 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Safe coding for non technical talent",
     "Install yieldOS",
     "View decision demo",
-    "claude plugin marketplace add /path/to/vibeOS",
-    "claude plugin install yieldos@yieldos-marketplace",
+    "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh",
     "TerminalInstallCommand",
     "yieldOS install - zsh",
-    "yieldOS gate active before tool execution",
+    "yieldOS installs for any AI coding agent",
     "Copy yieldOS install command",
     "Verdict",
     "Allow",
@@ -158,6 +157,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
     "Safe coding for non-tech people.",
     "$ claude plugin install yieldos@yieldos-marketplace",
+    "claude plugin marketplace add /path/to/vibeOS",
+    "claude plugin install yieldos@yieldos-marketplace",
     "PH26 Buenos Aires",
     "AI Security",
     "SAFE -&gt;",
@@ -347,6 +348,10 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".hero-terminal-screen"), "Expected terminal screen styling");
   assert.ok(globals.includes(".terminal-cmd"), "Expected terminal command token styling");
   assert.ok(globals.includes(".terminal-subcmd"), "Expected terminal subcommand token styling");
+  assert.ok(globals.includes(".terminal-flag"), "Expected terminal flag token styling");
+  assert.ok(globals.includes(".terminal-url"), "Expected terminal URL token styling");
+  assert.ok(globals.includes(".terminal-pipe"), "Expected terminal pipe token styling");
+  assert.ok(globals.includes(".terminal-continuation"), "Expected terminal continuation token styling");
   assert.ok(globals.includes(".terminal-path"), "Expected terminal path token styling");
   assert.ok(globals.includes(".terminal-package"), "Expected terminal package token styling");
   assert.ok(globals.includes(".terminal-success"), "Expected terminal success token styling");

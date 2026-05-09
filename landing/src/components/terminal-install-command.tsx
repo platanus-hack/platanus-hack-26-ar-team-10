@@ -75,18 +75,19 @@ export function TerminalInstallCommand({ command }: TerminalInstallCommandProps)
         <code>
           <span className="hero-terminal-line">
             <span className="hero-terminal-prompt">%</span>
-            <span className="terminal-cmd">claude</span>{" "}
-            <span className="terminal-subcmd">plugin marketplace add</span>{" "}
-            <span className="terminal-path">/path/to/vibeOS</span>
+            <span className="terminal-cmd">curl</span>{" "}
+            <span className="terminal-flag">-fsSL</span>{" "}
+            <span className="terminal-url">
+              https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh
+            </span>{" "}
+            <span className="terminal-continuation">\</span>
           </span>
-          <span className="hero-terminal-line">
-            <span className="hero-terminal-prompt">%</span>
-            <span className="terminal-cmd">claude</span>{" "}
-            <span className="terminal-subcmd">plugin install</span>{" "}
-            <span className="terminal-package">yieldos@yieldos-marketplace</span>
+          <span className="hero-terminal-line hero-terminal-line-indent">
+            <span className="terminal-pipe">|</span>{" "}
+            <span className="terminal-cmd">sh</span>
           </span>
           <span className="hero-terminal-output">
-            <span className="terminal-success">ready</span> yieldOS gate active before tool execution
+            <span className="terminal-success">ready</span> yieldOS installs for any AI coding agent
           </span>
         </code>
       </pre>
