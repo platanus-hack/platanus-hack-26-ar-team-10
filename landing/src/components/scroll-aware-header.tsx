@@ -43,10 +43,10 @@ export function ScrollAwareHeader() {
 
   return (
     <header
-      className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-4 text-white"
+      className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-3 text-white"
       data-visible={visible}
     >
-      <div className="command-bar mx-auto grid h-16 w-full max-w-[min(1160px,calc(100vw-2rem))] grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-hidden rounded-[26px] border border-white/15 bg-white/[0.075] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:h-[68px] sm:px-5">
+      <div className="command-bar mx-auto grid h-14 w-full max-w-[min(940px,calc(100vw-2rem))] grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-hidden rounded-[23px] border border-white/15 bg-white/[0.075] px-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:h-[58px] sm:px-4">
         <nav
           className="intro-nav nav-left hidden items-center gap-1 text-xs font-semibold sm:flex"
           aria-label="Primary navigation"
@@ -54,7 +54,7 @@ export function ScrollAwareHeader() {
           {navItems.map(([label, href]) => (
             <a
               key={href}
-              className="rounded-full px-3 py-2 transition hover:bg-zinc-950/[0.06] hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20"
+              className="rounded-full px-2.5 py-1.5 transition hover:bg-zinc-950/[0.06] hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20"
               href={href}
             >
               {label}
@@ -63,7 +63,7 @@ export function ScrollAwareHeader() {
         </nav>
         <a
           href="#hero"
-          className="intro-brand nav-brand text-lg font-semibold tracking-[-0.04em] transition hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20 sm:text-xl"
+          className="intro-brand nav-brand text-base font-semibold tracking-[-0.04em] transition hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20 sm:text-lg"
           aria-label="yieldOS home"
         >
           yieldOS
@@ -71,7 +71,7 @@ export function ScrollAwareHeader() {
         <div className="intro-status nav-right">
           <a
             href="#demo-flow"
-            className="nav-demo-button inline-flex h-11 items-center gap-2 rounded-full px-4 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20 sm:px-4 sm:text-sm"
+            className="nav-demo-button inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20"
           >
             Demo
             <span aria-hidden="true">-&gt;</span>

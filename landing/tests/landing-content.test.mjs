@@ -309,6 +309,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(scrollAwareHeader.includes("nav-brand"), "Expected centered brand region");
   assert.ok(scrollAwareHeader.includes("nav-right"), "Expected right nav action region");
   assert.ok(scrollAwareHeader.includes("nav-demo-button"), "Expected compact right-side demo CTA");
+  assert.ok(scrollAwareHeader.includes("max-w-[min(940px"), "Expected less dominant panoramic nav width");
+  assert.ok(scrollAwareHeader.includes("h-14"), "Expected more compact panoramic nav height");
   assert.ok(!scrollAwareHeader.includes("Install plugin"), "Expected install plugin CTA removed from navbar");
   assert.ok(!scrollAwareHeader.includes("CopyCommandButton"), "Expected navbar copy button removed");
   assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
@@ -324,8 +326,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(!globals.includes("rotateX(66deg)"), "Expected tilted roll-axis rotation to be removed");
   assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
   assert.ok(
-    globals.includes("rgba(255, 255, 255, 0.9)"),
-    "Expected panoramic nav to use a light capsule surface",
+    globals.includes("rgba(255, 255, 255, 0.52)"),
+    "Expected panoramic nav to use a translucent capsule surface",
   );
   assert.ok(globals.includes(".command-bar::before"), "Expected left panoramic nav color wash");
   assert.ok(globals.includes(".command-bar::after"), "Expected right panoramic nav color wash");
