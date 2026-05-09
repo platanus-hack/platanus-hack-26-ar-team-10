@@ -242,7 +242,6 @@ html {
   color: #ffffff;
   cursor: pointer;
   background: transparent;
-  perspective: 760px;
 }
 
 .orbital-install-pill:focus-visible {
@@ -255,50 +254,6 @@ html {
     0 0 0 6px rgba(var(--signal-blue-rgb), 0.22),
     0 26px 82px -46px rgba(var(--signal-red-rgb), 0.7),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-.orbital-pill-aura {
-  position: absolute;
-  inset: -24px -36px;
-  border-radius: 999px;
-  pointer-events: none;
-  transform-style: preserve-3d;
-  animation: orbital-roll 8.8s linear infinite;
-}
-
-.orbital-pill-aura::before {
-  position: absolute;
-  inset: 6px 12px;
-  content: "";
-  border-radius: inherit;
-  background:
-    conic-gradient(
-      from 28deg,
-      transparent 0deg,
-      rgba(var(--signal-blue-rgb), 0.38) 54deg,
-      rgba(var(--signal-violet-rgb), 0.2) 112deg,
-      transparent 154deg,
-      rgba(var(--signal-red-rgb), 0.34) 218deg,
-      transparent 304deg,
-      rgba(var(--signal-blue-rgb), 0.22) 338deg,
-      transparent 360deg
-    );
-  filter: blur(12px);
-  mask-image: radial-gradient(ellipse at center, transparent 0 53%, #000 57% 72%, transparent 76%);
-  opacity: 0.68;
-}
-
-.orbital-pill-aura::after {
-  position: absolute;
-  inset: 15px 30px;
-  content: "";
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: inherit;
-  box-shadow:
-    0 0 24px rgba(var(--signal-blue-rgb), 0.12),
-    inset 0 0 22px rgba(var(--signal-red-rgb), 0.1);
-  opacity: 0.58;
-  transform: translateZ(1px);
 }
 
 .orbital-pill-core {
@@ -990,16 +945,6 @@ html {
   }
 }
 
-@keyframes orbital-roll {
-  from {
-    transform: rotateX(66deg) rotateZ(0deg) scaleX(1.04);
-  }
-
-  to {
-    transform: rotateX(66deg) rotateZ(360deg) scaleX(1.04);
-  }
-}
-
 @keyframes orbital-color-pan {
   from {
     background-position: 0% 50%;
@@ -1248,10 +1193,6 @@ html {
     width: min(100%, 21rem);
   }
 
-  .orbital-pill-aura {
-    inset: -14px -18px;
-  }
-
   .orbital-pill-core {
     min-height: 3rem;
     gap: 0.48rem;
@@ -1315,7 +1256,6 @@ html {
   }
 
   .scan-sweep,
-  .orbital-pill-aura,
   .hero-typewriter-caret,
   .scanned-belt::before,
   .flow-rail-pulse,

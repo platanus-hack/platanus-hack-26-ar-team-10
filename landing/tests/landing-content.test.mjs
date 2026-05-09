@@ -313,11 +313,12 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(page.includes("<OrbitalInstallPill"), "Expected orbital install pill in hero");
   assert.ok(!page.includes("$ claude plugin install yieldos@yieldos-marketplace"), "Expected raw hero command text to be replaced");
   assert.ok(globals.includes(".orbital-install-pill"), "Expected orbital install pill styling");
-  assert.ok(globals.includes(".orbital-pill-aura"), "Expected orbiting texture layer");
+  assert.ok(!orbitalInstall.includes("orbital-pill-aura"), "Expected rotating orbit layer to be removed");
+  assert.ok(!globals.includes(".orbital-pill-aura"), "Expected rotating orbit styles to be removed");
   assert.ok(!orbitalInstall.includes("orbital-dot"), "Expected endpoint orbit dots to be removed");
   assert.ok(!globals.includes(".orbital-dot"), "Expected endpoint orbit dot styling to be removed");
-  assert.ok(globals.includes("@keyframes orbital-roll"), "Expected roll-axis orbit animation");
-  assert.ok(globals.includes("rotateX(66deg) rotateZ(360deg)"), "Expected tilted roll-axis rotation");
+  assert.ok(!globals.includes("@keyframes orbital-roll"), "Expected roll-axis orbit animation to be removed");
+  assert.ok(!globals.includes("rotateX(66deg)"), "Expected tilted roll-axis rotation to be removed");
   assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
   assert.ok(
     globals.includes("linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075))"),
