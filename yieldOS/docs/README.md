@@ -14,11 +14,12 @@ This directory captures every design decision behind yieldOS, why it exists, and
 8. [Trade-offs accepted](08-tradeoffs.md) — *what we gave up on purpose*
 9. [Decision log](09-decision-log.md) — *every decision in order, with rationale*
 10. [Code audit](10-code-audit.md) — *commit/push red-team and blue-team loop for source code*
+11. [Custom agent instructions](13-custom-instructions.md) — *generated CLAUDE.md / AGENTS.md safety defaults for different scopes*
 
 ## Planning docs (not yet implemented)
 
-11. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
-12. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+12. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
+13. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
 
 ## Reading order for AI agents
 
@@ -44,3 +45,4 @@ Every doc here was written by capturing the conversation that produced yieldOS. 
 - **Trade-offs** → what we explicitly gave up: depth of behavioral analysis, locally-managed allowlists, customization-as-feature.
 - **Decision log** → numbered list of every decision, in the order they were made, with the *why* attached.
 - **Code audit** → how yieldOS audits source-code diffs separately from dependency policy.
+- **Custom instructions** → how `/yieldos:init` generates reviewable agent instruction files without changing plugin installation.

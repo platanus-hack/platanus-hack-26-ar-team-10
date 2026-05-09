@@ -42,6 +42,26 @@ Requires Node.js 18+ for `fetch` and `node:test`.
 
 ---
 
+## Custom agent instructions
+
+Generate reviewable `AGENTS.md` and `CLAUDE.md` files with:
+
+```text
+/yieldos:init
+```
+
+Default mode previews the output. Add `--write` when the files should be created:
+
+```text
+/yieldos:init --agent both --scope project --profile secrets-safe,dependency-safe,code-audit --write
+```
+
+Supported scopes are `project`, `local`, `personal`, and export-only `org`. This stays separate from installation because plugin install is global while instruction files are project, local, personal, or organization policy.
+
+Detail: [docs/13-custom-instructions.md](docs/13-custom-instructions.md).
+
+---
+
 ## Updates and releases
 
 Users can update yieldOS from Claude Code:

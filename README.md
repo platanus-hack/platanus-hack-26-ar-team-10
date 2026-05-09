@@ -10,6 +10,8 @@ It also protects credentials: prompts that look like they contain API keys trigg
 
 It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`.
 
+It can also generate reviewable `AGENTS.md` and `CLAUDE.md` safety instructions through `/yieldos:init`, with profiles for read-only work, secrets, dependencies, source audit, databases, production, network bootstrap, git, testing, and cost-aware scans.
+
 Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
 
 ## Install
@@ -41,6 +43,22 @@ claude plugins update yieldos@yieldos
 ```
 
 Run `/reload-plugins` or restart Claude Code after updating so hooks switch to the new cached version.
+
+## Initialize Agent Instructions
+
+Preview generated agent instructions from Claude Code with:
+
+```text
+/yieldos:init
+```
+
+Write project files when ready:
+
+```text
+/yieldos:init --agent both --scope project --profile secrets-safe,dependency-safe,code-audit --write
+```
+
+The init flow is intentionally separate from plugin installation so global install state does not silently write project, personal, or organization instruction files.
 
 Maintainers publish a new plugin version from the repository root with:
 

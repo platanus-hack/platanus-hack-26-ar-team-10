@@ -133,6 +133,23 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
+
+  [
+    "InstructionGenerator",
+    "Generate CLAUDE.md and AGENTS.md.",
+    "Generate agent instructions.",
+    "yieldos-init --agent",
+    "--scope",
+    "--profile",
+    "--write",
+  ].forEach((text) => {
+    assert.ok(!source.includes(text), `Expected init implementation detail to stay off the landing page: ${text}`);
+  });
+
+  assert.ok(
+    !existsSync(join(root, "src/components/instruction-generator.tsx")),
+    "Instruction generator should stay out of the landing page until the feature is ready",
+  );
 });
 
 test("copy-to-clipboard behavior is isolated in a client component", () => {
