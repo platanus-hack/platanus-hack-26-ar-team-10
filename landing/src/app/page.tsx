@@ -81,10 +81,12 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex items-center justify-end gap-2">
-            <div className="command-pill command-pulse hidden max-w-[min(32vw,420px)] items-center gap-2 overflow-hidden rounded-md border border-white/10 bg-white/[0.055] px-3 py-2 font-mono text-xs text-zinc-400 lg:flex">
-              <span className="text-zinc-600">$</span>
-              <code className="truncate whitespace-nowrap">Install plugin</code>
-            </div>
+            <CopyCommandButton
+              command={installCommand}
+              label="Install plugin"
+              variant="dark"
+              className="command-pill command-pulse hidden h-9 max-w-[min(32vw,420px)] overflow-hidden px-3 py-2 font-mono text-xs text-zinc-300 lg:inline-flex"
+            />
           </div>
         </div>
       </header>
