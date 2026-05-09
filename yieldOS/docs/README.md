@@ -21,6 +21,8 @@ This directory captures every design decision behind yieldOS, why it exists, and
 
 13. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
 14. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+15. [Agent rules and playbooks](15-agent-rules-and-playbooks.md) — *cross-agent rules, skills, policies, and retrieval strategy*
+16. [Team agent packs](16-team-agent-packs.md) — *package team rules, skills, MCPs, profiles, and playbooks into native agent outputs*
 
 ## Reading order for AI agents
 
@@ -48,3 +50,5 @@ Every doc here was written by capturing the conversation that produced yieldOS. 
 - **Code audit** → how yieldOS audits source-code diffs separately from dependency policy.
 - **Audit command** → how users invoke Deepsec review explicitly without changing hook behavior.
 - **Custom instructions** → how `/yieldos:init` generates reviewable agent instruction files without changing plugin installation.
+- **Agent rules and playbooks** → how yieldOS should turn external agent rules, skills, and policies into scoped playbooks and generated adapters.
+- **Team agent packs** → how yieldOS should package approved skills, MCPs, profiles, rules, and playbooks for teams while keeping policy as the authority.

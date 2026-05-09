@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "yieldos",
-      "description": "Security gate for Claude Code. Intercepts dependency installs, skills, MCPs, instruction edits, source-code audits, audit commands, and generated agent safety instructions.",
-      "version": "0.5.0",
+      "description": "Security gate for Claude Code. Intercepts dependency installs, skills, MCPs, instruction edits, source-code audits, audit commands, generated agent safety instructions, and policy-validated team agent packs.",
+      "version": "0.6.0",
       "author": {
         "name": "platanus-hack-26-ar-team-10"
       },

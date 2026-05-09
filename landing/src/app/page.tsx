@@ -1,3 +1,4 @@
+import { AgentPackSection } from "@/components/agent-pack-section";
 import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
 import { AnimatedDemoStory } from "@/components/animated-demo-story";
 import { AnimatedSecurityMockup } from "@/components/animated-security-mockup";
@@ -72,6 +73,7 @@ export default function Home() {
               ["Demo", "#demo-flow"],
               ["Coverage", "#gated-vectors"],
               ["Policy", "#policy-flow"],
+              ["Packs", "#agent-packs"],
             ].map(([label, href]) => (
               <a
                 key={href}
@@ -249,6 +251,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <AgentPackSection />
 
       <section
         id="audit-trail"

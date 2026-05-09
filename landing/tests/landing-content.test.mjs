@@ -14,10 +14,12 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
   const animatedMockup = read("src/components/animated-security-mockup.tsx");
   const animatedDemo = read("src/components/animated-demo-flow.tsx");
   const animatedStory = read("src/components/animated-demo-story.tsx");
+  const agentPackSection = read("src/components/agent-pack-section.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
   const source = [
     page,
+    agentPackSection,
     animatedMockup,
     animatedDemo,
     animatedStory,
@@ -67,6 +69,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Demo",
     "Coverage",
     "Policy",
+    "Packs",
     "Audit",
     "Proof",
     "TypewriterHeroTitle",
@@ -93,6 +96,22 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "7",
     "9",
     "1163",
+    "Team agent packs",
+    "Package company rules once.",
+    "Choose approved skills, MCPs, safety profiles, and playbooks.",
+    "yield.agent-pack.yaml",
+    "yield.agent-pack.lock.json",
+    ".yield/pack-report.md",
+    "Preview pack",
+    "yieldos-pack preview --pack yield.agent-pack.yaml",
+    "Target agents",
+    "Claude Code",
+    "Codex",
+    "Cursor",
+    "Copilot",
+    "Windsurf",
+    "enforced via hooks",
+    "guidance",
   ].forEach((text) => {
     assert.ok(source.includes(text), `Expected yieldOS proof/capability copy: ${text}`);
   });
@@ -102,11 +121,12 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "demo-flow",
     "gated-vectors",
     "policy-flow",
+    "agent-packs",
     "audit-trail",
     "proof",
     "final-cta",
   ].forEach((id) => {
-    assert.ok(page.includes(`id="${id}"`), `Expected section id: ${id}`);
+    assert.ok(source.includes(`id="${id}"`), `Expected section id: ${id}`);
   });
 
   const demoIndex = page.indexOf('id="demo-flow"');
@@ -167,6 +187,38 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
   assert.ok(
     component.includes("navigator.clipboard.writeText"),
     "Expected clipboard write behavior",
+  );
+});
+
+test("agent packs page provides a downloadable pack builder", () => {
+  const page = read("src/app/agent-packs/page.tsx");
+  const builder = read("src/components/agent-pack-builder.tsx");
+  const source = `${page}\n${builder}`;
+
+  [
+    "Build an agent pack",
+    "Download yield.agent-pack.yaml",
+    "yield.agent-pack.yaml",
+    "Claude Code",
+    "Codex",
+    "Cursor",
+    "GitHub Copilot",
+    "Windsurf",
+    "secrets-safe",
+    "dependency-safe",
+    "code-audit",
+    "skill:dependency-gate",
+    "skill:security-review",
+    "mcp:filesystem",
+    "URL.createObjectURL",
+    "download",
+  ].forEach((text) => {
+    assert.ok(source.includes(text), `Expected agent-pack builder copy/code: ${text}`);
+  });
+
+  assert.ok(
+    !source.includes("skill:security-audit"),
+    "Builder should not emit skills missing from policy/skills.json",
   );
 });
 

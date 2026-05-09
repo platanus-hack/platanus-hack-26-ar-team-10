@@ -1,6 +1,6 @@
 # Policy management
 
-All policy lives at `github.com/platanus-hack/policy-yieldos/policy/` (the official policy repository owned by `platanus-hack-26-ar-team-10`). It is **not** editable locally.
+All policy lives at `github.com/platanus-hack/platanus-hack-26-ar-team-10/policy/`. Installed plugins fetch the raw files from that directory. Policy is **not** editable locally.
 
 ## Policy files
 

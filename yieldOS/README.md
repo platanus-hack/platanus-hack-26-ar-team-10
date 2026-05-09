@@ -60,6 +60,24 @@ Supported scopes are `project`, `local`, `personal`, and export-only `org`. This
 
 Detail: [docs/14-custom-instructions.md](docs/14-custom-instructions.md).
 
+Team agent packs are a reviewable manifest for approved profiles, skills, MCPs, rules, and playbooks that compiles into native agent outputs. Detail: [docs/16-team-agent-packs.md](docs/16-team-agent-packs.md).
+
+Preview a pack with:
+
+```text
+/yieldos:pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+```
+
+From a terminal:
+
+```bash
+yieldos-pack verify --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+yieldos-pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+yieldos-pack write --pack yield.agent-pack.yaml
+```
+
+The pack compiler writes `AGENTS.md`, `CLAUDE.md`, target adapters such as `.cursor/rules`, `.github/copilot-instructions.md`, `.github/instructions`, `.github/prompts`, `.windsurf/rules`, repo-local skill folders under `.claude/skills`, `.agents/skills`, `.cursor/skills`, and `.windsurf/skills`, plus `.yield/pack-report.md` and `yield.agent-pack.lock.json`. It validates referenced skills and MCP tool surfaces against policy before writing. Claude Code is the strongest enforcement target today; other adapters are generated guidance until their host exposes equivalent hooks or policy controls.
+
 ---
 
 ## Updates and releases
@@ -445,6 +463,11 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |
 | [docs/11-ci-cd.md](docs/11-ci-cd.md) | Planned CI/CD enforcement. |
 | [docs/12-dockerfile-scanner.md](docs/12-dockerfile-scanner.md) | Planned Dockerfile scanner. |
+| [docs/13-audit-command.md](docs/13-audit-command.md) | On-demand Deepsec source-code audit. |
+| [docs/14-custom-instructions.md](docs/14-custom-instructions.md) | Generated `CLAUDE.md` / `AGENTS.md` safety defaults. |
+| [docs/15-agent-rules-and-playbooks.md](docs/15-agent-rules-and-playbooks.md) | Cross-agent rules, skills, policies, and retrieval strategy. |
+| [docs/16-team-agent-packs.md](docs/16-team-agent-packs.md) | Team rule/skill/MCP packs that compile into native agent outputs. |
+| [playbooks/README.md](playbooks/README.md) | Draft registry for reviewed yieldOS agent playbooks. |
 
 ---
 

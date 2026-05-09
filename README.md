@@ -10,7 +10,15 @@ It also protects credentials: prompts that look like they contain API keys trigg
 
 It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`. For user-invoked review, `/yieldos:audit` runs Deepsec on demand, scoped to changed code by default, and keeps a small command log at `security/audit-events.md`.
 
-It can also generate reviewable `AGENTS.md` and `CLAUDE.md` safety instructions through `/yieldos:init`, with profiles for read-only work, secrets, dependencies, source audit, databases, production, network bootstrap, git, testing, and cost-aware scans.
+It can also generate reviewable `AGENTS.md` and `CLAUDE.md` safety instructions through `/yieldos:init`, with profiles for read-only work, secrets, dependencies, source audit, databases, production, network bootstrap, git, testing, and cost-aware scans. Team agent packs package approved skills, MCPs, rules, playbooks, and profiles into native agent outputs from one reviewed manifest.
+
+Preview the internal dogfood pack:
+
+```bash
+yieldos-pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
+```
+
+Pack output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`.
 
 Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
 
