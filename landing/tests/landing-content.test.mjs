@@ -25,7 +25,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
 
   [
     "yieldOS",
-    "A security gate before your AI agent runs anything.",
+    "AI agent actions, gated.",
     "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
     "PH26 Buenos Aires",
     "Install yieldOS",
@@ -142,6 +142,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Machine-readable stderr",
     "Blocked Install",
     "Hash-approved agent instructions",
+    "A security gate before your AI agent runs anything.",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });

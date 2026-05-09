@@ -7,7 +7,7 @@ import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
   "claude plugin marketplace add /path/to/vibeOS\nclaude plugin install yieldos@yieldos-marketplace";
-const heroTitle = "A security gate before your AI agent runs anything.";
+const heroTitle = "AI agent actions, gated.";
 
 const gatedVectors = [
   { title: "Packages", detail: "9 managers." },
@@ -111,7 +111,7 @@ export default function Home() {
             </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
-              lines={["A security gate", "before your AI", "agent runs", "anything."]}
+              lines={["AI agent actions,", "gated."]}
               className="hero-title font-semibold leading-[0.92]"
               startDelayMs={900}
             />
