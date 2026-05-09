@@ -29,20 +29,29 @@ function isAllowlisted(candidate, allowlist) {
   if (!allowlist || !Array.isArray(allowlist.entries)) return false;
   const fk = fullKey(candidate);
   const nk = nameKey(candidate);
-  // Match logic (strict):
-  //   - Exact <name>@<version>  → always matches.
-  //   - Name-only entry         → matches ONLY if candidate has no pinned version.
-  //   - Name-prefix             → matches ONLY if candidate has no pinned version.
-  // Goal: a candidate that pins a fake version like "999.999.999" or "0.0.0" cannot
-  // hide behind a name-only allowlist entry; it must go through the analyzer which
-  // will detect metadata-unavailable and block.
+  // Match logic:
+  //   - Exact <name>@<version>      → always matches.
+  //   - Name-only entry              → matches any version (the package is trusted).
+  //   - Name-prefix (entry has ver)  → matches only if candidate did not pin a version.
+  // Note: name-only matches with a pinned candidate version pass here, but decide.js
+  // performs a registry-based version-existence check on top, so fake versions
+  // (e.g. 999.999.999) are still caught by the analyzer downstream.
   const namePrefix = nk + (ecosystemFor(candidate) === 'python' ? '==' : '@');
   const noVersion = !candidate.version || candidate.version === 'latest' || candidate.version === 'unspecified';
   return allowlist.entries.some((e) => {
-    if (e.key === fk) return true;
-    if (noVersion && (e.key === nk || (typeof e.key === 'string' && e.key.startsWith(namePrefix)))) return true;
+    if (e.key === fk || e.key === nk) return true;
+    if (noVersion && typeof e.key === 'string' && e.key.startsWith(namePrefix)) return true;
     return false;
   });
+}
+
+function matchedByNameOnly(candidate, allowlist) {
+  if (!allowlist || !Array.isArray(allowlist.entries)) return false;
+  const fk = fullKey(candidate);
+  const nk = nameKey(candidate);
+  const exactMatch = allowlist.entries.some((e) => e.key === fk);
+  if (exactMatch) return false;
+  return allowlist.entries.some((e) => e.key === nk);
 }
 
 function isDenylisted(candidate, denylist) {
@@ -69,4 +78,4 @@ function isBuildScriptApproved(candidate, buildScriptsAllowed) {
   return buildScriptsAllowed.entries.some((e) => e.key === nameKey(candidate));
 }
 
-module.exports = { ecosystemFor, fullKey, nameKey, isAllowlisted, isDenylisted, nativeEquivalent, isBuildScriptApproved };
+module.exports = { ecosystemFor, fullKey, nameKey, isAllowlisted, matchedByNameOnly, isDenylisted, nativeEquivalent, isBuildScriptApproved };
