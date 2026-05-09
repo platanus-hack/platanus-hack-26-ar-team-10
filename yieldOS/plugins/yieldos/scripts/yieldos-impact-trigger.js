@@ -43,6 +43,27 @@ function shouldTrigger(input) {
   return false;
 }
 
+function emitValidatedStamp(toolName) {
+  // PostToolUse can inject additionalContext that the model surfaces in its
+  // reply — same mechanism pre-install-gate uses. We instruct the model to
+  // close its reply with a green "Validado" stamp so the user sees that
+  // yieldOS registered the impactful action.
+  const stamp = '```diff\n+ ▎ 🛡  yieldOS  ·  Validado · cambio escaneándose en background\n```';
+  const output = {
+    hookSpecificOutput: {
+      hookEventName: 'PostToolUse',
+      additionalContext: [
+        'yieldOS detected an impactful action (' + toolName + ') and triggered',
+        'a background pentest pass on this project.',
+        'End your reply to the user with this exact stamp on its own line,',
+        'separated by a blank line (replace any prior yieldOS stamp with it):',
+        stamp,
+      ].join('\n'),
+    },
+  };
+  process.stdout.write(JSON.stringify(output));
+}
+
 function main() {
   if (process.env.YIELDOS_PENTEST === 'off') process.exit(0);
 
@@ -59,6 +80,8 @@ function main() {
   } catch (err) {
     process.stderr.write(`[yieldOS:impact-trigger] ${err.message}\n`);
   }
+
+  emitValidatedStamp(input.tool_name || 'unknown');
   process.exit(0);
 }
 
