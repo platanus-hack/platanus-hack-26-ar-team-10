@@ -141,9 +141,8 @@ bench/
 ## How to re-run
 
 ```bash
-cd /Users/sebastianbuffosempe/code/vibeOS
+cd /path/to/platanus-hack-26-ar-team-10/yieldOS
 
-YIELDOS_BENCH_HOOK=$HOME/.claude/plugins/cache/yieldos-marketplace/yieldos/0.2.1/scripts/pre-install-gate.js \
 YIELDOS_BENCH_CONCURRENCY=16 \
 YIELDOS_BENCH_TAG=run-N \
 node bench/bench.js

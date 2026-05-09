@@ -21,13 +21,13 @@ yieldOS makes the trust decision **before** the install runs, deterministically,
 ## Quickstart
 
 ```bash
-# 1. Add the marketplace and install
-claude plugin marketplace add /path/to/vibeOS
-claude plugin install yieldos@yieldos-marketplace
+# 1. Add the public marketplace and install
+claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
+claude plugins install yieldos@yieldos
 
 # 2. (Optional) Run the test suite
 cd plugins/yieldos
-node --test tests/
+node --test tests/*.test.js
 ```
 
 That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` tool call.
@@ -302,7 +302,7 @@ Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacte
 
 ```bash
 cd plugins/yieldos
-node --test tests/
+node --test tests/*.test.js
 ```
 
 Zero external dependencies (uses `node:test`). Coverage:

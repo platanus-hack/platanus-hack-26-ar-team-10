@@ -281,17 +281,17 @@ Alternative considered: list it as a warning but allow. Rejected because users (
 
 ## D31 — Marketplace-based plugin install
 
-**Decision**: yieldOS is installed via Claude Code's official plugin CLI (`claude plugin marketplace add ...; claude plugin install yieldos@yieldos-marketplace`).
+**Decision**: yieldOS is installed via Claude Code's official plugin CLI (`claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10; claude plugins install yieldos@yieldos`).
 
 **Rationale**: tracks with how Claude Code expects plugins to be installed. Direct file copying to `~/.claude/plugins/yieldos/` works for testing but bypasses the official registration; the CLI flow registers the plugin properly in `installed_plugins.json`.
 
 ---
 
-## D32 — Marketplace structure: `<root>/.claude-plugin/marketplace.json` + `<root>/plugins/<name>/`
+## D32 — Public marketplace structure: repo root manifest + plugin bundle
 
-**Decision**: the project layout is a marketplace stub at `vibeOS/.claude-plugin/marketplace.json` and the actual plugin at `vibeOS/plugins/yieldos/`.
+**Decision**: the public repository exposes `.claude-plugin/marketplace.json` at the repo root and points Claude Code to `yieldOS/plugins/yieldos/`. The nested `yieldOS/.claude-plugin/marketplace.json` remains valid for local marketplace testing from the `yieldOS/` directory.
 
-**Rationale**: matches the structure of `claude-plugins-official`, validates with `claude plugin validate`, and allows the marketplace to host more plugins later.
+**Rationale**: Claude Code validates and installs GitHub marketplaces from the repository root. Keeping the root marketplace valid makes `claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10` work the same way public plugin repositories like Guard do.
 
 ---
 
@@ -325,6 +325,6 @@ plugins/yieldos/.claude-plugin/{hooks,scripts,...}
 
 ## D35 — Versioning + bump-and-reinstall flow for fixes
 
-**Decision**: every meaningful fix bumps the plugin version (0.1.0 → 0.1.1 → 0.1.2 → ...) and reinstalls via `claude plugin uninstall && claude plugin install`.
+**Decision**: every meaningful fix bumps the plugin version (0.1.0 → 0.1.1 → 0.1.2 → ...) and reinstalls via `claude plugins uninstall && claude plugins install`.
 
 **Rationale**: the marketplace caches the install path by version. Without a bump, the cached files don't update.
