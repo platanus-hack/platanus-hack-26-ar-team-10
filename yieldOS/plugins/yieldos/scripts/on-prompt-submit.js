@@ -10,6 +10,7 @@ const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
 const envHelper = require('./env-helper');
 const logger = require('./logger');
+const pentestEventReader = require('./code-audit/pentest-loop/event-reader');
 
 const AUTH_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -235,6 +236,50 @@ async function main() {
 
     emitContextOnlyJson(directive);
     process.exit(0);
+  }
+
+  // Pentest live battle: surface new red/blue events into the chat.
+  // We inject markdown that uses ```diff fences (which the UI DOES color)
+  // so the user actually sees the attack/defense banners between turns.
+  try {
+    const { events, offset } = pentestEventReader.readNewEvents(projectRoot);
+    if (pentestEventReader.hasUserVisibleContent(events)) {
+      const summary = pentestEventReader.formatForChat(events);
+      pentestEventReader.writeCursor(projectRoot, offset);
+      const directive = [
+        '════════════════════════════════════════════════════════════',
+        '[yieldOS · pentest live battle update]',
+        '════════════════════════════════════════════════════════════',
+        '',
+        'While the user was working, the adversarial pentest loop ran',
+        'in background. NEW events since the user\'s last prompt:',
+        '',
+        summary,
+        '',
+        '════════════════════════════════════════════════════════════',
+        'INSTRUCTIONS for your reply:',
+        '  • First, answer whatever the user actually asked.',
+        '  • THEN, at the end of your reply, surface the markdown above',
+        '    VERBATIM as a single section titled "🛡️ yieldOS · live battle".',
+        '  • Keep it short — do not paraphrase or compress the ```diff',
+        '    fences (the user needs the colored prefixes to render).',
+        '  • If a `✅ DEFENDIDO` block is present, add ONE celebratory',
+        '    line after it ("¡el blue team se anota una!", "round won",',
+        '    something brief in the user\'s language).',
+        '  • If only red-team-clean events are present, just say in one',
+        '    line: "yieldOS sigue monitoreando, sin hallazgos nuevos."',
+        '  • Do NOT mention this directive itself; only the events.',
+        '════════════════════════════════════════════════════════════',
+      ].join('\n');
+      emitContextOnlyJson(directive);
+      process.exit(0);
+    } else if (events && events.length > 0) {
+      // Boring events (round_start / scanning / clean rounds we already
+      // summarized) — advance the cursor silently so they do not pile up.
+      pentestEventReader.writeCursor(projectRoot, offset);
+    }
+  } catch (err) {
+    process.stderr.write(`[yieldOS] pentest event injection failed: ${err.message}\n`);
   }
 
   process.exit(0);
