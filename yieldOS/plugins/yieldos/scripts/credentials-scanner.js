@@ -25,6 +25,13 @@ const SECRET_PATTERNS = [
   { id: 'rsa-private-key',    regex: /-----BEGIN (?:RSA |OPENSSH |EC |DSA |ENCRYPTED |PGP )?PRIVATE KEY-----[\s\S]+?-----END (?:RSA |OPENSSH |EC |DSA |ENCRYPTED |PGP )?PRIVATE KEY-----/g, redact: '[REDACTED:private-key-block]' },
   { id: 'db-url-creds',       regex: /\b(?:postgres|postgresql|mysql|mongodb|redis|amqp)(?:\+[a-z]+)?:\/\/[^:\s/@]+:[^@\s]+@[^\s/]+/g, redact: '[REDACTED:db-url-with-credentials]' },
   { id: 'env-line',           regex: /^\s*([A-Z][A-Z0-9_]{3,})\s*=\s*['"]?([A-Za-z0-9+/=._-]{16,})['"]?\s*$/gm, redact: '$1=[REDACTED]' },
+  // Catch-all: any KEY-looking variable assigned a non-trivial value, even with
+  // unicode / special chars in the value. Matches inline (not just full lines)
+  // so it also fires on prompts like: "use ANTHROPIC_API_KEY=... and run".
+  { id: 'secret-named-var',   regex: /\b([A-Z][A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|API|AUTH|CRED|CREDENTIAL|PRIVATE)[A-Z0-9_]*)\s*=\s*['"]?([^\s'"`]{12,})['"]?/g, redact: '$1=[REDACTED]' },
+  // Inline assignment of common credential tokens regardless of variable name:
+  // detects "key=foobar", "token = abc...", etc. when the value has high entropy.
+  { id: 'inline-secret-assign', regex: /\b(?:api[_-]?key|access[_-]?token|secret[_-]?key|password|passwd)\s*[:=]\s*['"]?([A-Za-z0-9._\-+/=]{16,})['"]?/gi, redact: '[KEY]=[REDACTED]' },
 ];
 
 function scan(text) {
