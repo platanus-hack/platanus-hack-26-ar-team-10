@@ -45,6 +45,47 @@ The loop never patches a lower-severity finding while a higher-severity finding
 is still unresolved. For example, a manual critical secret finding blocks before
 an unrelated medium redirect fix is attempted.
 
+## Native Agent Mode
+
+The deterministic loop is always the default. Teams can opt into a deeper local
+agent review without giving yieldOS API keys:
+
+```bash
+YIELDOS_CODE_AUDIT_MODE=deterministic  # default
+YIELDOS_CODE_AUDIT_MODE=agent-review   # deterministic scan + local agent red team
+YIELDOS_CODE_AUDIT_MODE=agent-fix      # review + local agent patch proposal
+
+YIELDOS_CODE_AUDIT_AGENT=auto          # default: prefer claude, then codex
+YIELDOS_CODE_AUDIT_AGENT=claude
+YIELDOS_CODE_AUDIT_AGENT=codex
+YIELDOS_CODE_AUDIT_AGENT_TIMEOUT_MS=60000
+```
+
+This mode shells out to the user's already-authenticated local Claude Code or
+Codex CLI. yieldOS does not ask for, store, or proxy model API keys.
+
+The agent is not trusted to mutate the repository directly. The contract is:
+
+1. Red-team agents return JSON findings only when they can provide the same
+   exploit evidence required by deterministic detectors.
+2. Blue-team agents return a unified diff patch, not file edits.
+3. yieldOS rejects patches that touch files outside the audited diff.
+4. yieldOS applies the patch with `git apply`, stages the touched files, and
+   re-runs the deterministic audit loop.
+5. The original commit remains blocked when code materially changed, so the user
+   or active coding agent reviews and reruns the commit.
+
+Agent execution is guarded with `YIELDOS_AGENT_CHILD=1`, which forces nested
+yieldOS executions back to deterministic mode. This prevents a local audit agent
+from recursively spawning more audit agents through its own git commands.
+
+`agent-review` can block on an agent-only high or critical finding. `agent-fix`
+uses deterministic fixes first, then asks the local agent for a patch only when
+the deterministic blue team cannot safely patch the highest-severity finding.
+If a team explicitly enables native agent mode and the configured local agent
+fails to run, the audit is treated as incomplete and the hook blocks instead of
+reporting a clean pass.
+
 ## Initial Finding Classes
 
 V1 focuses on code-level security issues with clear exploit paths:
@@ -89,6 +130,17 @@ push, if the exact state is not already committed in `HEAD`, the hook writes and
 stages it, then blocks the push so the evidence can be committed before CI
 verifies it.
 
+When native agent mode is enabled, the state also records:
+
+- `agent_mode`
+- `agent_provider`
+- `agent_runs`
+- `agent_findings`
+- `agent_patch_applied`
+- `agent_errors`
+
+The state does not store raw prompts, full diffs, model transcripts, or secrets.
+
 Machine-readable verdicts:
 
 - `code-audit-clean`
@@ -103,7 +155,8 @@ review and rerun the commit.
 
 ## CI Verification
 
-CI should not call an LLM. It can verify the stored state cheaply:
+CI should not call an LLM or local agent CLI. It verifies the stored state
+cheaply:
 
 ```bash
 node yieldOS/plugins/yieldos/scripts/code-audit/ci-verify.js --mode pr --base origin/main

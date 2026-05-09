@@ -4,7 +4,9 @@ const { collectStagedDiff, collectPushDiff } = require('./git');
 const { redTeam } = require('./red-team');
 const { blueTeam } = require('./blue-team');
 const { verifyFix } = require('./verify');
-const { writeAuditState, readAuditState, verifyAuditState } = require('./state');
+const { writeAuditState, readAuditState, verifyAuditState, buildAuditState } = require('./state');
+const agents = require('./agents');
+const { applyAgentPatch } = require('./agents/patch');
 
 const MAX_FIX_ITERATIONS = 3;
 const PATCHABLE_SEVERITIES = ['critical', 'high', 'medium'];
@@ -25,35 +27,40 @@ function isGitAuditCommand(command) {
 function auditGitCommand(projectRoot, command, options = {}) {
   const mode = isGitPush(command) ? 'push' : 'commit';
   const input = mode === 'push' ? collectPushDiff(projectRoot) : collectStagedDiff(projectRoot);
+  const agentOptions = resolveAgentOptions(options.agent);
+  const agentMeta = makeAgentMeta(agentOptions);
 
   if (input.files.length === 0 || !input.diff) {
-    return result('code-audit-clean', 'allow', mode, input, [], null, 'yieldOS code-audit: no code changes to audit', null, { maxIterations: 0 });
+    return result('code-audit-clean', 'allow', mode, input, [], null, 'yieldOS code-audit: no code changes to audit', null, { maxIterations: 0, agent: agentMeta });
   }
 
   if (mode === 'push') {
-    return auditPush(input);
+    return auditPush(projectRoot, input, agentOptions, agentMeta);
   }
 
-  return auditCommit(projectRoot, input, options);
+  return auditCommit(projectRoot, input, options, agentOptions, agentMeta);
 }
 
-function auditPush(input) {
-  const findings = redTeam(input);
+function auditPush(projectRoot, input, agentOptions, agentMeta) {
+  const findings = collectFindings(projectRoot, input, agentOptions, agentMeta);
+  if (agentAuditFailed(agentMeta)) {
+    return result('code-audit-verification-failed', 'block', 'push', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations: 0, agent: agentMeta });
+  }
   if (findings.length === 0) {
-    return result('code-audit-clean', 'allow', 'push', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations: 0 });
+    return result('code-audit-clean', 'allow', 'push', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations: 0, agent: agentMeta });
   }
 
   const highest = highestSeverity(findings);
   if (PUSH_BLOCKING_SEVERITIES.includes(highest)) {
-    return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`, null, { maxIterations: 0 });
+    return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`, null, { maxIterations: 0, agent: agentMeta });
   }
 
-  return result('code-audit-warning', 'allow', 'push', input, findings, null, 'yieldOS code-audit found low-risk code; see log', null, { maxIterations: 0 });
+  return result('code-audit-warning', 'allow', 'push', input, findings, null, 'yieldOS code-audit found low-risk code; see log', null, { maxIterations: 0, agent: agentMeta });
 }
 
-function auditCommit(projectRoot, initialInput, options) {
+function auditCommit(projectRoot, initialInput, options, agentOptions, agentMeta) {
   let input = initialInput;
-  let findings = redTeam(input);
+  let findings = collectFindings(projectRoot, input, agentOptions, agentMeta);
   const maxIterations = options.maxFixIterations || MAX_FIX_ITERATIONS;
   const patches = [];
 
@@ -61,12 +68,13 @@ function auditCommit(projectRoot, initialInput, options) {
     const highest = highestSeverity(findings);
     if (!PATCHABLE_SEVERITIES.includes(highest)) break;
 
-    const patch = blueTeam(projectRoot, findings.filter((finding) => finding.severity === highest));
+    const scopedFindings = findings.filter((finding) => finding.severity === highest);
+    const patch = patchFindings(projectRoot, input, scopedFindings, agentOptions, agentMeta);
     if (!patch.fixed) break;
 
     patches.push(patch);
     input = collectStagedDiff(projectRoot);
-    findings = redTeam(input);
+    findings = collectFindings(projectRoot, input, agentOptions, agentMeta);
   }
 
   if (patches.length > 0) {
@@ -74,21 +82,69 @@ function auditCommit(projectRoot, initialInput, options) {
     patch.limitReached = findings.length > 0 && patches.length >= maxIterations;
     const verification = verifyFix(projectRoot);
     if (!verification.ok) {
-      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, verificationFailureMessage(patch), verification, { maxIterations });
+      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, verificationFailureMessage(patch), verification, { maxIterations, agent: agentMeta });
     }
-    return result('code-audit-fix-applied', 'block', 'commit', input, findings, patch, fixAppliedMessage(patch), verification, { maxIterations });
+    if (agentAuditFailed(agentMeta)) {
+      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, agentFailureMessage(agentMeta), verification, { maxIterations, agent: agentMeta });
+    }
+    return result('code-audit-fix-applied', 'block', 'commit', input, findings, patch, fixAppliedMessage(patch), verification, { maxIterations, agent: agentMeta });
+  }
+
+  if (agentAuditFailed(agentMeta)) {
+    return result('code-audit-verification-failed', 'block', 'commit', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations, agent: agentMeta });
   }
 
   if (findings.length === 0) {
-    return result('code-audit-clean', 'allow', 'commit', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations });
+    return result('code-audit-clean', 'allow', 'commit', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations, agent: agentMeta });
   }
 
   const highest = highestSeverity(findings);
   if (highest === 'critical' || highest === 'high') {
-    return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`, null, { maxIterations });
+    return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`, null, { maxIterations, agent: agentMeta });
   }
 
-  return result('code-audit-warning', 'allow', 'commit', input, findings, null, `yieldOS code-audit found ${highest}-risk code; see log`, null, { maxIterations });
+  return result('code-audit-warning', 'allow', 'commit', input, findings, null, `yieldOS code-audit found ${highest}-risk code; see log`, null, { maxIterations, agent: agentMeta });
+}
+
+function collectFindings(projectRoot, input, agentOptions, agentMeta) {
+  const findings = redTeam(input);
+  if (!agents.isAgentReviewEnabled(agentOptions)) return findings;
+
+  try {
+    agentMeta.runs += 1;
+    const agentFindings = agents.runAgentRedTeam(projectRoot, input, agentOptions);
+    agentMeta.findings += agentFindings.length;
+    return dedupeFindings([...findings, ...agentFindings]);
+  } catch (err) {
+    agentMeta.errors.push(err.message);
+    return findings;
+  }
+}
+
+function patchFindings(projectRoot, input, findings, agentOptions, agentMeta) {
+  const deterministicPatch = blueTeam(projectRoot, findings);
+  if (deterministicPatch.fixed) {
+    return { ...deterministicPatch, source: 'deterministic' };
+  }
+
+  if (!agents.isAgentFixEnabled(agentOptions)) return deterministicPatch;
+
+  try {
+    agentMeta.runs += 1;
+    const agentPatch = agents.runAgentBlueTeam(projectRoot, input, findings, agentOptions);
+    if (!agentPatch.patch) return deterministicPatch;
+    const applied = applyAgentPatch(projectRoot, agentPatch.patch, input.files);
+    agentMeta.patchApplied = true;
+    return {
+      fixed: true,
+      files: applied.files,
+      appliedFindings: unique(findings.map((finding) => finding.ruleId)),
+      source: 'agent',
+    };
+  } catch (err) {
+    agentMeta.errors.push(err.message);
+    return deterministicPatch;
+  }
 }
 
 function highestSeverity(findings) {
@@ -104,6 +160,7 @@ function combinePatches(patches) {
     iterations: patches.length,
     files: unique(patches.flatMap((patch) => patch.files || [])),
     appliedFindings: unique(patches.flatMap((patch) => patch.appliedFindings || [])),
+    sources: unique(patches.map((patch) => patch.source).filter(Boolean)),
   };
 }
 
@@ -136,12 +193,51 @@ function result(verdict, action, mode, input, findings, patch, message, verifica
     patch,
     verification,
     maxIterations: meta.maxIterations || 0,
+    agent: meta.agent || makeAgentMeta(resolveAgentOptions()),
     message,
   };
 }
 
+function resolveAgentOptions(optionOverrides) {
+  const base = agents.agentOptionsFromEnv(process.env);
+  if (process.env.YIELDOS_AGENT_CHILD === '1') return base;
+  return { ...base, ...(optionOverrides || {}) };
+}
+
+function makeAgentMeta(agentOptions) {
+  return {
+    mode: agentOptions.mode,
+    provider: agentOptions.provider,
+    enabled: agents.isAgentReviewEnabled(agentOptions),
+    runs: 0,
+    findings: 0,
+    patchApplied: false,
+    errors: [],
+  };
+}
+
+function agentAuditFailed(agentMeta) {
+  return Boolean(agentMeta.enabled && agentMeta.errors.length > 0);
+}
+
+function agentFailureMessage(agentMeta) {
+  return `yieldOS code-audit agent review failed: ${agentMeta.errors[0]}`;
+}
+
+function dedupeFindings(findings) {
+  const seen = new Set();
+  return findings.filter((finding) => {
+    const key = [finding.ruleId, finding.file, finding.line].join('\0');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 module.exports = {
   auditGitCommand,
+  agentOptionsFromEnv: agents.agentOptionsFromEnv,
+  buildAuditState,
   collectStagedDiff,
   collectPushDiff,
   highestSeverity,

@@ -271,7 +271,9 @@ function handleCodeAuditCommand(projectRoot, command) {
   if (!codeAudit.isGitAuditCommand(command)) return false;
   let audit;
   try {
-    audit = codeAudit.auditGitCommand(projectRoot, command);
+    audit = codeAudit.auditGitCommand(projectRoot, command, {
+      agent: codeAudit.agentOptionsFromEnv(process.env),
+    });
   } catch (err) {
     audit = {
       handled: true,

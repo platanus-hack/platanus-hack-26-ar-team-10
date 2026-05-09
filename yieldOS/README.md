@@ -86,6 +86,12 @@ blue-team fix per pass, re-scans after each patch, and stops after a hard limit.
 It then logs the result to `security/code-audit-events.md` and writes
 machine-verifiable state to `security/code-audit-state.json`.
 
+For deeper review, teams can opt into native local-agent mode with
+`YIELDOS_CODE_AUDIT_MODE=agent-review` or `agent-fix`. That uses the user's
+already-authenticated Claude Code or Codex CLI to propose findings or patches,
+then yieldOS validates and verifies the result deterministically. CI never needs
+an LLM or model API key.
+
 → Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
 
 ---
