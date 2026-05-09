@@ -173,5 +173,7 @@ test('audit command markdown and executable are registered', () => {
   assert.equal(command.includes('allowed-tools: Bash(yieldos-audit:*)'), true);
   assert.equal(command.includes('yieldos-audit $ARGUMENTS'), true);
   assert.equal(update.includes('yieldos-update $ARGUMENTS'), true);
-  assert.equal((mode & 0o111) !== 0, true);
+  if (process.platform !== 'win32') {
+    assert.equal((mode & 0o111) !== 0, true);
+  }
 });

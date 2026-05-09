@@ -18,9 +18,8 @@ function git(projectRoot, args, opts = {}) {
 }
 
 function collectStagedDiff(projectRoot) {
-  const pathspec = auditPathspec();
-  const files = listFiles(projectRoot, ['diff', '--cached', '--name-only', '--', ...pathspec]);
-  const diff = git(projectRoot, ['diff', '--cached', '--unified=80', '--', ...pathspec]);
+  const files = nonAuditFiles(listFiles(projectRoot, ['diff', '--cached', '--name-only']));
+  const diff = files.length > 0 ? git(projectRoot, ['diff', '--cached', '--unified=80', '--', ...files]) : '';
   return withHash({ mode: 'commit', diffSource: 'staged', files, diff, range: '--cached' });
 }
 
@@ -36,9 +35,8 @@ function collectBaseDiff(projectRoot, baseRef, mode = 'pr') {
 }
 
 function collectRangeDiff(projectRoot, range, mode, upstream) {
-  const pathspec = auditPathspec();
-  const files = listFiles(projectRoot, ['diff', '--name-only', range, '--', ...pathspec]);
-  const diff = git(projectRoot, ['diff', '--unified=80', range, '--', ...pathspec]);
+  const files = nonAuditFiles(listFiles(projectRoot, ['diff', '--name-only', range]));
+  const diff = files.length > 0 ? git(projectRoot, ['diff', '--unified=80', range, '--', ...files]) : '';
   return withHash({ mode, diffSource: 'merge-base', files, diff, range, upstream });
 }
 
@@ -52,8 +50,12 @@ function restageFiles(projectRoot, files) {
   git(projectRoot, ['add', '--', ...files], { stdio: ['ignore', 'ignore', 'pipe'] });
 }
 
-function auditPathspec() {
-  return ['.', ...AUDIT_PATHS.map((file) => `:(exclude)${file}`)];
+function nonAuditFiles(files) {
+  return (files || []).filter((file) => !AUDIT_PATHS.includes(normalizeGitPath(file)));
+}
+
+function normalizeGitPath(file) {
+  return String(file || '').replace(/\\/g, '/');
 }
 
 function withHash(input) {
@@ -73,4 +75,5 @@ module.exports = {
   restageFiles,
   hashDiff,
   AUDIT_PATHS,
+  nonAuditFiles,
 };

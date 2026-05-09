@@ -12,6 +12,7 @@ const versionComparator = require('./version-comparator');
 const osvChecker = require('./osv-checker');
 const obfuscationDetector = require('./obfuscation-detector');
 const binaryDetector = require('./binary-detector');
+const provenance = require('./provenance');
 
 function fetchJson(url, timeoutMs = 5000) {
   return new Promise((resolve, reject) => {
@@ -73,7 +74,9 @@ async function analyzePackage(candidate, opts = {}) {
 
   let metadata = null;
   if (SUPPORTED_NPM) {
-    metadata = await fetchNpmMetadata(candidate.name, candidate.version);
+    metadata = typeof opts.fetchNpmMetadata === 'function'
+      ? await opts.fetchNpmMetadata(candidate.name, candidate.version)
+      : await fetchNpmMetadata(candidate.name, candidate.version);
   } else if (SUPPORTED_PY) {
     metadata = await fetchPypiMetadata(candidate.name, candidate.version);
   } else {
@@ -139,6 +142,26 @@ async function analyzePackage(candidate, opts = {}) {
     }
   }
 
+  if (SUPPORTED_NPM && opts.provenance !== false) {
+    const checkProvenance = opts.provenanceChecker || provenance.checkNpm;
+    const provenanceResult = await checkProvenance(
+      candidate.name,
+      metadata.version || candidate.version,
+      repositoryUrlFromMetadata(metadata),
+      opts,
+    );
+
+    if (provenanceResult.tier && provenanceResult.tier !== 'clean') {
+      findings.push({
+        id: 'npm-provenance',
+        severity: provenanceResult.tier,
+        note: provenanceResult.reason,
+        verdict: provenanceResult.verdict,
+      });
+      tiers.push(provenanceResult.tier);
+    }
+  }
+
   if (metadata.dist && metadata.dist.unpackedSize) {
     const sizeMb = metadata.dist.unpackedSize / (1024 * 1024);
     if (sizeMb > 50) {
@@ -174,9 +197,17 @@ function pickReleaseDate(metadata, candidate) {
   return null;
 }
 
+function repositoryUrlFromMetadata(metadata) {
+  if (!metadata || !metadata.repository) return null;
+  if (typeof metadata.repository === 'string') return metadata.repository;
+  if (typeof metadata.repository.url === 'string') return metadata.repository.url;
+  return null;
+}
+
 module.exports = {
   analyzePackage,
   pickHighestTier,
+  repositoryUrlFromMetadata,
   manifestDiff,
   lockfileValidator,
   settingsValidator,
@@ -184,6 +215,7 @@ module.exports = {
   staticPatterns,
   versionComparator,
   osvChecker,
+  provenance,
   obfuscationDetector,
   binaryDetector,
 };
