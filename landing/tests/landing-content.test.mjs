@@ -33,19 +33,18 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "claude plugin marketplace add /path/to/vibeOS",
     "claude plugin install yieldos@yieldos-marketplace",
     "AI Security",
-    "Tool call",
     "Verdict",
     "Allow",
     "Block",
     "Rewrite",
     "AGENTS.md",
     "curl | sh",
-    "Live decision demo",
-    "Verdict before execution.",
-    "Tool call captured",
-    "Candidate classified",
-    "Policy checks run",
-    "Verdict returned",
+    "Decision demo",
+    "Before it runs.",
+    "Call",
+    "Classify",
+    "Policy",
+    "Verdict",
     "npm install colors",
     "denylist-match",
     "npm install node-fetch",
@@ -133,6 +132,15 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Claude Code tries to run something. yieldOS decides first.",
     "Working prototype",
     "AI supply-chain",
+    "Live decision demo",
+    "Verdict before execution.",
+    "Tool call captured",
+    "Candidate classified",
+    "Policy checks run",
+    "Verdict returned",
+    "Machine-readable stderr",
+    "Blocked Install",
+    "Hash-approved agent instructions",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
@@ -291,7 +299,15 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".scan-sweep"), "Expected scanner visual");
   assert.ok(globals.includes(".demo-cinema"), "Expected staged demo choreography");
   assert.ok(globals.includes(".decision-row"), "Expected verdict row choreography");
-  assert.ok(globals.includes(".policy-path"), "Expected animated policy path");
+  assert.ok(globals.includes(".policy-path"), "Expected policy path styling");
+  assert.ok(
+    !globals.includes(".policy-path::after"),
+    "Expected yellow policy connector line to be removed",
+  );
+  assert.ok(
+    !globals.includes("policy-draw"),
+    "Expected animated policy connector to be removed",
+  );
   assert.ok(globals.includes(".metric-tile"), "Expected proof metric timing");
   assert.ok(globals.includes(".vector-card"), "Expected source-truth coverage cards");
   assert.ok(globals.includes(".proof-card"), "Expected prototype proof cards");

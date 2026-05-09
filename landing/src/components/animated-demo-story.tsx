@@ -3,10 +3,10 @@
 import { motion, useReducedMotion } from "motion/react";
 
 const story = [
-  { step: "1", title: "Tool call captured" },
-  { step: "2", title: "Candidate classified" },
-  { step: "3", title: "Policy checks run" },
-  { step: "4", title: "Verdict returned" },
+  { step: "1", title: "Call" },
+  { step: "2", title: "Classify" },
+  { step: "3", title: "Policy" },
+  { step: "4", title: "Verdict" },
 ];
 
 export function AnimatedDemoStory() {

@@ -10,13 +10,13 @@ const installCommand =
 const heroTitle = "A security gate before your AI agent runs anything.";
 
 const gatedVectors = [
-  { title: "Packages", detail: "npm, pnpm, yarn, bun, pip, uv, cargo, go." },
-  { title: "Skills", detail: "Hash-approved agent instructions." },
-  { title: "MCPs", detail: "Source + tool approval." },
-  { title: "Instructions", detail: "CLAUDE.md, AGENTS.md, .cursorrules." },
-  { title: "Vendoring", detail: "git clone blocked by default." },
-  { title: "Binaries", detail: "curl | sh blocked by default." },
-  { title: "Manifests", detail: "Data passes; installs are gated." },
+  { title: "Packages", detail: "9 managers." },
+  { title: "Skills", detail: "Approved instructions." },
+  { title: "MCPs", detail: "Scoped tools." },
+  { title: "Instructions", detail: "AGENTS.md / CLAUDE.md." },
+  { title: "Vendoring", detail: "Block clone." },
+  { title: "Binaries", detail: "Block curl | sh." },
+  { title: "Manifests", detail: "Pass data." },
 ];
 
 const policySteps = [
@@ -154,10 +154,10 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[0.64fr_1.36fr] lg:items-end lg:gap-10">
             <MotionReveal>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Live decision demo
+                Decision demo
               </p>
               <h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight text-balance sm:mt-5 sm:text-5xl">
-                Verdict before execution.
+                Before it runs.
               </h2>
             </MotionReveal>
             <AnimatedDemoStory />

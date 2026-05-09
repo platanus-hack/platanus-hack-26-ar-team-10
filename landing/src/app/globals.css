@@ -526,50 +526,6 @@ html {
   opacity: 1;
 }
 
-.review-path::before {
-  position: absolute;
-  top: 26px;
-  bottom: 26px;
-  left: 31px;
-  width: 1px;
-  content: "";
-  background: linear-gradient(
-    180deg,
-    rgba(24, 24, 27, 0.08),
-    rgba(24, 24, 27, 0.2),
-    rgba(232, 255, 0, 0.56)
-  );
-}
-
-.policy-path::after {
-  position: absolute;
-  top: 26px;
-  bottom: 26px;
-  left: 31px;
-  width: 1px;
-  content: "";
-  background: linear-gradient(180deg, transparent, var(--acid), transparent);
-  transform: scaleY(0);
-  transform-origin: top;
-  animation: policy-draw 5.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-.review-step {
-  position: relative;
-}
-
-.review-step::before {
-  position: absolute;
-  top: 2px;
-  left: -24px;
-  width: 7px;
-  height: 7px;
-  content: "";
-  border-radius: 999px;
-  background: var(--acid);
-  box-shadow: 0 0 0 5px rgba(232, 255, 0, 0.08);
-}
-
 .log-row {
   position: relative;
   overflow: hidden;
@@ -809,23 +765,6 @@ html {
   }
 }
 
-@keyframes policy-draw {
-  0%,
-  18% {
-    transform: scaleY(0);
-    opacity: 0;
-  }
-  36%,
-  68% {
-    transform: scaleY(1);
-    opacity: 0.78;
-  }
-  100% {
-    transform: scaleY(1);
-    opacity: 0;
-  }
-}
-
 @keyframes metric-blink {
   0%,
   48% {
@@ -900,12 +839,6 @@ html {
   .hero-title {
     font-size: clamp(2rem, 8.2vw, 2.45rem);
     max-width: 15ch;
-  }
-
-  .review-path::before,
-  .review-step::before,
-  .policy-path::after {
-    display: none;
   }
 
   .scanned-belt::before {
@@ -1009,7 +942,6 @@ html {
   .scanned-belt::before,
   .flow-rail-pulse,
   .demo-cinema::before,
-  .policy-path::after,
   .verdict-token::after,
   .metric-tile::after {
     display: none;
