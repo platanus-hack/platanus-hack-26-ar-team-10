@@ -64,7 +64,7 @@ Current benchmark evidence is summarized in [`benchmarks/README.md`](./benchmark
 | [`policy/`](./policy) | Runtime policy source of truth: allowlist, denylist, skills, MCPs, categories, native equivalents, settings, and injection patterns. |
 | [`yieldOS/plugins/yieldos/`](./yieldOS/plugins/yieldos) | The actual Claude Code plugin: hooks, commands, scripts, dashboard, shipped policy cache, and tests. |
 | [`yieldOS/docs/`](./yieldOS/docs) | Product and architecture docs. The docs index separates shipped surfaces from forward-looking plans. |
-| [`yieldOS/fixtures/oracle-demo/`](./yieldOS/fixtures/oracle-demo) | Runnable missing-auth baseline/fixed demo fixtures. |
+| [`yieldOS/plugins/yieldos/fixtures/oracle-demo/`](./yieldOS/plugins/yieldos/fixtures/oracle-demo) | Runnable missing-auth baseline/fixed demo fixtures. |
 | [`yieldOS/packs/`](./yieldOS/packs) | Dogfood team agent pack manifest. |
 | [`benchmarks/`](./benchmarks) | Checked-in benchmark reports and benchmark notes. |
 | [`landing/`](./landing) | Next.js landing page, isolated from the plugin runtime. |

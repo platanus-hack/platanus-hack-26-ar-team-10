@@ -172,6 +172,34 @@ test('redTeam detects public admin route without auth guard', () => {
   assert.equal(findings.some((f) => f.ruleId === 'missing-authz'), true);
 });
 
+test('redTeam treats auth-looking tokens inside handlers as missing auth', () => {
+  const findings = codeAudit.redTeam({
+    files: ['server.js'],
+    diff: [
+      'diff --git a/server.js b/server.js',
+      '+++ b/server.js',
+      '@@',
+      "+app.get('/admin/users', (req, res) => { const requireAuth = false; res.json(users); });",
+    ].join('\n'),
+  });
+
+  assert.equal(findings.some((f) => f.ruleId === 'missing-authz'), true);
+});
+
+test('redTeam accepts auth middleware before the route handler', () => {
+  const findings = codeAudit.redTeam({
+    files: ['server.js'],
+    diff: [
+      'diff --git a/server.js b/server.js',
+      '+++ b/server.js',
+      '@@',
+      "+app.get('/admin/users', requireAuth, (req, res) => res.json(users));",
+    ].join('\n'),
+  });
+
+  assert.equal(findings.some((f) => f.ruleId === 'missing-authz'), false);
+});
+
 test('redTeam ignores fixtures, tests, and stringified route examples', () => {
   const findings = codeAudit.redTeam({
     files: ['tests/cdsc.test.js', 'fixtures/demo/server.js', 'demo-command.js'],
@@ -349,6 +377,33 @@ test('blueTeam applies safe sensitive-log fix and preserves unrelated staged cod
   assert.equal(content.includes('const ok = true;'), true);
   assert.equal(staged.includes('const ok = true;'), true);
   assert.equal(staged.includes('SECRET_TOKEN'), false);
+});
+
+test('code audit resolves git -C target before collecting staged diff', () => {
+  const outer = tmpRepo();
+  const inner = tmpRepo();
+  fs.writeFileSync(path.join(inner, 'config.js'), 'module.exports = { apiKey: "sk-test-12345678901234567890" };\n');
+  sh(inner, ['add', 'config.js']);
+
+  const result = codeAudit.auditGitCommand(outer, `git -C ${inner} commit -m audit-test`);
+
+  assert.equal(result.action, 'block');
+  assert.equal(fs.realpathSync(result.projectRoot), fs.realpathSync(inner));
+  assert.deepEqual(result.files, ['config.js']);
+  assert.equal(result.findings.some((finding) => finding.ruleId === 'hardcoded-secret'), true);
+});
+
+test('pre-install hook writes audit state in git -C target repo', () => {
+  const outer = tmpRepo();
+  const inner = tmpRepo();
+  fs.writeFileSync(path.join(inner, 'config.js'), 'module.exports = { apiKey: "sk-test-12345678901234567890" };\n');
+  sh(inner, ['add', 'config.js']);
+
+  const result = runHook(outer, `git -C ${inner} commit -m audit-test`);
+
+  assert.equal(result.code, 2);
+  assert.equal(fs.existsSync(path.join(inner, 'security', 'code-audit-state.json')), true);
+  assert.equal(fs.existsSync(path.join(outer, 'security', 'code-audit-state.json')), false);
 });
 
 test('code audit loops through bounded red-team and blue-team passes', () => {

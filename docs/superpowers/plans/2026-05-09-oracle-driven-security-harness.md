@@ -640,7 +640,7 @@ git commit -m "feat: define oracle evidence artifacts"
 - `yieldOS/plugins/yieldos/scripts/oracles/cdsc/replay-runner.js`
 - `yieldOS/plugins/yieldos/scripts/oracles/cdsc/proof.js`
 - `yieldOS/plugins/yieldos/tests/cdsc.test.js`
-- `yieldOS/fixtures/oracle-demo/` with a small runnable Express-style or Node HTTP demo app.
+- `yieldOS/plugins/yieldos/fixtures/oracle-demo/` with a small runnable Express-style or Node HTTP demo app.
 - `yieldOS/docs/21-counterexample-driven-security-contracts.md`
 
 **Modify:**

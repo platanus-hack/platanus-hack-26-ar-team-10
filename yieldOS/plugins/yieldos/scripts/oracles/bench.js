@@ -15,15 +15,17 @@ async function runBench(projectRoot, options = {}) {
   fs.mkdirSync(demoRoot, { recursive: true });
   for (let i = 0; i < demoRuns; i += 1) {
     const runStarted = Date.now();
+    const runId = `run-${String(i + 1).padStart(2, '0')}`;
     const result = await demo.runDemo(['missing-auth'], {
-      projectRoot: path.join(demoRoot, `run-${String(i + 1).padStart(2, '0')}`),
+      projectRoot: path.join(demoRoot, runId),
     });
     replayRuns.push({
+      run_id: runId,
       index: i + 1,
       status: result.result.status,
       exit_code: result.exitCode,
       duration_ms: Date.now() - runStarted,
-      project_root: result.projectRoot,
+      artifact_dir: relativeReportPath(projectRoot, result.projectRoot),
     });
   }
 
@@ -32,10 +34,16 @@ async function runBench(projectRoot, options = {}) {
   const metrics = {
     version: '0.1',
     generated_at: new Date().toISOString(),
+    measurement_source: 'local oracle replay outcomes',
     decisions_resolved_without_model_percent: 100,
     agent_runs_per_audit: 0,
     agent_tokens_per_audit: null,
     ci_model_calls: 0,
+    model_usage: {
+      source: 'deterministic oracle bench',
+      agent_runs_observed: 0,
+      ci_model_calls_observed: 0,
+    },
     oracle_count: listOracles().length,
     replay_runs: replayRuns.length,
     replay_pass_rate: ratio(replayRuns.filter((run) => run.status === 'pass').length, replayRuns.length),
@@ -118,6 +126,10 @@ function percentile(values, p) {
 function ratio(numerator, denominator) {
   if (!denominator) return 0;
   return Number((numerator / denominator).toFixed(4));
+}
+
+function relativeReportPath(projectRoot, target) {
+  return path.relative(projectRoot, target).split(path.sep).join('/');
 }
 
 function writeJson(file, value) {

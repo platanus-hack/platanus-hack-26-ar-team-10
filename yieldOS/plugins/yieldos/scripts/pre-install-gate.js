@@ -435,7 +435,7 @@ function handleCodeAuditCommand(projectRoot, command) {
       handled: true,
       verdict: 'code-audit-verification-failed',
       action: 'block',
-      mode: /^\s*git\s+push/.test(command) ? 'push' : 'commit',
+      mode: codeAudit.gitSubcommand(command) === 'push' ? 'push' : 'commit',
       files: [],
       findings: [],
       patch: null,
@@ -443,10 +443,11 @@ function handleCodeAuditCommand(projectRoot, command) {
     };
   }
 
+  const auditRoot = audit.projectRoot || projectRoot;
   if (audit.files && audit.files.length > 0) {
     try {
       const shouldStageState = audit.mode === 'commit' || (audit.mode === 'push' && audit.action !== 'block');
-      const stateWrite = codeAudit.writeAuditState(projectRoot, audit, { stage: shouldStageState });
+      const stateWrite = codeAudit.writeAuditState(auditRoot, audit, { stage: shouldStageState });
       if (audit.mode === 'push' && audit.action !== 'block' && !stateWrite.committed) {
         audit = {
           ...audit,
@@ -465,7 +466,7 @@ function handleCodeAuditCommand(projectRoot, command) {
     }
   }
 
-  logger.logCodeAudit(projectRoot, audit);
+  logger.logCodeAudit(auditRoot, audit);
   ui.writeAudit(audit);
   emitHookOutput([{
     candidate: { type: 'git', name: `git-${audit.mode}`, version: 'unknown' },

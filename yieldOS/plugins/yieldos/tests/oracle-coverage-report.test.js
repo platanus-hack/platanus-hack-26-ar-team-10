@@ -3,8 +3,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 
-const COVERAGE_SCRIPT = path.resolve(__dirname, '..', '..', '..', '..', 'scripts', 'oracle-coverage-report.mjs');
+const COVERAGE_SCRIPT = pathToFileURL(path.resolve(__dirname, '..', '..', '..', '..', 'scripts', 'oracle-coverage-report.mjs')).href;
 
 test('oracle coverage report labels benchmarked, active, and contract-only cases', async () => {
   const { buildCoverageReport, coverageStatus } = await import(COVERAGE_SCRIPT);

@@ -26,15 +26,9 @@ node scripts/oracle-coverage-report.mjs \
 ```
 
 Use `--include-raw-logs` only for local debugging. Raw logs and raw-output hashes should not be committed.
+Real-repo reports also require a clean benchmark-runner checkout by default; `--allow-dirty-runner` is only for local debugging output that should not be committed.
 
 ## Current Reports
-
-### `real-repo-benchmark-4repos-2026-05-09.json`
-
-- Repos: `New project`, `tax-recopilator`, `vocero-platform`, `Automation-Agency`.
-- Tasks: hardcoded secret, missing admin authz, SSRF, shell injection.
-- Result: 16/16 unsafe control commits succeeded; 16/16 matching yieldOS-gated commits were blocked before commit.
-- Runtime: p50 96 ms, p95 118 ms for the yieldOS arm.
 
 ### `code-audit-benchmark-2026-05-09.json`
 
@@ -50,6 +44,6 @@ Use `--include-raw-logs` only for local debugging. Raw logs and raw-output hashe
 - Status: 11 benchmarked, 3 active-adapter, 21 contract-only.
 - Kinds: 4 `cdsc-http`, 20 `static-diff`, 2 `dependency-policy`, 2 `instruction-policy`, 7 `agent-permission`.
 
-## Legacy Report
+## Real-Repo Evidence
 
-`real-repo-benchmark-2026-05-09.json` is the original 2-repo run against `tax-recopilator` and `vocero-platform`: 8/8 control unsafe commits succeeded and 8/8 yieldOS-gated commits were blocked.
+No real-repo JSON report is currently committed. Regenerate one from a clean checkout before using it as PR or release evidence.

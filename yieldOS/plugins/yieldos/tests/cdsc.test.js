@@ -15,8 +15,8 @@ const oracleCommand = require('../scripts/oracle-command');
 const { hashObject } = require('../scripts/oracles/result');
 const demoCommand = require('../scripts/oracles/demo-command');
 
-const REPO_ROOT = path.resolve(__dirname, '..', '..', '..', '..');
-const FIXTURE_ROOT = path.join(REPO_ROOT, 'yieldOS', 'fixtures', 'oracle-demo');
+const PLUGIN_ROOT = path.resolve(__dirname, '..');
+const FIXTURE_ROOT = path.join(PLUGIN_ROOT, 'fixtures', 'oracle-demo');
 
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-cdsc-'));
@@ -39,13 +39,12 @@ function tmpRepo() {
 
 function groundedSource(root) {
   fs.cpSync(FIXTURE_ROOT, path.join(root, 'fixture'), { recursive: true });
-  const sourceFile = path.join(root, 'fixture', 'server-source.js');
-  const sourceText = fs.readFileSync(sourceFile, 'utf8');
+  const vulnerableText = fs.readFileSync(path.join(root, 'fixture', 'vulnerable-source.js'), 'utf8');
   return {
     rule_id: 'missing-authz',
     source: 'deterministic',
     file: 'fixture/server-source.js',
-    file_hash: hashObject({ text: sourceText }),
+    file_hash: hashObject({ text: vulnerableText }),
     diff_hash: 'sha256:test-diff',
     line: "app.get('/admin/users', (req, res) => res.json(users));",
   };
@@ -78,7 +77,7 @@ function writeProofInputs(root, options = {}) {
 
 test('missing-auth contract grounds only current deterministic findings', () => {
   const root = tmpProject();
-  fs.copyFileSync(path.join(FIXTURE_ROOT, 'server-source.js'), path.join(root, 'server.js'));
+  fs.copyFileSync(path.join(FIXTURE_ROOT, 'vulnerable-source.js'), path.join(root, 'server.js'));
   const finding = {
     ruleId: 'missing-authz',
     severity: 'high',
@@ -98,7 +97,7 @@ test('missing-auth contract grounds only current deterministic findings', () => 
 });
 
 test('cdsc replay maps vulnerable baseline to fail and fixed runtime to pass', async () => {
-  const root = REPO_ROOT;
+  const root = PLUGIN_ROOT;
   const contract = {
     version: '0.1',
     id: 'express-admin-route-requires-auth',
@@ -275,11 +274,18 @@ test('cdsc proof requires grounded source metadata but tolerates fixed source dr
 
   const fixedRoot = tmpProject();
   writeProofInputs(fixedRoot);
-  fs.writeFileSync(
-    path.join(fixedRoot, 'fixture', 'server-source.js'),
-    "app.get('/admin/users', requireAuth, (req, res) => res.json(users));\n",
-  );
   const fixedSource = await proof.run(fixedRoot, {
+    contract: 'security/oracles/demo/contract.json',
+    runtime: 'yieldos.oracle-runtime.json',
+  });
+
+  const fakeAuthRoot = tmpProject();
+  writeProofInputs(fakeAuthRoot);
+  fs.writeFileSync(
+    path.join(fakeAuthRoot, 'fixture', 'server-source.js'),
+    "app.get('/admin/users', (req, res) => { const requireAuth = false; res.json(users); });\n",
+  );
+  const fakeAuthSource = await proof.run(fakeAuthRoot, {
     contract: 'security/oracles/demo/contract.json',
     runtime: 'yieldos.oracle-runtime.json',
   });
@@ -288,6 +294,25 @@ test('cdsc proof requires grounded source metadata but tolerates fixed source dr
   assert.equal(missingSource.blocking_reason, 'cdsc-proof-runtime-error');
   assert.equal(JSON.stringify(missingSource.evidence).includes('missing source'), true);
   assert.equal(fixedSource.status, 'pass');
+  assert.equal(fakeAuthSource.status, 'unknown');
+  assert.equal(JSON.stringify(fakeAuthSource.evidence).includes('authenticated version'), true);
+});
+
+test('cdsc proof requires the fixed runtime to execute the current source file', async () => {
+  const root = tmpProject();
+  writeProofInputs(root);
+  const runtimePath = path.join(root, 'yieldos.oracle-runtime.json');
+  const runtime = JSON.parse(fs.readFileSync(runtimePath, 'utf8'));
+  runtime.fixed.args = ['fixed-server.js'];
+  fs.writeFileSync(runtimePath, JSON.stringify(runtime, null, 2));
+
+  const result = await proof.run(root, {
+    contract: 'security/oracles/demo/contract.json',
+    runtime: 'yieldos.oracle-runtime.json',
+  });
+
+  assert.equal(result.status, 'unknown');
+  assert.equal(JSON.stringify(result.evidence).includes('fixed runtime is not bound'), true);
 });
 
 test('cdsc proof rejects source metadata that does not match the replay subject', async () => {

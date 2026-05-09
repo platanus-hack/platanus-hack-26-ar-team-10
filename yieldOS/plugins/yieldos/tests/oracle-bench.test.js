@@ -31,7 +31,10 @@ test('oracle bench runs real replay demos and writes metric reports', async () =
     assert.equal(fs.existsSync(path.join(root, 'security', file)), true, `expected ${file}`);
   });
   const artifactSizes = JSON.parse(fs.readFileSync(path.join(root, 'security', 'oracle-artifact-size-report.json'), 'utf8'));
+  const flakeReport = JSON.parse(fs.readFileSync(path.join(root, 'security', 'oracle-flake-report.json'), 'utf8'));
   assert.equal(artifactSizes.artifact_size_bytes.some((item) => item.path.includes('proof-manifest.json')), true);
+  assert.equal(flakeReport.runs.some((run) => path.isAbsolute(run.project_root || '')), false);
+  assert.equal(flakeReport.runs.every((run) => typeof run.run_id === 'string'), true);
 });
 
 test('oracle bench defaults to ten replay runs for flake measurement', async () => {

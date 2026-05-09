@@ -11,7 +11,7 @@ const SECRET_PATTERNS = [
   /Bearer\s+[A-Za-z0-9._\-]+/g,
   /https?:\/\/[^\s/]*:[^\s/@]+@[^\s]+/g,
   /xox[abprs]-[A-Za-z0-9-]+/g,
-  /sk-[A-Za-z0-9]{20,}/g,
+  /sk-[A-Za-z0-9_-]{16,}/g,
   /ghp_[A-Za-z0-9]{20,}/g,
 ];
 

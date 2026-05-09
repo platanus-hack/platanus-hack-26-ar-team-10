@@ -158,7 +158,9 @@ test('registry lists expected oracle ids', () => {
 test('yieldos-oracle list command is registered and executable', async () => {
   const command = await oracleCommand.runOracleCommand(tmpProject(), ['list']);
   const bin = path.join(PLUGIN_ROOT, 'bin', 'yieldos-oracle');
-  const spawned = spawnSync(bin, ['list'], { encoding: 'utf8' });
+  const spawned = process.platform === 'win32'
+    ? spawnSync('sh', [bin, 'list'], { encoding: 'utf8' })
+    : spawnSync(bin, ['list'], { encoding: 'utf8' });
 
   assert.equal(command.exitCode, 0);
   assert.equal(command.message.includes('yieldOS security oracles'), true);
@@ -384,4 +386,18 @@ test('project-tests oracle reuses detected npm test checks', () => {
   assert.equal(noTests.blocking, false);
   assert.equal(passTests.status, 'pass');
   assert.equal(failTests.status, 'fail');
+});
+
+test('project-tests oracle redacts check stdout and stderr evidence', () => {
+  const root = tmpProject();
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({
+    scripts: { test: 'node -e "console.log(\'sk-test-12345678901234567890\'); console.error(\'sk-test-12345678901234567890\')"' },
+  }));
+
+  const result = projectTestsOracle.run(root, { context: 'commit' });
+  const evidence = JSON.stringify(result.evidence);
+
+  assert.equal(result.status, 'pass');
+  assert.equal(evidence.includes('sk-test-12345678901234567890'), false);
+  assert.equal(evidence.includes('[REDACTED]'), true);
 });

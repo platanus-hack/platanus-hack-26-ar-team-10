@@ -9,8 +9,8 @@ const { spawnSync } = require('node:child_process');
 const proof = require('./cdsc/proof');
 const { hashObject } = require('./result');
 
-const REPO_ROOT = path.resolve(__dirname, '..', '..', '..', '..', '..');
-const FIXTURE_ROOT = path.join(REPO_ROOT, 'yieldOS', 'fixtures', 'oracle-demo');
+const PLUGIN_ROOT = path.resolve(__dirname, '..', '..');
+const FIXTURE_ROOT = path.join(PLUGIN_ROOT, 'fixtures', 'oracle-demo');
 
 function parseArgs(argv = []) {
   const args = [...argv];
@@ -54,7 +54,7 @@ async function runDemo(argv = process.argv.slice(2), options = {}) {
 function prepareDemoProject(root) {
   fs.mkdirSync(path.join(root, 'security/oracles/missing-auth-demo'), { recursive: true });
   fs.cpSync(FIXTURE_ROOT, path.join(root, 'fixture'), { recursive: true });
-  const sourceText = fs.readFileSync(path.join(root, 'fixture', 'server-source.js'), 'utf8');
+  const sourceText = fs.readFileSync(path.join(root, 'fixture', 'vulnerable-source.js'), 'utf8');
   const contract = {
     version: '0.1',
     id: 'missing-auth-demo',

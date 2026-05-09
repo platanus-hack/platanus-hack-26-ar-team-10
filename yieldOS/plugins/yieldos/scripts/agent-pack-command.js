@@ -18,6 +18,14 @@ const { knownOracleIds } = require('./oracles/registry');
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const VALID_ACTIONS = new Set(['preview', 'write', 'verify']);
 const VALID_TARGETS = new Set(['claude-code', 'codex', 'cursor', 'github-copilot', 'windsurf', 'universal']);
+const PACK_FIELDS = new Set(['version', 'kind', 'name', 'description', 'profiles', 'agents', 'skills', 'mcps', 'playbooks', 'oracles', 'evidence']);
+const AGENT_FIELDS = new Set(['enabled']);
+const SKILLS_FIELDS = new Set(['allow']);
+const SKILL_ITEM_FIELDS = new Set(['key', 'source']);
+const MCPS_FIELDS = new Set(['allow', 'default_unlisted']);
+const MCP_ITEM_FIELDS = new Set(['key', 'approved_tools']);
+const INCLUDE_FIELDS = new Set(['include']);
+const EVIDENCE_FIELDS = new Set(['decisions_dir', 'audit_state', 'pack_lock']);
 const TARGET_STRENGTH = {
   'claude-code': 'enforced-via-yieldos-hooks',
   codex: 'instruction-and-approval-guidance',
@@ -140,6 +148,7 @@ function readPolicyFile(projectRoot, policyRoot, filename) {
 
 function validatePack(pack, policy) {
   if (!pack || typeof pack !== 'object' || Array.isArray(pack)) throw new Error('pack must be an object');
+  assertSupportedPackFields(pack);
   if (pack.kind !== 'yield.agent-pack') throw new Error('kind must be yield.agent-pack');
   if (!pack.name) throw new Error('name is required');
   const profiles = asArray(pack.profiles, 'profiles');
@@ -165,6 +174,50 @@ function validatePack(pack, policy) {
     warnings,
     policyVersion: policy.skills.version || policy.mcps.version || 'unknown',
   };
+}
+
+function assertSupportedPackFields(pack) {
+  assertAllowedKeys('pack', pack, PACK_FIELDS);
+  assertMapFields('agents', pack.agents, AGENT_FIELDS);
+  assertConfigFields('skills', pack.skills, SKILLS_FIELDS);
+  assertConfigFields('mcps', pack.mcps, MCPS_FIELDS);
+  assertConfigFields('playbooks', pack.playbooks, INCLUDE_FIELDS);
+  assertConfigFields('oracles', pack.oracles, INCLUDE_FIELDS);
+  assertConfigFields('evidence', pack.evidence, EVIDENCE_FIELDS);
+
+  for (const [index, item] of asArray(pack.skills?.allow || [], 'skills.allow').entries()) {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      assertAllowedKeys(`skills.allow[${index}]`, item, SKILL_ITEM_FIELDS);
+    }
+  }
+  for (const [index, item] of asArray(pack.mcps?.allow || [], 'mcps.allow').entries()) {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      assertAllowedKeys(`mcps.allow[${index}]`, item, MCP_ITEM_FIELDS);
+    }
+  }
+}
+
+function assertMapFields(label, value, allowed) {
+  if (value == null) return;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+  for (const [key, config] of Object.entries(value)) {
+    if (config && typeof config === 'object' && !Array.isArray(config)) {
+      assertAllowedKeys(`${label}.${key}`, config, allowed);
+    }
+  }
+}
+
+function assertConfigFields(label, value, allowed) {
+  if (value == null) return;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+  assertAllowedKeys(label, value, allowed);
+}
+
+function assertAllowedKeys(label, value, allowed) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key)) throw new Error(`unsupported field ${label}.${key}`);
+  }
 }
 
 function validateOracles(oraclesConfig = {}) {

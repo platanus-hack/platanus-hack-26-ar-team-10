@@ -103,6 +103,30 @@ skills:
   assert.equal(result.message.includes('skill:not-approved is not approved'), true);
 });
 
+test('runPack verify rejects unsupported manifest fields instead of ignoring them', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: unknown-fields
+profiles:
+  - code-audit
+agents:
+  claude-code:
+    enabled: true
+    outputs:
+      - SHOULD-NOT-BE-IGNORED.md
+skills:
+  allow: []
+  require_review: true
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('unsupported field'), true);
+});
+
 test('runPack verify rejects playbooks that are not reviewed by yieldOS', () => {
   const root = tmpProject();
   writePack(root, `

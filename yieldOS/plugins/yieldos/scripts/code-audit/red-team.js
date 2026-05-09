@@ -97,7 +97,7 @@ function missingAuthz(item) {
   const route = /^\s*(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/.exec(item.code);
   if (!route) return null;
   if (!/(admin|private|settings|billing|users|account|dashboard)/i.test(route[1])) return null;
-  if (/(requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)/.test(item.code)) return null;
+  if (hasRouteAuthGuard(item.code)) return null;
   return makeFinding(item, 'missing-authz', 'high', 'Sensitive route without auth guard', {
     attackerControlledInput: 'Any unauthenticated HTTP client can request the new sensitive route.',
     vulnerableSink: 'Route handler for privileged application data or actions.',
@@ -105,6 +105,82 @@ function missingAuthz(item) {
     impact: 'Unauthorized access to administrative or private user data.',
     fixStrategy: 'manual',
   });
+}
+
+const AUTH_GUARD_RE = /\b(?:requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)\b/;
+
+function hasRouteAuthGuard(line) {
+  const args = routeCallArgs(line);
+  if (!args || args.length < 2) return false;
+
+  for (const arg of args.slice(1)) {
+    if (isRouteHandler(arg)) return false;
+    if (AUTH_GUARD_RE.test(arg)) return true;
+  }
+  return false;
+}
+
+function isRouteHandler(arg) {
+  const text = String(arg || '').trim();
+  return text.includes('=>') || /^async\s+function\b/.test(text) || /^function\b/.test(text);
+}
+
+function routeCallArgs(line) {
+  const match = /\b(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(/i.exec(line || '');
+  if (!match) return null;
+  return splitTopLevelArgs(String(line).slice(match.index + match[0].length));
+}
+
+function splitTopLevelArgs(input) {
+  const args = [];
+  let current = '';
+  let depth = 0;
+  let quote = '';
+  let escaped = false;
+
+  for (const ch of input) {
+    if (escaped) {
+      current += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && quote) {
+      current += ch;
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      current += ch;
+      if (ch === quote) quote = '';
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      quote = ch;
+      current += ch;
+      continue;
+    }
+    if (ch === '(' || ch === '[' || ch === '{') {
+      depth += 1;
+      current += ch;
+      continue;
+    }
+    if (ch === ')' || ch === ']' || ch === '}') {
+      if (depth === 0 && ch === ')') {
+        if (current.trim()) args.push(current.trim());
+        return args;
+      }
+      depth = Math.max(0, depth - 1);
+      current += ch;
+      continue;
+    }
+    if (ch === ',' && depth === 0) {
+      args.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  return args;
 }
 
 function sqlInjection(item) {
@@ -239,4 +315,13 @@ function stripRegexLiterals(code) {
   return code.replace(/(^|[=(:,\[{!&|?;]\s*)\/(?:\\.|[^/\\\n])+\/[dgimsuy]*/g, '$1//');
 }
 
-module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence, isAuditExemptFile, stripQuotedStrings, stripRegexLiterals };
+module.exports = {
+  redTeam,
+  parseAddedLines,
+  parseChangedLines,
+  hasExploitEvidence,
+  hasRouteAuthGuard,
+  isAuditExemptFile,
+  stripQuotedStrings,
+  stripRegexLiterals,
+};

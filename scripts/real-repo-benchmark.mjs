@@ -85,6 +85,7 @@ function parseArgs(argv = process.argv.slice(2)) {
     else if (arg === '--tmp') parsed.tempRoot = path.resolve(requireValue(arg, argv[++i]));
     else if (arg === '--include-raw-logs') parsed.includeRawLogs = true;
     else if (arg === '--include-private-paths') parsed.includePrivatePaths = true;
+    else if (arg === '--allow-dirty-runner') parsed.allowDirtyRunner = true;
     else if (arg === '--help' || arg === '-h') parsed.help = true;
     else throw new Error(`unknown option: ${arg}`);
   }
@@ -113,15 +114,19 @@ async function runBenchmark(options = {}) {
   const startedAt = new Date().toISOString();
   const includePrivatePaths = Boolean(options.includePrivatePaths);
   const includeRawLogs = Boolean(options.includeRawLogs);
+  const runnerSource = repoInfo(REPO_ROOT);
+  assertCleanRunnerSource(runnerSource, options);
   const report = {
     version: 2,
     generated_at: startedAt,
     benchmark_runner: {
       repository: path.basename(REPO_ROOT),
-      source: repoInfo(REPO_ROOT),
+      source: runnerSource,
       hook: path.relative(REPO_ROOT, HOOK_PATH),
       local_paths_included: includePrivatePaths,
       raw_logs_included: includeRawLogs,
+      agent_mode: 'deterministic',
+      agent_provider: 'none',
     },
     runs: options.runs || 1,
     tasks: ATTACK_TASKS.map(({ id, description }) => ({ id, description })),
@@ -233,6 +238,7 @@ function runYieldOSArm(repoRoot, task, options = {}) {
   applyTask(repoRoot, task);
   const hook = spawnSync(process.execPath, [HOOK_PATH], {
     cwd: repoRoot,
+    env: deterministicHookEnv(),
     input: JSON.stringify({
       tool_name: 'Bash',
       tool_input: { command: `git commit -m "benchmark ${task.id}"` },
@@ -261,6 +267,20 @@ function runYieldOSArm(repoRoot, task, options = {}) {
     };
   }
   return result;
+}
+
+function assertCleanRunnerSource(source, options = {}) {
+  if (!options.outFile || options.allowDirtyRunner || source.dirty !== true) return;
+  throw new Error('dirty benchmark runner cannot write committed evidence; pass --allow-dirty-runner for local debugging');
+}
+
+function deterministicHookEnv() {
+  return {
+    ...process.env,
+    YIELDOS_AGENT_CHILD: '',
+    YIELDOS_CODE_AUDIT_MODE: 'deterministic',
+    YIELDOS_CODE_AUDIT_AGENT: 'none',
+  };
 }
 
 function cloneRepo(source, dest) {
@@ -420,6 +440,7 @@ function usage() {
     '',
     'Runs identical unsafe coding tasks in disposable control and yieldOS-gated clones.',
     'Reports are sanitized by default; use --include-raw-logs or --include-private-paths only for local debugging.',
+    'Writing a report requires a clean runner checkout unless --allow-dirty-runner is passed for local debugging.',
   ].join('\n');
 }
 
@@ -438,6 +459,7 @@ async function main() {
       tempRoot: args.tempRoot,
       includeRawLogs: args.includeRawLogs,
       includePrivatePaths: args.includePrivatePaths,
+      allowDirtyRunner: args.allowDirtyRunner,
     });
     process.stdout.write(`${JSON.stringify({ outFile, aggregate: report.aggregate }, null, 2)}\n`);
   } catch (err) {
@@ -452,6 +474,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 export {
   ATTACK_TASKS,
+  assertCleanRunnerSource,
   parseArgs,
   runBenchmark,
   summarizeResults,

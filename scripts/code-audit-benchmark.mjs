@@ -95,6 +95,8 @@ async function runBenchmark(options = {}) {
       id: 'code-audit-fixtures',
       hook: path.relative(REPO_ROOT, HOOK_PATH),
       raw_logs_included: Boolean(options.includeRawLogs),
+      agent_mode: 'deterministic',
+      agent_provider: 'none',
     },
     cases: [],
     aggregate: null,
@@ -199,6 +201,7 @@ function writeFile(repoRoot, relativePath, content) {
 function runYieldOSHook(repoRoot, caseId) {
   return spawnSync(process.execPath, [HOOK_PATH], {
     cwd: repoRoot,
+    env: deterministicHookEnv(),
     input: JSON.stringify({
       tool_name: 'Bash',
       tool_input: { command: `git commit -m "benchmark ${caseId}"` },
@@ -207,6 +210,15 @@ function runYieldOSHook(repoRoot, caseId) {
     encoding: 'utf8',
     timeout: 20000,
   });
+}
+
+function deterministicHookEnv() {
+  return {
+    ...process.env,
+    YIELDOS_AGENT_CHILD: '',
+    YIELDOS_CODE_AUDIT_MODE: 'deterministic',
+    YIELDOS_CODE_AUDIT_AGENT: 'none',
+  };
 }
 
 function classifyObserved(verdict, exitCode) {

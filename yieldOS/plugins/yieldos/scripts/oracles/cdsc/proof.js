@@ -7,6 +7,7 @@ const { pass, fail, unknown, hashObject } = require('../result');
 const artifacts = require('../artifacts');
 const replayRunner = require('./replay-runner');
 const { parseRoute } = require('./missing-auth-contract');
+const { hasRouteAuthGuard } = require('../../code-audit/red-team');
 
 async function run(projectRoot, options = {}) {
   try {
@@ -18,6 +19,7 @@ async function run(projectRoot, options = {}) {
     const replay = readJson(path.join(path.dirname(absoluteContract), 'replay.json'));
     const runtime = readJson(absoluteRuntime);
     const sourceVerification = verifyContractSource(projectRoot, contract);
+    const runtimeSourceBinding = verifyRuntimeSourceBinding(projectRoot, contract, runtime);
 
     const baseline = await replayRunner.runReplay(projectRoot, contract, replay, replayRunner.runtimeForMode(runtime, 'baseline'), options);
     const fixed = await replayRunner.runReplay(projectRoot, contract, replay, replayRunner.runtimeForMode(runtime, 'fixed'), options);
@@ -30,6 +32,7 @@ async function run(projectRoot, options = {}) {
       fixed: resultSummary(fixed),
       proof_status: proofStatus(baseline, fixed),
       source: sourceVerification,
+      runtime_source_binding: runtimeSourceBinding,
       limits: ['This proves this route and replay only, not the whole repo.'],
     };
     const artifactSet = writeProofManifest(projectRoot, contract, proofManifest, baseline, fixed);
@@ -144,7 +147,7 @@ function verifyContractSource(projectRoot, contract) {
   if (currentHash === source.file_hash && !exactLinePresent) {
     throw new Error('cdsc contract source line is not present in the grounded file');
   }
-  if (currentHash !== source.file_hash && (!currentRouteLine || !hasAuthGuard(currentRouteLine))) {
+  if (currentHash !== source.file_hash && (!currentRouteLine || !hasRouteAuthGuard(currentRouteLine))) {
     throw new Error('cdsc contract source drift is not tied to an authenticated version of the same route');
   }
 
@@ -159,8 +162,31 @@ function verifyContractSource(projectRoot, contract) {
   };
 }
 
-function hasAuthGuard(line) {
-  return /\b(?:requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)\b/.test(line);
+function verifyRuntimeSourceBinding(projectRoot, contract, runtime) {
+  const fixedRuntime = replayRunner.runtimeForMode(runtime, 'fixed');
+  const source = contract.source || {};
+  const contractSourceFile = replayRunner.resolveProjectPath(projectRoot, source.file, { mustExist: true });
+  const runtimeCwd = fixedRuntime.cwd
+    ? replayRunner.resolveProjectPath(projectRoot, fixedRuntime.cwd, { mustExist: true, allowDirectory: true })
+    : path.resolve(projectRoot);
+  const sourceFile = requireOption(fixedRuntime.source_file, 'fixed runtime source_file');
+  const entrypoint = Array.isArray(fixedRuntime.args) ? fixedRuntime.args[0] : null;
+  if (!entrypoint) throw new Error('fixed runtime is not bound to a Node entrypoint');
+  const runtimeSourceFile = replayRunner.resolveProjectPath(runtimeCwd, sourceFile, { mustExist: true });
+  const runtimeEntrypoint = replayRunner.resolveProjectPath(runtimeCwd, entrypoint, { mustExist: true });
+
+  if (runtimeSourceFile !== contractSourceFile || runtimeEntrypoint !== contractSourceFile) {
+    throw new Error('fixed runtime is not bound to the grounded source file');
+  }
+
+  return {
+    source_file: relativeProjectPath(projectRoot, runtimeSourceFile),
+    entrypoint: relativeProjectPath(projectRoot, runtimeEntrypoint),
+  };
+}
+
+function relativeProjectPath(projectRoot, target) {
+  return path.relative(path.resolve(projectRoot), target).split(path.sep).join('/');
 }
 
 function requireOption(value, label) {
@@ -172,4 +198,5 @@ module.exports = {
   proofStatus,
   run,
   verifyContractSource,
+  verifyRuntimeSourceBinding,
 };

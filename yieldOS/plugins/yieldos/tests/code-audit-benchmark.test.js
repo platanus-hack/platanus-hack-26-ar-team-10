@@ -5,8 +5,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 
-const BENCHMARK_SCRIPT = path.resolve(__dirname, '..', '..', '..', '..', 'scripts', 'code-audit-benchmark.mjs');
+const BENCHMARK_SCRIPT = pathToFileURL(path.resolve(__dirname, '..', '..', '..', '..', 'scripts', 'code-audit-benchmark.mjs')).href;
 
 test('code-audit benchmark exercises blocked, fixed, and allowed outcomes', async () => {
   const { CODE_AUDIT_CASES, runBenchmark } = await import(BENCHMARK_SCRIPT);

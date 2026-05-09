@@ -1,6 +1,8 @@
 'use strict';
 
-const { collectStagedDiff, collectPushDiff } = require('./git');
+const path = require('node:path');
+
+const { collectStagedDiff, collectPushDiff, git } = require('./git');
 const { redTeam } = require('./red-team');
 const { blueTeam } = require('./blue-team');
 const { verifyFix } = require('./verify');
@@ -31,12 +33,7 @@ function gitSubcommand(command) {
     if (subcommand) return subcommand;
   }
 
-  for (const segment of splitShellSegments(stripQuotedText(command || ''))) {
-    const tokens = segment.trim().split(/\s+/).filter(Boolean);
-    const subcommand = gitSubcommandFromTokens(tokens);
-    if (subcommand) return subcommand;
-  }
-  return null;
+  return findGitCommand(command || '')?.subcommand || null;
 }
 
 function extractShellEvalCommands(command) {
@@ -90,64 +87,146 @@ function splitShellSegments(command) {
 }
 
 function gitSubcommandFromTokens(tokens) {
+  return gitInfoFromTokens(tokens)?.subcommand || null;
+}
+
+function gitInfoFromTokens(tokens, cwd = null) {
   let index = 0;
   while (tokens[index] && /^[A-Za-z_][A-Za-z0-9_]*=/.test(tokens[index])) index += 1;
   if (tokens[index] === 'env') {
     index += 1;
     while (tokens[index] && /^[A-Za-z_][A-Za-z0-9_]*=/.test(tokens[index])) index += 1;
   }
+  if (tokens[index] === 'sudo') index += 1;
   if (tokens[index] === 'command') index += 1;
 
   const gitToken = tokens[index] || '';
   if (gitToken !== 'git' && !/\/git$/.test(gitToken)) return null;
   index += 1;
 
+  let gitCwd = cwd;
+  let unsupported = null;
   while (tokens[index] && tokens[index].startsWith('-')) {
     const flag = tokens[index];
     index += 1;
-    if (flag === '-C' || flag === '-c' || flag === '--git-dir' || flag === '--work-tree') {
+    if (flag === '-C') {
+      if (gitCwd && tokens[index]) gitCwd = path.resolve(gitCwd, tokens[index]);
+      index += 1;
+    } else if (flag === '-c') {
+      index += 1;
+    } else if (flag === '--git-dir' || flag === '--work-tree') {
+      unsupported = flag;
       index += 1;
     }
   }
 
-  return tokens[index] === 'commit' || tokens[index] === 'push' ? tokens[index] : null;
+  return tokens[index] === 'commit' || tokens[index] === 'push'
+    ? { subcommand: tokens[index], cwd: gitCwd, unsupported }
+    : null;
+}
+
+function findGitCommand(command, initialCwd = null) {
+  for (const innerCommand of extractShellEvalCommands(command || '')) {
+    const info = findGitCommand(innerCommand, initialCwd);
+    if (info) return info;
+  }
+
+  let cwd = initialCwd ? path.resolve(initialCwd) : null;
+  for (const segment of splitShellSegments(command || '')) {
+    const tokens = shellTokens(segment);
+    if (tokens.length === 0) continue;
+    if (tokens[0] === 'cd' && tokens[1] && cwd) {
+      cwd = path.resolve(cwd, tokens[1]);
+      continue;
+    }
+    const info = gitInfoFromTokens(tokens, cwd);
+    if (info) return info;
+  }
+  return null;
+}
+
+function shellTokens(segment) {
+  const tokens = [];
+  let current = '';
+  let quote = '';
+  let escaped = false;
+
+  for (const ch of String(segment || '')) {
+    if (escaped) {
+      current += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && quote !== "'") {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (ch === quote) quote = '';
+      else current += ch;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      continue;
+    }
+    if (/\s/.test(ch)) {
+      if (current) tokens.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  if (current) tokens.push(current);
+  return tokens;
+}
+
+function resolveGitAuditProjectRoot(projectRoot, command) {
+  const info = findGitCommand(command, projectRoot);
+  if (!info) return path.resolve(projectRoot);
+  if (info.unsupported) {
+    throw new Error(`unsupported git audit option: ${info.unsupported}`);
+  }
+  const targetCwd = info.cwd || path.resolve(projectRoot);
+  return path.resolve(git(targetCwd, ['rev-parse', '--show-toplevel']));
 }
 
 function auditGitCommand(projectRoot, command, options = {}) {
   const mode = isGitPush(command) ? 'push' : 'commit';
-  const input = mode === 'push' ? collectPushDiff(projectRoot) : collectStagedDiff(projectRoot);
+  const auditRoot = resolveGitAuditProjectRoot(projectRoot, command);
+  const input = mode === 'push' ? collectPushDiff(auditRoot) : collectStagedDiff(auditRoot);
   const agentOptions = resolveAgentOptions(options.agent);
   const agentMeta = makeAgentMeta(agentOptions);
 
   if (input.files.length === 0 || !input.diff) {
-    return result('code-audit-clean', 'allow', mode, input, [], null, 'yieldOS code-audit: no code changes to audit', null, { maxIterations: 0, agent: agentMeta });
+    return result('code-audit-clean', 'allow', mode, input, [], null, 'yieldOS code-audit: no code changes to audit', null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
   }
 
   if (mode === 'push') {
-    return attachCdscArtifacts(projectRoot, auditPush(projectRoot, input, agentOptions, agentMeta));
+    return attachCdscArtifacts(auditRoot, auditPush(auditRoot, input, agentOptions, agentMeta, auditRoot));
   }
 
-  return attachCdscArtifacts(projectRoot, auditCommit(projectRoot, input, options, agentOptions, agentMeta));
+  return attachCdscArtifacts(auditRoot, auditCommit(auditRoot, input, options, agentOptions, agentMeta, auditRoot));
 }
 
-function auditPush(projectRoot, input, agentOptions, agentMeta) {
+function auditPush(projectRoot, input, agentOptions, agentMeta, auditRoot = projectRoot) {
   const findings = collectFindings(projectRoot, input, agentOptions, agentMeta);
   if (agentAuditFailed(agentMeta)) {
-    return result('code-audit-verification-failed', 'block', 'push', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations: 0, agent: agentMeta });
+    return result('code-audit-verification-failed', 'block', 'push', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
   }
   if (findings.length === 0) {
-    return result('code-audit-clean', 'allow', 'push', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations: 0, agent: agentMeta });
+    return result('code-audit-clean', 'allow', 'push', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
   }
 
   const highest = highestSeverity(findings);
   if (PUSH_BLOCKING_SEVERITIES.includes(highest)) {
-    return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`, null, { maxIterations: 0, agent: agentMeta });
+    return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`, null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
   }
 
-  return result('code-audit-warning', 'allow', 'push', input, findings, null, 'yieldOS code-audit found low-risk code; see log', null, { maxIterations: 0, agent: agentMeta });
+  return result('code-audit-warning', 'allow', 'push', input, findings, null, 'yieldOS code-audit found low-risk code; see log', null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
 }
 
-function auditCommit(projectRoot, initialInput, options, agentOptions, agentMeta) {
+function auditCommit(projectRoot, initialInput, options, agentOptions, agentMeta, auditRoot = projectRoot) {
   let input = initialInput;
   let findings = collectFindings(projectRoot, input, agentOptions, agentMeta);
   const maxIterations = options.maxFixIterations || MAX_FIX_ITERATIONS;
@@ -171,28 +250,28 @@ function auditCommit(projectRoot, initialInput, options, agentOptions, agentMeta
     patch.limitReached = findings.length > 0 && patches.length >= maxIterations;
     const verification = verifyFix(projectRoot);
     if (!verification.ok) {
-      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, verificationFailureMessage(patch), verification, { maxIterations, agent: agentMeta });
+      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, verificationFailureMessage(patch), verification, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
     }
     if (agentAuditFailed(agentMeta)) {
-      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, agentFailureMessage(agentMeta), verification, { maxIterations, agent: agentMeta });
+      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, agentFailureMessage(agentMeta), verification, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
     }
-    return result('code-audit-fix-applied', 'block', 'commit', input, findings, patch, fixAppliedMessage(patch), verification, { maxIterations, agent: agentMeta });
+    return result('code-audit-fix-applied', 'block', 'commit', input, findings, patch, fixAppliedMessage(patch), verification, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
   }
 
   if (agentAuditFailed(agentMeta)) {
-    return result('code-audit-verification-failed', 'block', 'commit', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations, agent: agentMeta });
+    return result('code-audit-verification-failed', 'block', 'commit', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
   }
 
   if (findings.length === 0) {
-    return result('code-audit-clean', 'allow', 'commit', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations, agent: agentMeta });
+    return result('code-audit-clean', 'allow', 'commit', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
   }
 
   const highest = highestSeverity(findings);
   if (highest === 'critical' || highest === 'high') {
-    return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`, null, { maxIterations, agent: agentMeta });
+    return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`, null, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
   }
 
-  return result('code-audit-warning', 'allow', 'commit', input, findings, null, `yieldOS code-audit found ${highest}-risk code; see log`, null, { maxIterations, agent: agentMeta });
+  return result('code-audit-warning', 'allow', 'commit', input, findings, null, `yieldOS code-audit found ${highest}-risk code; see log`, null, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
 }
 
 function collectFindings(projectRoot, input, agentOptions, agentMeta) {
@@ -283,6 +362,7 @@ function result(verdict, action, mode, input, findings, patch, message, verifica
     verification,
     maxIterations: meta.maxIterations || 0,
     agent: meta.agent || makeAgentMeta(resolveAgentOptions()),
+    projectRoot: meta.projectRoot || null,
     message,
   };
 }
@@ -334,6 +414,7 @@ module.exports = {
   isGitCommit,
   isGitPush,
   gitSubcommand,
+  resolveGitAuditProjectRoot,
   stripQuotedText,
   redTeam,
   MAX_FIX_ITERATIONS,

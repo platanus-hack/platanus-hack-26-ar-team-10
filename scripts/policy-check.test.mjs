@@ -48,7 +48,10 @@ function makePolicyRoot(overrides = {}) {
       }],
       rules: { default_unlisted: 'block', validate_tool_surface_at_registration: true },
     },
-    'injection-patterns.json': { version: 'test', patterns: [] },
+    'injection-patterns.json': {
+      version: 'test',
+      patterns: [{ id: 'ignore-previous', regex: 'ignore previous instructions', severity: 'critical' }],
+    },
     'build-scripts-allowed.json': { version: 'test', entries: [] },
     'required-settings.json': { version: 'test', managers: {} },
     'version.json': { version: 'test' },
@@ -88,4 +91,22 @@ test('validatePolicyRoot rejects unsafe MCP tool overlap and stale cache', () =>
   assert.equal(errors.some((error) => error.includes('mcps.json rules.default_unlisted must be block')), true);
   assert.equal(errors.some((error) => error.includes('approved and denied tools overlap')), true);
   assert.equal(errors.some((error) => error.includes('policy-cache/mcps.json differs')), true);
+});
+
+test('validatePolicyRoot rejects malformed non-entry policy schemas', () => {
+  const root = makePolicyRoot({
+    'categories.json': { version: 'test', A_safe_to_rewrite: 'npm:clsx', D_never_rewrite: [] },
+    'native-equivalents.json': { version: 'test', entries: [] },
+    'injection-patterns.json': { version: 'test', patterns: 'not-an-array' },
+    'required-settings.json': { version: 'test', managers: [] },
+    'version.json': { version: 5 },
+  });
+
+  const errors = validatePolicyRoot(root);
+
+  assert.equal(errors.some((error) => error.includes('categories.json A_safe_to_rewrite must be an array')), true);
+  assert.equal(errors.some((error) => error.includes('native-equivalents.json entries must be an object')), true);
+  assert.equal(errors.some((error) => error.includes('injection-patterns.json patterns must be a non-empty array')), true);
+  assert.equal(errors.some((error) => error.includes('required-settings.json managers must be an object')), true);
+  assert.equal(errors.some((error) => error.includes('version.json version must be a string')), true);
 });

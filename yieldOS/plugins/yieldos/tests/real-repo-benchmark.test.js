@@ -6,8 +6,9 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const { pathToFileURL } = require('node:url');
 
-const BENCHMARK_SCRIPT = path.resolve(__dirname, '..', '..', '..', '..', 'scripts', 'real-repo-benchmark.mjs');
+const BENCHMARK_SCRIPT = pathToFileURL(path.resolve(__dirname, '..', '..', '..', '..', 'scripts', 'real-repo-benchmark.mjs')).href;
 
 function sh(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
@@ -37,6 +38,7 @@ test('real repo benchmark compares control commits against yieldOS-gated commits
     outFile,
     tempRoot,
     runs: 1,
+    allowDirtyRunner: true,
   });
 
   assert.equal(fs.existsSync(outFile), true);
@@ -91,6 +93,7 @@ test('real repo benchmark resolves repo roots and keeps same-basename repos isol
     repos: [subdir, repoTwo],
     tempRoot,
     runs: 1,
+    allowDirtyRunner: true,
   });
 
   assert.equal(report.repositories.length, 2);
@@ -121,4 +124,16 @@ test('real repo benchmark parser accepts repeated repo flags', async () => {
   assert.equal(parsed.outFile, '/tmp/out.json');
   assert.equal(parsed.includeRawLogs, true);
   assert.equal(parsed.includePrivatePaths, true);
+});
+
+test('real repo benchmark refuses committed reports from dirty runner by default', async () => {
+  const { assertCleanRunnerSource } = await import(BENCHMARK_SCRIPT);
+
+  assert.throws(
+    () => assertCleanRunnerSource({ dirty: true }, { allowDirtyRunner: false, outFile: '/tmp/report.json' }),
+    /dirty benchmark runner/,
+  );
+  assert.doesNotThrow(
+    () => assertCleanRunnerSource({ dirty: true }, { allowDirtyRunner: true, outFile: '/tmp/report.json' }),
+  );
 });

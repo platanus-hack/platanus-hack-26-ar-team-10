@@ -1,7 +1,5 @@
 'use strict';
 
-const http = require('node:http');
-
 const users = [{ id: 1, email: 'admin@example.com' }];
 const app = {
   get(route, handler) {

@@ -1,6 +1,7 @@
 'use strict';
 
 const { pass, fail, unknown } = require('../result');
+const { redactValue } = require('../redact');
 const verify = require('../../code-audit/verify');
 
 function run(projectRoot, options = {}) {
@@ -48,8 +49,8 @@ function summarizeChecks(checks = []) {
     name: check.name,
     status: check.status,
     ok: check.ok,
-    stdout: check.stdout,
-    stderr: check.stderr,
+    stdout: redactValue(check.stdout || ''),
+    stderr: redactValue(check.stderr || ''),
   }));
 }
 

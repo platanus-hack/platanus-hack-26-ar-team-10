@@ -82,38 +82,19 @@ profiles:
 agents:
   claude-code:
     enabled: true
-    outputs:
-      - AGENTS.md
-      - CLAUDE.md
-      - .claude/skills/security-audit/SKILL.md
   codex:
     enabled: true
-    outputs:
-      - AGENTS.md
-      - .codex/rules/yieldos.rules
   cursor:
     enabled: false
-    outputs:
-      - .cursor/rules/yieldos-security.mdc
-      - .cursor/skills/security-audit/SKILL.md
   github-copilot:
     enabled: false
-    outputs:
-      - .github/copilot-instructions.md
-      - .github/instructions/yieldos-security.instructions.md
   windsurf:
     enabled: false
-    outputs:
-      - .windsurf/rules/yieldos-security.md
-      - .windsurf/skills/security-audit/SKILL.md
 
 skills:
   allow:
     - key: skill:dependency-gate
       source: policy/skills.json
-  require_review:
-    - permission_scope: network
-    - permission_scope: privileged
 
 mcps:
   allow:
