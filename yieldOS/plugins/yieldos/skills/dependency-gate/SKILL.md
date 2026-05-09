@@ -72,6 +72,7 @@ yieldOS will block any attempt to:
 - Modify files under `.claude/plugins/yieldos/**`.
 - Modify `security/dependency-events.md` other than via append from yieldOS itself.
 - Modify `security/code-audit-events.md` or `security/code-audit-state.json` by hand.
+- Modify `security/audit-events.md` other than via append from yieldOS itself.
 - Modify `security/yieldos-rewrites.json` outside of the rewrite flow.
 - Modify the official policy cache.
 

@@ -64,6 +64,7 @@ function validateParsed(parsed) {
   if (parsed.scope === 'local' && parsed.agent !== 'claude') {
     throw new Error('--scope local only supports --agent claude');
   }
+  if (parsed.profiles.length === 0) throw new Error('--profile needs at least one profile');
   for (const profile of parsed.profiles) {
     if (!PROFILE_SECTIONS[profile]) throw new Error(`unknown profile: ${profile}`);
   }
@@ -154,7 +155,7 @@ function runInit(projectRoot, argv = process.argv.slice(2), options = {}) {
   }
 
   const files = resolveTargets(projectRoot, parsed, options);
-  if (!parsed.write) return { exitCode: 0, message: renderPreview(projectRoot, files), files };
+  if (!parsed.write) return { exitCode: 0, message: renderPreview(projectRoot, files, parsed), files };
 
   const existing = files.filter((file) => fs.existsSync(file.absolutePath));
   if (existing.length > 0 && !parsed.force) {
@@ -196,7 +197,10 @@ function targetPath(projectRoot, home, scope, filename) {
   return path.join(projectRoot, filename);
 }
 
-function renderPreview(projectRoot, files) {
+function renderPreview(projectRoot, files, parsed = {}) {
+  const footer = parsed.scope === 'org'
+    ? 'Organization scope is export-only. Copy these generated instructions into your managed rollout system.'
+    : 'Rerun with --write to create these files.';
   return [
     'yieldOS init preview',
     '',
@@ -205,7 +209,7 @@ function renderPreview(projectRoot, files) {
       file.content.trimEnd(),
       '',
     ]),
-    'Rerun with --write to create these files.',
+    footer,
   ].join('\n');
 }
 

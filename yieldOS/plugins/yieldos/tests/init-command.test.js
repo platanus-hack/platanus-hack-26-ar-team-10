@@ -69,10 +69,22 @@ test('runInit writes personal scope to both agent homes without relative imports
 
 test('runInit keeps organization scope export-only', () => {
   const root = tmpProject();
+  const preview = init.runInit(root, ['--scope', 'org']);
   const result = init.runInit(root, ['--scope', 'org', '--write']);
 
+  assert.equal(preview.exitCode, 0);
+  assert.equal(preview.message.includes('export-only'), true);
+  assert.equal(preview.message.includes('Rerun with --write'), false);
   assert.equal(result.exitCode, 2);
   assert.equal(result.message.includes('export-only'), true);
+});
+
+test('runInit rejects an empty profile list', () => {
+  const root = tmpProject();
+  const result = init.runInit(root, ['--profile', ',']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('at least one profile'), true);
 });
 
 test('runInit keeps local scope Claude-only and previews the local target', () => {
