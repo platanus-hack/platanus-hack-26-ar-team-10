@@ -1,5 +1,11 @@
 # Changelog
 
+## yieldOS v0.10.1 - 2026-05-09
+
+- Add animated local pentest dashboard with explicit audio unlock.
+- Expose dashboard start, status, and stop through yieldos-pentest.
+- Keep SessionStart dashboard launch opt-in, harden serving, and ignore runtime artifacts.
+
 ## yieldOS v0.8.1 - 2026-05-09
 
 - Add detached pentest launch/watch/stop commands with project-local live logs.

@@ -142,6 +142,17 @@ State is written under `security/pentest-memory.md`,
 `security/pentest-history.json`, `security/pentest-state.json`,
 `security/pentest-live.log`, and `security/pentest-events.jsonl`.
 
+For a browser view, start the local dashboard:
+
+```bash
+yieldos-pentest dashboard --start
+```
+
+It serves the live feed at `http://127.0.0.1:5473` by default and can be
+managed with `yieldos-pentest dashboard --status` and
+`yieldos-pentest dashboard --stop`. Session-start dashboard launch stays
+opt-in only through `YIELDOS_DASHBOARD_AUTO=1` or `YIELDOS_DASHBOARD=auto`.
+
 Detail: [docs/15-pentest-loop.md](docs/15-pentest-loop.md).
 
 ---

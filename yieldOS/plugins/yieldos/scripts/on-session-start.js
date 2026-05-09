@@ -11,6 +11,7 @@ const injectionScanner = require('./injection-scanner');
 const logger = require('./logger');
 const ui = require('./ui');
 const pentestAutoLauncher = require('./code-audit/pentest-loop/auto-launcher');
+const dashboardLauncher = require('../dashboard/launcher');
 
 function readStdinSync() {
   try { return fs.readFileSync(0, 'utf8'); }
@@ -77,6 +78,7 @@ async function main() {
 
   handleInstructionChanges(projectRoot, policy);
   maybeAutoLaunchPentest(projectRoot);
+  maybeAutoLaunchDashboard(projectRoot);
 
   process.exit(0);
 }
@@ -98,6 +100,27 @@ function maybeAutoLaunchPentest(projectRoot, env = process.env) {
     return result;
   } catch (error) {
     ui.writeMessage(`pentest auto-launch failed: ${error.message}`);
+    return { status: 'failed', reason: error.message };
+  }
+}
+
+function dashboardAutoLaunchEnabled(env = process.env) {
+  const value = String(env.YIELDOS_DASHBOARD_AUTO || env.YIELDOS_DASHBOARD || '').toLowerCase();
+  return ['1', 'true', 'on', 'auto'].includes(value);
+}
+
+function maybeAutoLaunchDashboard(projectRoot, env = process.env) {
+  if (!dashboardAutoLaunchEnabled(env)) return { status: 'disabled' };
+  try {
+    const result = dashboardLauncher.launch(projectRoot);
+    if (result.status === 'launched') {
+      ui.writeMessage(`dashboard live en ${result.url} (graficos + sonido + animacion).`);
+    } else if (result.status === 'already-running') {
+      ui.writeMessage(`dashboard ya corriendo en ${result.url}.`);
+    }
+    return result;
+  } catch (error) {
+    ui.writeMessage(`dashboard auto-launch failed: ${error.message}`);
     return { status: 'failed', reason: error.message };
   }
 }
@@ -138,4 +161,6 @@ module.exports = {
   handleInstructionChanges,
   maybeAutoLaunchPentest,
   pentestAutoLaunchEnabled,
+  maybeAutoLaunchDashboard,
+  dashboardAutoLaunchEnabled,
 };

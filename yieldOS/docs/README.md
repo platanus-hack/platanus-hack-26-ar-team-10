@@ -16,7 +16,7 @@ This directory captures every design decision behind yieldOS, why it exists, and
 10. [Code audit](10-code-audit.md) — *commit/push red-team and blue-team loop for source code*
 11. [Audit command](13-audit-command.md) — *on-demand Deepsec source-code audit*
 12. [Custom agent instructions](14-custom-instructions.md) — *preview-first AGENTS.md / CLAUDE.md generation*
-13. [Adversarial pentest loop](15-pentest-loop.md) — *continuous red-team / blue-team review with persistent memory*
+13. [Adversarial pentest loop](15-pentest-loop.md) — *continuous red-team / blue-team review with persistent memory, terminal feed, and local dashboard*
 
 ## Planning docs (not yet implemented)
 
@@ -49,4 +49,4 @@ Every doc here was written by capturing the conversation that produced yieldOS. 
 - **Code audit** → how yieldOS audits source-code diffs separately from dependency policy.
 - **Audit command** → how users invoke Deepsec review explicitly without changing hook behavior.
 - **Custom agent instructions** → how teams generate reviewable AGENTS.md / CLAUDE.md safety defaults.
-- **Adversarial pentest loop** → how red-team and blue-team agent rounds persist lessons, stream terminal colors, and surface chat-rendered events across runs.
+- **Adversarial pentest loop** → how red-team and blue-team agent rounds persist lessons, stream terminal colors, surface chat-rendered events, and expose a local dashboard across runs.
