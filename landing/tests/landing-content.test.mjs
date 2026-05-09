@@ -211,6 +211,18 @@ test("cinematic motion components and reduced motion styles are configured", () 
     globals.includes("min-height: max(100vh, 100svh, 100dvh)"),
     "Expected mobile full-screen section height",
   );
+  assert.ok(
+    globals.includes("grid-template-columns: repeat(2, minmax(0, 1fr))"),
+    "Expected compact mobile coverage grid",
+  );
+  assert.ok(
+    globals.includes(".policy-path article"),
+    "Expected compact mobile policy rows",
+  );
+  assert.ok(
+    demo.includes("grid-cols-[minmax(0,1fr)_124px]"),
+    "Expected compact mobile demo verdict rows",
+  );
   assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
   assert.ok(page.includes("intro-header"), "Expected staged topbar intro class");

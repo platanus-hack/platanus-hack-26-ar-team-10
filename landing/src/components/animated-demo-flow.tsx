@@ -55,7 +55,7 @@ export function AnimatedDemoFlow() {
 
   return (
     <motion.div
-      className="demo-cinema mt-6 grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-[1.18fr_0.82fr]"
+      className="demo-cinema mt-4 grid min-w-0 grid-cols-1 gap-2 sm:mt-6 sm:gap-3 lg:grid-cols-[1.18fr_0.82fr]"
       initial={reduceMotion ? false : { opacity: 0, y: 24 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-15% 0px -10% 0px" }}
@@ -72,7 +72,7 @@ export function AnimatedDemoFlow() {
             {decisions.map((decision, index) => (
               <motion.article
                 key={decision.command}
-                className="decision-row grid gap-3 p-3 sm:grid-cols-[1fr_150px] sm:p-4 lg:grid-cols-[1.1fr_170px]"
+                className="decision-row grid grid-cols-[minmax(0,1fr)_124px] items-center gap-2 p-2.5 sm:grid-cols-[1fr_150px] sm:gap-3 sm:p-4 lg:grid-cols-[1.1fr_170px]"
                 initial={reduceMotion ? false : { opacity: 0, x: -12 }}
                 whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -86,12 +86,12 @@ export function AnimatedDemoFlow() {
                   <p className="break-words font-mono text-xs text-zinc-300 sm:text-sm">
                     {decision.command}
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-zinc-500 sm:text-sm">
+                  <p className="mt-1 hidden text-xs leading-5 text-zinc-500 sm:block sm:text-sm">
                     {decision.result}
                   </p>
                 </div>
                 <span
-                  className={`verdict-token inline-flex h-8 items-center justify-center rounded border px-2 font-mono text-[10px] uppercase tracking-[0.12em] ${toneClass(
+                  className={`verdict-token inline-flex h-7 items-center justify-center whitespace-nowrap rounded border px-1.5 font-mono text-[8px] uppercase tracking-normal sm:h-8 sm:px-2 sm:text-[10px] sm:tracking-[0.12em] ${toneClass(
                     decision.tone,
                   )}`}
                 >

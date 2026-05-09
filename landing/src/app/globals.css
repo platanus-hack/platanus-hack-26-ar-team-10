@@ -851,7 +851,8 @@ html {
   }
 
   .vector-grid {
-    gap: 0.375rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
   }
 
   .vector-grid::before {
@@ -860,13 +861,39 @@ html {
 
   .vector-card {
     min-height: auto;
-    padding: 0.75rem;
+    padding: 0.72rem;
+  }
+
+  .vector-card h3 {
+    font-size: 0.9rem;
+    line-height: 1.15rem;
+  }
+
+  .vector-card span {
+    font-size: 0.58rem;
   }
 
   .vector-card p {
-    margin-top: 0.35rem;
-    font-size: 0.75rem;
-    line-height: 1.35rem;
+    display: none;
+  }
+
+  .decision-row {
+    min-height: 3.3rem;
+  }
+
+  .policy-path article {
+    gap: 0.25rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .policy-path h3 {
+    font-size: 0.95rem;
+    line-height: 1.3rem;
+  }
+
+  .policy-path p {
+    font-size: 0.86rem;
+    line-height: 1.25rem;
   }
 
   .proof-card {

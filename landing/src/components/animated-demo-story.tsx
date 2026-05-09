@@ -17,7 +17,7 @@ export function AnimatedDemoStory() {
       {story.map((item, index) => (
         <motion.article
           key={item.step}
-          className="cinematic-card relative overflow-hidden rounded-md border border-white/10 bg-white/[0.04] p-3 sm:p-4"
+          className="cinematic-card relative overflow-hidden rounded-md border border-white/10 bg-white/[0.04] p-2.5 sm:p-4"
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
@@ -27,8 +27,8 @@ export function AnimatedDemoStory() {
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          <span className="absolute left-0 top-4 h-8 w-px bg-[var(--acid)] opacity-70" />
-          <h3 className="font-mono text-[11px] leading-5 text-white sm:text-sm">
+          <span className="absolute left-0 top-3 h-6 w-px bg-[var(--acid)] opacity-70 sm:top-4 sm:h-8" />
+          <h3 className="font-mono text-[10px] leading-4 text-white sm:text-sm sm:leading-5">
             {item.step}. {item.title}
           </h3>
         </motion.article>
