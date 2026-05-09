@@ -237,13 +237,22 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(page.includes("theme-surface-blue"), "Expected blue-tinted surface sections");
   assert.ok(page.includes("theme-surface-red"), "Expected red-tinted surface sections");
   assert.ok(globals.includes(".snap-deck::before"), "Expected page-wide grid layer");
+  assert.ok(globals.includes(".snap-deck::after"), "Expected page-wide active grid cells");
   assert.ok(
     globals.includes(".pitch-section:not(.security-hero)::before"),
     "Expected section-level grid layer",
   );
   assert.ok(
+    globals.includes(".pitch-section:not(.security-hero)::after"),
+    "Expected section-level active grid cells",
+  );
+  assert.ok(
     globals.includes("background-size: 72px 72px"),
     "Expected extended square grid rhythm",
+  );
+  assert.ok(
+    globals.includes("144px 72px"),
+    "Expected varied active grid cell sizes",
   );
   assert.ok(
     existsSync(join(root, "public/yieldos-ascii-bg.webp")),
