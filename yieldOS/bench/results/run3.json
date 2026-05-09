@@ -1,0 +1,273 @@
+{
+  "run": "run3",
+  "timestamp": "2026-05-09T06:03:09.432Z",
+  "duration_seconds": "94.6",
+  "hook": "/Users/sebastianbuffosempe/.claude/plugins/cache/yieldos-marketplace/yieldos/0.2.1/scripts/pre-install-gate.js",
+  "concurrency": 16,
+  "summary": {
+    "total": 1160,
+    "durationSeconds": "1468.8",
+    "byVerdict": {
+      "allowlist-match": 251,
+      "category-d-blocked": 202,
+      "verification-passed": 507,
+      "build-script-not-approved": 26,
+      "category-a-rewrite": 63,
+      "native-suggest": 25,
+      "denylist-match": 23,
+      "verification-failed": 58,
+      "passthrough-or-allow": 5
+    },
+    "byDataset": {
+      "npm-top": {
+        "allowlist-match": 128,
+        "category-d-blocked": 140,
+        "verification-passed": 231,
+        "build-script-not-approved": 26,
+        "category-a-rewrite": 58,
+        "native-suggest": 12,
+        "denylist-match": 1
+      },
+      "pypi-top": {
+        "native-suggest": 2,
+        "allowlist-match": 95,
+        "verification-passed": 264,
+        "category-d-blocked": 55,
+        "verification-failed": 2
+      },
+      "malicious": {
+        "denylist-match": 19,
+        "verification-failed": 41,
+        "category-d-blocked": 7
+      },
+      "edge-cases": {
+        "allowlist-match": 28,
+        "verification-failed": 15,
+        "native-suggest": 11,
+        "verification-passed": 12,
+        "passthrough-or-allow": 5,
+        "denylist-match": 3,
+        "category-a-rewrite": 5
+      }
+    },
+    "byManager": {
+      "npm": {
+        "allowlist-match": 128,
+        "category-d-blocked": 143,
+        "verification-passed": 231,
+        "build-script-not-approved": 26,
+        "category-a-rewrite": 58,
+        "native-suggest": 12,
+        "denylist-match": 20,
+        "verification-failed": 16
+      },
+      "pip": {
+        "native-suggest": 2,
+        "allowlist-match": 95,
+        "verification-passed": 264,
+        "category-d-blocked": 59,
+        "verification-failed": 27
+      },
+      "mixed": {
+        "allowlist-match": 28,
+        "verification-failed": 15,
+        "native-suggest": 11,
+        "verification-passed": 12,
+        "passthrough-or-allow": 5,
+        "denylist-match": 3,
+        "category-a-rewrite": 5
+      }
+    }
+  },
+  "falsePositives": [
+    {
+      "id": "npm:colors",
+      "package": "colors",
+      "verdict": "denylist-match",
+      "message": "yieldOS bloqueó colors: self-sabotage attack 2022; corrupted output infinite loop"
+    },
+    {
+      "id": "pip:pdb++",
+      "package": "pdb++",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en pdb++ y bloqueó la instalación"
+    },
+    {
+      "id": "pip:etree",
+      "package": "etree",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en etree y bloqueó la instalación"
+    }
+  ],
+  "falseNegatives": [],
+  "edgeMismatches": [
+    {
+      "id": "edge:3:npm install @types/node",
+      "command": "npm install @types/node",
+      "expected": "verification-passed",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:13:yarn add svelte",
+      "command": "yarn add svelte",
+      "expected": "verification-passed",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:14:yarn install vue",
+      "command": "yarn install vue",
+      "expected": "verification-passed",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:15:bun add hono",
+      "command": "bun add hono",
+      "expected": "verification-passed",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:18:pip install requests==2.31.0",
+      "command": "pip install requests==2.31.0",
+      "expected": "allowlist-match",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:17:pip install requests",
+      "command": "pip install requests",
+      "expected": "allowlist-match",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:11:pnpm add hono",
+      "command": "pnpm add hono",
+      "expected": "verification-passed",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:19:pip install requests>=2.0",
+      "command": "pip install requests>=2.0",
+      "expected": "verification-passed",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:22:poetry add httpx",
+      "command": "poetry add httpx",
+      "expected": "verification-passed",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:10:npm install pkg-a pkg-b pkg-c",
+      "command": "npm install pkg-a pkg-b pkg-c",
+      "expected": "multiple",
+      "got": "verification-passed"
+    },
+    {
+      "id": "edge:36:claude plugin add some-plugin",
+      "command": "claude plugin add some-plugin",
+      "expected": "verification-failed",
+      "got": "verification-passed"
+    },
+    {
+      "id": "edge:35:npx skills add @company/some-skill",
+      "command": "npx skills add @company/some-skill",
+      "expected": "verification-failed",
+      "got": "verification-passed"
+    },
+    {
+      "id": "edge:49:pip install --user requests",
+      "command": "pip install --user requests",
+      "expected": "allowlist-match",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:51:npm install jsonwebtoken",
+      "command": "npm install jsonwebtoken",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:50:npm install bcrypt",
+      "command": "npm install bcrypt",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:52:npm install passport",
+      "command": "npm install passport",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:53:npm install react",
+      "command": "npm install react",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:56:npm install pg",
+      "command": "npm install pg",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:58:pip install numpy",
+      "command": "pip install numpy",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:54:npm install express",
+      "command": "npm install express",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:59:pip install pandas",
+      "command": "pip install pandas",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:61:pip install torch",
+      "command": "pip install torch",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:55:npm install prisma",
+      "command": "npm install prisma",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:62:pip install django",
+      "command": "pip install django",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:60:pip install tensorflow",
+      "command": "pip install tensorflow",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:63:pip install flask",
+      "command": "pip install flask",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:57:pip install matplotlib",
+      "command": "pip install matplotlib",
+      "expected": "category-d-blocked",
+      "got": "allowlist-match"
+    },
+    {
+      "id": "edge:72:npm install nanoid",
+      "command": "npm install nanoid",
+      "expected": "category-a-rewrite",
+      "got": "native-suggest"
+    }
+  ]
+}

@@ -97,6 +97,10 @@ async function processCandidates(candidates, projectRoot, policy) {
         if (decision.message) {
           process.stderr.write(`[yieldOS] ${decision.message}\n`);
         }
+        // Always emit machine-readable verdict so downstream tools (logs, benches,
+        // QA harnesses) can identify what happened, even when the human-facing
+        // message is intentionally silent.
+        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
         break;
 
       case 'block-with-suggestion':
