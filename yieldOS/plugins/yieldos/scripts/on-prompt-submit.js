@@ -241,8 +241,25 @@ async function main() {
   // Pentest live battle: surface new red/blue events into the chat.
   // We inject markdown that uses ```diff fences (which the UI DOES color)
   // so the user actually sees the attack/defense banners between turns.
+  //
+  // Gate: only surface live-battle updates while the pentest loop is
+  // ACTIVE (pentest-state.json.active === true). After the loop converges,
+  // no more notifications until something triggers a relaunch — i.e. an
+  // impactful tool call routed through the impact-trigger hook.
   try {
     const { events, offset } = pentestEventReader.readNewEvents(projectRoot);
+    let pentestActive = false;
+    try {
+      const stateRaw = fs.readFileSync(path.join(projectRoot, 'security', 'pentest-state.json'), 'utf8');
+      const state = JSON.parse(stateRaw);
+      pentestActive = state && state.active === true;
+    } catch (_) { /* no state file → treat as inactive */ }
+    if (!pentestActive) {
+      if (events && events.length > 0) {
+        pentestEventReader.writeCursor(projectRoot, offset);
+      }
+      process.exit(0);
+    }
     if (pentestEventReader.hasUserVisibleContent(events)) {
       const summary = pentestEventReader.formatForChat(events);
       pentestEventReader.writeCursor(projectRoot, offset);
