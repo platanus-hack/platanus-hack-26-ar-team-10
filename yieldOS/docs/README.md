@@ -17,11 +17,13 @@ This directory captures every design decision behind yieldOS, why it exists, and
 11. [Audit command](13-audit-command.md) — *on-demand Deepsec source-code audit*
 12. [Custom agent instructions](14-custom-instructions.md) — *preview-first AGENTS.md / CLAUDE.md generation*
 13. [Adversarial pentest loop](15-pentest-loop.md) — *continuous red-team / blue-team review with persistent memory, terminal feed, and local dashboard*
+14. [Team agent packs](17-team-agent-packs.md) — *policy-validated packs for Claude Code, Codex, Cursor, Copilot, and Windsurf outputs*
 
 ## Planning docs (not yet implemented)
 
-14. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
-15. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+15. [CI/CD enforcement](11-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
+16. [Dockerfile scanner](12-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+17. [Agent rules and playbooks](16-agent-rules-and-playbooks.md) — *cross-agent rules, skills, policies, and retrieval strategy*
 
 ## Reading order for AI agents
 
@@ -50,3 +52,5 @@ Every doc here was written by capturing the conversation that produced yieldOS. 
 - **Audit command** → how users invoke Deepsec review explicitly without changing hook behavior.
 - **Custom agent instructions** → how teams generate reviewable AGENTS.md / CLAUDE.md safety defaults.
 - **Adversarial pentest loop** → how red-team and blue-team agent rounds persist lessons, stream terminal colors, surface chat-rendered events, and expose a local dashboard across runs.
+- **Agent rules and playbooks** → how yieldOS should turn external agent rules, skills, and policies into scoped playbooks and generated adapters.
+- **Team agent packs** → how yieldOS packages approved skills, MCPs, profiles, rules, and playbooks for teams while keeping policy as the authority.

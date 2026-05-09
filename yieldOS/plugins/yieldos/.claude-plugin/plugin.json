@@ -1,7 +1,7 @@
 {
   "name": "yieldos",
-  "version": "0.10.1",
-  "description": "Security gate for Claude Code. Intercepts dependency installations, skill activations, MCP additions, instruction file changes, source-code audits, generated agent instructions, adversarial pentest loops, and a local live pentest dashboard.",
+  "version": "0.11.0",
+  "description": "Security gate for Claude Code. Intercepts dependency installations, skill activations, MCP additions, instruction file changes, source-code audits, generated agent instructions, adversarial pentest loops, a local live pentest dashboard, and policy-validated team agent packs.",
   "author": {
     "name": "platanus-hack-26-ar-team-10"
   },
@@ -14,6 +14,7 @@
     "claude-code",
     "agent-instructions",
     "red-team",
-    "dashboard"
+    "dashboard",
+    "agent-packs"
   ]
 }

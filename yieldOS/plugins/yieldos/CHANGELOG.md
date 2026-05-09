@@ -1,5 +1,11 @@
 # Changelog
 
+## yieldOS v0.11.0 - 2026-05-09
+
+- Add policy-validated team agent packs for approved skills, MCPs, profiles, and playbooks.
+- Generate native Claude Code, Codex, Cursor, GitHub Copilot, and Windsurf guidance with pack locks and reports.
+- Add landing-page agent pack builder that downloads a `yield.agent-pack.yaml` manifest.
+
 ## yieldOS v0.10.1 - 2026-05-09
 
 - Add animated local pentest dashboard with explicit audio unlock.

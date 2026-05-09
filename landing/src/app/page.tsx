@@ -1,3 +1,4 @@
+import { AgentPackSection } from "@/components/agent-pack-section";
 import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
 import { AnimatedDemoStory } from "@/components/animated-demo-story";
 import { CopyCommandButton } from "@/components/copy-command-button";
@@ -184,6 +185,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <AgentPackSection />
 
       <section
         id="audit-trail"
