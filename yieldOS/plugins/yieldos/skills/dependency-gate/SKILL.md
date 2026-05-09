@@ -56,40 +56,42 @@ Keep messages short, in their language, and informative — never asking.
 
 ### Visual stamp — always include when yieldOS intervened
 
-Whenever a tool call you ran was processed by the yieldOS gate (regardless of allow / block / rewrite / native-suggest), close your reply to the user with a one-line **visual stamp** on its own line. Use the matching variant:
+Whenever a tool call you ran was processed by the yieldOS gate (regardless of allow / block / rewrite / native-suggest), close your reply to the user with a **shield stamp** rendered as a markdown `diff` code block. The `+` / `-` / `!` prefix makes Claude Code paint the line green / red / orange.
 
-| Verdict in stderr                  | Stamp to append at the end of your message |
-|------------------------------------|---------------------------------------------|
-| `allowlist-match`                  | `> 🛡  Validado por yieldOS`                |
-| `verification-passed`              | `> 🛡  Validado por yieldOS (análisis OK)`  |
-| `denylist-match`                   | `> ⛔ Bloqueado por yieldOS — denylist`     |
-| `category-d-blocked`               | `> ⛔ Bloqueado por yieldOS — categoría crítica` |
-| `verification-failed`              | `> ⛔ Bloqueado por yieldOS — señales sospechosas` |
-| `build-script-not-approved`        | `> ⛔ Bloqueado por yieldOS — build script no aprobado` |
-| `native-suggest`                   | `> 💡 yieldOS sugiere usar API nativa`      |
-| `category-a-rewrite`               | `> ✨ yieldOS optimizó la instalación`      |
-| `injection-blocked`                | `> ⛔ Bloqueado por yieldOS — inyección detectada` |
-| `self-defense-block`               | `> ⛔ Bloqueado por yieldOS — archivo protegido` |
+The hook also returns the exact stamp string in `hookSpecificOutput.additionalContext` — when you receive that context, copy the stamp verbatim at the end of your reply.
 
-The stamp is the **last line** of your message, separated by a blank line. Examples:
+Format reference per verdict:
 
+| Verdict                         | Color  | Rendered stamp                                              |
+|----------------------------------|--------|--------------------------------------------------------------|
+| `allowlist-match`               | green  | `+ ▎ 🛡  yieldOS  ·  Validado · allowlist`                  |
+| `verification-passed`           | green  | `+ ▎ 🛡  yieldOS  ·  Validado · análisis OK`                |
+| `category-a-rewrite`            | green  | `+ ▎ 🛡  yieldOS  ·  Optimizado · rewrite local`            |
+| `denylist-match`                | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · denylist`                  |
+| `category-d-blocked`            | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · categoría crítica`         |
+| `verification-failed`           | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · señales sospechosas`       |
+| `build-script-not-approved`     | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · build script no aprobado`  |
+| `injection-blocked`             | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada`       |
+| `self-defense-block`            | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido`         |
+| `native-suggest`                | orange | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa`          |
+
+Each stamp must be wrapped in a `diff` fenced code block so the color renders. Example:
+
+````
+Agregué numpy a requirements.txt. Para instalarlo, ejecutá pip install -r requirements.txt.
+
+```diff
++ ▎ 🛡  yieldOS  ·  Validado · allowlist
 ```
-Agregué seaborn a requirements.txt. Para instalarlo, ejecutá pip install -r requirements.txt.
+````
 
-> 🛡  Validado por yieldOS
-```
+```` 
+No puedo instalar `event-stream@3.3.6`: ataque de cadena de suministro confirmado en 2018.
 
+```diff
+- ▎ 🛡  yieldOS  ·  Bloqueado · denylist
 ```
-No puedo instalar `event-stream@3.3.6`: el paquete fue víctima de un ataque de cadena de suministro en 2018.
-
-> ⛔ Bloqueado por yieldOS — denylist
-```
-
-```
-Reescribí `clsx` localmente en `src/lib/yieldos/clsx/` con la API mínima que usás en el proyecto.
-
-> ✨ yieldOS optimizó la instalación
-```
+````
 
 ### Other one-liner messages (in addition to the stamp)
 

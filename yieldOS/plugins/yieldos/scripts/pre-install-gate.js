@@ -84,17 +84,30 @@ async function handleInstructionEdit(input, projectRoot, policy) {
   return false;
 }
 
+function shieldBlock(prefix, label) {
+  // Renders as a colored bar in Claude Code via the markdown `diff` syntax:
+  //   + line  → green  (allow / safe)
+  //   - line  → red    (block / unsafe)
+  //   ! line  → orange (warning / suggestion)
+  // The triple-backtick fence is part of the stamp so the renderer applies the color.
+  return [
+    '```diff',
+    `${prefix} ▎ 🛡  yieldOS  ·  ${label}`,
+    '```',
+  ].join('\n');
+}
+
 const STAMP_BY_VERDICT = {
-  'allowlist-match':           '> 🛡  Validado por yieldOS',
-  'verification-passed':       '> 🛡  Validado por yieldOS (análisis OK)',
-  'denylist-match':            '> ⛔ Bloqueado por yieldOS — denylist',
-  'category-d-blocked':        '> ⛔ Bloqueado por yieldOS — categoría crítica',
-  'verification-failed':       '> ⛔ Bloqueado por yieldOS — señales sospechosas',
-  'build-script-not-approved': '> ⛔ Bloqueado por yieldOS — build script no aprobado',
-  'native-suggest':            '> 💡 yieldOS sugiere usar API nativa',
-  'category-a-rewrite':        '> ✨ yieldOS optimizó la instalación',
-  'injection-blocked':         '> ⛔ Bloqueado por yieldOS — inyección detectada',
-  'self-defense-block':        '> ⛔ Bloqueado por yieldOS — archivo protegido',
+  'allowlist-match':           shieldBlock('+', 'Validado · allowlist'),
+  'verification-passed':       shieldBlock('+', 'Validado · análisis OK'),
+  'denylist-match':            shieldBlock('-', 'Bloqueado · denylist'),
+  'category-d-blocked':        shieldBlock('-', 'Bloqueado · categoría crítica'),
+  'verification-failed':       shieldBlock('-', 'Bloqueado · señales sospechosas'),
+  'build-script-not-approved': shieldBlock('-', 'Bloqueado · build script no aprobado'),
+  'native-suggest':            shieldBlock('!', 'Sugerencia · usar API nativa'),
+  'category-a-rewrite':        shieldBlock('+', 'Optimizado · rewrite local'),
+  'injection-blocked':         shieldBlock('-', 'Bloqueado · inyección detectada'),
+  'self-defense-block':        shieldBlock('-', 'Bloqueado · archivo protegido'),
 };
 
 function stampFor(verdict) {
