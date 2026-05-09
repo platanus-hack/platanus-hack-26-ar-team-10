@@ -8,6 +8,8 @@ const os = require('node:os');
 const { execFileSync, spawnSync } = require('node:child_process');
 
 const codeAudit = require('../scripts/code-audit');
+const auditState = require('../scripts/code-audit/state');
+const auditVerify = require('../scripts/code-audit/verify');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const HOOK_PATH = path.join(PLUGIN_ROOT, 'scripts', 'pre-install-gate.js');
@@ -79,6 +81,29 @@ test('collectPushDiff returns commits ahead of upstream', () => {
 
   assert.deepEqual(auditInput.files, ['server.js']);
   assert.equal(auditInput.diff.includes('+res.redirect(req.query.next);'), true);
+});
+
+test('collectPushDiff ignores committed generated audit files for hash and files', () => {
+  const remote = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-code-audit-remote-'));
+  sh(remote, ['init', '--bare']);
+
+  const root = tmpRepo();
+  sh(root, ['remote', 'add', 'origin', remote]);
+  sh(root, ['push', '-u', 'origin', 'main']);
+
+  fs.mkdirSync(path.join(root, 'security'));
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 1;\n');
+  fs.writeFileSync(path.join(root, 'security', 'code-audit-events.md'), 'log\n');
+  fs.writeFileSync(path.join(root, 'security', 'code-audit-state.json'), '{"old":true}\n');
+  sh(root, ['add', 'app.js', 'security/code-audit-events.md', 'security/code-audit-state.json']);
+  sh(root, ['commit', '-m', 'safe change with generated audit state']);
+
+  const auditInput = codeAudit.collectPushDiff(root);
+
+  assert.deepEqual(auditInput.files, ['app.js']);
+  assert.equal(auditInput.diff.includes('+const value = 1;'), true);
+  assert.equal(auditInput.diff.includes('code-audit-state.json'), false);
+  assert.equal(auditInput.diff.includes('code-audit-events.md'), false);
 });
 
 test('redTeam reports only findings with exploit evidence', () => {
@@ -324,6 +349,25 @@ test('verifyAuditState passes for matching staged diff and fails after source ch
   assert.equal(ok.ok, true);
   assert.equal(stale.ok, false);
   assert.equal(stale.reason, 'diff-hash-mismatch');
+});
+
+test('audit state text comparison tolerates CRLF line endings', () => {
+  assert.equal(auditState.sameText('{\r\n  "ok": true\r\n}\r\n', '{\n  "ok": true\n}\n'), true);
+});
+
+test('audit state comparison ignores volatile git range and generated file list after state commit', () => {
+  const left = JSON.stringify({ version: 1, range: 'abc..def', files: ['app.js'], diff_hash: 'sha256:1', verdict: 'code-audit-clean' });
+  const right = JSON.stringify({ version: 1, range: 'abc..ghi', files: ['app.js', 'security/code-audit-state.json'], diff_hash: 'sha256:1', verdict: 'code-audit-clean' });
+  assert.equal(auditState.sameAuditStateContent(left, right), true);
+});
+
+test('audit state git object path stays repo-posix on every platform', () => {
+  assert.equal(auditState.STATE_FILE, 'security/code-audit-state.json');
+});
+
+test('audit verification resolves npm command for the current platform', () => {
+  const command = auditVerify.npmCommand();
+  assert.equal(command, process.platform === 'win32' ? 'npm.cmd' : 'npm');
 });
 
 test('ci verifier validates stored state against merge-base diff', () => {

@@ -1,5 +1,64 @@
 {
-  "version": "0.1.0",
-  "updated_at": "2026-05-09T00:00:00Z",
-  "entries": []
+  "version": "0.4.0",
+  "updated_at": "2026-05-09T05:30:00Z",
+  "description": "Approved Model Context Protocol (MCP) servers. Each entry pins the binary/source by name and lists the tools the MCP is allowed to expose. Tools not on the approved list MUST be ignored at registration time.",
+  "entries": [
+    {
+      "key": "mcp:filesystem",
+      "vendor": "modelcontextprotocol",
+      "purpose": "read/list filesystem within a sandboxed root",
+      "approved_tools": ["read_file", "list_directory", "search_files"],
+      "denied_tools": ["write_file", "delete_file", "move_file"],
+      "scope": "read-only",
+      "notes": "default to read-only; PR required to grant write tools"
+    },
+    {
+      "key": "mcp:git",
+      "vendor": "modelcontextprotocol",
+      "purpose": "read git history and diffs",
+      "approved_tools": ["git_log", "git_diff", "git_show", "git_status"],
+      "denied_tools": ["git_commit", "git_push", "git_reset"],
+      "scope": "read-only"
+    },
+    {
+      "key": "mcp:fetch",
+      "vendor": "modelcontextprotocol",
+      "purpose": "HTTP fetch with allowlisted hosts",
+      "approved_tools": ["fetch"],
+      "denied_tools": [],
+      "scope": "network",
+      "notes": "host allowlist is enforced at the MCP itself"
+    },
+    {
+      "key": "mcp:postgres",
+      "vendor": "modelcontextprotocol",
+      "purpose": "read-only Postgres queries",
+      "approved_tools": ["query"],
+      "denied_tools": ["execute"],
+      "scope": "read-only-db"
+    },
+    {
+      "key": "mcp:brave-search",
+      "vendor": "modelcontextprotocol",
+      "purpose": "web search via Brave API",
+      "approved_tools": ["search"],
+      "denied_tools": [],
+      "scope": "network"
+    },
+    {
+      "key": "mcp:claude-in-chrome",
+      "vendor": "anthropic",
+      "purpose": "control a Chrome session",
+      "approved_tools": [],
+      "denied_tools": ["execute_script", "navigate"],
+      "scope": "blocked-by-default",
+      "notes": "user-level skill 'gstack/browse' replaces this MCP per project guidance"
+    }
+  ],
+  "rules": {
+    "default_unlisted": "block",
+    "block_message": "yieldOS bloqueó la instalación del MCP: no está en el policy oficial. Para agregarlo, abrí un PR a /policy/mcps.json con la lista de tools que va a exponer.",
+    "validate_tool_surface_at_registration": true,
+    "validate_tool_surface_note": "before yieldOS allows MCP registration, the MCP's announced tools must match the approved_tools list 1:1; extras = block"
+  }
 }

@@ -201,6 +201,14 @@ test('Edit to package.json with new dependency yields candidate', () => {
   assert.equal(out[0].version, '2.0.0');
 });
 
+test('Edit to package.json handles Windows path separators', () => {
+  const oldContent = '{"dependencies": {"foo": "1.0.0"}}';
+  const newContent = '{"dependencies": {"foo": "1.0.0", "bar": "2.0.0"}}';
+  const out = classifyWriteOrEdit('C:\\some\\path\\package.json', newContent, oldContent);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].name, 'bar');
+});
+
 test('Edit to package.json with version change yields candidate', () => {
   const oldContent = '{"dependencies": {"react": "18.2.0"}}';
   const newContent = '{"dependencies": {"react": "18.3.1"}}';

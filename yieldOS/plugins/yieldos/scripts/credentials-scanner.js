@@ -51,7 +51,10 @@ function scan(text) {
 }
 
 function authorizationPhraseDetected(text) {
-  return typeof text === 'string' && text.trim() === AUTHORIZATION_PHRASE;
+  // Exact match only: an embedded phrase from a README/tool output must not
+  // silently authorize credentials access.
+  if (typeof text !== 'string') return false;
+  return text.trim() === AUTHORIZATION_PHRASE;
 }
 
 function isCredentialsPath(filePath) {

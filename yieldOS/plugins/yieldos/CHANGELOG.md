@@ -1,5 +1,10 @@
 # Changelog
 
+## yieldOS v0.5.0 - 2026-05-09
+
+- Add pen-test hardening for credential authorization, plugin self-defense, skills/MCP policies, race handling, and npm provenance signals.
+- Add cross-platform yieldOS CI coverage for plugin and policy changes.
+
 ## yieldOS v0.4.1 - 2026-05-09
 
 - Add on-demand yieldOS audit command.
