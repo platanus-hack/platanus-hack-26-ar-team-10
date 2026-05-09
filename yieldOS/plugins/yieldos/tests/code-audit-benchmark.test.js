@@ -53,7 +53,7 @@ test('code-audit benchmark parser supports sanitized and debug modes', async () 
   const { parseArgs } = await import(BENCHMARK_SCRIPT);
   const parsed = parseArgs(['--out', '/tmp/report.json', '--tmp', '/tmp/run-root', '--include-raw-logs']);
 
-  assert.equal(parsed.outFile, '/tmp/report.json');
-  assert.equal(parsed.tempRoot, '/tmp/run-root');
+  assert.equal(parsed.outFile, path.resolve('/tmp/report.json'));
+  assert.equal(parsed.tempRoot, path.resolve('/tmp/run-root'));
   assert.equal(parsed.includeRawLogs, true);
 });

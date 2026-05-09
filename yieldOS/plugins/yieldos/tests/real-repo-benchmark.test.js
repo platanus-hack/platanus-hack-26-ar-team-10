@@ -119,9 +119,9 @@ test('real repo benchmark parser accepts repeated repo flags', async () => {
     '--include-private-paths',
   ]);
 
-  assert.deepEqual(parsed.repos, ['/tmp/a', '/tmp/b']);
+  assert.deepEqual(parsed.repos, [path.resolve('/tmp/a'), path.resolve('/tmp/b')]);
   assert.equal(parsed.runs, 2);
-  assert.equal(parsed.outFile, '/tmp/out.json');
+  assert.equal(parsed.outFile, path.resolve('/tmp/out.json'));
   assert.equal(parsed.includeRawLogs, true);
   assert.equal(parsed.includePrivatePaths, true);
 });

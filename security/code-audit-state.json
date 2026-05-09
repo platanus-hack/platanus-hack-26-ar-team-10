@@ -2,8 +2,8 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:d5f47565bfa280a7ae12254741f1200014e3cd7256c2497ffd33f74af80a2f77",
-  "range": "9be4262aa765045716747ddde830ff11969273f7..WORKTREE",
+  "diff_hash": "sha256:28a03dd7d1165db30cde5ec1684e32a3d169bcef33a40e764153cc0c313f2b87",
+  "range": "9be4262aa765045716747ddde830ff11969273f7..HEAD",
   "files": [
     ".github/workflows/plugin.yml",
     ".github/workflows/release.yml",
@@ -155,7 +155,7 @@
   "findings": [],
   "resolved_findings": [],
   "verification": {
-    "static_rescan": "not-run",
+    "static_rescan": "passed",
     "checks": []
   },
   "oracle_artifacts": []

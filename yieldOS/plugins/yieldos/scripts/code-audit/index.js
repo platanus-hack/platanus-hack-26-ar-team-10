@@ -149,16 +149,18 @@ function shellTokens(segment) {
   const tokens = [];
   let current = '';
   let quote = '';
-  let escaped = false;
 
-  for (const ch of String(segment || '')) {
-    if (escaped) {
-      current += ch;
-      escaped = false;
-      continue;
-    }
+  const source = String(segment || '');
+  for (let index = 0; index < source.length; index += 1) {
+    const ch = source[index];
     if (ch === '\\' && quote !== "'") {
-      escaped = true;
+      const next = source[index + 1];
+      if (next && shouldEscapeShellChar(next, quote)) {
+        current += next;
+        index += 1;
+      } else {
+        current += ch;
+      }
       continue;
     }
     if (quote) {
@@ -179,6 +181,11 @@ function shellTokens(segment) {
   }
   if (current) tokens.push(current);
   return tokens;
+}
+
+function shouldEscapeShellChar(ch, quote) {
+  if (quote === '"') return ch === '"' || ch === '\\' || ch === '$' || ch === '`' || ch === '\n';
+  return /\s/.test(ch) || ch === '"' || ch === "'" || ch === '\\' || ch === ';' || ch === '&' || ch === '|' || ch === '<' || ch === '>' || ch === '(' || ch === ')';
 }
 
 function resolveGitAuditProjectRoot(projectRoot, command) {

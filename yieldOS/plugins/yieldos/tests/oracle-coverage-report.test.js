@@ -29,5 +29,5 @@ test('oracle coverage report parser accepts output path', async () => {
   const { parseArgs } = await import(COVERAGE_SCRIPT);
   const parsed = parseArgs(['--out', '/tmp/oracle-coverage.json']);
 
-  assert.equal(parsed.outFile, '/tmp/oracle-coverage.json');
+  assert.equal(parsed.outFile, path.resolve('/tmp/oracle-coverage.json'));
 });

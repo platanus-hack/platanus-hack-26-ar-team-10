@@ -167,7 +167,9 @@ test('yieldos-oracle list command is registered and executable', async () => {
   assert.equal(command.message.includes('cdsc-proof'), true);
   assert.equal(spawned.status, 0, spawned.stderr);
   assert.equal(spawned.stdout.includes('agent-pack-lock'), true);
-  assert.equal(fs.statSync(bin).mode & 0o111, 0o111);
+  if (process.platform !== 'win32') {
+    assert.equal(fs.statSync(bin).mode & 0o111, 0o111);
+  }
 });
 
 test('oracle contract catalog covers current red-team rules and researched standards', () => {
