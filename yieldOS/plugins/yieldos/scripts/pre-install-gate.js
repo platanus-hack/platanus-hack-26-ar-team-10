@@ -80,8 +80,27 @@ async function handleInstructionEdit(input, projectRoot, policy) {
   return false;
 }
 
+const STAMP_BY_VERDICT = {
+  'allowlist-match':           '> 🛡  Validado por yieldOS',
+  'verification-passed':       '> 🛡  Validado por yieldOS (análisis OK)',
+  'denylist-match':            '> ⛔ Bloqueado por yieldOS — denylist',
+  'category-d-blocked':        '> ⛔ Bloqueado por yieldOS — categoría crítica',
+  'verification-failed':       '> ⛔ Bloqueado por yieldOS — señales sospechosas',
+  'build-script-not-approved': '> ⛔ Bloqueado por yieldOS — build script no aprobado',
+  'native-suggest':            '> 💡 yieldOS sugiere usar API nativa',
+  'category-a-rewrite':        '> ✨ yieldOS optimizó la instalación',
+  'injection-blocked':         '> ⛔ Bloqueado por yieldOS — inyección detectada',
+  'self-defense-block':        '> ⛔ Bloqueado por yieldOS — archivo protegido',
+};
+
+function stampFor(verdict) {
+  return STAMP_BY_VERDICT[verdict] || `> 🛡  yieldOS verdict: ${verdict}`;
+}
+
 async function processCandidates(candidates, projectRoot, policy) {
   let anyBlocked = false;
+  const interventions = [];
+
   for (const candidate of candidates) {
     const decision = await decide(candidate, policy, {
       thresholds: DEFAULTS.thresholds,
@@ -90,6 +109,8 @@ async function processCandidates(candidates, projectRoot, policy) {
       ttlSeconds: DEFAULTS.audit.osv_cache_ttl_seconds,
     });
 
+    interventions.push({ candidate, decision });
+
     switch (decision.action) {
       case 'allow':
         if (decision.verdict === 'allowlist-match') logger.logAllowed(projectRoot, candidate);
@@ -97,9 +118,6 @@ async function processCandidates(candidates, projectRoot, policy) {
         if (decision.message) {
           process.stderr.write(`[yieldOS] ${decision.message}\n`);
         }
-        // Always emit machine-readable verdict so downstream tools (logs, benches,
-        // QA harnesses) can identify what happened, even when the human-facing
-        // message is intentionally silent.
         process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
         break;
 
@@ -134,7 +152,52 @@ async function processCandidates(candidates, projectRoot, policy) {
       }
     }
   }
-  return anyBlocked;
+  return { anyBlocked, interventions };
+}
+
+function emitHookOutput(interventions, blocked) {
+  if (!interventions || interventions.length === 0) return;
+
+  // Build a single visible line that the user will see. Use the strongest verdict
+  // (block > rewrite > native > verification > allow) to pick the stamp.
+  const order = [
+    'denylist-match', 'category-d-blocked', 'verification-failed', 'build-script-not-approved',
+    'injection-blocked', 'self-defense-block',
+    'category-a-rewrite', 'native-suggest',
+    'verification-passed', 'allowlist-match',
+  ];
+  let chosen = interventions[0].decision.verdict;
+  let chosenIdx = order.indexOf(chosen);
+  for (const i of interventions) {
+    const idx = order.indexOf(i.decision.verdict);
+    if (idx >= 0 && (chosenIdx < 0 || idx < chosenIdx)) {
+      chosen = i.decision.verdict;
+      chosenIdx = idx;
+    }
+  }
+
+  const stamp = stampFor(chosen);
+  const summary = interventions
+    .map((i) => `${i.candidate.name}@${i.candidate.version} → ${i.decision.verdict}`)
+    .join('; ');
+
+  // Hook JSON output. PreToolUse hooks in Claude Code can emit
+  // hookSpecificOutput.additionalContext on stdout, which the harness injects
+  // into the model's context for the next turn. This makes yieldOS visible to
+  // the agent even on exit 0 (allow) flows.
+  const out = {
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      additionalContext: [
+        `yieldOS intervened on this tool call.`,
+        `Verdict: ${chosen}.`,
+        `Per-candidate: ${summary}.`,
+        `End your reply to the user with this exact line on its own line, separated by a blank line:`,
+        stamp,
+      ].join('\n'),
+    },
+  };
+  process.stdout.write(JSON.stringify(out));
 }
 
 async function main() {
@@ -175,8 +238,9 @@ async function main() {
     process.exit(0);
   }
 
-  const blocked = await processCandidates(candidates, projectRoot, policy);
-  process.exit(blocked ? 2 : 0);
+  const { anyBlocked, interventions } = await processCandidates(candidates, projectRoot, policy);
+  emitHookOutput(interventions, anyBlocked);
+  process.exit(anyBlocked ? 2 : 0);
 }
 
 main().catch((err) => {
