@@ -74,7 +74,10 @@ export function TypewriterHeroTitle({
         {value.slice(0, safeIndex)}
         <span className="hero-safe-word">
           {safeWord}
-          <span className="hero-safe-marker">SAFE -&gt;</span>
+          <span className="hero-safe-marker">
+            <span className="hero-safe-label">SAFE</span>
+            <span className="hero-safe-arrow" aria-hidden="true" />
+          </span>
         </span>
         {value.slice(safeIndex + safeWord.length)}
       </>

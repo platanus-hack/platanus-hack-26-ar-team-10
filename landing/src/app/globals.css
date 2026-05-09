@@ -157,29 +157,66 @@ html {
 
 .hero-safe-marker {
   position: absolute;
-  bottom: calc(100% - 0.18em);
-  left: 50%;
+  bottom: calc(100% - 0.02em);
+  left: 42%;
+  display: block;
+  width: 7.6em;
+  height: 2.4em;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--font-mono);
+  font-size: clamp(0.46rem, 0.15em, 0.64rem);
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  pointer-events: none;
+  text-transform: uppercase;
+  transform: translateX(-46%) rotate(-5deg);
+}
+
+.hero-safe-label {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: inline-flex;
   align-items: center;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  padding: 0.28em 0.46em;
-  color: rgba(255, 255, 255, 0.88);
+  padding: 0.28em 0.5em;
   background:
     linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.24), rgba(var(--signal-red-rgb), 0.2)),
     rgba(8, 10, 14, 0.36);
-  font-family: var(--font-mono);
-  font-size: clamp(0.48rem, 0.16em, 0.68rem);
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  line-height: 1;
-  text-transform: uppercase;
   white-space: nowrap;
   box-shadow:
     0 0 24px rgba(var(--signal-blue-rgb), 0.18),
     0 0 28px rgba(var(--signal-red-rgb), 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  transform: translateX(-12%);
+}
+
+.hero-safe-arrow {
+  position: absolute;
+  top: 0.7em;
+  left: 2.86em;
+  width: 4.05em;
+  height: 1.72em;
+  border-right: 1.75px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 1.75px solid rgba(255, 255, 255, 0.8);
+  border-bottom-right-radius: 999px;
+  filter:
+    drop-shadow(0 0 8px rgba(var(--signal-blue-rgb), 0.4))
+    drop-shadow(0 0 8px rgba(var(--signal-red-rgb), 0.22));
+  transform: rotate(8deg);
+}
+
+.hero-safe-arrow::after {
+  position: absolute;
+  right: -0.2em;
+  bottom: -0.17em;
+  width: 0.48em;
+  height: 0.48em;
+  border-right: 1.75px solid rgba(255, 255, 255, 0.86);
+  border-bottom: 1.75px solid rgba(255, 255, 255, 0.86);
+  content: "";
+  transform: rotate(18deg);
 }
 
 .hero-typewriter-caret {

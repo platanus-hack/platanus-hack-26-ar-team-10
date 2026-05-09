@@ -32,7 +32,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Unlock coding for non technical talent",
     "Unlock coding for",
     "non technical talent",
-    "SAFE -&gt;",
+    "hero-safe-label",
+    "hero-safe-arrow",
     "yieldOS checks what AI agents install, edit, and run before anything happens.",
     "Safe coding for non technical talent",
     "Install yieldOS",
@@ -157,6 +158,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "$ claude plugin install yieldos@yieldos-marketplace",
     "PH26 Buenos Aires",
     "AI Security",
+    "SAFE -&gt;",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
