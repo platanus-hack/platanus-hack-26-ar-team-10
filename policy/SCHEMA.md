@@ -166,7 +166,7 @@ Rules:
 - Packs may generate `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, skills, reports, and lockfiles.
 - Packs must not silently install unreviewed skills or MCPs.
 - Runtime enforcement strength must be explicit per target agent.
-- Generated outputs should be previewed before writing and tracked by a pack lock.
+- Generated outputs should be previewed before writing, tracked by a pack lock, and verified against that lock metadata plus file hashes when the files are active in the repo.
 - Vector retrieval can recommend pack entries, but reviewed manifest entries decide what becomes active.
 
 ## Retrieval Boundary

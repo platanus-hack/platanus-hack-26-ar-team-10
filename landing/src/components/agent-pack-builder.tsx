@@ -12,27 +12,27 @@ const agents: ToggleOption[] = [
   {
     key: "claude-code",
     label: "Claude Code",
-    description: "CLAUDE.md, hooks guidance, and repo-local skills.",
+    description: "CLAUDE.md, repo-local skills, and enforcement through installed yieldOS hooks.",
   },
   {
     key: "codex",
     label: "Codex",
-    description: "AGENTS.md plus repo-local skills in .agents/skills.",
+    description: "AGENTS.md plus progressive-disclosure skills in .agents/skills.",
   },
   {
     key: "cursor",
     label: "Cursor",
-    description: "Native .cursor/rules plus skill folders.",
+    description: "Project rules guidance; deterministic enforcement stays in yieldOS verification.",
   },
   {
     key: "github-copilot",
     label: "GitHub Copilot",
-    description: "Repository instructions, path instructions, and prompts.",
+    description: "Repository instructions, path instructions, and review prompts.",
   },
   {
     key: "windsurf",
     label: "Windsurf",
-    description: "Workspace rules and skill folders.",
+    description: "Workspace rules plus skills with progressive disclosure.",
   },
 ];
 

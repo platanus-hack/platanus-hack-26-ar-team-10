@@ -1,6 +1,6 @@
 # Team Agent Packs
 
-Status: implemented for Claude/Codex instructions, Cursor/Copilot/Windsurf adapters, repo-local skills, and the web manifest builder
+Status: implemented for Claude/Codex instructions, Cursor/Copilot/Windsurf guidance adapters, repo-local skills, lock verification, and the web manifest builder
 Last researched: 2026-05-09
 
 This document defines the product layer behind the landing-page promise:
@@ -37,7 +37,7 @@ runtime gates where supported, guidance everywhere else
 
 Current implementation:
 
-- `yieldos-pack verify --pack yield.agent-pack.yaml` validates the pack without writing files.
+- `yieldos-pack verify --pack yield.agent-pack.yaml` validates the pack. If generated files already exist, it requires the pack lock and verifies lock metadata plus generated file hashes against the active repo files.
 - `yieldos-pack preview --pack yield.agent-pack.yaml` renders every generated file for review.
 - `yieldos-pack write --pack yield.agent-pack.yaml` writes reviewed output and refuses to overwrite existing files unless `--force` is passed.
 - `/agent-packs` in the landing app builds and downloads a `yield.agent-pack.yaml` source manifest for a team to put at a repo root.
@@ -55,11 +55,11 @@ Cursor, GitHub Copilot, Claude Code, Codex, and Windsurf each expose different c
 
 | Target | Pack output | Enforcement strength |
 | --- | --- | --- |
-| Claude Code | `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.claude/skills/**` | strongest today through hooks/settings/plugin integration |
-| Codex | `AGENTS.md`, optional rules/profile guidance, skills install instructions | strong for instructions and approvals; runtime enforcement depends on Codex config |
-| Cursor | `.cursor/rules/*.mdc`, `.cursor/skills/**`, `.cursor/mcp.json`, optional `AGENTS.md` | guidance plus target-native rule/MCP surfaces |
+| Claude Code | `CLAUDE.md`, `AGENTS.md`, `.claude/skills/**` | strongest today through the installed yieldOS plugin hooks/settings; generated markdown is guidance |
+| Codex | `AGENTS.md`, `.agents/skills/**` | instructions, approvals, and progressive-disclosure skills; runtime enforcement depends on Codex config |
+| Cursor | `.cursor/rules/*.mdc`, optional `AGENTS.md` | host-native guidance only; use yieldOS verification or CI for deterministic enforcement |
 | GitHub Copilot | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `.github/prompts/*.prompt.md`, `AGENTS.md` | repo guidance and review context, not a hard local gate |
-| Windsurf | `.windsurf/rules/**`, `.windsurf/skills/**`, `AGENTS.md` | guidance with skill/rule activation and enterprise system-rule upside |
+| Windsurf | `.windsurf/rules/**`, `.windsurf/skills/**`, `AGENTS.md` | guidance and progressive-disclosure skills; enterprise/system enforcement requires admin deployment |
 | Universal | `AGENTS.md`, `REVIEW.md`, `CONVENTIONS.md` | portable guidance only |
 
 ## Core Object
@@ -84,7 +84,6 @@ agents:
     outputs:
       - AGENTS.md
       - CLAUDE.md
-      - .claude/settings.json
       - .claude/skills/security-audit/SKILL.md
   codex:
     enabled: true
@@ -172,7 +171,7 @@ Every generated pack should produce a lockfile:
 }
 ```
 
-The lockfile gives teams the forensic answer: which agent rules and capabilities were active when this repo accepted agent work? For generated skill folders, the actual generated file hash appears under `generated_files`. For externally approved skills, the lock records the policy entry hash and only records `content_sha256` when the policy entry itself contains a reviewed content hash.
+The lockfile gives teams the forensic answer: which agent rules and capabilities were generated and verified before this repo accepted agent work? For generated skill folders, the actual generated file hash appears under `generated_files`. For externally approved skills, the lock records the policy entry hash and only records `content_sha256` when the policy entry itself contains a reviewed content hash.
 
 ## Product UX
 
@@ -188,7 +187,7 @@ The first user-facing flow can stay simple:
 
 Landing-page copy should be careful:
 
-> Package your team's agent rules. Choose approved skills, MCPs, safety profiles, and guidelines. yieldOS exports reviewable `AGENTS.md`, `CLAUDE.md`, and target-specific rule files, then enforces the risky parts at runtime where hooks are supported.
+> Package your team's agent rules. Choose approved skills, MCPs, safety profiles, and guidelines. yieldOS exports reviewable `AGENTS.md`, `CLAUDE.md`, and target-specific rule files, then enforces the risky parts at runtime where hooks, CI, or managed policy are active.
 
 Avoid:
 
@@ -196,7 +195,7 @@ Avoid:
 
 Better:
 
-> One source of truth, native outputs for each agent, strongest enforcement where the host exposes hooks or policy controls.
+> One source of truth, host-native outputs for each agent, strongest enforcement where the host exposes hooks, CI, or managed policy controls.
 
 For the non-technical builder story, the pack should behave like a safety rail rather than an expert-only checklist. The generated files repeat the same contract in every adapter because a user may run Cursor, Copilot, Claude Code, Codex, or Windsurf without understanding which file the host loaded:
 
@@ -276,8 +275,8 @@ The pack compiler can consume recommendations only after they resolve to explici
 Implemented:
 
 - `yield.agent-pack.yaml` and `yield.agent-pack.lock.json` are documented and generated.
-- `yieldos-pack` supports `verify`, `preview`, and `write`.
-- Generated outputs include `AGENTS.md`, `CLAUDE.md`, `.yield/pack-report.md`, Cursor rules, GitHub Copilot instructions/prompts, Windsurf rules, and repo-local skill folders for Claude, Codex-style agents, Cursor, and Windsurf.
+- `yieldos-pack` supports `verify`, `preview`, and `write`; `verify` requires a pack lock when generated files are active and checks lock metadata plus file hashes.
+- Generated outputs include `AGENTS.md`, `CLAUDE.md`, `.yield/pack-report.md`, Cursor rules, GitHub Copilot instructions/prompts, Windsurf rules, and repo-local skill folders for Claude, Codex-style agents, Cursor, and Windsurf. Cursor/Copilot/Windsurf outputs are guidance unless paired with yieldOS verification, CI, or managed host policy.
 - Pack references are validated against `policy/skills.json` and `policy/mcps.json`.
 - `agent-pack-review` is emitted as a repo-local skill when included in the pack.
 - The landing app includes `/agent-packs`, a browser-side builder that downloads `yield.agent-pack.yaml`.
@@ -305,7 +304,7 @@ Preview should show:
 - profiles included
 - skills approved, blocked, or requiring review
 - MCP servers and approved tools
-- enforcement level per target agent
+- enforcement or guidance boundary per target agent
 - evidence paths
 
 ## Sources

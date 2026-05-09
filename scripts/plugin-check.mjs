@@ -100,6 +100,7 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/CHANGELOG.md',
   'yieldOS/plugins/yieldos/scripts/audit-command.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-command.js',
+  'yieldOS/plugins/yieldos/scripts/agent-pack-playbooks.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-yaml.js',
   'yieldOS/plugins/yieldos/scripts/init-command.js',
   'yieldOS/plugins/yieldos/scripts/init-profiles.js',

@@ -128,7 +128,7 @@ Detail: [docs/14-custom-instructions.md](docs/14-custom-instructions.md).
 
 ## Team agent packs
 
-Compile a reviewed `yield.agent-pack.yaml` manifest into native agent files:
+Compile a reviewed `yield.agent-pack.yaml` manifest into reviewable host-native guidance files:
 
 ```text
 /yieldos:pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
@@ -142,7 +142,7 @@ yieldos-pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-
 yieldos-pack write --pack yield.agent-pack.yaml
 ```
 
-The compiler validates referenced skills and MCP tool surfaces against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. Claude Code has the strongest runtime enforcement through hooks; other adapters are native guidance until their host exposes equivalent controls.
+The compiler validates referenced skills and MCP tool surfaces against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. `yieldos-pack verify` validates the manifest; once generated files are active, it requires the pack lock and checks lock metadata plus recorded file hashes. Claude Code has the strongest runtime enforcement through installed yieldOS hooks; other adapters are host-native guidance until paired with yieldOS verification, CI, or managed host policy.
 
 Detail: [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md).
 

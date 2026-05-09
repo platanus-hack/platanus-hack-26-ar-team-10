@@ -179,7 +179,7 @@ Mecanismos concretos:
 - Policy bloquea decisiones obvias sin gastar tokens.
 - Skills/playbooks convierten seguridad en workflows reutilizables.
 - Los adapters evitan que cada herramienta tenga reglas distintas.
-- El lockfile registra que reglas estuvieron activas.
+- El lockfile registra que reglas fueron generadas y verificadas.
 - El agente recibe contexto mas chico y mas relevante.
 
 Esto hace que yieldOS sea mas que un scanner. Lo acerca a un **security harness para agentes de codigo**.
@@ -201,7 +201,7 @@ No hace todavia:
 
 La frase correcta:
 
-> One source of truth, native outputs for each agent, strongest enforcement where the host exposes hooks or policy controls.
+> One source of truth, host-native outputs for each agent, strongest enforcement where the host exposes hooks, CI, or managed policy controls.
 
 No deberiamos decir:
 
@@ -229,11 +229,27 @@ Si el pack solo apuntaba a Claude Code, se generaba `CLAUDE.md` sin el bloque de
 
 Se corrigio para que el contrato se escriba tambien cuando no hay `AGENTS.md`.
 
-4. **El lockfile llamaba `content_sha256` a algo que no era contenido real**
+4. **`verify` podia quedar en modo manifest-only aunque hubiera archivos generados activos**
+
+Ahora `yieldos-pack verify` valida el manifest y, si ya existen archivos generados activos, exige `yield.agent-pack.lock.json` y compara metadata estable del lock mas hashes de archivos.
+
+5. **MCPs bloqueados por policy podian pasar por existir en el catalogo**
+
+Se rechazo explicitamente cualquier MCP con scope `blocked-by-default`, aunque la key exista en `policy/mcps.json`.
+
+6. **Los adapters guidance-only necesitaban decir su limite**
+
+Cursor, Copilot y Windsurf ahora declaran que el adapter es guidance-only y que la enforcement deterministica viene de hooks, CLI verification, CI o managed policy.
+
+7. **El lockfile llamaba `content_sha256` a algo que no era contenido real**
 
 El lock registraba un hash de metadata de policy como `content_sha256`. Eso era confuso.
 
 Ahora registra `policy_entry_sha256` para la entrada de policy y reserva `content_sha256` para cuando policy tenga un hash real de contenido.
+
+8. **El parser aceptaba JSON y podia saltarse las defensas YAML**
+
+El manifest ahora debe ser YAML. Asi evitamos que JSON con claves duplicadas o peligrosas use el comportamiento de `JSON.parse` y saltee la validacion del parser del pack.
 
 ## Riesgos residuales
 
@@ -243,7 +259,7 @@ Estos no bloquean el PR, pero hay que tenerlos claros:
 - `policy/skills.json` todavia permite algunas skills third-party por nombre y no por hash. Para una version mas fuerte, deberiamos exigir hash para third-party.
 - El builder web usa una lista curada estatica. No lee policy en vivo.
 - Las skills custom todavia deben entrar por review manual de policy, no por upload directo.
-- El parser YAML es intencionalmente chico y soporta el subset que generamos. No es un parser YAML completo.
+- El parser YAML es intencionalmente chico y soporta el subset que generamos. No acepta JSON ni es un parser YAML completo.
 - El flujo web descarga solo `yield.agent-pack.yaml`; no descarga todavia un zip con todos los outputs generados.
 
 ## Como probarlo

@@ -10,9 +10,9 @@ It also protects credentials: prompts that look like they contain API keys trigg
 
 It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`. For user-invoked review, `/yieldos:audit` runs Deepsec on demand, scoped to changed code by default, and keeps a small command log at `security/audit-events.md`.
 
-For project setup and deeper review, yieldOS also ships `/yieldos:init` to generate preview-first `AGENTS.md` / `CLAUDE.md` safety instructions, `/yieldos:pack` to compile policy-validated team agent packs into native agent files, plus `/yieldos:pentest` for an explicit red-team / blue-team adversarial loop with persistent local memory.
+For project setup and deeper review, yieldOS also ships `/yieldos:init` to generate preview-first `AGENTS.md` / `CLAUDE.md` safety instructions, `/yieldos:pack` to compile policy-validated team agent packs into reviewable host-native guidance files, plus `/yieldos:pentest` for an explicit red-team / blue-team adversarial loop with persistent local memory.
 
-Team agent packs let a repo carry one reviewed source of truth for approved skills, MCPs, safety profiles, playbooks, and target agents. The compiler validates the manifest against `policy/skills.json` and `policy/mcps.json`, then can generate `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`.
+Team agent packs let a repo carry one reviewed source of truth for approved skills, MCPs, safety profiles, playbooks, and target agents. The compiler validates the manifest against `policy/skills.json` and `policy/mcps.json`, then can generate `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. `yieldos-pack verify` also requires a lock when generated files are active and checks lock metadata plus file hashes.
 
 Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
 

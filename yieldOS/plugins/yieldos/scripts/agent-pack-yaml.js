@@ -3,7 +3,9 @@
 function parseManifest(text) {
   const trimmed = String(text || '').trim();
   if (!trimmed) throw new Error('pack file is empty');
-  if (trimmed.startsWith('{') || trimmed.startsWith('[')) return JSON.parse(trimmed);
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    throw new Error('pack manifests must use YAML, not JSON');
+  }
 
   const lines = trimmed.split(/\r?\n/)
     .map((raw, index) => ({ ...parseLine(raw), number: index + 1 }))
@@ -41,16 +43,16 @@ function parseMap(lines, index, indent) {
     const { key, value } = parsePair(line.text, line.number);
     i += 1;
     if (value !== '') {
-      out[key] = parseScalar(value);
+      setMapValue(out, key, parseScalar(value), line.number);
       continue;
     }
 
     if (i < lines.length && lines[i].indent > indent) {
       const [child, next] = parseBlock(lines, i, lines[i].indent);
-      out[key] = child;
+      setMapValue(out, key, child, line.number);
       i = next;
     } else {
-      out[key] = null;
+      setMapValue(out, key, null, line.number);
     }
   }
 
@@ -82,10 +84,13 @@ function parseList(lines, index, indent) {
 
     if (/^[A-Za-z0-9_.-]+:/.test(item)) {
       const { key, value } = parsePair(item, line.number);
-      const obj = { [key]: value === '' ? null : parseScalar(value) };
+      const obj = {};
+      setMapValue(obj, key, value === '' ? null : parseScalar(value), line.number);
       if (i < lines.length && lines[i].indent > indent) {
         const [child, next] = parseBlock(lines, i, lines[i].indent);
-        Object.assign(obj, child);
+        for (const [childKey, childValue] of Object.entries(child || {})) {
+          setMapValue(obj, childKey, childValue, lines[i].number);
+        }
         i = next;
       }
       out.push(obj);
@@ -101,10 +106,25 @@ function parseList(lines, index, indent) {
 function parsePair(text, lineNumber) {
   const idx = text.indexOf(':');
   if (idx <= 0) throw new Error(`expected key/value pair on line ${lineNumber}`);
+  const key = text.slice(0, idx).trim();
+  validateKey(key, lineNumber);
   return {
-    key: text.slice(0, idx).trim(),
+    key,
     value: text.slice(idx + 1).trim(),
   };
+}
+
+function validateKey(key, lineNumber) {
+  if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+    throw new Error(`dangerous key on line ${lineNumber}: ${key}`);
+  }
+}
+
+function setMapValue(target, key, value, lineNumber) {
+  if (Object.hasOwn(target, key)) {
+    throw new Error(`duplicate key on line ${lineNumber}: ${key}`);
+  }
+  target[key] = value;
 }
 
 function parseScalar(value) {

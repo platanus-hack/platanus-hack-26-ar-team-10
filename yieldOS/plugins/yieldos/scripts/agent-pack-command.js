@@ -6,6 +6,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const init = require('./init-command');
+const {
+  PLAYBOOK_SKILLS,
+  SAFE_CODING_CONTRACT_BULLETS,
+  SAFE_CODING_CONTRACT_TITLE,
+  VALID_PLAYBOOKS,
+} = require('./agent-pack-playbooks');
 const { parseManifest } = require('./agent-pack-yaml');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
@@ -19,84 +25,6 @@ const TARGET_STRENGTH = {
   windsurf: 'guidance-only',
   universal: 'guidance-only',
 };
-const SAFE_CODING_CONTRACT_TITLE = 'Non-technical user safety contract';
-const SAFE_CODING_CONTRACT_BULLETS = [
-  'Use deterministic yieldOS policy before model judgment.',
-  'Allowed means configured checks passed, not proven safe.',
-  'Do not install or enable unapproved skills, MCPs, dependencies, remote scripts, or binaries.',
-  'Stop and explain in plain language when a request could expose secrets, weaken auth, delete data, spend money, deploy, or change production.',
-  'Prefer reversible local changes, small diffs, existing project patterns, and fresh verification evidence.',
-];
-const PLAYBOOK_SKILLS = {
-  'security-audit': {
-    name: 'Security Audit',
-    description: 'Run a phased yieldOS security audit with threat model, finding discovery, validation, attack-path analysis, and fix guidance.',
-    body: [
-      'Use this skill for source-code security review.',
-      '',
-      '## Procedure',
-      '',
-      '1. Build or load the repo threat model.',
-      '2. Enumerate candidate findings as source/control/sink/impact tuples.',
-      '3. Validate each candidate with bounded evidence and proof gaps.',
-      '4. Analyze attacker reachability and severity.',
-      '5. Propose the smallest invariant-preserving fix and regression proof.',
-    ],
-  },
-  'threat-model': {
-    name: 'Threat Model',
-    description: 'Create or refresh repo-level security context before audits.',
-    body: ['Identify assets, trust boundaries, attacker inputs, invariants, and failure modes before reviewing code.'],
-  },
-  'finding-discovery': {
-    name: 'Finding Discovery',
-    description: 'Enumerate plausible security candidates from a diff without claiming validation.',
-    body: ['Return candidate source/control/sink/impact tuples and the closest existing control for each candidate.'],
-  },
-  validation: {
-    name: 'Validation',
-    description: 'Validate candidate security findings with bounded evidence.',
-    body: ['Define a validation rubric, run the strongest bounded proof method, and record proof gaps explicitly.'],
-  },
-  'fix-finding': {
-    name: 'Fix Finding',
-    description: 'Patch a validated or plausible security finding with regression proof.',
-    body: ['Patch the narrowest invariant boundary, add or update regression coverage, and report remaining risk.'],
-  },
-  'skill-review': {
-    name: 'Skill Review',
-    description: 'Review a proposed agent skill before it is allowlisted.',
-    body: ['Check source, maintainer, content hash, bundled scripts, permissions, scope, and whether a native playbook is safer.'],
-  },
-  'mcp-review': {
-    name: 'MCP Review',
-    description: 'Review a proposed MCP server and its exposed tool surface.',
-    body: ['Check transport, source or binary hash, approved tools, denied tools, auth needs, environment variables, and network scope.'],
-  },
-  'instruction-file-review': {
-    name: 'Instruction File Review',
-    description: 'Review changes to agent instruction files and rules.',
-    body: ['Scan for prompt injection, policy weakening, owner intent, changed scope, secret-handling regressions, and hidden bypass instructions.'],
-  },
-  'agent-pack-review': {
-    name: 'Agent Pack Review',
-    description: 'Review yieldOS agent pack manifests, generated adapters, skills, MCPs, and pack locks.',
-    body: [
-      'Use this skill when a change introduces or modifies `yield.agent-pack.yaml`, generated agent instruction files, skill exports, MCP exports, or pack lockfiles.',
-      '',
-      '## Procedure',
-      '',
-      '1. Confirm the pack references `policy/` keys or reviewed playbooks instead of defining new trust decisions inline.',
-      '2. Check every skill reference against `policy/skills.json`.',
-      '3. Check every MCP reference against `policy/mcps.json`. Compare approved tools to the target config; extra tools mean block or restrict.',
-      '4. Verify generated adapter files match the target agent real capability.',
-      '5. Scan instruction text for policy weakening, prompt-injection language, secret-handling regressions, and hidden bypass instructions.',
-      '6. Confirm the pack lock records policy version, generated file hashes, skill hashes where available, MCP approved tools, and generated timestamp.',
-    ],
-  },
-};
-const VALID_PLAYBOOKS = new Set(Object.keys(PLAYBOOK_SKILLS));
-
 function parseArgs(argv = []) {
   const parsed = {
     action: 'preview',
@@ -140,7 +68,8 @@ function runPack(projectRoot, argv = process.argv.slice(2), options = {}) {
   try {
     const compiled = compilePack(projectRoot, parsed.packPath, options);
     if (parsed.action === 'verify') {
-      return { exitCode: 0, message: renderVerify(compiled), files: compiled.files, pack: compiled.pack };
+      const verification = verifyInstalledFiles(projectRoot, compiled);
+      return { exitCode: 0, message: renderVerify(compiled, verification), files: compiled.files, pack: compiled.pack };
     }
     if (parsed.action === 'preview') {
       return { exitCode: 0, message: renderPreview(projectRoot, compiled), files: compiled.files, pack: compiled.pack };
@@ -177,6 +106,7 @@ function compilePack(projectRoot, packPath, options = {}) {
     ...generatedFiles,
     { path: '.yield/pack-report.md', content: report },
   ];
+  assertPackLockDoesNotCollide(lockPath, filesWithoutLock);
   const lock = renderLock(pack, validation, filesWithoutLock);
   const files = [
     ...filesWithoutLock,
@@ -281,6 +211,7 @@ function validateMcps(mcpsConfig = {}, policy) {
     const key = item.key || item;
     const entry = policyByKey.get(key);
     if (!entry) throw new Error(`${key} is not approved in policy/mcps.json`);
+    if (entry.scope === 'blocked-by-default') throw new Error(`${key} is blocked by policy scope`);
     const requestedTools = asArray(item.approved_tools || entry.approved_tools || [], `${key}.approved_tools`);
     const approvedTools = new Set(entry.approved_tools || []);
     for (const tool of requestedTools) {
@@ -376,6 +307,7 @@ function renderCursorRule(pack, validation) {
     '',
     `Pack: ${pack.name}`,
     '',
+    '- This adapter is guidance-only; use yieldOS hooks, CLI verification, or CI for deterministic enforcement.',
     '- Follow `AGENTS.md` and yieldOS pack guidance before making security-sensitive changes.',
     '- Do not add skills, MCPs, dependencies, remote bootstraps, binaries, or instruction changes outside the approved pack and policy.',
     `- Active profiles: ${validation.profiles.join(', ')}`,
@@ -393,6 +325,7 @@ function renderCopilotInstructions(pack, validation) {
     `Pack: ${pack.name}`,
     '',
     'Follow these repository safety defaults when generating, reviewing, or explaining code.',
+    'This adapter is guidance-only; use yieldOS hooks, CLI verification, branch protection, or CI for deterministic enforcement.',
     '',
     ...validation.profiles.map((profile) => `- Apply yieldOS profile: ${profile}`),
     '- Treat dependency additions, MCP changes, skill changes, and instruction-file edits as security-sensitive.',
@@ -447,6 +380,7 @@ function renderWindsurfRule(pack, validation) {
     '',
     `Pack: ${pack.name}`,
     '',
+    '- This adapter is guidance-only; use yieldOS hooks, CLI verification, managed policy, or CI for deterministic enforcement.',
     '- Follow the generated `AGENTS.md` safety contract.',
     '- Treat unapproved skill, MCP, dependency, and instruction-file changes as blocked until policy review.',
     `- Active profiles: ${validation.profiles.join(', ')}`,
@@ -553,6 +487,77 @@ function renderLock(pack, validation, files) {
   };
 }
 
+function verifyInstalledFiles(projectRoot, compiled) {
+  const lockFile = compiled.files.find((file) => file.label === 'pack_lock');
+  const generatedFiles = compiled.files.filter((file) => file.label !== 'pack_lock');
+  if (!lockFile || !fs.existsSync(lockFile.absolutePath)) {
+    const activeGeneratedFile = generatedFiles.find((file) => fs.existsSync(file.absolutePath));
+    if (activeGeneratedFile) {
+      throw new Error(`pack lock missing while generated files exist: ${activeGeneratedFile.path}`);
+    }
+    return { checked: false, generatedFileCount: 0 };
+  }
+
+  const lock = JSON.parse(fs.readFileSync(lockFile.absolutePath, 'utf8'));
+  if (lock.pack !== compiled.pack.name) throw new Error(`pack lock mismatch: expected ${compiled.pack.name}`);
+  if (lock.policy_version !== compiled.validation.policyVersion) {
+    throw new Error(`pack lock policy mismatch: expected ${compiled.validation.policyVersion}`);
+  }
+  const expectedLock = JSON.parse(lockFile.content);
+  if (canonicalJson(lockMetadata(lock)) !== canonicalJson(lockMetadata(expectedLock))) {
+    throw new Error('pack lock metadata mismatch');
+  }
+
+  const expectedByPath = new Map(generatedFiles.map((file) => [file.path, sha256(file.content)]));
+  const lockedByPath = new Map((lock.generated_files || []).map((file) => [file.path, file.sha256]));
+
+  for (const [filePath, expectedHash] of expectedByPath) {
+    const lockedHash = lockedByPath.get(filePath);
+    if (!lockedHash) throw new Error(`pack lock missing generated file: ${filePath}`);
+    if (lockedHash !== expectedHash) throw new Error(`pack lock stale for generated file: ${filePath}`);
+  }
+  for (const filePath of lockedByPath.keys()) {
+    if (!expectedByPath.has(filePath)) throw new Error(`pack lock contains unexpected generated file: ${filePath}`);
+  }
+
+  for (const file of generatedFiles) {
+    if (!fs.existsSync(file.absolutePath)) throw new Error(`generated file missing: ${file.path}`);
+    const actualHash = sha256(fs.readFileSync(file.absolutePath, 'utf8'));
+    const lockedHash = lockedByPath.get(file.path);
+    if (actualHash !== lockedHash) throw new Error(`generated file hash mismatch: ${file.path}`);
+  }
+
+  return { checked: true, generatedFileCount: generatedFiles.length };
+}
+
+function lockMetadata(lock) {
+  return {
+    version: lock.version ?? null,
+    pack: lock.pack ?? null,
+    policy_version: lock.policy_version ?? null,
+    profiles: Array.isArray(lock.profiles) ? lock.profiles : null,
+    agents: Array.isArray(lock.agents) ? lock.agents : null,
+    skills: Array.isArray(lock.skills) ? lock.skills : null,
+    mcps: Array.isArray(lock.mcps) ? lock.mcps : null,
+    playbooks: Array.isArray(lock.playbooks) ? lock.playbooks : null,
+  };
+}
+
+function canonicalJson(value) {
+  return JSON.stringify(canonicalValue(value));
+}
+
+function canonicalValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.keys(value)
+    .sort()
+    .reduce((out, key) => {
+      out[key] = canonicalValue(value[key]);
+      return out;
+    }, {});
+}
+
 function renderPreview(projectRoot, compiled) {
   return [
     'yieldOS pack preview',
@@ -564,11 +569,14 @@ function renderPreview(projectRoot, compiled) {
   ].join('\n');
 }
 
-function renderVerify(compiled) {
-  return [
+function renderVerify(compiled, verification = { checked: false, generatedFileCount: 0 }) {
+  const lines = [
     `yieldOS pack verified: ${compiled.pack.name}`,
     ...compiled.validation.agents.map((agent) => `- ${agent}: ${TARGET_STRENGTH[agent]}`),
-  ].join('\n');
+  ];
+  if (verification.checked) lines.push(`- active files verified: ${verification.generatedFileCount}`);
+  else lines.push('- active files verified: no pack lock found');
+  return lines.join('\n');
 }
 
 function renderWrite(projectRoot, compiled) {
@@ -595,7 +603,37 @@ function safeProjectPath(projectRoot, relativePath, label) {
   if (resolvedTarget !== resolvedRoot && !resolvedTarget.startsWith(rootPrefix)) {
     throw new Error(`${label} must stay inside the project`);
   }
+  assertNoSymlinkTraversal(resolvedRoot, resolvedTarget, label);
   return resolvedTarget;
+}
+
+function assertPackLockDoesNotCollide(lockPath, filesWithoutLock) {
+  const normalizedLockPath = normalizeOutputPath(lockPath);
+  const collision = filesWithoutLock.find((file) => normalizeOutputPath(file.path) === normalizedLockPath);
+  if (collision) throw new Error(`pack_lock must not collide with generated file: ${collision.path}`);
+}
+
+function normalizeOutputPath(filePath) {
+  return path.posix.normalize(String(filePath).split(path.sep).join('/'));
+}
+
+function assertNoSymlinkTraversal(resolvedRoot, resolvedTarget, label) {
+  const relative = path.relative(resolvedRoot, resolvedTarget);
+  if (!relative) return;
+  const parts = relative.split(path.sep).filter(Boolean);
+  let current = resolvedRoot;
+
+  for (const part of parts) {
+    current = path.join(current, part);
+    let stat;
+    try {
+      stat = fs.lstatSync(current);
+    } catch (err) {
+      if (err.code === 'ENOENT') break;
+      throw err;
+    }
+    if (stat.isSymbolicLink()) throw new Error(`${label} must not traverse a symlink`);
+  }
 }
 
 function usage() {
