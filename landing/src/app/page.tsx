@@ -109,12 +109,7 @@ export default function Home() {
               <span className="rounded border border-[rgba(232,255,0,0.28)] bg-[rgba(232,255,0,0.04)] px-2.5 py-1 text-zinc-200">
                 PH26 Buenos Aires
               </span>
-              <span>AI supply-chain</span>
-            </MotionReveal>
-            <MotionReveal delay={0.18} immediate y={10}>
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:mb-5 sm:text-[11px]">
-                Working prototype
-              </p>
+              <span>AI Security</span>
             </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
@@ -344,7 +339,7 @@ export default function Home() {
       <footer className="border-t border-zinc-200 bg-[#f4f3ef] py-5">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 font-mono text-xs text-zinc-500 sm:flex-row sm:px-8">
           <p>yieldOS</p>
-          <p>PH26 Buenos Aires / AI supply-chain</p>
+          <p>PH26 Buenos Aires / AI Security</p>
         </div>
       </footer>
     </main>

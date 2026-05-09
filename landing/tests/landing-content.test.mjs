@@ -32,6 +32,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "View decision demo",
     "claude plugin marketplace add /path/to/vibeOS",
     "claude plugin install yieldos@yieldos-marketplace",
+    "AI Security",
     "Tool call",
     "Verdict",
     "Allow",
@@ -130,6 +131,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "npm install nanoid",
     "A security gate for AI agent installs.",
     "Claude Code tries to run something. yieldOS decides first.",
+    "Working prototype",
+    "AI supply-chain",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
