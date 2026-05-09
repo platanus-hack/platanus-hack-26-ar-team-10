@@ -1,5 +1,11 @@
 # Changelog
 
+## yieldOS v0.3.1 - 2026-05-09
+
+- Block credential-looking prompts before they reach the model.
+- Gate Read access to .env and other credentials paths behind an exact user authorization phrase.
+- Add red diff alert panels with ASCII art and redacted credential previews.
+
 ## yieldOS v0.2.8 - 2026-05-09
 
 - Add self-update command for Claude Code.
