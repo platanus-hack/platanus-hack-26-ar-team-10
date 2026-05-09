@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-goof",
+  "target": "/tmp/yos-bench/targets/nodejs-goof",
+  "repo": {
+    "commit": "add14ba59e98240d9e00a235dd7d42cd61ae9912",
+    "remote": "https://github.com/snyk-labs/nodejs-goof"
+  },
+  "started_at": "2026-05-09T10:03:07.983Z",
+  "finished_at": "2026-05-09T10:19:35.821Z",
+  "summary": {
+    "rounds": 8,
+    "findings": 5,
+    "fixes_applied": 0,
+    "fixes_failed": 5,
+    "terminated": "converged"
+  },
+  "bench": "yieldOS Reality Check",
+  "bench_version": 1
+}
