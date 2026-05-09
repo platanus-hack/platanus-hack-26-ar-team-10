@@ -8,6 +8,8 @@ yieldOS is a Claude Code security plugin that gates the risky things AI agents d
 
 It also protects credentials: prompts that look like they contain API keys trigger a no-echo security directive with a guided `.env` remediation panel, and reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar credential paths require the exact local authorization phrase `AUTORIZO A LEER LAS CREDENCIALES`.
 
+It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`.
+
 Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
 
 ## Install

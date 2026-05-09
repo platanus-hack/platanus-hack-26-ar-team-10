@@ -75,6 +75,27 @@ That keeps the root marketplace, nested marketplace, plugin manifest, changelog,
 
 ---
 
+## Code audit
+
+yieldOS also audits source-code changes before `git commit` and `git push`.
+This is separate from dependency security: dependency allowlists, denylists,
+native equivalents, and rewrites do not decide code-audit outcomes.
+
+The code-audit loop red-teams the changed code, applies one minimal deterministic
+blue-team fix per pass, re-scans after each patch, and stops after a hard limit.
+It logs the result to `security/code-audit-events.md` and writes
+machine-verifiable state to `security/code-audit-state.json`.
+
+For deeper review, teams can opt into native local-agent mode with
+`YIELDOS_CODE_AUDIT_MODE=agent-review` or `agent-fix`. That uses the user's
+already-authenticated Claude Code or Codex CLI to propose findings or patches,
+then yieldOS validates and verifies the result deterministically. CI never needs
+an LLM or model API key.
+
+Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
+
+---
+
 ## High-level flow
 
 ```
@@ -256,11 +277,12 @@ plugins/yieldos/
 │   ├── injection-scanner.js    ← prompt-injection patterns
 │   ├── instruction-watcher.js  ← hash CLAUDE.md/AGENTS.md
 │   ├── transitive-auditor.js   ← post-install lockfile audit
+│   ├── code-audit/             ← commit/push source-code audit loop
 │   ├── classifiers/   (12 detectors)
 │   ├── analyzers/     (9 modules)
 │   └── rewriter/      (Category A scaffold gen)
 ├── skills/dependency-gate/SKILL.md
-└── tests/  (node:test, 122 tests)
+└── tests/  (node:test)
 ```
 
 → Detail: [docs/06-architecture.md](docs/06-architecture.md).
@@ -272,12 +294,16 @@ plugins/yieldos/
 You don't have to do anything. yieldOS works in the background:
 
 - **Safe installs go through silently.** If the package is on the official allowlist, it just installs.
-- **Dangerous installs are blocked.** You'll see a one-line message: `yieldOS bloqueó {package}: {reason}`.
-- **Tiny utility packages get rewritten locally.** You'll see: `yieldOS realizó una optimización de la instalación de {package}`. The code lives in `src/lib/yieldos/` in your project.
+- **Dangerous installs are blocked.** You'll see a one-line message: `[yieldOS] BLOCK bloqueó {package}: {reason}`.
+- **Tiny utility packages get rewritten locally.** You'll see: `[yieldOS] REWRITE realizó una optimización de la instalación de {package}`. The code lives in `src/lib/yieldos/` in your project.
 - **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to open a PR to the official policy repo.
-- **CVEs in transitive dependencies are flagged** post-install — you'll see `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.
+- **CVEs in transitive dependencies are flagged** post-install — you'll see `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
 
 Everything is logged to `<project>/security/dependency-events.md`. You can read it any time to audit what yieldOS decided and why.
+
+When stderr is an interactive terminal, yieldOS colorizes the status label. In
+non-interactive agent runs, CI, or `NO_COLOR=1`, output stays plain text. The
+machine-readable line is always unstyled: `[yieldOS:verdict] <verdict>`.
 
 You do not need to:
 
@@ -309,6 +335,9 @@ If you are an AI coding agent operating in a project protected by yieldOS:
    | `build-script-not-approved`   | Build script not in `policy/build-scripts-allowed.json`. Tell the user.              |
    | `self-defense-block`          | You attempted to modify a yieldOS-protected file. Stop. This is not a bug.           |
    | `injection-blocked`           | Detected prompt-injection in instruction-file edit. Reconsider the edit.             |
+   | `code-audit-fix-applied`      | A security fix was applied to staged code. Review the change and rerun `git commit`. |
+   | `code-audit-blocked`          | Source-code audit found unresolved blocking risk. Fix it before committing/pushing.  |
+   | `code-audit-clean`            | The audited commit or push diff passed. Continue.                                    |
 
 3. **The rewrite flow (Category A)**: when yieldOS blocks with `category-a-rewrite`, follow the `dependency-gate` skill that's loaded automatically.
 
@@ -332,6 +361,7 @@ If you are an AI coding agent operating in a project protected by yieldOS:
 - `Self-Defense Trigger` — yieldOS blocked a modification of its own files.
 - `Blocked Instruction File Edit (injection)` — prompt-injection detected.
 - `Required Settings Applied` — yieldOS inserted missing manager settings.
+- `Code Audit` — commit/push source-code audit result in `security/code-audit-events.md`.
 
 Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacted before being written.
 
@@ -354,9 +384,10 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `instruction-watcher.test.js` — hash-based change detection on `CLAUDE.md`/`AGENTS.md`.
 - `logger.test.js` — log entry shape and secret redaction.
 - `self-defense.test.js` — protected path matching.
+- `code-audit.test.js` — staged/push diff collection, red/blue loop, audit state, CI verification, hook routing.
+- `code-audit-agents.test.js` — optional local Claude/Codex agent boundary and patch validation.
+- `ui.test.js` — terminal labels, color gating, exact machine-readable verdicts.
 - `e2e.test.js` — end-to-end runs of the pre-install gate with realistic inputs.
-
-122/122 passing.
 
 ---
 
@@ -373,6 +404,9 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/07-policy.md](docs/07-policy.md) | Policy fetching, the three-layer cache, refresh triggers, PR flow. |
 | [docs/08-tradeoffs.md](docs/08-tradeoffs.md) | What we gave up on purpose and why. |
 | [docs/09-decision-log.md](docs/09-decision-log.md) | Every meaningful decision in order, with rationale. |
+| [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |
+| [docs/11-ci-cd.md](docs/11-ci-cd.md) | Planned CI/CD enforcement. |
+| [docs/12-dockerfile-scanner.md](docs/12-dockerfile-scanner.md) | Planned Dockerfile scanner. |
 
 ---
 

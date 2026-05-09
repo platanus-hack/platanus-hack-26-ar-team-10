@@ -341,6 +341,6 @@ plugins/yieldos/.claude-plugin/{hooks,scripts,...}
 
 ## D37 — CI/CD and Dockerfile scanner remain planning docs until implemented
 
-**Decision**: the CI/CD gate and Dockerfile scanner designs live in `docs/10-ci-cd.md` and `docs/11-dockerfile-scanner.md` as plans only. They are not enabled by the plugin runtime yet.
+**Decision**: the CI/CD gate and Dockerfile scanner designs live in `docs/11-ci-cd.md` and `docs/12-dockerfile-scanner.md` as plans only. They are not enabled by the plugin runtime yet.
 
 **Rationale**: both ideas extend the same policy engine beyond the current Claude Code hook surface, but shipping them requires new classifiers, reporters, and CI entrypoints. Keeping them as explicit plans prevents the docs from implying capabilities the project does not yet provide.

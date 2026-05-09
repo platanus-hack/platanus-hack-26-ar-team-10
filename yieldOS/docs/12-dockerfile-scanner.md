@@ -22,7 +22,7 @@ We are not building a Docker security scanner that competes with Trivy, Grype, o
 
 - Catch unsafe patterns when an agent writes a Dockerfile, in the same hook that already catches unsafe `npm install` calls.
 - Reuse the policy mechanism: the rules ship in `policy-cache/dockerfile-rules.json`, fetched online-first like everything else.
-- Stay agent-side. No CLI, no separate binary. The CI gate (see `10-ci-cd.md`) can adopt this scanner later by reusing the same analyzer.
+- Stay agent-side. No CLI, no separate binary. The CI gate (see `11-ci-cd.md`) can adopt this scanner later by reusing the same analyzer.
 
 ## How it fits into the existing architecture
 
@@ -249,4 +249,4 @@ Total for v1 (phases 1–3): ~2.5 days.
 
 ## Relationship to the CI gate
 
-Once the CI gate exists (`10-ci-cd.md`), the same `analyzers/dockerfile-checks.js` runs against any Dockerfile changed in the PR diff. Same policy, same findings, second enforcement point. No new code in CI beyond an additional candidate type in `lockfile-diff.js` (which becomes `change-set.js` once Dockerfiles are part of it).
+Once the CI gate exists (`11-ci-cd.md`), the same `analyzers/dockerfile-checks.js` runs against any Dockerfile changed in the PR diff. Same policy, same findings, second enforcement point. No new code in CI beyond an additional candidate type in `lockfile-diff.js` (which becomes `change-set.js` once Dockerfiles are part of it).

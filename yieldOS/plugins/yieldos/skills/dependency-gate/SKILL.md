@@ -1,11 +1,11 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent runs install commands, reads credentials files, edits dependency manifests, activates skills, adds MCPs, edits instruction files, or receives credential-looking prompts. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands, reads credentials files, edits dependency manifests, activates skills, adds MCPs, edits instruction files, runs git commit/push, or receives credential-looking prompts. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate
 
-You are operating in a project protected by **yieldOS**, a security gate that intercepts dependency installations, skill activations, MCP additions, credentials reads, credential-looking prompts, and instruction-file changes.
+You are operating in a project protected by **yieldOS**, a security gate that intercepts dependency installations, skill activations, MCP additions, credentials reads, credential-looking prompts, instruction-file changes, and git commit/push source-code audits.
 
 ## Core principles
 
@@ -26,6 +26,10 @@ When yieldOS blocks a `Bash` / `Write` / `Edit` action, it returns a structured 
 - `verification-passed` — package is safe; retry the install once.
 - `credentials-read-blocked` — the agent tried to read `.env`, `.ssh`, `.aws`, `.kube`, or another credentials path without the user's exact authorization phrase. Surface the colored warning returned in `hookSpecificOutput.additionalContext` and do not retry the read.
 - `prompt-credentials-detected` — the user prompt contained credential-looking material. The hook injects a critical directive and pre-rendered alert/guide blocks. Surface them verbatim, never repeat the credential value, and never use it in tools.
+- `code-audit-fix-applied` — yieldOS applied a source-code security fix to the staged diff. Review the staged changes and rerun `git commit`; do not blindly force the original command.
+- `code-audit-blocked` — source-code audit found unresolved blocking risk. Fix the code before retrying commit or push.
+- `code-audit-verification-failed` — source-code audit could not verify the fix or state. Treat the git command as blocked.
+- `code-audit-clean` — source-code audit passed and the git command can run.
 
 ## Credentials flow
 
@@ -55,12 +59,19 @@ If yieldOS instructs you to perform a local rewrite:
 5. Update `security/yieldos-rewrites.json` with the new entry.
 6. After the rewrite is done, surface a single short message to the user: `yieldOS realizó una optimización de la instalación de <package>`.
 
+## Code audit flow
+
+For `git commit`, yieldOS audits the staged diff. For `git push`, it audits the commits ahead of upstream. It writes audit events to `security/code-audit-events.md` and machine-verifiable state to `security/code-audit-state.json`.
+
+If yieldOS applies a fix, the original commit is intentionally blocked so the user or current agent can review the staged patch and rerun `git commit`. If yieldOS writes push verification state, commit `security/code-audit-state.json` before retrying `git push`.
+
 ## Self-defense
 
 yieldOS will block any attempt to:
 
 - Modify files under `.claude/plugins/yieldos/**`.
 - Modify `security/dependency-events.md` other than via append from yieldOS itself.
+- Modify `security/code-audit-events.md` or `security/code-audit-state.json` by hand.
 - Modify `security/yieldos-rewrites.json` outside of the rewrite flow.
 - Modify the official policy cache.
 
@@ -91,6 +102,11 @@ Each stamp is a markdown `diff` code block so the line renders with color: `+` g
 | `credentials-read-authorized` | `+ ▎ 🛡  yieldOS  ·  Validado · lectura de credenciales autorizada` |
 | `prompt-credentials-detected` | `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial` |
 | `native-suggest` | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa` |
+| `code-audit-clean` | `+ ▎ 🛡  yieldOS  ·  Validado · code audit limpio` |
+| `code-audit-warning` | `! ▎ 🛡  yieldOS  ·  Advertencia · code audit` |
+| `code-audit-fix-applied` | `+ ▎ 🛡  yieldOS  ·  Corregido · code audit` |
+| `code-audit-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · code audit` |
+| `code-audit-verification-failed` | `- ▎ 🛡  yieldOS  ·  Bloqueado · verificación code audit` |
 
 Example:
 
@@ -109,6 +125,7 @@ Use a brief body only when the user needs context:
 - Blocked (Category D): say it requires security-team approval, then stamp.
 - Rewritten: say yieldOS optimized the install locally, then stamp.
 - Verification failed: say yieldOS found suspicious signals and blocked the install, then stamp.
+- Code audit fixed or blocked a commit/push: explain the one-line hook message and tell the user to rerun the git command only after reviewing staged changes.
 - Credentials read blocked: copy the returned red warning panel verbatim, then stamp.
 - Prompt credentials detected: copy the returned red alert and green `.env` guide verbatim, never repeat the secret value, then stamp.
 - CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.

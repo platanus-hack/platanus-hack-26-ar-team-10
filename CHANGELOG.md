@@ -1,5 +1,12 @@
 # Changelog
 
+## yieldOS v0.4.0 - 2026-05-09
+
+- Add commit/push code-audit loop with deterministic red-team and blue-team fixes
+- Add optional local Claude/Codex agent review and patch validation for code audit
+- Add terminal presenter for colored human labels while preserving exact machine-readable verdicts
+- Add Next.js yieldOS landing app with CI validation
+
 ## yieldOS v0.3.6 - 2026-05-09
 
 - Add root /policy as the online source of truth for yieldOS runtime policy refreshes.

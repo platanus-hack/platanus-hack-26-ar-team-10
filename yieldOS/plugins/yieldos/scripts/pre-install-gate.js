@@ -10,6 +10,8 @@ const decide = require('./decide').decide;
 const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const injectionScanner = require('./injection-scanner');
+const codeAudit = require('./code-audit');
+const ui = require('./ui');
 const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
 
@@ -53,21 +55,31 @@ const STAMP_BY_VERDICT = {
   'category-a-rewrite': shieldBlock('+', 'Optimizado · rewrite local'),
   'injection-blocked': shieldBlock('-', 'Bloqueado · inyección detectada'),
   'self-defense-block': shieldBlock('-', 'Bloqueado · archivo protegido'),
+  'code-audit-clean': shieldBlock('+', 'Validado · code audit limpio'),
+  'code-audit-warning': shieldBlock('!', 'Advertencia · code audit'),
+  'code-audit-fix-applied': shieldBlock('+', 'Corregido · code audit'),
+  'code-audit-blocked': shieldBlock('-', 'Bloqueado · code audit'),
+  'code-audit-verification-failed': shieldBlock('-', 'Bloqueado · verificación code audit'),
   'credentials-read-blocked': shieldBlock('-', 'Bloqueado · lectura de credenciales sin autorización'),
   'credentials-read-authorized': shieldBlock('+', 'Validado · lectura de credenciales autorizada'),
 };
 
 const VERDICT_PRIORITY = [
   'credentials-read-blocked',
+  'code-audit-verification-failed',
+  'code-audit-blocked',
   'denylist-match',
   'category-d-blocked',
   'verification-failed',
   'build-script-not-approved',
   'injection-blocked',
   'self-defense-block',
+  'code-audit-fix-applied',
   'category-a-rewrite',
+  'code-audit-warning',
   'native-suggest',
   'credentials-read-authorized',
+  'code-audit-clean',
   'verification-passed',
   'allowlist-match',
 ];
@@ -157,10 +169,7 @@ function contentForWriteOrEdit(tool, toolInput) {
 }
 
 function emitDecision(verdict, message, exitCode) {
-  if (message) {
-    process.stderr.write(`[yieldOS] ${message}\n`);
-  }
-  process.stderr.write(`[yieldOS:verdict] ${verdict}\n`);
+  ui.writeDecision({ verdict, action: exitCode === 2 ? 'block' : 'allow', message });
   emitHookOutput([{
     candidate: { type: 'hook', name: 'yieldOS', version: 'unknown' },
     decision: { verdict },
@@ -331,20 +340,16 @@ async function processCandidates(candidates, projectRoot, policy) {
       case 'allow':
         if (decision.verdict === 'allowlist-match') logger.logAllowed(projectRoot, candidate);
         else logger.logVerified(projectRoot, candidate, decision.meta?.findings || []);
-        if (decision.message) {
-          process.stderr.write(`[yieldOS] ${decision.message}\n`);
-        }
         // Always emit machine-readable verdict so downstream tools (logs, benches,
         // QA harnesses) can identify what happened, even when the human-facing
         // message is intentionally silent.
-        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
+        ui.writeDecision(decision);
         break;
 
       case 'block-with-suggestion':
       case 'block':
         logger.logBlocked(projectRoot, candidate, decision.verdict, { findings: decision.meta?.findings });
-        process.stderr.write(`[yieldOS] ${decision.message || 'blocked'}\n`);
-        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
+        ui.writeDecision({ ...decision, message: decision.message || 'blocked' });
         anyBlocked = true;
         break;
 
@@ -360,11 +365,10 @@ async function processCandidates(candidates, projectRoot, policy) {
             api: 'see scaffold; agent must populate via dependency-gate skill',
             marker: scaffold.indexPath,
           });
-          process.stderr.write(`[yieldOS] ${decision.message}\n`);
-          process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
-          process.stderr.write(`[yieldOS:rewrite-target] ${scaffold.dir}\n`);
+          ui.writeDecision(decision);
+          process.stderr.write(`${ui.formatRewriteTarget(scaffold.dir)}\n`);
         } catch (err) {
-          process.stderr.write(`[yieldOS] error generating rewrite scaffold: ${err.message}\n`);
+          ui.writeMessage(`error generating rewrite scaffold: ${err.message}`);
         }
         anyBlocked = true;
         break;
@@ -372,6 +376,58 @@ async function processCandidates(candidates, projectRoot, policy) {
     }
   }
   return { anyBlocked, interventions };
+}
+
+function handleCodeAuditCommand(projectRoot, command) {
+  if (!codeAudit.isGitAuditCommand(command)) return false;
+
+  let audit;
+  try {
+    audit = codeAudit.auditGitCommand(projectRoot, command, {
+      agent: codeAudit.agentOptionsFromEnv(process.env),
+    });
+  } catch (err) {
+    audit = {
+      handled: true,
+      verdict: 'code-audit-verification-failed',
+      action: 'block',
+      mode: /^\s*git\s+push/.test(command) ? 'push' : 'commit',
+      files: [],
+      findings: [],
+      patch: null,
+      message: `yieldOS code-audit failed: ${err.message}`,
+    };
+  }
+
+  if (audit.files && audit.files.length > 0) {
+    try {
+      const shouldStageState = audit.mode === 'commit' || (audit.mode === 'push' && audit.action !== 'block');
+      const stateWrite = codeAudit.writeAuditState(projectRoot, audit, { stage: shouldStageState });
+      if (audit.mode === 'push' && audit.action !== 'block' && !stateWrite.committed) {
+        audit = {
+          ...audit,
+          verdict: 'code-audit-blocked',
+          action: 'block',
+          message: 'yieldOS code-audit wrote verification state; commit security/code-audit-state.json and rerun git push',
+        };
+      }
+    } catch (err) {
+      audit = {
+        ...audit,
+        verdict: 'code-audit-verification-failed',
+        action: 'block',
+        message: `yieldOS code-audit could not write verification state: ${err.message}`,
+      };
+    }
+  }
+
+  logger.logCodeAudit(projectRoot, audit);
+  ui.writeAudit(audit);
+  emitHookOutput([{
+    candidate: { type: 'git', name: `git-${audit.mode}`, version: 'unknown' },
+    decision: { verdict: audit.verdict },
+  }]);
+  process.exit(audit.action === 'block' ? 2 : 0);
 }
 
 async function main() {
@@ -384,11 +440,15 @@ async function main() {
   await handleSelfDefense(input, projectRoot);
   if (await handleCredentialsRead(input, projectRoot)) return;
 
+  if (tool === 'Bash') {
+    handleCodeAuditCommand(projectRoot, ti.command || '');
+  }
+
   let policyResult;
   try {
     policyResult = await policyFetcher.getPolicy({ forceRefresh: false });
   } catch (err) {
-    process.stderr.write(`[yieldOS] policy fetch failed: ${err.message}\n`);
+    ui.writeMessage(`policy fetch failed: ${err.message}`);
     policyResult = { source: 'unavailable', policy: null };
   }
   const policy = policyResult.policy || {};

@@ -85,7 +85,7 @@ Lookup `policy/native-equivalents.json` for `<ecosystem>:<package-name>`.
 If found:
 - Verdict: `native-suggest`
 - Action: block install, suggest the native API
-- User msg: `yieldOS sustituyó <pkg> por API nativa: <api>`
+- User msg: `[yieldOS] BLOCK sustituyó <pkg> por API nativa: <api>`
 
 Examples:
 - `npm install uuid` → suggest `crypto.randomUUID()`
@@ -109,7 +109,7 @@ Lookup `policy/denylist.json` for `<ecosystem>:<name>@<version>` or `<ecosystem>
 If found:
 - Verdict: `denylist-match`
 - Action: block
-- User msg: `yieldOS bloqueó <pkg>: <reason>`
+- User msg: `[yieldOS] BLOCK bloqueó <pkg>: <reason>`
 
 If a candidate matches both allowlist and denylist, denylist wins.
 
@@ -118,7 +118,7 @@ If a candidate matches both allowlist and denylist, denylist wins.
 If candidate `type` is `binary` or `vendored-code`, or `exotic === true`:
 - Verdict: `verification-failed`
 - Action: block
-- User msg: `yieldOS bloqueó <pkg>: instalación de tipo <type> no permitida sin allowlist explícita`
+- User msg: `[yieldOS] BLOCK bloqueó <pkg>: instalación de tipo <type> no permitida sin allowlist explícita`
 
 This catches:
 - `git clone` (vendoring)
@@ -146,11 +146,11 @@ Run the rewriter's `evaluate(candidate, metadata, policy, thresholds)`:
 
 #### Category D match → block
 
-User msg: `yieldOS bloqueó <pkg>: categoría crítica, requiere aprobación del equipo de seguridad`
+User msg: `[yieldOS] BLOCK bloqueó <pkg>: categoría crítica, requiere aprobación del equipo de seguridad`
 
 #### Category A → rewrite local
 
-Generate scaffold at `<project>/src/lib/yieldos/<package>/index.js` with header marker. User msg: `yieldOS realizó una optimización de la instalación de <pkg>`. Skill `dependency-gate` is loaded so the agent knows to populate the scaffold.
+Generate scaffold at `<project>/src/lib/yieldos/<package>/index.js` with header marker. User msg: `[yieldOS] REWRITE realizó una optimización de la instalación de <pkg>`. Skill `dependency-gate` is loaded so the agent knows to populate the scaffold.
 
 #### Else → analyzers (large-lib analysis)
 
@@ -169,25 +169,47 @@ Aggregate to highest tier:
 - **clean** → ALLOW as `verification-passed`
 
 User msg by verdict:
-- tier1 block: `yieldOS detectó señales sospechosas en <pkg> y bloqueó la instalación`
-- tier2 block: `yieldOS bloqueó <pkg>: requiere aprobación de build scripts`
-- tier3 allow: `yieldOS instaló <pkg> con advertencias (ver log)`
+- tier1 block: `[yieldOS] BLOCK detectó señales sospechosas en <pkg> y bloqueó la instalación`
+- tier2 block: `[yieldOS] BLOCK bloqueó <pkg>: requiere aprobación de build scripts`
+- tier3 allow: `[yieldOS] ALLOW instaló <pkg> con advertencias (ver log)`
 - clean: silent
 
 ## Verdict table
 
 | Verdict | Action | Exit code | User message |
 |---|---|---|---|
-| `native-suggest` | block | 2 | `yieldOS sustituyó <pkg> por API nativa…` |
+| `native-suggest` | block | 2 | `[yieldOS] BLOCK sustituyó <pkg> por API nativa…` |
 | `allowlist-match` | allow | 0 | (silent) |
-| `denylist-match` | block | 2 | `yieldOS bloqueó <pkg>: <reason>` |
-| `category-d-blocked` | block | 2 | `yieldOS bloqueó <pkg>: categoría crítica…` |
-| `category-a-rewrite` | block + scaffold | 2 | `yieldOS realizó una optimización…` |
+| `denylist-match` | block | 2 | `[yieldOS] BLOCK bloqueó <pkg>: <reason>` |
+| `category-d-blocked` | block | 2 | `[yieldOS] BLOCK bloqueó <pkg>: categoría crítica…` |
+| `category-a-rewrite` | block + scaffold | 2 | `[yieldOS] REWRITE realizó una optimización…` |
 | `verification-passed` | allow | 0 | (silent or warning) |
-| `verification-failed` | block | 2 | `yieldOS detectó señales sospechosas…` |
-| `build-script-not-approved` | block | 2 | `yieldOS bloqueó <pkg>: requiere aprobación de build scripts` |
-| `injection-blocked` | block | 2 | `yieldOS bloqueó edición de <file>: detectó intento de inyección` |
-| `self-defense-block` | block | 2 | `yieldOS bloqueó modificación de archivo protegido…` |
+| `verification-failed` | block | 2 | `[yieldOS] BLOCK detectó señales sospechosas…` |
+| `build-script-not-approved` | block | 2 | `[yieldOS] BLOCK bloqueó <pkg>: requiere aprobación de build scripts` |
+| `injection-blocked` | block | 2 | `[yieldOS] BLOCK bloqueó edición de <file>: detectó intento de inyección` |
+| `self-defense-block` | block | 2 | `[yieldOS] BLOCK bloqueó modificación de archivo protegido…` |
+| `code-audit-clean` | allow | 0 | `[yieldOS] ALLOW code-audit: clean` |
+| `code-audit-warning` | allow | 0 | `[yieldOS] WARN code-audit found low-risk code; see log` |
+| `code-audit-fix-applied` | block | 2 | `[yieldOS] FIXED code-audit applied fix; rerun git commit` |
+| `code-audit-blocked` | block | 2 | `[yieldOS] BLOCK code-audit blocked unresolved risk` |
+| `code-audit-verification-failed` | block | 2 | `[yieldOS] BLOCK code-audit verification failed` |
+
+Human-facing lines are colorized only for interactive terminals and stay plain
+text under CI, `NO_COLOR=1`, or non-TTY agent runs. Verdict lines stay exact and
+unstyled: `[yieldOS:verdict] <verdict>`.
+
+## Code audit: commit and push
+
+For `git commit`, yieldOS audits `git diff --cached`. For `git push`, it audits
+commits ahead of the configured upstream branch. The source-code audit is not
+part of the dependency 5-check flow; it uses the dedicated red-team/blue-team
+loop documented in [10-code-audit.md](10-code-audit.md).
+
+The hook writes:
+
+- `security/code-audit-events.md` for human-readable audit events.
+- `security/code-audit-state.json` for the latest machine-verifiable diff hash,
+  verdict, findings summary, and verification metadata.
 
 ## Post-install: transitive audit
 
