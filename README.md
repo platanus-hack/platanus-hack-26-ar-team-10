@@ -83,6 +83,20 @@ red/blue events can also surface in Claude Code chat through markdown diff
 blocks. The pentest loop stores local state under `security/pentest-*` files so
 rounds and lessons can be inspected later.
 
+Open the local live dashboard when you want a browser view of the same
+red/blue stream:
+
+```bash
+yieldos-pentest dashboard --start
+yieldos-pentest dashboard --status
+yieldos-pentest dashboard --stop
+```
+
+The dashboard listens on `http://127.0.0.1:5473` by default. Session-start
+dashboard launch is opt-in only: set `YIELDOS_DASHBOARD_AUTO=1` or
+`YIELDOS_DASHBOARD=auto` if you want Claude Code sessions to start it
+automatically.
+
 Maintainers publish a new plugin version from the repository root with:
 
 ```bash

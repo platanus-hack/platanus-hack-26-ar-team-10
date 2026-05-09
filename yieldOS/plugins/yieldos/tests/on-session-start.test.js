@@ -37,3 +37,10 @@ test('pentest auto-launch is opt-in only', () => {
   assert.equal(sessionStart.pentestAutoLaunchEnabled({ YIELDOS_PENTEST: 'auto' }), true);
   assert.equal(sessionStart.pentestAutoLaunchEnabled({ YIELDOS_PENTEST_AUTO: '1' }), true);
 });
+
+test('dashboard auto-launch is opt-in only', () => {
+  assert.equal(sessionStart.dashboardAutoLaunchEnabled({}), false);
+  assert.equal(sessionStart.dashboardAutoLaunchEnabled({ YIELDOS_DASHBOARD: 'off' }), false);
+  assert.equal(sessionStart.dashboardAutoLaunchEnabled({ YIELDOS_DASHBOARD: 'auto' }), true);
+  assert.equal(sessionStart.dashboardAutoLaunchEnabled({ YIELDOS_DASHBOARD_AUTO: '1' }), true);
+});
