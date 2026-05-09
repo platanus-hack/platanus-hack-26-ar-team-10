@@ -176,6 +176,21 @@ test('redTeam ignores fixtures, tests, and stringified route examples', () => {
   assert.deepEqual(findings, []);
 });
 
+test('redTeam ignores exact sink examples inside quoted template data', () => {
+  const findings = codeAudit.redTeam({
+    files: ['scripts/oracles/templates/web.js'],
+    diff: [
+      'diff --git a/scripts/oracles/templates/web.js b/scripts/oracles/templates/web.js',
+      '+++ b/scripts/oracles/templates/web.js',
+      '@@',
+      "+    signals: ['res.redirect(req.query.next)', 'exec(\"git log \" + req.query.ref)'],",
+      "+    fixtures: ['fetch(req.query.url)', 'fs.unlinkSync(req.query.path)'],",
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
 test('redTeam does not treat regex exec calls as shell execution', () => {
   const findings = codeAudit.redTeam({
     files: ['parser.js'],
@@ -212,6 +227,7 @@ test('redTeam detects V1 vulnerability classes with exploit evidence', () => {
     ['missing-authz', 'server.js', "+app.get('/admin/users', (req, res) => res.json(users));"],
     ['sql-injection', 'db.js', '+db.query("SELECT * FROM users WHERE id = " + req.query.id);'],
     ['shell-injection', 'tasks.js', '+exec("git log " + req.query.ref);'],
+    ['shell-injection', 'tasks.js', '+exec(`git log ${req.query.ref}`);'],
     ['path-traversal', 'files.js', '+const file = path.join(baseDir, req.query.name);'],
     ['unsafe-file-mutation', 'files.js', '+fs.unlinkSync(req.query.path);'],
     ['ssrf', 'server.js', '+fetch(req.query.url);'],

@@ -122,8 +122,9 @@ function sqlInjection(item) {
 
 function shellInjection(item) {
   if (item.sign !== '+') return null;
-  if (!/(?:^|[^\w.])(?:exec|execSync)\s*\(/.test(item.code)) return null;
-  if (!/(\+|\$\{|\breq\.|\bprocess\.argv\b)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/(?:^|[^\w.])(?:exec|execSync)\s*\(/.test(code)) return null;
+  if (!/(\+|\$\{|\breq\.|\bprocess\.argv\b)/.test(code)) return null;
   return makeFinding(item, 'shell-injection', 'high', 'Interpolated shell command', {
     attackerControlledInput: 'Request, argument, or variable data can reach a shell command.',
     vulnerableSink: 'child_process shell execution.',
@@ -135,8 +136,9 @@ function shellInjection(item) {
 
 function pathTraversal(item) {
   if (item.sign !== '+') return null;
-  if (!/\bpath\.join\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bpath\.join\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'path-traversal', 'high', 'User-controlled filesystem path', {
     attackerControlledInput: 'Route, query, body, or CLI input controls a path segment.',
     vulnerableSink: 'Filesystem path construction.',
@@ -148,8 +150,9 @@ function pathTraversal(item) {
 
 function unsafeFileMutation(item) {
   if (item.sign !== '+') return null;
-  if (!/\bfs\.(?:writeFile|writeFileSync|rm|rmSync|unlink|unlinkSync)\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bfs\.(?:writeFile|writeFileSync|rm|rmSync|unlink|unlinkSync)\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'unsafe-file-mutation', 'high', 'User-controlled file mutation', {
     attackerControlledInput: 'Route, query, body, or CLI input controls the file target.',
     vulnerableSink: 'Filesystem write or delete operation.',
@@ -161,8 +164,9 @@ function unsafeFileMutation(item) {
 
 function ssrf(item) {
   if (item.sign !== '+') return null;
-  if (!/\bfetch\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bfetch\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'ssrf', 'high', 'User-controlled outbound request', {
     attackerControlledInput: 'Request or argument data controls the outbound URL.',
     vulnerableSink: 'Server-side HTTP request.',
@@ -174,8 +178,9 @@ function ssrf(item) {
 
 function openRedirect(item) {
   if (item.sign !== '+') return null;
-  if (!/\bres\.redirect\s*\(/.test(item.code)) return null;
-  if (!/(req\.(?:params|query|body)|process\.argv)/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/\bres\.redirect\s*\(/.test(code)) return null;
+  if (!/(req\.(?:params|query|body)|process\.argv)/.test(code)) return null;
   return makeFinding(item, 'open-redirect', 'medium', 'User-controlled redirect target', {
     attackerControlledInput: 'Request data controls the redirect destination.',
     vulnerableSink: 'HTTP redirect response.',
@@ -215,4 +220,12 @@ function isAuditExemptFile(file) {
   return /(?:^|\/)(?:tests?|__tests__|fixtures?)\//.test(normalized) || /\.test\.[cm]?[jt]sx?$/.test(normalized);
 }
 
-module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence, isAuditExemptFile };
+function codeShape(code) {
+  return stripQuotedStrings(String(code || ''));
+}
+
+function stripQuotedStrings(code) {
+  return code.replace(/(['"])(?:\\.|(?!\1)[\s\S])*\1/g, '$1$1');
+}
+
+module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence, isAuditExemptFile, stripQuotedStrings };

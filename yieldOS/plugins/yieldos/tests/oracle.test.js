@@ -19,6 +19,7 @@ const agentPackOracle = require('../scripts/oracles/adapters/agent-pack-lock');
 const instructionPolicyOracle = require('../scripts/oracles/adapters/instruction-policy');
 const dependencyPolicyOracle = require('../scripts/oracles/adapters/dependency-policy');
 const projectTestsOracle = require('../scripts/oracles/adapters/project-tests');
+const oracleTemplates = require('../scripts/oracles/templates');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const FIXTURE_PACK = path.join(__dirname, 'fixtures', 'yield.agent-pack.yaml');
@@ -165,6 +166,82 @@ test('yieldos-oracle list command is registered and executable', async () => {
   assert.equal(spawned.status, 0, spawned.stderr);
   assert.equal(spawned.stdout.includes('agent-pack-lock'), true);
   assert.equal(fs.statSync(bin).mode & 0o111, 0o111);
+});
+
+test('oracle template catalog covers current red-team rules and researched standards', () => {
+  const catalog = oracleTemplates.listTemplates();
+  const ids = new Set(catalog.map((item) => item.id));
+  const standards = new Set(catalog.flatMap((item) => item.standards.map((standard) => standard.family)));
+
+  [
+    'sensitive-logging',
+    'hardcoded-secret',
+    'missing-authz',
+    'sql-injection',
+    'shell-injection',
+    'path-traversal',
+    'unsafe-file-mutation',
+    'ssrf',
+    'open-redirect',
+    'removed-security-guard',
+    'dangerous-instruction-edit',
+    'broken-authentication',
+    'mass-assignment-bopla',
+    'excessive-data-exposure',
+    'business-flow-abuse',
+    'insecure-deserialization',
+    'llm-output-to-sensitive-sink',
+    'llm-data-model-poisoning',
+    'llm-misinformation-critical-decision',
+  ].forEach((id) => assert.equal(ids.has(id), true, `missing template for ${id}`));
+
+  ['owasp-top-10-2021', 'owasp-api-top-10-2023', 'owasp-llm-top-10-2025', 'cwe'].forEach((family) => {
+    assert.equal(standards.has(family), true, `missing standard family ${family}`);
+  });
+  assert.equal(catalog.length >= 30, true);
+});
+
+test('oracle templates are benchmarkable acceptance contracts, not prose only', () => {
+  const catalog = oracleTemplates.listTemplates();
+  const ids = new Set(catalog.map((item) => item.id));
+
+  assert.equal(ids.size, catalog.length, 'template ids must be unique');
+
+  for (const item of catalog) {
+    assert.equal(typeof item.id, 'string');
+    assert.equal(item.id.length > 0, true);
+    assert.equal(item.standards.length > 0, true, `${item.id} needs standards`);
+    assert.equal(item.evidence.required.length >= 4, true, `${item.id} needs evidence requirements`);
+    assert.equal(item.acceptance.pass.length > 0, true, `${item.id} needs pass criteria`);
+    assert.equal(item.acceptance.fail.length > 0, true, `${item.id} needs fail criteria`);
+    assert.equal(item.acceptance.unknown.length > 0, true, `${item.id} needs unknown criteria`);
+    assert.equal(item.negativeControls.length > 0, true, `${item.id} needs negative controls`);
+    assert.equal(item.benchmark.metrics.length > 0, true, `${item.id} needs benchmark metrics`);
+    assert.equal(item.benchmark.fixtures.length > 0, true, `${item.id} needs benchmark fixtures`);
+    item.standards.forEach((standard) => {
+      assert.equal(standard.url.startsWith('https://'), true, `${item.id} standard needs source URL`);
+    });
+  }
+});
+
+test('oracle template accessors do not expose mutable catalog internals', () => {
+  const first = oracleTemplates.getTemplate('missing-authz');
+  first.standards[0].id = 'mutated';
+
+  const fresh = oracleTemplates.getTemplate('missing-authz');
+  assert.equal(fresh.standards[0].id, 'A01 Broken Access Control');
+});
+
+test('yieldos-oracle templates command renders catalog for benchmark planning', async () => {
+  const json = await oracleCommand.runOracleCommand(tmpProject(), ['templates', '--json']);
+  const text = await oracleCommand.runOracleCommand(tmpProject(), ['templates']);
+
+  assert.equal(json.exitCode, 0);
+  assert.equal(JSON.parse(json.message).length >= 30, true);
+  assert.equal(text.exitCode, 0);
+  assert.equal(text.message.includes('yieldOS oracle templates'), true);
+  assert.equal(text.message.includes('missing-authz'), true);
+  assert.equal(text.message.includes('prompt-injection'), true);
 });
 
 test('internal dependency-policy adapter is not exposed as a runnable public oracle', async () => {
