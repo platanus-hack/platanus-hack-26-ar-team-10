@@ -60,6 +60,14 @@ Whenever a tool call you ran was processed by the yieldOS gate (regardless of al
 
 The hook also returns the exact stamp string in `hookSpecificOutput.additionalContext` — when you receive that context, copy the stamp verbatim at the end of your reply.
 
+### Special handling for `prompt-credentials-blocked`
+
+If `additionalContext` contains the credential warning + remediation guide, your reply MUST:
+1. Surface the **alert block** (red) and the **camino correcto block** (green) **verbatim**, in that order.
+2. Do NOT mention or echo any value from the user's original prompt — even if Claude Code already showed the "Original prompt:" line on its own. Treat that value as compromised and never reproduce it in your own text.
+3. Do NOT offer to "fix" or "configure" anything for the user that requires the secret value to be in the conversation. Only suggest actions that put the value into `.env` directly (via `! open .env` / `! code .env` / `! echo 'NAME=VALOR' >> .env`, where the user types the value themselves at the shell, not in chat).
+4. End the reply with the stamp `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial`.
+
 Format reference per verdict:
 
 | Verdict                         | Color  | Rendered stamp                                              |

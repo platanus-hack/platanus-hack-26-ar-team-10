@@ -8,6 +8,7 @@ const os = require('node:os');
 const policyFetcher = require('./policy-fetcher');
 const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
+const envHelper = require('./env-helper');
 const logger = require('./logger');
 
 const AUTH_TTL_MS = 30 * 60 * 1000; // 30 minutes
@@ -59,39 +60,63 @@ function shieldBlock(prefix, label) {
   return ['```diff', `${prefix} ▎ 🛡  yieldOS  ·  ${label}`, '```'].join('\n');
 }
 
-function buildCredentialsWarning(findings) {
-  // Pick a random alert art for variety, embed the credential type and a
-  // redacted preview, all wrapped in a `diff` code block so the lines render
-  // red in Claude Code. This is what the agent surfaces to the user verbatim.
-  const art = terminalArt.randomAlertArt();
-  const summary = findings.map((f) => {
-    const sample = f.sample ? terminalArt.redactCredential(f.sample) : '[redacted]';
-    return `${f.id} ×${f.count}  →  ${sample}`;
-  });
+function extractVarNames(prompt) {
+  // Pull the variable names that triggered detection so we can show the user
+  // the exact echo command. Only names — never values.
+  const names = new Set();
+  const re = /\b([A-Z][A-Z0-9_]{2,40})\s*=/g;
+  let m;
+  while ((m = re.exec(prompt))) {
+    if (/(KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|API|AUTH|CRED|PRIVATE)/.test(m[1])) {
+      names.add(m[1]);
+    }
+  }
+  return [...names];
+}
 
-  const lines = [
+function buildCredentialsWarning(findings, prompt, projectRoot) {
+  const art = terminalArt.randomAlertArt();
+  const types = [...new Set(findings.map((f) => f.id))].join(', ');
+  const varNames = extractVarNames(prompt);
+  const guide = envHelper.buildRemediationGuide(projectRoot, varNames);
+
+  // Two visual blocks back to back:
+  //   1) red alert with art + what happened (drawn with diff syntax → red)
+  //   2) green guide with concrete copy-pasteable commands (diff syntax → green)
+  const alertBlock = [
     '```diff',
     '- ╔════════════════════════════════════════════════════════════════╗',
     '- ║   🛡  yieldOS  ·  CREDENCIAL DETECTADA EN EL PROMPT            ║',
+    '- ║   ¡PARÁ! No mandes secrets en el chat                          ║',
     '- ╚════════════════════════════════════════════════════════════════╝',
     '-',
     ...art.split('\n').map((l) => '- ' + l),
     '-',
-    '- Patrones detectados:',
-    ...summary.map((l) => '-   ' + l),
+    `- Patrones detectados: ${types}`,
+    `- Variables identificadas: ${varNames.length > 0 ? varNames.join(', ') : '(nombre genérico)'}`,
     '-',
-    '- yieldOS bloqueó tu prompt antes de que llegara al modelo.',
-    '- El valor NO fue registrado en el log ni enviado al agente.',
-    '-',
-    '- ¿Querés mandar el mismo prompt sin credenciales?',
-    '-   1. Reemplazá el valor real por una referencia (ej: $OPENAI_API_KEY).',
-    '-   2. Volvé a enviar el prompt.',
-    '-',
-    '- Si necesitás que el agente USE la credencial, ponela en un .env',
-    '  y autorizá la lectura con: AUTORIZO A LEER LAS CREDENCIALES',
+    '- ❌ El valor que pegaste quedó EXPUESTO en el chat de Claude Code.',
+    '-    Asumilo como comprometido. Rotalo en el panel del proveedor.',
+    '- ❌ yieldOS bloqueó el prompt para que NO llegue al modelo.',
     '```',
-  ];
-  return lines.join('\n');
+  ].join('\n');
+
+  const guideBlock = [
+    '```diff',
+    '+ ╔════════════════════════════════════════════════════════════════╗',
+    '+ ║   ✓  CAMINO CORRECTO  ·  cómo guardar la credencial bien        ║',
+    '+ ╚════════════════════════════════════════════════════════════════╝',
+    '+',
+    ...guide.split('\n').map((l) => l.startsWith('```') ? l : '+ ' + l),
+    '+',
+    '+ Cuando ya esté en .env, decile al agente:',
+    '+   "leé la credencial desde .env"',
+    '+ y autorizá con la frase exacta:',
+    '+   AUTORIZO A LEER LAS CREDENCIALES',
+    '```',
+  ].join('\n');
+
+  return alertBlock + '\n\n' + guideBlock;
 }
 
 function buildEnvRiskExplanation(projectRoot) {
@@ -159,9 +184,13 @@ async function main() {
     });
     process.stderr.write(`[yieldOS] yieldOS bloqueó el prompt: contiene credenciales (${findings.map((f) => f.id).join(', ')})\n`);
     process.stderr.write(`[yieldOS:verdict] prompt-credentials-blocked\n`);
+    // The reason field is what Claude Code shows the user verbatim, so it must
+    // be SHORT and MUST NOT include the secret value (the harness already shows
+    // the original prompt — we cannot suppress that, but we can keep our own
+    // message tight and non-leaky).
     emitBlockJson(
-      'yieldOS blocked the user prompt because it contains what looks like real credentials. Tell the user to retry without pasting secrets.',
-      buildCredentialsWarning(findings),
+      'yieldOS blocked this prompt: it contains a credential. Show the user the colored guide in additionalContext (do not echo any secret value).',
+      buildCredentialsWarning(findings, prompt, projectRoot),
     );
     process.exit(2);
   }
