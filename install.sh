@@ -124,5 +124,7 @@ if [ "$DRY_RUN" = "1" ]; then
   printf 'Dry run complete. No changes were made.\n'
 else
   printf 'yieldOS installed. Restart Claude Code so the plugin hooks load in new sessions.\n'
+  printf 'Update later with: claude plugins update %s\n' "$PLUGIN_ID"
+  printf 'Or inside Claude Code: /yieldos:update\n'
   printf 'Verify with: claude plugins list\n'
 fi

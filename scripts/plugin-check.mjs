@@ -29,6 +29,10 @@ function assertExecutable(relativePath) {
   assert((mode & 0o111) !== 0, `${relativePath} must be executable`);
 }
 
+function assertSemver(value, label) {
+  assert(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value), `${label} must be semver x.y.z`);
+}
+
 function assertNoUnknownMarketplaceKeys(marketplace, relativePath) {
   const allowed = new Set(['name', 'metadata', 'owner', 'plugins']);
   for (const key of Object.keys(marketplace)) {
@@ -36,7 +40,7 @@ function assertNoUnknownMarketplaceKeys(marketplace, relativePath) {
   }
 }
 
-function validateMarketplace(relativePath, expectedSource, sourceBase = '.') {
+function validateMarketplace(relativePath, expectedSource, expectedVersion, sourceBase = '.') {
   const marketplace = readJson(relativePath);
   assertNoUnknownMarketplaceKeys(marketplace, relativePath);
   assert(marketplace.name === 'yieldos', `${relativePath} must be named yieldos`);
@@ -45,24 +49,32 @@ function validateMarketplace(relativePath, expectedSource, sourceBase = '.') {
 
   const entry = marketplace.plugins.find((plugin) => plugin.name === 'yieldos');
   assert(entry, `${relativePath} must declare the yieldos plugin`);
-  assert(entry.version === '0.2.7', `${relativePath} must point at yieldos 0.2.7`);
+  assert(entry.version === expectedVersion, `${relativePath} must point at yieldos ${expectedVersion}`);
   assert(entry.source === expectedSource, `${relativePath} has wrong source: ${entry.source}`);
   assert(entry.author?.name === 'platanus-hack-26-ar-team-10', `${relativePath} has wrong author`);
   assert(entry.category === 'security', `${relativePath} should classify yieldos as security`);
   assertFile(path.join(sourceBase, expectedSource, '.claude-plugin/plugin.json'));
 }
 
-validateMarketplace('.claude-plugin/marketplace.json', './yieldOS/plugins/yieldos');
-validateMarketplace('yieldOS/.claude-plugin/marketplace.json', './plugins/yieldos', 'yieldOS');
-
 const plugin = readJson('yieldOS/plugins/yieldos/.claude-plugin/plugin.json');
 assert(plugin.name === 'yieldos', 'plugin manifest must be named yieldos');
-assert(plugin.version === '0.2.7', 'plugin manifest must be version 0.2.7');
+assertSemver(plugin.version, 'plugin manifest version');
 assert(plugin.author?.name === 'platanus-hack-26-ar-team-10', 'plugin manifest has wrong author');
+
+validateMarketplace('.claude-plugin/marketplace.json', './yieldOS/plugins/yieldos', plugin.version);
+validateMarketplace('yieldOS/.claude-plugin/marketplace.json', './plugins/yieldos', plugin.version, 'yieldOS');
 
 for (const relativePath of [
   'install.sh',
+  'CHANGELOG.md',
+  'scripts/release.mjs',
+  'scripts/release.test.mjs',
+  'scripts/versioning.mjs',
+  '.github/workflows/release.yml',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
+  'yieldOS/plugins/yieldos/commands/update.md',
+  'yieldOS/plugins/yieldos/bin/yieldos-update',
+  'yieldOS/plugins/yieldos/CHANGELOG.md',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
   'yieldOS/plugins/yieldos/scripts/post-install-audit.js',
   'yieldOS/plugins/yieldos/scripts/on-session-start.js',
@@ -74,5 +86,6 @@ for (const relativePath of [
 }
 
 assertExecutable('install.sh');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-update');
 
 console.log('plugin structure OK');
