@@ -167,8 +167,9 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
     component.includes("navigator.clipboard.writeText"),
     "Expected clipboard write behavior",
   );
-  assert.ok(component.includes("prefix?: ReactNode"), "Expected optional button prefix");
-  assert.ok(component.includes("showArrow = true"), "Expected optional arrow rendering");
+  assert.ok(component.includes("-&gt;"), "Expected install button arrow rendering");
+  assert.ok(!component.includes("prefix?: ReactNode"), "Expected prefix-only install experiment to be removed");
+  assert.ok(!component.includes("showArrow"), "Expected arrow toggle experiment to be removed");
 });
 
 test("cinematic motion components and reduced motion styles are configured", () => {
@@ -226,14 +227,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
     scrollAwareHeader.includes("window.requestAnimationFrame(update)"),
     "Expected requestAnimationFrame scroll direction handling",
   );
-  assert.ok(
-    scrollAwareHeader.includes("showArrow={false}"),
-    "Expected reference-style install button without arrow",
-  );
-  assert.ok(
-    scrollAwareHeader.includes("install-marks"),
-    "Expected icon marks inside the install pill",
-  );
+  assert.ok(!scrollAwareHeader.includes("showArrow={false}"), "Expected install button arrow to be restored");
+  assert.ok(!scrollAwareHeader.includes("install-marks"), "Expected icon marks to be removed from the install pill");
   assert.ok(globals.includes("--acid: #e8ff00"), "Expected acid accent");
   assert.ok(globals.includes(".pitch-section"), "Expected full-screen sections");
   assert.ok(globals.includes(".snap-deck::before"), "Expected page-wide grid layer");
@@ -281,10 +276,10 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(scrollAwareHeader.includes("intro-header"), "Expected staged topbar intro class");
   assert.ok(!scrollAwareHeader.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
   assert.ok(!scrollAwareHeader.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
-  assert.ok(scrollAwareHeader.includes("!h-12"), "Expected larger reference-style topbar install button");
-  assert.ok(scrollAwareHeader.includes("!w-[190px]"), "Expected fixed reference-style install pill");
+  assert.ok(scrollAwareHeader.includes("!h-11"), "Expected previous compact topbar install button");
+  assert.ok(scrollAwareHeader.includes("!w-[166px]"), "Expected previous fixed install pill");
   assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
-  assert.ok(globals.includes(".install-marks"), "Expected install pill mark styling");
+  assert.ok(!globals.includes(".install-marks"), "Expected install pill mark styling to be removed");
   assert.ok(
     globals.includes("background-color: rgba(82, 92, 122, 0.24)"),
     "Expected capsule glass nav color",
