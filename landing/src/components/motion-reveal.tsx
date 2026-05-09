@@ -23,8 +23,11 @@ export function MotionReveal({
   return (
     <motion.div
       className={className}
-      initial={reduceMotion || immediate ? false : { opacity: 0, y }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      initial={reduceMotion ? false : { opacity: 0, y }}
+      animate={reduceMotion || !immediate ? undefined : { opacity: 1, y: 0 }}
+      whileInView={
+        reduceMotion || immediate ? undefined : { opacity: 1, y: 0 }
+      }
       viewport={{ once: true, margin: "-12% 0px -10% 0px" }}
       transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
     >
