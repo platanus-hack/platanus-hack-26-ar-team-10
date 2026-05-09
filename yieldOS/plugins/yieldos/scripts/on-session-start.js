@@ -11,6 +11,7 @@ const injectionScanner = require('./injection-scanner');
 const logger = require('./logger');
 const ui = require('./ui');
 const pentestAutoLauncher = require('./code-audit/pentest-loop/auto-launcher');
+const dashboardLauncher = require('../dashboard/launcher');
 
 function readStdinSync() {
   try { return fs.readFileSync(0, 'utf8'); }
@@ -105,6 +106,21 @@ async function main() {
       }
     } catch (err) {
       ui.writeMessage(`pentest auto-launch failed: ${err.message}`);
+    }
+  }
+
+  // Auto-launch the live dashboard at localhost:5473 ("SAFE").
+  // Disable with YIELDOS_DASHBOARD=off.
+  if (process.env.YIELDOS_DASHBOARD !== 'off') {
+    try {
+      const r = dashboardLauncher.launch(projectRoot);
+      if (r.status === 'launched') {
+        ui.writeMessage(`dashboard live en ${r.url}  (gráficos + sonido + animación)`);
+      } else if (r.status === 'already-running') {
+        ui.writeMessage(`dashboard ya corriendo en ${r.url}`);
+      }
+    } catch (err) {
+      ui.writeMessage(`dashboard auto-launch failed: ${err.message}`);
     }
   }
 

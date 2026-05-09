@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>yieldOS — Pentest Live Battle</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header class="banner">
+    <div class="banner-row">
+      <h1>🛡️ yieldOS · Pentest Live Battle</h1>
+      <div class="banner-meta">
+        <span id="connection-pill" class="pill pill-warn">connecting…</span>
+        <span id="round-pill" class="pill">round —</span>
+        <span id="strategy-pill" class="pill">strategy —</span>
+        <button id="sound-toggle" class="pill pill-btn" title="toggle sound">🔊 ON</button>
+      </div>
+    </div>
+    <div class="banner-row">
+      <div class="totals">
+        <span class="totals-row"><span class="dot dot-red"></span>findings <strong id="t-findings">0</strong></span>
+        <span class="totals-row"><span class="dot dot-blue"></span>fixes <strong id="t-fixes">0</strong></span>
+        <span class="totals-row"><span class="dot dot-yellow"></span>rounds <strong id="t-rounds">0</strong></span>
+        <span class="totals-row"><span class="dot dot-green"></span>streak <strong id="t-streak">0</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <section class="tug">
+    <div class="tug-label tug-label-red">🔴 RED TEAM</div>
+    <div class="tug-track">
+      <div class="tug-rope" id="tug-rope">
+        <div class="tug-flag tug-flag-red">⚔</div>
+        <div class="tug-flag tug-flag-blue">🛡</div>
+      </div>
+      <div class="tug-marker" id="tug-marker"></div>
+    </div>
+    <div class="tug-label tug-label-blue">🛡️ BLUE TEAM</div>
+  </section>
+
+  <main class="grid">
+    <section class="card">
+      <div class="card-head">
+        <h2>Iteración de mejoras y fixes</h2>
+        <span class="card-sub">findings encontrados vs vulnerabilidades resueltas, por round</span>
+      </div>
+      <canvas id="chart-iter" width="900" height="320"></canvas>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Historia de la batalla</h2>
+        <span class="card-sub">últimos ataques del red team y respuestas del blue team</span>
+      </div>
+      <ol class="history" id="history"></ol>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="overlay-card" id="overlay-card">
+      <div class="overlay-emoji" id="overlay-emoji">⚔</div>
+      <div class="overlay-title" id="overlay-title">RED TEAM ATTACK</div>
+      <div class="overlay-sub" id="overlay-sub">…</div>
+    </div>
+  </div>
+
+  <script src="/assets/sounds.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+/* yieldOS pentest dashboard — medieval / RTS palette */
+
+:root {
+  --bg: #0c1322;
+  --bg-2: #121d36;
+  --panel: #16223e;
+  --panel-2: #1e2c4f;
+  --line: #2a3a63;
+  --text: #d6def0;
+  --text-dim: #8a97b6;
+  --red: #e0463a;
+  --red-glow: rgba(224, 70, 58, 0.55);
+  --blue: #3da4ff;
+  --blue-glow: rgba(61, 164, 255, 0.55);
+  --green: #56d364;
+  --yellow: #f5c451;
+  --orange: #ff9b3d;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(ellipse at top, var(--bg-2), var(--bg) 70%);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.banner {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border-bottom: 1px solid var(--line);
+  padding: 14px 22px;
+  box-shadow: var(--shadow);
+}
+.banner-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+.banner h1 { margin: 0; font-size: 18px; letter-spacing: 0.02em; }
+.banner-meta { display: flex; gap: 8px; align-items: center; }
+.pill {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.pill strong { color: var(--text); }
+.pill-warn { color: var(--yellow); border-color: var(--yellow); }
+.pill-ok { color: var(--green); border-color: var(--green); }
+.pill-fail { color: var(--red); border-color: var(--red); }
+.pill-btn { background: transparent; cursor: pointer; color: var(--text); }
+.pill-btn:hover { background: var(--panel-2); }
+
+.totals { display: flex; gap: 18px; }
+.totals-row { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-dim); }
+.totals-row strong { color: var(--text); margin-left: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+.dot-red { background: var(--red); box-shadow: 0 0 8px var(--red-glow); }
+.dot-blue { background: var(--blue); box-shadow: 0 0 8px var(--blue-glow); }
+.dot-green { background: var(--green); }
+.dot-yellow { background: var(--yellow); }
+
+/* ── Tug-of-war bar ────────────────────────────────────────────────── */
+.tug {
+  display: grid;
+  grid-template-columns: 90px 1fr 90px;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.tug-label { font-weight: 700; font-size: 13px; letter-spacing: 0.05em; }
+.tug-label-red { color: var(--red); text-align: right; text-shadow: 0 0 12px var(--red-glow); }
+.tug-label-blue { color: var(--blue); text-align: left; text-shadow: 0 0 12px var(--blue-glow); }
+
+.tug-track {
+  position: relative;
+  height: 56px;
+  background: linear-gradient(90deg, rgba(224, 70, 58, 0.18), rgba(0, 0, 0, 0) 50%, rgba(61, 164, 255, 0.18));
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  overflow: hidden;
+}
+.tug-rope {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(-50%);
+  transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tug-flag {
+  position: absolute;
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.tug-flag-red { left: -38px; color: var(--red); }
+.tug-flag-blue { right: -38px; color: var(--blue); }
+.tug-marker {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: var(--text-dim);
+  opacity: 0.4;
+}
+
+/* ── Cards layout ──────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+  padding: 18px 22px;
+}
+@media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.card-head h2 { margin: 0; font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text); }
+.card-sub { color: var(--text-dim); font-size: 12px; }
+
+canvas { width: 100%; height: auto; display: block; }
+
+/* ── History list ──────────────────────────────────────────────────── */
+.history { list-style: none; padding: 0; margin: 0; max-height: 420px; overflow-y: auto; }
+.history li {
+  padding: 10px 12px;
+  border-left: 3px solid var(--line);
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 13px;
+}
+.history li.h-red { border-left-color: var(--red); }
+.history li.h-blue { border-left-color: var(--blue); }
+.history li.h-defended { border-left-color: var(--green); }
+.history li.h-failed { border-left-color: var(--orange); }
+.history li.h-clean { border-left-color: var(--text-dim); opacity: 0.7; }
+.h-title { font-weight: 600; }
+.h-meta { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+
+/* ── Overlay (event flash) ─────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s;
+  z-index: 50;
+}
+.overlay.show { background: rgba(0, 0, 0, 0.35); }
+
+.overlay-card {
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  padding: 22px 32px;
+  border-radius: 14px;
+  text-align: center;
+  min-width: 280px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  transform: scale(0.8);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+}
+.overlay.show .overlay-card { transform: scale(1); opacity: 1; }
+.overlay-emoji { font-size: 56px; margin-bottom: 6px; }
+.overlay-title { font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
+.overlay-sub { color: var(--text-dim); font-size: 13px; margin-top: 6px; max-width: 420px; }
+
+/* per-event tinting */
+.overlay-card.tone-red { border-color: var(--red); box-shadow: 0 0 50px var(--red-glow); }
+.overlay-card.tone-red .overlay-title { color: var(--red); }
+.overlay-card.tone-blue { border-color: var(--blue); box-shadow: 0 0 50px var(--blue-glow); }
+.overlay-card.tone-blue .overlay-title { color: var(--blue); }
+.overlay-card.tone-green { border-color: var(--green); box-shadow: 0 0 50px rgba(86, 211, 100, 0.55); }
+.overlay-card.tone-green .overlay-title { color: var(--green); }
+.overlay-card.tone-yellow { border-color: var(--yellow); }
+.overlay-card.tone-yellow .overlay-title { color: var(--yellow); }
+
+/* shake the screen on an attack */
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(-4px, 2px); }
+  40% { transform: translate(4px, -2px); }
+  60% { transform: translate(-3px, -2px); }
+  80% { transform: translate(3px, 2px); }
+}
+body.shake-red { animation: shake 0.4s; }
+
+@keyframes pulse-blue {
+  0%, 100% { box-shadow: 0 0 0 0 var(--blue-glow); }
+  50% { box-shadow: 0 0 30px 8px var(--blue-glow); }
+}
+.pulse-blue { animation: pulse-blue 1.2s ease-in-out infinite; }
+
+@keyframes confetti-pop {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-220px) scale(1.4) rotate(540deg); opacity: 0; }
+}
+.confetti {
+  position: absolute;
+  pointer-events: none;
+  font-size: 22px;
+  animation: confetti-pop 1.4s ease-out forwards;
+  z-index: 60;
+}
