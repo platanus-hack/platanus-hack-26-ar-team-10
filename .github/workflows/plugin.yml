@@ -1,0 +1,27 @@
+name: Plugin
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Validate marketplace and plugin structure
+        run: node scripts/plugin-check.mjs
+      - name: Run plugin tests
+        working-directory: yieldOS/plugins/yieldos
+        run: node --test tests/*.test.js
+      - name: Check benchmark runner syntax
+        working-directory: yieldOS
+        run: node --check bench/bench.js

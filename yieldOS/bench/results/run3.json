@@ -2,7 +2,7 @@
   "run": "run3",
   "timestamp": "2026-05-09T06:03:09.432Z",
   "duration_seconds": "94.6",
-  "hook": "/Users/sebastianbuffosempe/.claude/plugins/cache/yieldos-marketplace/yieldos/0.2.1/scripts/pre-install-gate.js",
+  "hook": "plugins/yieldos/scripts/pre-install-gate.js",
   "concurrency": 16,
   "summary": {
     "total": 1160,

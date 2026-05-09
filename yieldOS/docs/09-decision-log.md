@@ -157,11 +157,11 @@ Alternative considered: list it as a warning but allow. Rejected because users (
 
 ---
 
-## D18 — Manifest edits pass through (don't gate)
+## D18 — Manifest edits are parsed by diff, not by filename
 
-**Decision**: when the agent edits `package.json` / `requirements.txt` / `Cargo.toml` etc., yieldOS does NOT block. The Bash install gate covers the actual install.
+**Decision**: when the agent writes or edits dependency manifests (`package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `go.mod`, etc.), yieldOS reconstructs the full new file, diffs it against the previous content, and validates only the added or changed dependency entries.
 
-**Rationale**: a real bug — the matplotlib false positive. The classifier was treating the filename ("requirements.txt") as a package name, hitting the analyzer with `requirements.txt` as the candidate. Metadata 404'd, tier1 fired, edit blocked. Lesson: don't conflate "edit a manifest" with "install a package".
+**Rationale**: the original "pass through" rule avoided a real bug: the classifier treated the filename (`requirements.txt`) as a package name and blocked legitimate edits. The corrected rule keeps that lesson but closes the silent-edit gap. A manifest file path is never a package candidate; only parsed dependency entries from the manifest diff become candidates.
 
 ---
 
@@ -281,17 +281,17 @@ Alternative considered: list it as a warning but allow. Rejected because users (
 
 ## D31 — Marketplace-based plugin install
 
-**Decision**: yieldOS is installed via Claude Code's official plugin CLI (`claude plugin marketplace add ...; claude plugin install yieldos@yieldos-marketplace`).
+**Decision**: yieldOS is installed via Claude Code's official plugin CLI (`claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10; claude plugins install yieldos@yieldos`).
 
 **Rationale**: tracks with how Claude Code expects plugins to be installed. Direct file copying to `~/.claude/plugins/yieldos/` works for testing but bypasses the official registration; the CLI flow registers the plugin properly in `installed_plugins.json`.
 
 ---
 
-## D32 — Marketplace structure: `<root>/.claude-plugin/marketplace.json` + `<root>/plugins/<name>/`
+## D32 — Public marketplace structure: repo root manifest + plugin bundle
 
-**Decision**: the project layout is a marketplace stub at `vibeOS/.claude-plugin/marketplace.json` and the actual plugin at `vibeOS/plugins/yieldos/`.
+**Decision**: the public repository exposes `.claude-plugin/marketplace.json` at the repo root and points Claude Code to `yieldOS/plugins/yieldos/`. The nested `yieldOS/.claude-plugin/marketplace.json` remains valid for local marketplace testing from the `yieldOS/` directory.
 
-**Rationale**: matches the structure of `claude-plugins-official`, validates with `claude plugin validate`, and allows the marketplace to host more plugins later.
+**Rationale**: Claude Code validates and installs GitHub marketplaces from the repository root. Keeping the root marketplace valid makes `claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10` work the same way public plugin repositories like Guard do.
 
 ---
 
@@ -325,6 +325,22 @@ plugins/yieldos/.claude-plugin/{hooks,scripts,...}
 
 ## D35 — Versioning + bump-and-reinstall flow for fixes
 
-**Decision**: every meaningful fix bumps the plugin version (0.1.0 → 0.1.1 → 0.1.2 → ...) and reinstalls via `claude plugin uninstall && claude plugin install`.
+**Decision**: every meaningful fix bumps the plugin version (0.1.0 → 0.1.1 → 0.1.2 → ...) and reinstalls via `claude plugins uninstall && claude plugins install`.
 
 **Rationale**: the marketplace caches the install path by version. Without a bump, the cached files don't update.
+
+---
+
+## D36 — Hook output stamps use `hookSpecificOutput.additionalContext`
+
+**Decision**: PreToolUse hooks emit structured JSON on stdout with `hookSpecificOutput.additionalContext`, including the verdict, per-candidate summary, and the exact visual stamp the agent should append to the user-facing reply.
+
+**Rationale**: stderr is visible for blocked hooks, but allowed hooks can complete without reliably reinjecting stderr into the model context. `additionalContext` makes yieldOS visible to the agent on allow, block, rewrite, native-suggest, instruction-injection, and self-defense paths.
+
+---
+
+## D37 — CI/CD and Dockerfile scanner remain planning docs until implemented
+
+**Decision**: the CI/CD gate and Dockerfile scanner designs live in `docs/10-ci-cd.md` and `docs/11-dockerfile-scanner.md` as plans only. They are not enabled by the plugin runtime yet.
+
+**Rationale**: both ideas extend the same policy engine beyond the current Claude Code hook surface, but shipping them requires new classifiers, reporters, and CI entrypoints. Keeping them as explicit plans prevents the docs from implying capabilities the project does not yet provide.

@@ -157,12 +157,17 @@ bench/
 ## How to re-run
 
 ```bash
-cd /path/to/yieldOS
+cd /path/to/platanus-hack-26-ar-team-10/yieldOS
 
-YIELDOS_BENCH_HOOK=$HOME/.claude/plugins/cache/yieldos-marketplace/yieldos/0.2.2/scripts/pre-install-gate.js \
+# Option A — bench against the installed plugin (auto-detects current version)
+INSTALL=$(node -p "require('$HOME/.claude/plugins/installed_plugins.json').plugins['yieldos@yieldos-marketplace'][0].installPath")
+YIELDOS_BENCH_HOOK=$INSTALL/scripts/pre-install-gate.js \
 YIELDOS_BENCH_CONCURRENCY=16 \
 YIELDOS_BENCH_TAG=run-N \
 node bench/bench.js
+
+# Option B — bench against the source in this repo (no env var needed)
+YIELDOS_BENCH_CONCURRENCY=16 YIELDOS_BENCH_TAG=run-N node bench/bench.js
 ```
 
 ## Verdict

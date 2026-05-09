@@ -19,6 +19,20 @@ test('exact allowlist match returns true', () => {
   assert.equal(lookup.isAllowlisted(allowlistedCandidate, allowlist), true);
 });
 
+test('name-only allowlist match returns true for pinned versions', () => {
+  const localAllowlist = { entries: [{ key: 'npm:react', category: 'framework' }] };
+  assert.equal(lookup.isAllowlisted({ manager: 'npm', name: 'react', version: '18.2.0' }, localAllowlist), true);
+});
+
+test('matchedByNameOnly is false for exact allowlist match', () => {
+  assert.equal(lookup.matchedByNameOnly(allowlistedCandidate, allowlist), false);
+});
+
+test('matchedByNameOnly is true when only package name matches', () => {
+  const localAllowlist = { entries: [{ key: 'npm:react', category: 'framework' }] };
+  assert.equal(lookup.matchedByNameOnly({ manager: 'npm', name: 'react', version: '18.2.0' }, localAllowlist), true);
+});
+
 test('python allowlist match', () => {
   assert.equal(lookup.isAllowlisted(pythonAllowed, allowlist), true);
 });

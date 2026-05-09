@@ -7,7 +7,7 @@ const os = require('node:os');
 const { spawn } = require('node:child_process');
 
 const CONCURRENCY = parseInt(process.env.YIELDOS_BENCH_CONCURRENCY || '16', 10);
-const HOOK_PATH = process.env.YIELDOS_BENCH_HOOK || path.resolve(process.argv[2] || '/Users/sebastianbuffosempe/.claude/plugins/cache/yieldos-marketplace/yieldos/0.1.2/scripts/pre-install-gate.js');
+const HOOK_PATH = process.env.YIELDOS_BENCH_HOOK || path.resolve(process.argv[2] || path.join(__dirname, '..', 'plugins', 'yieldos', 'scripts', 'pre-install-gate.js'));
 const OUT_DIR = process.env.YIELDOS_BENCH_OUT || path.resolve(__dirname, 'results');
 const RUN_TAG = process.env.YIELDOS_BENCH_TAG || 'run';
 const DATASETS_DIR = path.resolve(__dirname, 'datasets');

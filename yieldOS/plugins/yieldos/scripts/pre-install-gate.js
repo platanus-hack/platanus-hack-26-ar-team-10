@@ -217,6 +217,33 @@ function emitHookOutput(interventions, blocked) {
   process.stdout.write(JSON.stringify(out));
 }
 
+function readFileIfExists(filePath) {
+  try { return fs.readFileSync(filePath, 'utf8'); }
+  catch (_) { return ''; }
+}
+
+function contentForWriteOrEdit(tool, toolInput) {
+  const filePath = toolInput.file_path || toolInput.path || '';
+  if (tool === 'Write') {
+    return { filePath, newContent: toolInput.content || '', oldContent: null };
+  }
+  const oldString = toolInput.old_string || '';
+  const newString = toolInput.new_string || '';
+  const oldContent = readFileIfExists(filePath);
+  if (oldString && oldContent.includes(oldString)) {
+    return {
+      filePath,
+      newContent: oldContent.replace(oldString, newString),
+      oldContent,
+    };
+  }
+  return {
+    filePath,
+    newContent: toolInput.content || newString,
+    oldContent: oldString || oldContent || null,
+  };
+}
+
 async function main() {
   const raw = readStdinSync();
   const input = parseInput(raw);
@@ -242,12 +269,11 @@ async function main() {
   if (tool === 'Bash') {
     candidates = classifiers.classifyBashCommand(ti.command || '');
   } else if (tool === 'Write' || tool === 'Edit') {
-    // For Edit: the new content equals (file content with old_string -> new_string).
-    // For our manifest diff we approximate by using new_string vs old_string.
     // For Write: the whole file is replaced; oldContent comes from disk.
-    const filePath = ti.file_path || ti.path || '';
-    const newContent = ti.content || ti.new_string || '';
-    const oldContent = tool === 'Edit' ? (ti.old_string || '') : null;
+    // For Edit: reconstruct the full new content by reading disk and applying
+    // the old_string → new_string replacement. This is necessary because
+    // partial fragments cannot be parsed as JSON / TOML / etc.
+    const { filePath, newContent, oldContent } = contentForWriteOrEdit(tool, ti);
     candidates = classifiers.classifyWriteOrEdit(filePath, newContent, oldContent);
   }
 

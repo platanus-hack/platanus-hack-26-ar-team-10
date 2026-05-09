@@ -1,5 +1,5 @@
 {
-  "project-name": "<FILL THIS>",
-  "project-oneliner-spanish": "<FILL THIS>",
-  "project-description-spanish": "<FILL THIS>"
+  "project-name": "yieldOS",
+  "project-oneliner-spanish": "Un plugin de Claude Code que bloquea instalaciones y cambios riesgosos antes de que un agente de IA los ejecute.",
+  "project-description-spanish": "yieldOS es una puerta de seguridad para agentes de programación: intercepta instalaciones de dependencias, plugins, skills, MCPs, código vendorizado, comandos remotos tipo curl|sh y ediciones de archivos de instrucciones. Decide de forma automática con una política versionada, registra cada evento y reduce el riesgo de ataques de supply chain sin pedirle al usuario que apruebe cada acción."
 }

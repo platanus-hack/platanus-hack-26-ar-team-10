@@ -16,7 +16,7 @@ This directory captures every design decision behind yieldOS, why it exists, and
 
 ## Planning docs (not yet implemented)
 
-10. [CI/CD enforcement](10-ci-cd.md) — *the same policy as a GitHub Action; one cerebro, dos puntos de aplicación*
+10. [CI/CD enforcement](10-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
 11. [Dockerfile scanner](11-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
 
 ## Reading order for AI agents
