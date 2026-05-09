@@ -34,6 +34,8 @@ plugins/yieldos/
 │   ├── instruction-watcher.js         Hash-check on CLAUDE.md/AGENTS.md
 │   ├── injection-scanner.js           Prompt-injection patterns
 │   ├── transitive-auditor.js          Lockfile + OSV + age rule
+│   ├── ui.js                          Terminal presenter + exact verdict lines
+│   ├── code-audit/                    Commit/push source-code audit loop
 │   ├── classifiers/
 │   │   ├── index.js                   Orchestrator
 │   │   ├── npm.js, pnpm.js, yarn.js, bun.js
@@ -188,9 +190,10 @@ PreToolUse hook
 
 3. **OSV cache** — `~/.claude/plugins/yieldos/.osv-cache/`. Per-package `<ecosystem>__<name>__<version>.json`. TTL 1 hour. Avoids hammering OSV API for the same `(pkg, version)` repeatedly.
 
-## Logging
+## Logging And Audit State
 
 Every hook can append to `<project>/security/dependency-events.md`. Format: markdown sections, append-only, secret-redacted.
+Code audit also appends human-readable events to `<project>/security/code-audit-events.md` and writes the latest machine-verifiable state to `<project>/security/code-audit-state.json`.
 
 ```
 ## YYYY-MM-DD HH:mm - <Heading>
@@ -231,6 +234,8 @@ Paths protected from agent edit:
 /.claude/plugins/yieldos/**
 /.claude-plugin/{plugin.json,hooks/,scripts/,policy-cache/,config/}
 /security/dependency-events.md
+/security/code-audit-events.md
+/security/code-audit-state.json
 /security/yieldos-rewrites.json
 /security/.yieldos-instruction-hashes.json
 ```

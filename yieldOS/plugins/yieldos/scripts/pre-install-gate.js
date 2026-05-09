@@ -10,6 +10,8 @@ const decide = require('./decide').decide;
 const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const injectionScanner = require('./injection-scanner');
+const codeAudit = require('./code-audit');
+const ui = require('./ui');
 const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
 
@@ -34,15 +36,144 @@ function projectCwd(input) {
   return input.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
 }
 
-function emitDecision(verdict, message, exitCode) {
-  if (message) {
-    process.stderr.write(`[yieldOS] ${message}\n`);
+function shieldBlock(prefix, label) {
+  return [
+    '```diff',
+    `${prefix} ▎ 🛡  yieldOS  ·  ${label}`,
+    '```',
+  ].join('\n');
+}
+
+const STAMP_BY_VERDICT = {
+  'allowlist-match': shieldBlock('+', 'Validado · allowlist'),
+  'verification-passed': shieldBlock('+', 'Validado · análisis OK'),
+  'denylist-match': shieldBlock('-', 'Bloqueado · denylist'),
+  'category-d-blocked': shieldBlock('-', 'Bloqueado · categoría crítica'),
+  'verification-failed': shieldBlock('-', 'Bloqueado · señales sospechosas'),
+  'build-script-not-approved': shieldBlock('-', 'Bloqueado · build script no aprobado'),
+  'native-suggest': shieldBlock('!', 'Sugerencia · usar API nativa'),
+  'category-a-rewrite': shieldBlock('+', 'Optimizado · rewrite local'),
+  'injection-blocked': shieldBlock('-', 'Bloqueado · inyección detectada'),
+  'self-defense-block': shieldBlock('-', 'Bloqueado · archivo protegido'),
+  'code-audit-clean': shieldBlock('+', 'Validado · code audit limpio'),
+  'code-audit-warning': shieldBlock('!', 'Advertencia · code audit'),
+  'code-audit-fix-applied': shieldBlock('+', 'Corregido · code audit'),
+  'code-audit-blocked': shieldBlock('-', 'Bloqueado · code audit'),
+  'code-audit-verification-failed': shieldBlock('-', 'Bloqueado · verificación code audit'),
+  'credentials-read-blocked': shieldBlock('-', 'Bloqueado · lectura de credenciales sin autorización'),
+  'credentials-read-authorized': shieldBlock('+', 'Validado · lectura de credenciales autorizada'),
+};
+
+const VERDICT_PRIORITY = [
+  'credentials-read-blocked',
+  'code-audit-verification-failed',
+  'code-audit-blocked',
+  'denylist-match',
+  'category-d-blocked',
+  'verification-failed',
+  'build-script-not-approved',
+  'injection-blocked',
+  'self-defense-block',
+  'code-audit-fix-applied',
+  'category-a-rewrite',
+  'code-audit-warning',
+  'native-suggest',
+  'credentials-read-authorized',
+  'code-audit-clean',
+  'verification-passed',
+  'allowlist-match',
+];
+
+function stampFor(verdict) {
+  return STAMP_BY_VERDICT[verdict] || `> 🛡  yieldOS verdict: ${verdict}`;
+}
+
+function strongestVerdict(interventions) {
+  let chosen = interventions[0]?.decision?.verdict || 'verification-passed';
+  let chosenIdx = VERDICT_PRIORITY.indexOf(chosen);
+
+  for (const item of interventions) {
+    const verdict = item?.decision?.verdict;
+    const idx = VERDICT_PRIORITY.indexOf(verdict);
+    if (idx >= 0 && (chosenIdx < 0 || idx < chosenIdx)) {
+      chosen = verdict;
+      chosenIdx = idx;
+    }
   }
-  process.stderr.write(`[yieldOS:verdict] ${verdict}\n`);
-  // Also emit hookSpecificOutput JSON so the agent receives the stamp instruction
-  // even on shortcut paths (self-defense, instruction-edit injection) that don't
-  // pass through processCandidates.
-  emitHookOutput([{ candidate: { name: '(file)', version: 'n/a' }, decision: { verdict } }], exitCode === 2);
+
+  return chosen;
+}
+
+function formatCandidate(candidate = {}) {
+  const name = candidate.name || candidate.type || 'tool-call';
+  const version = candidate.version && candidate.version !== 'unknown' ? `@${candidate.version}` : '';
+  return `${name}${version}`;
+}
+
+function emitHookOutput(interventions) {
+  if (!interventions || interventions.length === 0) return;
+
+  const chosen = strongestVerdict(interventions);
+  const stamp = stampFor(chosen);
+  const summary = interventions
+    .map((item) => `${formatCandidate(item.candidate)} -> ${item.decision.verdict}`)
+    .join('; ');
+
+  const output = {
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      additionalContext: [
+        'yieldOS processed this tool call.',
+        `Verdict: ${chosen}.`,
+        `Per-candidate: ${summary}.`,
+        'End your reply to the user with this exact line on its own line, separated by a blank line:',
+        stamp,
+      ].join('\n'),
+    },
+  };
+
+  process.stdout.write(JSON.stringify(output));
+}
+
+function readFileIfExists(filePath) {
+  try { return fs.readFileSync(filePath, 'utf8'); }
+  catch (_) { return ''; }
+}
+
+function contentForWriteOrEdit(tool, toolInput) {
+  const filePath = toolInput.file_path || toolInput.path || '';
+  if (tool === 'Write') {
+    return {
+      filePath,
+      newContent: toolInput.content || '',
+      oldContent: null,
+    };
+  }
+
+  const oldString = toolInput.old_string || '';
+  const newString = toolInput.new_string || '';
+  const oldContent = readFileIfExists(filePath);
+  if (oldString && oldContent.includes(oldString)) {
+    return {
+      filePath,
+      newContent: oldContent.replace(oldString, newString),
+      oldContent,
+    };
+  }
+
+  return {
+    filePath,
+    newContent: toolInput.content || newString,
+    oldContent: oldString || oldContent || null,
+  };
+}
+
+function emitDecision(verdict, message, exitCode) {
+  ui.writeDecision({ verdict, action: exitCode === 2 ? 'block' : 'allow', message });
+  emitHookOutput([{
+    candidate: { type: 'hook', name: 'yieldOS', version: 'unknown' },
+    decision: { verdict },
+  }]);
   process.exit(exitCode);
 }
 
@@ -87,34 +218,114 @@ async function handleInstructionEdit(input, projectRoot, policy) {
   return false;
 }
 
-function shieldBlock(prefix, label) {
-  // Renders as a colored bar in Claude Code via the markdown `diff` syntax:
-  //   + line  → green  (allow / safe)
-  //   - line  → red    (block / unsafe)
-  //   ! line  → orange (warning / suggestion)
-  // The triple-backtick fence is part of the stamp so the renderer applies the color.
+function authFlagPath(projectRoot) {
+  return path.join(projectRoot, 'security', '.yieldos-credentials-authorized');
+}
+
+function isAuthorizationActive(projectRoot) {
+  const filePath = authFlagPath(projectRoot);
+  if (!fs.existsSync(filePath)) return false;
+
+  try {
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const authorizedAt = new Date(data.authorized_at).getTime();
+    const ttl = Number(data.ttl_ms || AUTH_TTL_MS);
+    return Number.isFinite(authorizedAt) && Number.isFinite(ttl) && Date.now() - authorizedAt < ttl;
+  } catch (_) {
+    return false;
+  }
+}
+
+function buildCredentialsReadWarning() {
+  const art = terminalArt.randomAlertArt();
   return [
     '```diff',
-    `${prefix} ▎ 🛡  yieldOS  ·  ${label}`,
+    '- ╔════════════════════════════════════════════════════════════════╗',
+    '- ║   🛡  yieldOS  ·  LECTURA DE CREDENCIALES BLOQUEADA            ║',
+    '- ╚════════════════════════════════════════════════════════════════╝',
+    '-',
+    ...art.split('\n').map((line) => `- ${line}`),
+    '-',
+    '- El agente intentó leer un archivo de credenciales (.env / .ssh / .aws / etc).',
+    '- Riesgo concreto si autorizás:',
+    '-   - El agente puede ver claves de API, tokens y contraseñas.',
+    '-   - Esos valores pueden quedar en el contexto del modelo.',
+    '-   - Un prompt-injection posterior podría exfiltrarlas.',
+    '-',
+    '- Para autorizar la lectura por 30 minutos en este proyecto, respondé',
+    '- EXACTAMENTE con esta frase, sin nada antes ni después:',
+    '+   AUTORIZO A LEER LAS CREDENCIALES',
+    '-',
+    '- Si no querés autorizar, seguí la conversación normalmente.',
     '```',
   ].join('\n');
 }
 
-const STAMP_BY_VERDICT = {
-  'allowlist-match':           shieldBlock('+', 'Validado · allowlist'),
-  'verification-passed':       shieldBlock('+', 'Validado · análisis OK'),
-  'denylist-match':            shieldBlock('-', 'Bloqueado · denylist'),
-  'category-d-blocked':        shieldBlock('-', 'Bloqueado · categoría crítica'),
-  'verification-failed':       shieldBlock('-', 'Bloqueado · señales sospechosas'),
-  'build-script-not-approved': shieldBlock('-', 'Bloqueado · build script no aprobado'),
-  'native-suggest':            shieldBlock('!', 'Sugerencia · usar API nativa'),
-  'category-a-rewrite':        shieldBlock('+', 'Optimizado · rewrite local'),
-  'injection-blocked':         shieldBlock('-', 'Bloqueado · inyección detectada'),
-  'self-defense-block':        shieldBlock('-', 'Bloqueado · archivo protegido'),
-};
+async function writeJsonAndExit(payload, exitCode) {
+  // Drain stdout BEFORE returning. Using a callback here would not work because
+  // callers don't await the drain — by the time the callback fires and calls
+  // process.exit(exitCode), main() may have already continued through and
+  // called process.exit(0) elsewhere, masking the intended block. Awaiting
+  // a Promise wrapper makes the exit deterministic.
+  await new Promise((resolve) => process.stdout.write(JSON.stringify(payload), resolve));
+  process.exit(exitCode);
+}
 
-function stampFor(verdict) {
-  return STAMP_BY_VERDICT[verdict] || `> 🛡  yieldOS verdict: ${verdict}`;
+async function handleCredentialsRead(input, projectRoot) {
+  const tool = input.tool_name;
+  const toolInput = input.tool_input || {};
+  if (tool !== 'Read') return false;
+
+  const target = toolInput.file_path || toolInput.path || '';
+  if (!credentialsScanner.isCredentialsPath(target)) return false;
+
+  if (isAuthorizationActive(projectRoot)) {
+    logger.appendEntry(projectRoot, 'Credentials Read Allowed (under active authorization)', {
+      File: target,
+      Note: 'agent read a credentials file with active user authorization',
+    });
+    process.stderr.write(`${terminalArt.statusLine('[yieldOS] lectura de credenciales autorizada (ventana activa)', 'success')}\n`);
+    process.stderr.write('[yieldOS:verdict] credentials-read-authorized\n');
+    await writeJsonAndExit({
+      hookSpecificOutput: {
+        hookEventName: 'PreToolUse',
+        additionalContext: [
+          'yieldOS allowed a credentials-file Read under active user authorization.',
+          'Verdict: credentials-read-authorized.',
+          'End your reply to the user with this exact line on its own line, separated by a blank line:',
+          STAMP_BY_VERDICT['credentials-read-authorized'],
+        ].join('\n'),
+      },
+    }, 0);
+    return true;
+  }
+
+  logger.appendEntry(projectRoot, 'Credentials Read Blocked (no authorization)', {
+    File: target,
+    'Required action': 'user must reply with the exact phrase "AUTORIZO A LEER LAS CREDENCIALES"',
+    'Authorization TTL': '30 minutes once granted',
+  });
+  process.stderr.write(`${terminalArt.alertLine(`lectura bloqueada: ${path.basename(target)} requiere autorización explícita`)}\n`);
+  process.stderr.write('[yieldOS:verdict] credentials-read-blocked\n');
+
+  await writeJsonAndExit({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      additionalContext: [
+        'yieldOS blocked a credentials-file Read.',
+        'Verdict: credentials-read-blocked.',
+        'Surface this warning to the user verbatim:',
+        '',
+        buildCredentialsReadWarning(),
+        '',
+        'Then append this yieldOS stamp on a separate final block:',
+        STAMP_BY_VERDICT['credentials-read-blocked'],
+        '',
+        'Do not retry the Read until the user replies with the exact phrase: AUTORIZO A LEER LAS CREDENCIALES',
+      ].join('\n'),
+    },
+  }, 2);
+  return true;
 }
 
 async function processCandidates(candidates, projectRoot, policy) {
@@ -135,17 +346,16 @@ async function processCandidates(candidates, projectRoot, policy) {
       case 'allow':
         if (decision.verdict === 'allowlist-match') logger.logAllowed(projectRoot, candidate);
         else logger.logVerified(projectRoot, candidate, decision.meta?.findings || []);
-        if (decision.message) {
-          process.stderr.write(`[yieldOS] ${decision.message}\n`);
-        }
-        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
+        // Always emit machine-readable verdict so downstream tools (logs, benches,
+        // QA harnesses) can identify what happened, even when the human-facing
+        // message is intentionally silent.
+        ui.writeDecision(decision);
         break;
 
       case 'block-with-suggestion':
       case 'block':
         logger.logBlocked(projectRoot, candidate, decision.verdict, { findings: decision.meta?.findings });
-        process.stderr.write(`[yieldOS] ${decision.message || 'blocked'}\n`);
-        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
+        ui.writeDecision({ ...decision, message: decision.message || 'blocked' });
         anyBlocked = true;
         break;
 
@@ -161,11 +371,10 @@ async function processCandidates(candidates, projectRoot, policy) {
             api: 'see scaffold; agent must populate via dependency-gate skill',
             marker: scaffold.indexPath,
           });
-          process.stderr.write(`[yieldOS] ${decision.message}\n`);
-          process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
-          process.stderr.write(`[yieldOS:rewrite-target] ${scaffold.dir}\n`);
+          ui.writeDecision(decision);
+          process.stderr.write(`${ui.formatRewriteTarget(scaffold.dir)}\n`);
         } catch (err) {
-          process.stderr.write(`[yieldOS] error generating rewrite scaffold: ${err.message}\n`);
+          ui.writeMessage(`error generating rewrite scaffold: ${err.message}`);
         }
         anyBlocked = true;
         break;
@@ -175,175 +384,56 @@ async function processCandidates(candidates, projectRoot, policy) {
   return { anyBlocked, interventions };
 }
 
-function emitHookOutput(interventions, blocked) {
-  if (!interventions || interventions.length === 0) return;
+function handleCodeAuditCommand(projectRoot, command) {
+  if (!codeAudit.isGitAuditCommand(command)) return false;
 
-  // Build a single visible line that the user will see. Use the strongest verdict
-  // (block > rewrite > native > verification > allow) to pick the stamp.
-  const order = [
-    'denylist-match', 'category-d-blocked', 'verification-failed', 'build-script-not-approved',
-    'injection-blocked', 'self-defense-block',
-    'category-a-rewrite', 'native-suggest',
-    'verification-passed', 'allowlist-match',
-  ];
-  let chosen = interventions[0].decision.verdict;
-  let chosenIdx = order.indexOf(chosen);
-  for (const i of interventions) {
-    const idx = order.indexOf(i.decision.verdict);
-    if (idx >= 0 && (chosenIdx < 0 || idx < chosenIdx)) {
-      chosen = i.decision.verdict;
-      chosenIdx = idx;
+  let audit;
+  try {
+    audit = codeAudit.auditGitCommand(projectRoot, command, {
+      agent: codeAudit.agentOptionsFromEnv(process.env),
+    });
+  } catch (err) {
+    audit = {
+      handled: true,
+      verdict: 'code-audit-verification-failed',
+      action: 'block',
+      mode: /^\s*git\s+push/.test(command) ? 'push' : 'commit',
+      files: [],
+      findings: [],
+      patch: null,
+      message: `yieldOS code-audit failed: ${err.message}`,
+    };
+  }
+
+  if (audit.files && audit.files.length > 0) {
+    try {
+      const shouldStageState = audit.mode === 'commit' || (audit.mode === 'push' && audit.action !== 'block');
+      const stateWrite = codeAudit.writeAuditState(projectRoot, audit, { stage: shouldStageState });
+      if (audit.mode === 'push' && audit.action !== 'block' && !stateWrite.committed) {
+        audit = {
+          ...audit,
+          verdict: 'code-audit-blocked',
+          action: 'block',
+          message: 'yieldOS code-audit wrote verification state; commit security/code-audit-state.json and rerun git push',
+        };
+      }
+    } catch (err) {
+      audit = {
+        ...audit,
+        verdict: 'code-audit-verification-failed',
+        action: 'block',
+        message: `yieldOS code-audit could not write verification state: ${err.message}`,
+      };
     }
   }
 
-  const stamp = stampFor(chosen);
-  const summary = interventions
-    .map((i) => `${i.candidate.name}@${i.candidate.version} → ${i.decision.verdict}`)
-    .join('; ');
-
-  // Hook JSON output. PreToolUse hooks in Claude Code can emit
-  // hookSpecificOutput.additionalContext on stdout, which the harness injects
-  // into the model's context for the next turn. This makes yieldOS visible to
-  // the agent even on exit 0 (allow) flows.
-  const out = {
-    hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      additionalContext: [
-        `yieldOS intervened on this tool call.`,
-        `Verdict: ${chosen}.`,
-        `Per-candidate: ${summary}.`,
-        `End your reply to the user with this exact line on its own line, separated by a blank line:`,
-        stamp,
-      ].join('\n'),
-    },
-  };
-  process.stdout.write(JSON.stringify(out));
-}
-
-function readFileIfExists(filePath) {
-  try { return fs.readFileSync(filePath, 'utf8'); }
-  catch (_) { return ''; }
-}
-
-function authFlagPath(projectRoot) {
-  return path.join(projectRoot, 'security', '.yieldos-credentials-authorized');
-}
-
-function isAuthorizationActive(projectRoot) {
-  const fp = authFlagPath(projectRoot);
-  if (!fs.existsSync(fp)) return false;
-  try {
-    const data = JSON.parse(fs.readFileSync(fp, 'utf8'));
-    const at = new Date(data.authorized_at).getTime();
-    const ttl = data.ttl_ms || AUTH_TTL_MS;
-    return Number.isFinite(at) && (Date.now() - at) < ttl;
-  } catch (_) {
-    return false;
-  }
-}
-
-function buildEnvBlockMessage() {
-  const art = terminalArt.randomAlertArt();
-  return [
-    '```diff',
-    '- ╔════════════════════════════════════════════════════════════════╗',
-    '- ║   🛡  yieldOS  ·  LECTURA DE CREDENCIALES BLOQUEADA            ║',
-    '- ╚════════════════════════════════════════════════════════════════╝',
-    '-',
-    ...art.split('\n').map((l) => '- ' + l),
-    '-',
-    '- El agente intentó leer un archivo de credenciales (.env / .ssh / .aws / etc).',
-    '- Riesgo concreto si autorizás:',
-    '-   • El agente puede ver claves de API, tokens, contraseñas DB.',
-    '-   • Esos valores quedan en el contexto del modelo.',
-    '-   • Si el contexto se exporta o se comparte, las credenciales viajan.',
-    '-   • Un prompt-injection posterior podría exfiltrarlas.',
-    '-',
-    '- Para autorizar (válido por 30 minutos en este proyecto), respondé',
-    '  EXACTAMENTE con esta frase, en mayúsculas, sin nada antes ni después:',
-    '+   AUTORIZO A LEER LAS CREDENCIALES',
-    '-',
-    '- Si NO querés autorizar, simplemente continuá la conversación;',
-    '  la lectura del archivo seguirá bloqueada.',
-    '```',
-  ].join('\n');
-}
-
-async function handleCredentialsRead(input, projectRoot) {
-  const tool = input.tool_name;
-  const ti = input.tool_input || {};
-  if (tool !== 'Read') return false;
-  const target = ti.file_path || ti.path || '';
-  if (!credentialsScanner.isCredentialsPath(target)) return false;
-
-  if (isAuthorizationActive(projectRoot)) {
-    logger.appendEntry(projectRoot, 'Credentials Read Allowed (under active authorization)', {
-      File: target,
-      Note: 'agent read a credentials file with active user authorization (30-min window)',
-    });
-    process.stderr.write(`[yieldOS] 🛡  lectura de credenciales autorizada (ventana activa)\n`);
-    process.stderr.write(`[yieldOS:verdict] credentials-read-authorized\n`);
-    emitHookOutput([{ candidate: { name: path.basename(target), version: 'n/a' }, decision: { verdict: 'verification-passed' } }]);
-    return false;
-  }
-
-  logger.appendEntry(projectRoot, 'Credentials Read Blocked (no authorization)', {
-    File: target,
-    'Required action': 'user must reply with the exact phrase "AUTORIZO A LEER LAS CREDENCIALES"',
-    'Authorization TTL': '30 minutes once granted',
-  });
-
-  process.stderr.write(`[yieldOS] yieldOS bloqueó la lectura de ${path.basename(target)}: requiere autorización explícita\n`);
-  process.stderr.write(`[yieldOS:verdict] credentials-read-blocked\n`);
-
-  // Custom hook output that ALSO carries the colored risk explanation that
-  // the agent must surface verbatim to the user.
-  const out = {
-    hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      additionalContext: [
-        'yieldOS blocked a credentials-file Read.',
-        'Verdict: credentials-read-blocked.',
-        'You MUST end your reply by surfacing this colored warning to the user verbatim, on its own block:',
-        '',
-        buildEnvBlockMessage(),
-        '',
-        'Then append the standard yieldOS stamp on a separate line:',
-        shieldBlock('-', 'Bloqueado · lectura de credenciales sin autorización'),
-        '',
-        'Do NOT retry the Read until the user replies with the exact phrase: AUTORIZO A LEER LAS CREDENCIALES',
-      ].join('\n'),
-    },
-  };
-  // Drain stdout BEFORE returning. The previous implementation passed a
-  // callback to stdout.write, but main() did not await the callback — by the
-  // time the callback fired and called process.exit(2), main() had already
-  // continued through and called process.exit(0) elsewhere, masking the
-  // intended block. Awaiting the drain Promise makes the exit deterministic.
-  await new Promise((resolve) => process.stdout.write(JSON.stringify(out), resolve));
-  process.exit(2);
-}
-
-function contentForWriteOrEdit(tool, toolInput) {
-  const filePath = toolInput.file_path || toolInput.path || '';
-  if (tool === 'Write') {
-    return { filePath, newContent: toolInput.content || '', oldContent: null };
-  }
-  const oldString = toolInput.old_string || '';
-  const newString = toolInput.new_string || '';
-  const oldContent = readFileIfExists(filePath);
-  if (oldString && oldContent.includes(oldString)) {
-    return {
-      filePath,
-      newContent: oldContent.replace(oldString, newString),
-      oldContent,
-    };
-  }
-  return {
-    filePath,
-    newContent: toolInput.content || newString,
-    oldContent: oldString || oldContent || null,
-  };
+  logger.logCodeAudit(projectRoot, audit);
+  ui.writeAudit(audit);
+  emitHookOutput([{
+    candidate: { type: 'git', name: `git-${audit.mode}`, version: 'unknown' },
+    decision: { verdict: audit.verdict },
+  }]);
+  process.exit(audit.action === 'block' ? 2 : 0);
 }
 
 async function main() {
@@ -354,13 +444,17 @@ async function main() {
   const ti = input.tool_input || {};
 
   await handleSelfDefense(input, projectRoot);
-  await handleCredentialsRead(input, projectRoot);
+  if (await handleCredentialsRead(input, projectRoot)) return;
+
+  if (tool === 'Bash') {
+    handleCodeAuditCommand(projectRoot, ti.command || '');
+  }
 
   let policyResult;
   try {
     policyResult = await policyFetcher.getPolicy({ forceRefresh: false });
   } catch (err) {
-    process.stderr.write(`[yieldOS] policy fetch failed: ${err.message}\n`);
+    ui.writeMessage(`policy fetch failed: ${err.message}`);
     policyResult = { source: 'unavailable', policy: null };
   }
   const policy = policyResult.policy || {};
@@ -372,12 +466,8 @@ async function main() {
   if (tool === 'Bash') {
     candidates = classifiers.classifyBashCommand(ti.command || '');
   } else if (tool === 'Write' || tool === 'Edit') {
-    // For Write: the whole file is replaced; oldContent comes from disk.
-    // For Edit: reconstruct the full new content by reading disk and applying
-    // the old_string → new_string replacement. This is necessary because
-    // partial fragments cannot be parsed as JSON / TOML / etc.
-    const { filePath, newContent, oldContent } = contentForWriteOrEdit(tool, ti);
-    candidates = classifiers.classifyWriteOrEdit(filePath, newContent, oldContent);
+    const edit = contentForWriteOrEdit(tool, ti);
+    candidates = classifiers.classifyWriteOrEdit(edit.filePath, edit.newContent, edit.oldContent);
   }
 
   if (candidates.length === 0) {
@@ -385,7 +475,7 @@ async function main() {
   }
 
   const { anyBlocked, interventions } = await processCandidates(candidates, projectRoot, policy);
-  emitHookOutput(interventions, anyBlocked);
+  emitHookOutput(interventions);
   process.exit(anyBlocked ? 2 : 0);
 }
 

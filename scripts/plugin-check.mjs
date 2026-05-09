@@ -83,6 +83,7 @@ for (const relativePath of [
   'scripts/release.mjs',
   'scripts/release.test.mjs',
   'scripts/versioning.mjs',
+  '.github/workflows/plugin.yml',
   '.github/workflows/release.yml',
   'policy/README.md',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
@@ -96,8 +97,13 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/credentials-scanner.js',
   'yieldOS/plugins/yieldos/scripts/env-helper.js',
   'yieldOS/plugins/yieldos/scripts/terminal-art.js',
+  'yieldOS/plugins/yieldos/scripts/ui.js',
+  'yieldOS/plugins/yieldos/scripts/code-audit/index.js',
+  'yieldOS/plugins/yieldos/scripts/code-audit/ci-verify.js',
   'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
+  'landing/package.json',
+  'landing/src/app/page.tsx',
 ]) {
   assertFile(relativePath);
 }

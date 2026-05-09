@@ -28,6 +28,18 @@ jobs:
       - name: Run plugin tests
         working-directory: yieldOS/plugins/yieldos
         run: node --test tests/*.test.js
+      - name: Install landing dependencies
+        working-directory: landing
+        run: npm ci
+      - name: Run landing tests
+        working-directory: landing
+        run: npm test
+      - name: Lint landing
+        working-directory: landing
+        run: npm run lint
+      - name: Build landing
+        working-directory: landing
+        run: npm run build
       - name: Check benchmark runner syntax
         working-directory: yieldOS
         run: node --check bench/bench.js

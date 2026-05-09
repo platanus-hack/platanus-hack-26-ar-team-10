@@ -1,11 +1,11 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent runs install commands (npm/pip/cargo/etc), edits manifest files (package.json, requirements.txt, pyproject.toml, Cargo.toml, go.mod), activates skills, adds MCPs, or edits instruction files (CLAUDE.md, AGENTS.md). Provides context on yieldOS policy, the colored visual stamp every reply must end with, and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands, reads credentials files, edits dependency manifests, activates skills, adds MCPs, edits instruction files, runs git commit/push, or receives credential-looking prompts. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate
 
-You are operating in a project protected by **yieldOS**, a security gate that intercepts dependency installations, skill activations, MCP additions, and instruction-file changes.
+You are operating in a project protected by **yieldOS**, a security gate that intercepts dependency installations, skill activations, MCP additions, credentials reads, credential-looking prompts, instruction-file changes, and git commit/push source-code audits.
 
 ## Core principles
 
@@ -24,6 +24,26 @@ When yieldOS blocks a `Bash` / `Write` / `Edit` action, it returns a structured 
 - `large-lib-analysis` — large package; yieldOS will run manifest/script/OSV/static analysis. Wait for the analyzer verdict. Do not retry the install.
 - `verification-failed` — analysis flagged the package. Inform the user and do not retry.
 - `verification-passed` — package is safe; retry the install once.
+- `credentials-read-blocked` — the agent tried to read `.env`, `.ssh`, `.aws`, `.kube`, or another credentials path without the user's exact authorization phrase. Surface the colored warning returned in `hookSpecificOutput.additionalContext` and do not retry the read.
+- `prompt-credentials-detected` — the user prompt contained credential-looking material. The hook injects a critical directive and pre-rendered alert/guide blocks. Surface them verbatim, never repeat the credential value, and never use it in tools.
+- `code-audit-fix-applied` — yieldOS applied a source-code security fix to the staged diff. Review the staged changes and rerun `git commit`; do not blindly force the original command.
+- `code-audit-blocked` — source-code audit found unresolved blocking risk. Fix the code before retrying commit or push.
+- `code-audit-verification-failed` — source-code audit could not verify the fix or state. Treat the git command as blocked.
+- `code-audit-clean` — source-code audit passed and the git command can run.
+
+## Credentials flow
+
+Never ask the user to paste secrets into chat. If a prompt contains credentials, yieldOS returns a critical directive with two visual `diff` panels: a red alert and a green `.env` remediation guide. Copy those panels verbatim when they are present.
+
+For `prompt-credentials-detected`, do not echo, quote, paraphrase, encode, summarize, or use any part of the credential value. Only variable names are allowed. Do not put the credential into any `Bash`, `Edit`, or `Write` tool call. Tell the user to move the value into `.env` from the shell using the guide.
+
+If the agent needs to read credentials from a local file, the user must reply with exactly:
+
+```text
+AUTORIZO A LEER LAS CREDENCIALES
+```
+
+The phrase must be the whole prompt. When accepted, yieldOS writes a local authorization flag under `security/` that expires after 30 minutes. Do not retry a blocked credentials read until the user has sent that exact phrase.
 
 ## Rewrite flow (Category A only)
 
@@ -39,12 +59,19 @@ If yieldOS instructs you to perform a local rewrite:
 5. Update `security/yieldos-rewrites.json` with the new entry.
 6. After the rewrite is done, surface a single short message to the user: `yieldOS realizó una optimización de la instalación de <package>`.
 
+## Code audit flow
+
+For `git commit`, yieldOS audits the staged diff. For `git push`, it audits the commits ahead of upstream. It writes audit events to `security/code-audit-events.md` and machine-verifiable state to `security/code-audit-state.json`.
+
+If yieldOS applies a fix, the original commit is intentionally blocked so the user or current agent can review the staged patch and rerun `git commit`. If yieldOS writes push verification state, commit `security/code-audit-state.json` before retrying `git push`.
+
 ## Self-defense
 
 yieldOS will block any attempt to:
 
 - Modify files under `.claude/plugins/yieldos/**`.
 - Modify `security/dependency-events.md` other than via append from yieldOS itself.
+- Modify `security/code-audit-events.md` or `security/code-audit-state.json` by hand.
 - Modify `security/yieldos-rewrites.json` outside of the rewrite flow.
 - Modify the official policy cache.
 
@@ -54,41 +81,34 @@ Do not try to bypass these blocks. They are a feature, not a bug.
 
 Keep messages short, in their language, and informative — never asking.
 
-### Visual stamp — always include when yieldOS intervened
+### Visual stamp
 
-Whenever a tool call you ran was processed by the yieldOS gate (regardless of allow / block / rewrite / native-suggest), close your reply to the user with a **shield stamp** rendered as a markdown `diff` code block. The `+` / `-` / `!` prefix makes Claude Code paint the line green / red / orange.
+Whenever a tool call was processed by yieldOS, close your reply with the matching shield stamp on its own final block. The hook also returns the exact stamp in `hookSpecificOutput.additionalContext`; when present, copy it verbatim.
 
-The hook also returns the exact stamp string in `hookSpecificOutput.additionalContext` — when you receive that context, copy the stamp verbatim at the end of your reply.
+Each stamp is a markdown `diff` code block so the line renders with color: `+` green for allowed/safe, `-` red for blocked/unsafe, and `!` orange for suggestions.
 
-### Special handling for `prompt-credentials-detected`
+| Verdict in stderr | Stamp line inside the `diff` block |
+| --- | --- |
+| `allowlist-match` | `+ ▎ 🛡  yieldOS  ·  Validado · allowlist` |
+| `verification-passed` | `+ ▎ 🛡  yieldOS  ·  Validado · análisis OK` |
+| `category-a-rewrite` | `+ ▎ 🛡  yieldOS  ·  Optimizado · rewrite local` |
+| `denylist-match` | `- ▎ 🛡  yieldOS  ·  Bloqueado · denylist` |
+| `category-d-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · categoría crítica` |
+| `verification-failed` | `- ▎ 🛡  yieldOS  ·  Bloqueado · señales sospechosas` |
+| `build-script-not-approved` | `- ▎ 🛡  yieldOS  ·  Bloqueado · build script no aprobado` |
+| `injection-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada` |
+| `self-defense-block` | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido` |
+| `credentials-read-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · lectura de credenciales sin autorización` |
+| `credentials-read-authorized` | `+ ▎ 🛡  yieldOS  ·  Validado · lectura de credenciales autorizada` |
+| `prompt-credentials-detected` | `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial` |
+| `native-suggest` | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa` |
+| `code-audit-clean` | `+ ▎ 🛡  yieldOS  ·  Validado · code audit limpio` |
+| `code-audit-warning` | `! ▎ 🛡  yieldOS  ·  Advertencia · code audit` |
+| `code-audit-fix-applied` | `+ ▎ 🛡  yieldOS  ·  Corregido · code audit` |
+| `code-audit-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · code audit` |
+| `code-audit-verification-failed` | `- ▎ 🛡  yieldOS  ·  Bloqueado · verificación code audit` |
 
-When yieldOS detects a credential in a user prompt, the hook does NOT block the prompt — blocking would let the harness re-print the original prompt verbatim and re-leak the secret. Instead, the prompt passes and the hook injects a CRITICAL SECURITY DIRECTIVE in `additionalContext`.
-
-When you receive that directive, your reply MUST:
-1. Start with the two visual blocks (red ALERT + green GUIDE) surfaced verbatim, in order. They come pre-rendered in the directive.
-2. NEVER echo, quote, paraphrase, summarize, base64, hex, or otherwise reveal any portion of the credential value. Only the variable NAME is allowed in your reply.
-3. NEVER use the credential value in any tool call (Bash, Edit, Write). The value must not leave the chat.
-4. NEVER offer to "save", "configure", "test" or "use" the value. Only suggest the shell commands the directive provides (`! open .env`, `! echo '...' >> .env`, etc.) so the user types the value at the shell, not in chat.
-5. End with the stamp `- ▎ 🛡  yieldOS  ·  Bloqueado · prompt expuso credencial` on its own diff block.
-
-If you fail any of rules 2-4, you have leaked the credential. Treat as non-negotiable.
-
-Format reference per verdict:
-
-| Verdict                         | Color  | Rendered stamp                                              |
-|----------------------------------|--------|--------------------------------------------------------------|
-| `allowlist-match`               | green  | `+ ▎ 🛡  yieldOS  ·  Validado · allowlist`                  |
-| `verification-passed`           | green  | `+ ▎ 🛡  yieldOS  ·  Validado · análisis OK`                |
-| `category-a-rewrite`            | green  | `+ ▎ 🛡  yieldOS  ·  Optimizado · rewrite local`            |
-| `denylist-match`                | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · denylist`                  |
-| `category-d-blocked`            | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · categoría crítica`         |
-| `verification-failed`           | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · señales sospechosas`       |
-| `build-script-not-approved`     | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · build script no aprobado`  |
-| `injection-blocked`             | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada`       |
-| `self-defense-block`            | red    | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido`         |
-| `native-suggest`                | orange | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa`          |
-
-Each stamp must be wrapped in a `diff` fenced code block so the color renders. Example:
+Example:
 
 ````
 Agregué numpy a requirements.txt. Para instalarlo, ejecutá pip install -r requirements.txt.
@@ -98,20 +118,14 @@ Agregué numpy a requirements.txt. Para instalarlo, ejecutá pip install -r requ
 ```
 ````
 
-```` 
-No puedo instalar `event-stream@3.3.6`: ataque de cadena de suministro confirmado en 2018.
-
-```diff
-- ▎ 🛡  yieldOS  ·  Bloqueado · denylist
-```
-````
-
-### Other one-liner messages (in addition to the stamp)
+Use a brief body only when the user needs context:
 
 - Allowed: silent body, just the stamp.
-- Blocked (denylist): explain reason in 1 line, then stamp.
-- Blocked (Category D): say "requiere aprobación del equipo de seguridad", then stamp.
-- Rewritten: say "yieldOS realizó una optimización de la instalación de {package}", then stamp.
-- CVE on transitive: say "yieldOS detectó CVE en transitiva {pkg}: {cve_id}", then stamp.
-
-The stamp is non-negotiable: the user relies on it to know that yieldOS intervened in the action.
+- Blocked (denylist): explain the reason in one line, then stamp.
+- Blocked (Category D): say it requires security-team approval, then stamp.
+- Rewritten: say yieldOS optimized the install locally, then stamp.
+- Verification failed: say yieldOS found suspicious signals and blocked the install, then stamp.
+- Code audit fixed or blocked a commit/push: explain the one-line hook message and tell the user to rerun the git command only after reviewing staged changes.
+- Credentials read blocked: copy the returned red warning panel verbatim, then stamp.
+- Prompt credentials detected: copy the returned red alert and green `.env` guide verbatim, never repeat the secret value, then stamp.
+- CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.

@@ -82,7 +82,7 @@ test('Edit to package.json reconstructs full manifest and validates added depend
 
   assert.equal(r.code, 0, `expected allow but got exit ${r.code}, stderr: ${r.stderr}`);
   assert.equal(r.stderr.includes('[yieldOS:verdict] allowlist-match'), true);
-  assert.equal(hookContext(r).includes('react@18.3.1 → allowlist-match'), true);
+  assert.equal(hookContext(r).includes('react@18.3.1 -> allowlist-match'), true);
 });
 
 test('npm install of bcrypt (Category D) blocks', () => {

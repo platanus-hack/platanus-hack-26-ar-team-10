@@ -36,6 +36,12 @@ function ensureLogDir(projectRoot) {
   return logPath;
 }
 
+function ensureSecurityLog(projectRoot, filename) {
+  const logPath = path.join(projectRoot, 'security', filename);
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  return logPath;
+}
+
 function stringifyItem(v) {
   if (v === null || v === undefined) return '';
   if (typeof v === 'string') return v;
@@ -58,6 +64,10 @@ function renderField(key, value) {
 
 function appendEntry(projectRoot, heading, fields) {
   const logPath = ensureLogDir(projectRoot);
+  return appendEntryToFile(logPath, heading, fields);
+}
+
+function appendEntryToFile(logPath, heading, fields) {
   const stamp = nowStamp();
   const lines = [
     '',
@@ -68,6 +78,31 @@ function appendEntry(projectRoot, heading, fields) {
   ];
   fs.appendFileSync(logPath, lines.join('\n'));
   return logPath;
+}
+
+function logCodeAudit(projectRoot, audit) {
+  const logPath = ensureSecurityLog(projectRoot, 'code-audit-events.md');
+  return appendEntryToFile(logPath, 'Code Audit', {
+    Mode: audit.mode,
+    Verdict: audit.verdict,
+    Action: audit.action,
+    Files: audit.files,
+    Findings: (audit.findings || []).map((f) => `${f.severity}:${f.ruleId}:${f.file} - ${f.title}`),
+    'Patch applied': audit.patch?.fixed ? 'yes' : 'no',
+    'Patch passes': audit.patch?.iterations,
+    'Patched files': audit.patch?.files || [],
+    Verification: summarizeVerification(audit.verification),
+    Message: audit.message,
+  });
+}
+
+function summarizeVerification(verification) {
+  if (!verification) return '';
+  if (!verification.checks?.ran) {
+    return verification.ok ? 'static rescan passed; no project checks detected' : verification.checks?.reason;
+  }
+  const checks = verification.checks.checks || [];
+  return checks.map((check) => `${check.name}: ${check.ok ? 'passed' : 'failed'}`).join(', ');
 }
 
 function logAllowed(projectRoot, candidate, extra = {}) {
@@ -170,5 +205,6 @@ module.exports = {
   logTransitiveAudit,
   logInstructionChange,
   logSelfDefense,
+  logCodeAudit,
   sanitize,
 };

@@ -1,0 +1,281 @@
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import test from "node:test";
+
+const root = process.cwd();
+
+function read(path) {
+  return readFileSync(join(root, path), "utf8");
+}
+
+test("home page pivots to the yieldOS source-of-truth story", () => {
+  const page = read("src/app/page.tsx");
+  const animatedMockup = read("src/components/animated-security-mockup.tsx");
+  const animatedDemo = read("src/components/animated-demo-flow.tsx");
+  const animatedStory = read("src/components/animated-demo-story.tsx");
+  const scrollProgress = read("src/components/scroll-progress.tsx");
+  const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
+  const source = [
+    page,
+    animatedMockup,
+    animatedDemo,
+    animatedStory,
+    scrollProgress,
+    typewriterTitle,
+  ].join("\n");
+
+  [
+    "yieldOS",
+    "A security gate for AI agent installs.",
+    "Claude Code tries to run something. yieldOS decides first.",
+    "PH26 Buenos Aires",
+    "Install yieldOS",
+    "View decision demo",
+    "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh",
+    "Gate timeline",
+    "Denied path",
+    "Approved path",
+    "Tool call",
+    "PreToolUse gate",
+    "Verdict",
+    "Allow",
+    "Block",
+    "Rewrite",
+    "AGENTS.md",
+    "curl | sh",
+    "allowlist-match",
+    "npm install nanoid",
+    "Live decision demo",
+    "Verdict before execution.",
+    "Tool call captured",
+    "Candidate classified",
+    "Policy checks run",
+    "Verdict returned",
+    "npm install colors",
+    "denylist-match",
+    "npm install node-fetch",
+    "native-suggest",
+    "npm install clsx",
+    "category-a-rewrite",
+    "Write AGENTS.md",
+    "injection-blocked",
+    "security/dependency-events.md",
+    "[yieldOS:verdict] category-a-rewrite",
+    "ScrollProgress",
+    "Hero",
+    "Demo",
+    "Coverage",
+    "Policy",
+    "Audit",
+    "Proof",
+    "TypewriterHeroTitle",
+  ].forEach((text) => {
+    assert.ok(source.includes(text), `Expected landing source to include: ${text}`);
+  });
+
+  [
+    "Packages",
+    "Skills",
+    "MCPs",
+    "Instructions",
+    "Vendoring",
+    "Binaries",
+    "Manifests",
+    "Five-check policy flow",
+    "Native",
+    "Allow",
+    "Deny",
+    "Exotic",
+    "Analyze",
+    "180+",
+    "local tests",
+    "7",
+    "9",
+    "1163",
+  ].forEach((text) => {
+    assert.ok(source.includes(text), `Expected yieldOS proof/capability copy: ${text}`);
+  });
+
+  [
+    "hero",
+    "demo-flow",
+    "gated-vectors",
+    "policy-flow",
+    "audit-trail",
+    "proof",
+    "final-cta",
+  ].forEach((id) => {
+    assert.ok(page.includes(`id="${id}"`), `Expected section id: ${id}`);
+  });
+
+  const demoIndex = page.indexOf('id="demo-flow"');
+  const coverageIndex = page.indexOf('id="gated-vectors"');
+  const policyIndex = page.indexOf('id="policy-flow"');
+  assert.ok(demoIndex < coverageIndex, "Expected demo to appear after hero");
+  assert.ok(coverageIndex < policyIndex, "Expected coverage before policy flow");
+
+  [
+    "npx anon scan",
+    "Run anon",
+    "How anon works",
+    "Security for software built with AI agents.",
+    "Agent PR",
+    "anon scan",
+    "patch preview",
+    "pre-merge security guardrail",
+    "Decision path",
+    "SessionStart",
+    "UserPromptSubmit",
+    "PostToolUse",
+    "Claude gate",
+    "View demo",
+  ].forEach((text) => {
+    assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
+  });
+});
+
+test("copy-to-clipboard behavior is isolated in a client component", () => {
+  const componentPath = "src/components/copy-command-button.tsx";
+  assert.ok(existsSync(join(root, componentPath)), "Expected copy component");
+
+  const component = read(componentPath);
+
+  assert.ok(component.startsWith('"use client";'), "Expected client boundary");
+  assert.ok(component.includes('aria-live="polite"'), "Expected live status");
+  assert.ok(
+    component.includes("focus-visible:ring-2"),
+    "Expected keyboard focus styles",
+  );
+  assert.ok(
+    component.includes("navigator.clipboard.writeText"),
+    "Expected clipboard write behavior",
+  );
+});
+
+test("cinematic motion components and reduced motion styles are configured", () => {
+  const packageJson = read("package.json");
+  const reveal = read("src/components/motion-reveal.tsx");
+  const mockup = read("src/components/animated-security-mockup.tsx");
+  const demo = read("src/components/animated-demo-flow.tsx");
+  const story = read("src/components/animated-demo-story.tsx");
+  const scrollProgress = read("src/components/scroll-progress.tsx");
+  const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
+  const globals = read("src/app/globals.css");
+
+  assert.ok(packageJson.includes('"motion"'), "Expected motion dependency");
+  [reveal, mockup, demo, story, scrollProgress, typewriterTitle].forEach((source) => {
+    assert.ok(source.startsWith('"use client";'), "Expected client boundary");
+    assert.ok(source.includes('"motion/react"'), "Expected Motion import");
+    assert.ok(source.includes("useReducedMotion"), "Expected reduced motion hook");
+  });
+  assert.ok(
+    typewriterTitle.includes("setVisibleCharacters"),
+    "Expected typewriter character reveal",
+  );
+  assert.ok(
+    typewriterTitle.includes("speedMs = 52"),
+    "Expected calmer typewriter timing",
+  );
+  assert.ok(
+    typewriterTitle.includes('displayLines.join("\\n")'),
+    "Expected stable pre-defined typewriter lines",
+  );
+  assert.ok(
+    globals.includes(".hero-typewriter-line"),
+    "Expected fixed line styling for hero typewriter",
+  );
+  assert.ok(scrollProgress.includes("useScroll"), "Expected scroll-driven progress");
+  assert.ok(
+    scrollProgress.includes("useTransform"),
+    "Expected transformed progress value",
+  );
+  assert.ok(globals.includes("--acid: #e8ff00"), "Expected acid accent");
+  assert.ok(globals.includes(".pitch-section"), "Expected full-screen sections");
+  assert.ok(
+    globals.includes("min-height: max(100vh, 100dvh)"),
+    "Expected desktop full-screen section height",
+  );
+  assert.ok(
+    globals.includes("min-height: max(100vh, 100svh, 100dvh)"),
+    "Expected mobile full-screen section height",
+  );
+  assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
+  assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
+  assert.ok(
+    globals.includes("backdrop-filter: blur"),
+    "Expected glass topbar backdrop blur",
+  );
+  assert.ok(globals.includes(".snap-deck"), "Expected snap deck wrapper");
+  assert.ok(
+    globals.includes("scroll-snap-type: y proximity"),
+    "Expected softer scroll snap",
+  );
+  assert.ok(
+    globals.includes("scroll-snap-align: start"),
+    "Expected section snap alignment",
+  );
+  assert.ok(
+    !globals.includes("scroll-snap-stop: always"),
+    "Expected scroll snap stops to be softened",
+  );
+  assert.ok(
+    globals.includes(".scroll-progress"),
+    "Expected scroll progress rail styling",
+  );
+  assert.ok(globals.includes(".gate-frame"), "Expected hero gate frame");
+  assert.ok(
+    globals.includes(".hero-typewriter"),
+    "Expected hero typewriter styling",
+  );
+  assert.ok(
+    globals.includes(".hero-typewriter-caret"),
+    "Expected hero typewriter caret",
+  );
+  assert.ok(globals.includes(".gate-flow"), "Expected dual gate flow styling");
+  assert.ok(
+    globals.includes(".gate-flow.is-denied"),
+    "Expected denied gate flow styling",
+  );
+  assert.ok(
+    globals.includes(".gate-flow.is-allowed"),
+    "Expected approved gate flow styling",
+  );
+  assert.ok(
+    !globals.includes(".gate-pulse"),
+    "Expected old horizontal gate pulse to be removed",
+  );
+  assert.ok(
+    !globals.includes(".gate-scan"),
+    "Expected old horizontal gate scanner to be removed",
+  );
+  assert.ok(
+    !globals.includes(".gate-lane::before"),
+    "Expected old center policy line to be removed",
+  );
+  assert.ok(globals.includes(".scan-sweep"), "Expected scanner visual");
+  assert.ok(globals.includes(".demo-cinema"), "Expected staged demo choreography");
+  assert.ok(globals.includes(".decision-row"), "Expected verdict row choreography");
+  assert.ok(globals.includes(".policy-path"), "Expected animated policy path");
+  assert.ok(globals.includes(".metric-tile"), "Expected proof metric timing");
+  assert.ok(globals.includes(".vector-card"), "Expected source-truth coverage cards");
+  assert.ok(globals.includes(".proof-card"), "Expected prototype proof cards");
+  assert.ok(
+    globals.includes("@media (prefers-reduced-motion: reduce)"),
+    "Expected reduced motion CSS fallback",
+  );
+});
+
+test("layout metadata and Geist theme are configured for yieldOS", () => {
+  const layout = read("src/app/layout.tsx");
+  const globals = read("src/app/globals.css");
+
+  assert.ok(layout.includes("yieldOS - security gate for AI agent installs"));
+  assert.ok(
+    layout.includes(
+      "yieldOS allows, blocks, rewrites, and audits Claude Code actions before execution.",
+    ),
+  );
+  assert.ok(globals.includes('"Geist"'));
+  assert.ok(globals.includes('"Geist Mono"'));
+});

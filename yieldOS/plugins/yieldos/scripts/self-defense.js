@@ -7,6 +7,8 @@ const PROTECTED_PATTERNS = [
   /(?:^|\/)\.claude\/plugins\/yieldos\//,
   /(?:^|\/)\.claude-plugin\/(?:plugin\.json|hooks\/|scripts\/|policy-cache\/|config\/)/,
   /(?:^|\/)security\/dependency-events\.md$/,
+  /(?:^|\/)security\/code-audit-events\.md$/,
+  /(?:^|\/)security\/code-audit-state\.json$/,
   /(?:^|\/)security\/yieldos-rewrites\.json$/,
   /(?:^|\/)security\/\.yieldos-instruction-hashes\.json$/,
 ];
