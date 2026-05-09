@@ -2,9 +2,9 @@ import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
 import { AnimatedDemoStory } from "@/components/animated-demo-story";
 import { CopyCommandButton } from "@/components/copy-command-button";
 import { MotionReveal } from "@/components/motion-reveal";
-import { OrbitalInstallPill } from "@/components/orbital-install-pill";
 import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { TerminalInstallCommand } from "@/components/terminal-install-command";
 import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
@@ -80,7 +80,7 @@ export default function Home() {
               immediate
               y={14}
             >
-              <OrbitalInstallPill command={installCommand} />
+              <TerminalInstallCommand command={installCommand} />
             </MotionReveal>
           </div>
         </div>
