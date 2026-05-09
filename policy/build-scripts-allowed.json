@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-05-09T00:00:00Z",
+  "entries": [
+    { "key": "npm:bcrypt", "reason": "native bindings for password hashing, vetted maintainer" },
+    { "key": "npm:sharp", "reason": "native image processing, vetted maintainer" },
+    { "key": "npm:node-sass", "reason": "deprecated but still common; native bindings" },
+    { "key": "npm:sqlite3", "reason": "native sqlite bindings" },
+    { "key": "npm:better-sqlite3", "reason": "native sqlite bindings" },
+    { "key": "npm:canvas", "reason": "native canvas bindings" },
+    { "key": "npm:argon2", "reason": "native argon2 bindings" },
+    { "key": "npm:esbuild", "reason": "downloads platform binary, vetted maintainer" },
+    { "key": "npm:swc", "reason": "downloads platform binary, vetted maintainer" }
+  ]
+}
