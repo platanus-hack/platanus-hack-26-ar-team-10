@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "yieldos-marketplace",
+  "description": "Local marketplace for yieldOS — security gate for Claude Code.",
+  "owner": {
+    "name": "platanus-hack-26-ar-team-10"
+  },
+  "plugins": [
+    {
+      "name": "yieldos",
+      "description": "Security gate for Claude Code. Intercepts dependency installs, skills, MCPs, and instruction-file edits with deterministic policy.",
+      "author": {
+        "name": "platanus-hack-26-ar-team-10"
+      },
+      "category": "security",
+      "source": "./plugins/yieldos",
+      "homepage": "https://github.com/platanus-hack/platanus-hack-26-ar-team-10"
+    }
+  ]
+}

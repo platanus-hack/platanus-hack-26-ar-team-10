@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-05-09T00:00:00Z",
+  "entries": {
+    "npm:uuid": { "native": "crypto.randomUUID()", "platform": "node>=14.17 / browser", "note": "v4 UUIDs only" },
+    "npm:nanoid": { "native": "crypto.randomUUID() or custom Uint8Array", "platform": "node>=14.17 / browser" },
+    "npm:node-fetch": { "native": "fetch", "platform": "node>=18 / browser" },
+    "npm:isomorphic-fetch": { "native": "fetch", "platform": "node>=18 / browser" },
+    "npm:lodash.clonedeep": { "native": "structuredClone", "platform": "node>=17 / browser" },
+    "npm:rfdc": { "native": "structuredClone", "platform": "node>=17 / browser" },
+    "npm:qs": { "native": "URLSearchParams", "platform": "node>=10 / browser", "note": "for simple cases without nested objects" },
+    "npm:query-string": { "native": "URLSearchParams", "platform": "node>=10 / browser" },
+    "npm:mkdirp": { "native": "fs.mkdir({recursive: true})", "platform": "node>=10" },
+    "npm:rimraf": { "native": "fs.rm({recursive: true, force: true})", "platform": "node>=14" },
+    "npm:dotenv": { "native": "node --env-file=.env", "platform": "node>=20" },
+    "npm:cross-env": { "native": "node --env-file=.env or shell prefix", "platform": "node>=20" },
+    "npm:chalk": { "native": "util.styleText()", "platform": "node>=20", "note": "basic colors only" },
+    "npm:get-port": { "native": "net.createServer().listen(0)", "platform": "node>=4" },
+    "npm:object.assign": { "native": "Object.assign", "platform": "all" },
+    "npm:array-includes": { "native": "Array.prototype.includes", "platform": "all" },
+    "python:python-dotenv": { "native": "os.environ + manual parse", "platform": "python>=3", "note": "trivial parser" },
+    "python:requests": { "native": "urllib.request or httpx", "platform": "python>=3", "note": "stdlib equivalent for simple cases" }
+  }
+}

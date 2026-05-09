@@ -1,0 +1,501 @@
+{
+  "run": "run1",
+  "timestamp": "2026-05-09T05:53:37.346Z",
+  "duration_seconds": "174.5",
+  "hook": "plugins/yieldos/scripts/pre-install-gate.js",
+  "concurrency": 16,
+  "summary": {
+    "total": 1163,
+    "durationSeconds": "2661.9",
+    "byVerdict": {
+      "category-d-blocked": 334,
+      "passthrough-or-allow": 586,
+      "build-script-not-approved": 35,
+      "category-a-rewrite": 63,
+      "native-suggest": 25,
+      "denylist-match": 23,
+      "verification-failed": 81,
+      "unknown-block": 16
+    },
+    "byDataset": {
+      "npm-top": {
+        "category-d-blocked": 210,
+        "passthrough-or-allow": 257,
+        "build-script-not-approved": 35,
+        "category-a-rewrite": 58,
+        "native-suggest": 12,
+        "denylist-match": 1,
+        "verification-failed": 10,
+        "unknown-block": 13
+      },
+      "pypi-top": {
+        "native-suggest": 2,
+        "verification-failed": 10,
+        "category-d-blocked": 95,
+        "passthrough-or-allow": 308,
+        "unknown-block": 3
+      },
+      "malicious": {
+        "denylist-match": 19,
+        "verification-failed": 38,
+        "category-d-blocked": 7,
+        "passthrough-or-allow": 6
+      },
+      "edge-cases": {
+        "verification-failed": 23,
+        "passthrough-or-allow": 15,
+        "category-d-blocked": 22,
+        "native-suggest": 11,
+        "denylist-match": 3,
+        "category-a-rewrite": 5
+      }
+    },
+    "byManager": {
+      "npm": {
+        "category-d-blocked": 213,
+        "passthrough-or-allow": 259,
+        "build-script-not-approved": 35,
+        "category-a-rewrite": 58,
+        "native-suggest": 12,
+        "denylist-match": 20,
+        "verification-failed": 26,
+        "unknown-block": 13
+      },
+      "pip": {
+        "native-suggest": 2,
+        "verification-failed": 32,
+        "category-d-blocked": 99,
+        "passthrough-or-allow": 312,
+        "unknown-block": 3
+      },
+      "mixed": {
+        "verification-failed": 23,
+        "passthrough-or-allow": 15,
+        "category-d-blocked": 22,
+        "native-suggest": 11,
+        "denylist-match": 3,
+        "category-a-rewrite": 5
+      }
+    }
+  },
+  "falsePositives": [
+    {
+      "id": "npm:colors",
+      "package": "colors",
+      "verdict": "denylist-match",
+      "message": "yieldOS bloqueó colors: self-sabotage attack 2022; corrupted output infinite loop"
+    },
+    {
+      "id": "npm:http-proxy",
+      "package": "http-proxy",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó http-proxy: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "npm:http-proxy-middleware",
+      "package": "http-proxy-middleware",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó http-proxy-middleware: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "npm:gatsby",
+      "package": "gatsby",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:lingui",
+      "package": "lingui",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en lingui y bloqueó la instalación"
+    },
+    {
+      "id": "npm:@rxjs/operators",
+      "package": "@rxjs/operators",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en @rxjs/operators y bloqueó la instalación"
+    },
+    {
+      "id": "npm:@aws-sdk/client-s3",
+      "package": "@aws-sdk/client-s3",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:@clerk/clerk-sdk-node",
+      "package": "@clerk/clerk-sdk-node",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:@aws-sdk/client-secretsmanager",
+      "package": "@aws-sdk/client-secretsmanager",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en @aws-sdk/client-secretsmanager y bloqueó la instalación"
+    },
+    {
+      "id": "npm:@twilio/sdk",
+      "package": "@twilio/sdk",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en @twilio/sdk y bloqueó la instalación"
+    },
+    {
+      "id": "npm:@mui/icons-material",
+      "package": "@mui/icons-material",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:tailwindcss",
+      "package": "tailwindcss",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:@solana/web3.js",
+      "package": "@solana/web3.js",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:langchain",
+      "package": "langchain",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:http-proxy-agent",
+      "package": "http-proxy-agent",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó http-proxy-agent: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "npm:https-proxy-agent",
+      "package": "https-proxy-agent",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó https-proxy-agent: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "npm:public-suffix-list",
+      "package": "public-suffix-list",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en public-suffix-list y bloqueó la instalación"
+    },
+    {
+      "id": "npm:@ember/array",
+      "package": "@ember/array",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en @ember/array y bloqueó la instalación"
+    },
+    {
+      "id": "npm:@types/node",
+      "package": "@types/node",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:create-next-app",
+      "package": "create-next-app",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:discord.js",
+      "package": "discord.js",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:discord-api-types",
+      "package": "discord-api-types",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "pip:httpx",
+      "package": "httpx",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó httpx: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "pip:httpcore",
+      "package": "httpcore",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó httpcore: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "npm:@firebase/app",
+      "package": "@firebase/app",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "npm:firebase",
+      "package": "firebase",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "pip:unittest-mock",
+      "package": "unittest-mock",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en unittest-mock y bloqueó la instalación"
+    },
+    {
+      "id": "pip:asyncpg-pool",
+      "package": "asyncpg-pool",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en asyncpg-pool y bloqueó la instalación"
+    },
+    {
+      "id": "pip:httpretty",
+      "package": "httpretty",
+      "verdict": "verification-failed",
+      "message": "yieldOS bloqueó httpretty: instalación de tipo vendored-code no permitida sin allowlist explícita"
+    },
+    {
+      "id": "pip:stripe-mock",
+      "package": "stripe-mock",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en stripe-mock y bloqueó la instalación"
+    },
+    {
+      "id": "pip:aiohttp",
+      "package": "aiohttp",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "pip:pdb++",
+      "package": "pdb++",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en pdb++ y bloqueó la instalación"
+    },
+    {
+      "id": "pip:pydantic-core",
+      "package": "pydantic-core",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "pip:rapidjson",
+      "package": "rapidjson",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en rapidjson y bloqueó la instalación"
+    },
+    {
+      "id": "pip:speech-recognition",
+      "package": "speech-recognition",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en speech-recognition y bloqueó la instalación"
+    },
+    {
+      "id": "pip:botocore",
+      "package": "botocore",
+      "verdict": "unknown-block",
+      "message": ""
+    },
+    {
+      "id": "pip:etree",
+      "package": "etree",
+      "verdict": "verification-failed",
+      "message": "yieldOS detectó señales sospechosas en etree y bloqueó la instalación"
+    }
+  ],
+  "falseNegatives": [
+    {
+      "id": "mal:npm:open@8.0.6",
+      "package": "open",
+      "verdict": "passthrough-or-allow",
+      "incident": "synthetic test - open is a real package"
+    },
+    {
+      "id": "mal:npm:mailparser@2.7.1",
+      "package": "mailparser",
+      "verdict": "passthrough-or-allow",
+      "incident": "fake credentials harvester (typosquatting)"
+    },
+    {
+      "id": "mal:pip:boto@2.49.0",
+      "package": "boto",
+      "verdict": "passthrough-or-allow",
+      "incident": "abandoned (use boto3) - actually a real legitimate older package"
+    },
+    {
+      "id": "mal:pip:openai-cli@0.0.1",
+      "package": "openai-cli",
+      "verdict": "passthrough-or-allow",
+      "incident": "typosquatting openai"
+    },
+    {
+      "id": "mal:pip:langchain-cli@0.0.1",
+      "package": "langchain-cli",
+      "verdict": "passthrough-or-allow",
+      "incident": "typosquatting"
+    },
+    {
+      "id": "mal:pip:huggingface@0.0.1",
+      "package": "huggingface",
+      "verdict": "passthrough-or-allow",
+      "incident": "typosquatting huggingface-hub"
+    }
+  ],
+  "edgeMismatches": [
+    {
+      "id": "edge:8:npm install -D typescript",
+      "command": "npm install -D typescript",
+      "expected": "allowlist-match",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:9:npm install --save-dev eslint",
+      "command": "npm install --save-dev eslint",
+      "expected": "allowlist-match",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:13:yarn add svelte",
+      "command": "yarn add svelte",
+      "expected": "verification-passed",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:14:yarn install vue",
+      "command": "yarn install vue",
+      "expected": "verification-passed",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:17:pip install requests",
+      "command": "pip install requests",
+      "expected": "allowlist-match",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:18:pip install requests==2.31.0",
+      "command": "pip install requests==2.31.0",
+      "expected": "allowlist-match",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:19:pip install requests>=2.0",
+      "command": "pip install requests>=2.0",
+      "expected": "verification-passed",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:22:poetry add httpx",
+      "command": "poetry add httpx",
+      "expected": "verification-passed",
+      "got": "verification-failed"
+    },
+    {
+      "id": "edge:21:python -m pip install pydantic",
+      "command": "python -m pip install pydantic",
+      "expected": "allowlist-match",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:20:pip3 install fastapi",
+      "command": "pip3 install fastapi",
+      "expected": "allowlist-match",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:23:uv add fastapi",
+      "command": "uv add fastapi",
+      "expected": "allowlist-match",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:26:cargo add tokio",
+      "command": "cargo add tokio",
+      "expected": "verification-passed",
+      "got": "verification-failed"
+    },
+    {
+      "id": "edge:28:go get github.com/gin-gonic/gin",
+      "command": "go get github.com/gin-gonic/gin",
+      "expected": "verification-passed",
+      "got": "verification-failed"
+    },
+    {
+      "id": "edge:24:uv pip install pyjwt",
+      "command": "uv pip install pyjwt",
+      "expected": "allowlist-match",
+      "got": "category-d-blocked"
+    },
+    {
+      "id": "edge:27:cargo install ripgrep",
+      "command": "cargo install ripgrep",
+      "expected": "verification-passed",
+      "got": "verification-failed"
+    },
+    {
+      "id": "edge:25:cargo add serde",
+      "command": "cargo add serde",
+      "expected": "verification-passed",
+      "got": "verification-failed"
+    },
+    {
+      "id": "edge:29:go install golang.org/x/tools/cmd/gopls@",
+      "command": "go install golang.org/x/tools/cmd/gopls@latest",
+      "expected": "verification-passed",
+      "got": "verification-failed"
+    },
+    {
+      "id": "edge:10:npm install pkg-a pkg-b pkg-c",
+      "command": "npm install pkg-a pkg-b pkg-c",
+      "expected": "multiple",
+      "got": "passthrough-or-allow"
+    },
+    {
+      "id": "edge:49:pip install --user requests",
+      "command": "pip install --user requests",
+      "expected": "allowlist-match",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:72:npm install nanoid",
+      "command": "npm install nanoid",
+      "expected": "category-a-rewrite",
+      "got": "native-suggest"
+    },
+    {
+      "id": "edge:16:bun install elysia",
+      "command": "bun install elysia",
+      "expected": "verification-passed",
+      "got": "passthrough-or-allow"
+    },
+    {
+      "id": "edge:15:bun add hono",
+      "command": "bun add hono",
+      "expected": "verification-passed",
+      "got": "passthrough-or-allow"
+    },
+    {
+      "id": "edge:4:npm install @types/node@18.0.0",
+      "command": "npm install @types/node@18.0.0",
+      "expected": "verification-passed",
+      "got": "passthrough-or-allow"
+    },
+    {
+      "id": "edge:12:pnpm install zod",
+      "command": "pnpm install zod",
+      "expected": "allowlist-match",
+      "got": "passthrough-or-allow"
+    },
+    {
+      "id": "edge:11:pnpm add hono",
+      "command": "pnpm add hono",
+      "expected": "verification-passed",
+      "got": "passthrough-or-allow"
+    },
+    {
+      "id": "edge:3:npm install @types/node",
+      "command": "npm install @types/node",
+      "expected": "verification-passed",
+      "got": "passthrough-or-allow"
+    }
+  ]
+}

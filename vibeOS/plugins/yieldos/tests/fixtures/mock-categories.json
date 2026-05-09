@@ -1,0 +1,11 @@
+{
+  "version": "test",
+  "A_safe_to_rewrite": ["npm:classnames", "npm:clsx", "npm:uuid", "npm:slugify", "npm:p-limit"],
+  "B_rewrite_with_care": ["npm:cookie", "npm:qs"],
+  "C_dangerous_to_rewrite": ["npm:axios", "npm:date-fns"],
+  "D_never_rewrite": ["npm:bcrypt", "npm:react", "npm:express", "npm:prisma", "npm:jsonwebtoken"],
+  "category_keywords_for_unlisted": {
+    "crypto": ["bcrypt", "argon", "scrypt"],
+    "auth": ["passport", "oauth", "jwt"]
+  }
+}

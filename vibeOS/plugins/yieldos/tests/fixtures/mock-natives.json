@@ -1,0 +1,7 @@
+{
+  "version": "test",
+  "entries": {
+    "npm:uuid": { "native": "crypto.randomUUID()", "platform": "node>=14.17 / browser" },
+    "npm:node-fetch": { "native": "fetch", "platform": "node>=18 / browser" }
+  }
+}

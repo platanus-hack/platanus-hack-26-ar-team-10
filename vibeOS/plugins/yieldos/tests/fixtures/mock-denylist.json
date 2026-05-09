@@ -1,0 +1,8 @@
+{
+  "version": "test",
+  "entries": [
+    { "key": "npm:event-stream@3.3.6", "reason": "supply-chain attack" },
+    { "key": "npm:colors", "reason": "self-sabotage" },
+    { "key": "npm:crossenv", "reason": "typosquatting cross-env" }
+  ]
+}

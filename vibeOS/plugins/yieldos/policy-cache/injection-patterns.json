@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-05-09T00:00:00Z",
+  "patterns": [
+    { "id": "ignore-previous", "regex": "(?i)ignore (?:all )?(?:previous|prior|above) instructions", "severity": "critical" },
+    { "id": "you-are-now", "regex": "(?i)you are now (?:a |an )?(?:different|new|jailbroken)", "severity": "critical" },
+    { "id": "disable-yieldos", "regex": "(?i)(?:disable|turn off|bypass|skip) yieldos", "severity": "critical" },
+    { "id": "disable-safety", "regex": "(?i)(?:disable|turn off|bypass) (?:safety|security|guard|protection)", "severity": "critical" },
+    { "id": "execute-without-confirmation", "regex": "(?i)execute (?:the )?(?:following|below) (?:command|code) without (?:confirmation|asking|approval)", "severity": "high" },
+    { "id": "do-not-log", "regex": "(?i)(?:do not|don't|never) log (?:this|the following)", "severity": "high" },
+    { "id": "exfiltration-token", "regex": "(?i)(?:send|copy|exfiltrate|leak) (?:tokens?|secrets?|credentials?|api[_-]?keys?)", "severity": "critical" },
+    { "id": "ssh-private-key", "regex": "BEGIN (?:RSA|OPENSSH|EC|DSA) PRIVATE KEY", "severity": "critical" },
+    { "id": "env-exfiltration", "regex": "(?i)(?:read|cat|exfiltrate|copy).*(?:\\.env|\\.npmrc|\\.ssh|\\.aws|credentials)", "severity": "critical" },
+    { "id": "rm-rf-root", "regex": "rm\\s+-rf\\s+/(?:\\s|$)", "severity": "critical" },
+    { "id": "curl-pipe-shell", "regex": "curl\\s+[^|]*\\|\\s*(?:sh|bash|zsh)", "severity": "high" }
+  ]
+}

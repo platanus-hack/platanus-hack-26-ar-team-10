@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-05-09T00:00:00Z",
+  "entries": [
+    { "key": "npm:event-stream@3.3.6", "reason": "supply-chain attack 2018 (bitcoin wallet exfiltration via flatmap-stream)" },
+    { "key": "npm:flatmap-stream", "reason": "supply-chain attack vector for event-stream 2018" },
+    { "key": "npm:colors", "reason": "self-sabotage attack 2022; corrupted output infinite loop" },
+    { "key": "npm:faker", "reason": "self-sabotage attack 2022; package was destroyed by maintainer" },
+    { "key": "npm:node-ipc", "reason": "protestware 2022; deletes files in specific geo regions" },
+    { "key": "npm:ua-parser-js@0.7.29", "reason": "supply-chain attack October 2021" },
+    { "key": "npm:ua-parser-js@0.8.0", "reason": "supply-chain attack October 2021" },
+    { "key": "npm:ua-parser-js@1.0.0", "reason": "supply-chain attack October 2021" },
+    { "key": "npm:rc@1.2.9", "reason": "supply-chain attack" },
+    { "key": "npm:coa", "reason": "supply-chain attack November 2021" },
+    { "key": "npm:crossenv", "reason": "typosquatting cross-env" }
+  ]
+}

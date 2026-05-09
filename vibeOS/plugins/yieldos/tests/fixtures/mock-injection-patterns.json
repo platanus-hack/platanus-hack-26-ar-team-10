@@ -1,0 +1,7 @@
+{
+  "version": "test",
+  "patterns": [
+    { "id": "ignore-previous", "regex": "(?i)ignore (?:all )?(?:previous|prior|above) instructions", "severity": "critical" },
+    { "id": "disable-yieldos", "regex": "(?i)(?:disable|turn off|bypass) yieldos", "severity": "critical" }
+  ]
+}
