@@ -11,6 +11,7 @@ const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const injectionScanner = require('./injection-scanner');
 const credentialsScanner = require('./credentials-scanner');
+const terminalArt = require('./terminal-art');
 
 const DEFAULTS = require(path.join(__dirname, '..', 'config', 'defaults.json'));
 const AUTH_TTL_MS = 30 * 60 * 1000;
@@ -242,20 +243,26 @@ function isAuthorizationActive(projectRoot) {
 }
 
 function buildEnvBlockMessage() {
+  const art = terminalArt.randomAlertArt();
   return [
     '```diff',
-    '- ╭───────────────────────────────────────────────────────────────╮',
-    '- │  🛡  yieldOS  ·  LECTURA DE CREDENCIALES BLOQUEADA             │',
-    '- ╰───────────────────────────────────────────────────────────────╯',
+    '- ╔════════════════════════════════════════════════════════════════╗',
+    '- ║   🛡  yieldOS  ·  LECTURA DE CREDENCIALES BLOQUEADA            ║',
+    '- ╚════════════════════════════════════════════════════════════════╝',
+    '-',
+    ...art.split('\n').map((l) => '- ' + l),
+    '-',
     '- El agente intentó leer un archivo de credenciales (.env / .ssh / .aws / etc).',
     '- Riesgo concreto si autorizás:',
     '-   • El agente puede ver claves de API, tokens, contraseñas DB.',
     '-   • Esos valores quedan en el contexto del modelo.',
     '-   • Si el contexto se exporta o se comparte, las credenciales viajan.',
     '-   • Un prompt-injection posterior podría exfiltrarlas.',
+    '-',
     '- Para autorizar (válido por 30 minutos en este proyecto), respondé',
     '  EXACTAMENTE con esta frase, en mayúsculas, sin nada antes ni después:',
     '+   AUTORIZO A LEER LAS CREDENCIALES',
+    '-',
     '- Si NO querés autorizar, simplemente continuá la conversación;',
     '  la lectura del archivo seguirá bloqueada.',
     '```',

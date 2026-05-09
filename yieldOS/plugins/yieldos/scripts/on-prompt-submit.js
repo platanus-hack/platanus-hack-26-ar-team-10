@@ -7,6 +7,7 @@ const os = require('node:os');
 
 const policyFetcher = require('./policy-fetcher');
 const credentialsScanner = require('./credentials-scanner');
+const terminalArt = require('./terminal-art');
 const logger = require('./logger');
 
 const AUTH_TTL_MS = 30 * 60 * 1000; // 30 minutes
@@ -59,20 +60,38 @@ function shieldBlock(prefix, label) {
 }
 
 function buildCredentialsWarning(findings) {
-  // Colored, prominent warning with the diff syntax red highlight.
-  const types = findings.map((f) => f.id).join(', ');
-  return [
+  // Pick a random alert art for variety, embed the credential type and a
+  // redacted preview, all wrapped in a `diff` code block so the lines render
+  // red in Claude Code. This is what the agent surfaces to the user verbatim.
+  const art = terminalArt.randomAlertArt();
+  const summary = findings.map((f) => {
+    const sample = f.sample ? terminalArt.redactCredential(f.sample) : '[redacted]';
+    return `${f.id} ×${f.count}  →  ${sample}`;
+  });
+
+  const lines = [
     '```diff',
-    '- ╭───────────────────────────────────────────────────────────────╮',
-    '- │  🛡  yieldOS  ·  CREDENCIALES DETECTADAS EN EL PROMPT          │',
-    '- ╰───────────────────────────────────────────────────────────────╯',
-    `- Tipos detectados: ${types}`,
-    '- yieldOS bloqueó el prompt antes de que llegara al modelo.',
-    '- Las credenciales NO fueron registradas en el log ni enviadas al agente.',
-    '- Si necesitás compartir contexto sensible, usá variables de entorno o',
-    '  un secret manager y referenciá el nombre, no el valor.',
+    '- ╔════════════════════════════════════════════════════════════════╗',
+    '- ║   🛡  yieldOS  ·  CREDENCIAL DETECTADA EN EL PROMPT            ║',
+    '- ╚════════════════════════════════════════════════════════════════╝',
+    '-',
+    ...art.split('\n').map((l) => '- ' + l),
+    '-',
+    '- Patrones detectados:',
+    ...summary.map((l) => '-   ' + l),
+    '-',
+    '- yieldOS bloqueó tu prompt antes de que llegara al modelo.',
+    '- El valor NO fue registrado en el log ni enviado al agente.',
+    '-',
+    '- ¿Querés mandar el mismo prompt sin credenciales?',
+    '-   1. Reemplazá el valor real por una referencia (ej: $OPENAI_API_KEY).',
+    '-   2. Volvé a enviar el prompt.',
+    '-',
+    '- Si necesitás que el agente USE la credencial, ponela en un .env',
+    '  y autorizá la lectura con: AUTORIZO A LEER LAS CREDENCIALES',
     '```',
-  ].join('\n');
+  ];
+  return lines.join('\n');
 }
 
 function buildEnvRiskExplanation(projectRoot) {
