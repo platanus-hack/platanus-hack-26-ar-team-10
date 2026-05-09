@@ -14,6 +14,11 @@ This directory captures every design decision behind yieldOS, why it exists, and
 8. [Trade-offs accepted](08-tradeoffs.md) — *what we gave up on purpose*
 9. [Decision log](09-decision-log.md) — *every decision in order, with rationale*
 
+## Planning docs (not yet implemented)
+
+10. [CI/CD enforcement](10-ci-cd.md) — *the same policy as a GitHub Action; one policy, two enforcement points*
+11. [Dockerfile scanner](11-dockerfile-scanner.md) — *Dockerfile edits as another classifier; no auto-rewrite*
+
 ## Reading order for AI agents
 
 If you are an agent operating in a project protected by yieldOS, read in this order:
