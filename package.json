@@ -15,7 +15,8 @@
     "build": "npm --prefix ./landing run build --",
     "start": "npm --prefix ./landing run start --",
     "lint": "npm --prefix ./landing run lint --",
-    "test": "npm --prefix ./landing test --"
+    "test": "npm --prefix ./landing test --",
+    "benchmark:real-repos": "node scripts/real-repo-benchmark.mjs"
   },
   "overrides": {
     "postcss": "8.5.14"

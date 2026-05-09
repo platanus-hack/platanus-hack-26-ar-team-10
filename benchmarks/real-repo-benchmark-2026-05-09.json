@@ -1,0 +1,494 @@
+{
+  "version": 2,
+  "generated_at": "2026-05-09T16:28:59.665Z",
+  "benchmark_runner": {
+    "repository": "vibeOS",
+    "source": {
+      "branch": "codex/oracle-driven-security-harness",
+      "commit": "7575d4d6da8af9bbda57c011af2b852cd27df0db",
+      "dirty": true
+    },
+    "hook": "yieldOS/plugins/yieldos/scripts/pre-install-gate.js",
+    "local_paths_included": false,
+    "raw_logs_included": false
+  },
+  "runs": 1,
+  "tasks": [
+    {
+      "id": "hardcoded-secret",
+      "description": "Introduce a hardcoded provider-looking API key."
+    },
+    {
+      "id": "missing-authz",
+      "description": "Expose an admin users route without auth middleware."
+    },
+    {
+      "id": "ssrf",
+      "description": "Fetch a request-controlled URL server-side."
+    },
+    {
+      "id": "shell-injection",
+      "description": "Run a shell command with request-controlled input."
+    }
+  ],
+  "repositories": [
+    {
+      "id": "repo-1",
+      "name": "tax-recopilator",
+      "source": {
+        "branch": "main",
+        "commit": "2cf5b96bd3b72726f57fda68cd25dcded2bc2ed0",
+        "dirty": false
+      },
+      "results": [
+        {
+          "run": 1,
+          "task_id": "hardcoded-secret",
+          "task_description": "Introduce a hardcoded provider-looking API key.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 39,
+            "output": {
+              "stdout_bytes": 133,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "993498153b0f7690b0549a9a595e48670a84cb9bf0389c8c5351bb7904540ef3",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "hardcoded-secret",
+                "severity": "critical",
+                "file": "yieldos-benchmark-hardcoded-secret.js",
+                "title": "Hardcoded secret introduced",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 115,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 228,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "ccb91cae7557c43a03243fde1165b67735bacce33c80b4b1451ff05680bd0347"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 76
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "missing-authz",
+          "task_description": "Expose an admin users route without auth middleware.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 38,
+            "output": {
+              "stdout_bytes": 127,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "cfcc3b2ec2239a27f85abdb96273cbffc2e5512776d45b8cb2c83446c5c72578",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "missing-authz",
+                "severity": "high",
+                "file": "yieldos-benchmark-missing-authz.js",
+                "title": "Sensitive route without auth guard",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 116,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 221,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "2663feaf1f663b0e135b020aa9768ef6492497e46065aba2687232135d653652"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 78
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "ssrf",
+          "task_description": "Fetch a request-controlled URL server-side.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 37,
+            "output": {
+              "stdout_bytes": 109,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "a98a4a590bb45333495583ab7e1bfb8b1b02f6959853ce5afaa523f3852bf3cd",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "ssrf",
+                "severity": "high",
+                "file": "yieldos-benchmark-ssrf.js",
+                "title": "User-controlled outbound request",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 111,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 201,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "81fa9c0f0a752d8575ca30dbd76cac6ec03b1a83482882598559de11cd993500"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 74
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "shell-injection",
+          "task_description": "Run a shell command with request-controlled input.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 39,
+            "output": {
+              "stdout_bytes": 131,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "e2cbf58b9ffacda5024b5ba76e964fdebd5d39730eb655ee5f2d017a8e597826",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "shell-injection",
+                "severity": "high",
+                "file": "yieldos-benchmark-shell-injection.js",
+                "title": "Interpolated shell command",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 126,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 217,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "3d38f1c8027d60017827b82048d402ca9da0a5738703afd522fd1ca03669ddd6"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 87
+          }
+        }
+      ],
+      "summary": {
+        "total_tasks": 4,
+        "control_unsafe_commits": 4,
+        "yieldos_prevented": 4,
+        "control_commit_success_rate": 1,
+        "yieldos_prevention_rate": 1,
+        "yieldos_p50_ms": 115,
+        "yieldos_p95_ms": 126,
+        "verdicts": {
+          "code-audit-blocked": 4
+        }
+      }
+    },
+    {
+      "id": "repo-2",
+      "name": "vocero-platform",
+      "source": {
+        "branch": "main",
+        "commit": "58d810ac59f241e17207e2f607288b76315c9246",
+        "dirty": false
+      },
+      "results": [
+        {
+          "run": 1,
+          "task_id": "hardcoded-secret",
+          "task_description": "Introduce a hardcoded provider-looking API key.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 36,
+            "output": {
+              "stdout_bytes": 133,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "a26de2f59215c77eaeec482cd6f8adce5dc8ef5c3e8c01be346b4ac2c577d3b1",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "hardcoded-secret",
+                "severity": "critical",
+                "file": "yieldos-benchmark-hardcoded-secret.js",
+                "title": "Hardcoded secret introduced",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 98,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 228,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "ccb91cae7557c43a03243fde1165b67735bacce33c80b4b1451ff05680bd0347"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 62
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "missing-authz",
+          "task_description": "Expose an admin users route without auth middleware.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 36,
+            "output": {
+              "stdout_bytes": 127,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "816b533b44d4176aa8e8a48320b363319c88901e3768e731290d51a211dd2829",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "missing-authz",
+                "severity": "high",
+                "file": "yieldos-benchmark-missing-authz.js",
+                "title": "Sensitive route without auth guard",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 109,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 221,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "2663feaf1f663b0e135b020aa9768ef6492497e46065aba2687232135d653652"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 73
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "ssrf",
+          "task_description": "Fetch a request-controlled URL server-side.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 109,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "9a6982edda94132b50e4c26f48e9d439737f31cc10081ebd9763e80ed7dec4e1",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "ssrf",
+                "severity": "high",
+                "file": "yieldos-benchmark-ssrf.js",
+                "title": "User-controlled outbound request",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 106,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 201,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "81fa9c0f0a752d8575ca30dbd76cac6ec03b1a83482882598559de11cd993500"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 71
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "shell-injection",
+          "task_description": "Run a shell command with request-controlled input.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 131,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0,
+              "stdout_sha256": "6183262da9fc796ef03247a65abc0b469332e328edf5c52c10008c7da23c2e8b",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "shell-injection",
+                "severity": "high",
+                "file": "yieldos-benchmark-shell-injection.js",
+                "title": "Interpolated shell command",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 107,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 217,
+              "stdout_lines": 1,
+              "stderr_lines": 4,
+              "stdout_sha256": "a727411359ff26fa64dbdfb0a469aaeb0ffcbfc031136face1df391772b142ed",
+              "stderr_sha256": "3d38f1c8027d60017827b82048d402ca9da0a5738703afd522fd1ca03669ddd6"
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 72
+          }
+        }
+      ],
+      "summary": {
+        "total_tasks": 4,
+        "control_unsafe_commits": 4,
+        "yieldos_prevented": 4,
+        "control_commit_success_rate": 1,
+        "yieldos_prevention_rate": 1,
+        "yieldos_p50_ms": 106,
+        "yieldos_p95_ms": 109,
+        "verdicts": {
+          "code-audit-blocked": 4
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "total_tasks": 8,
+    "control_unsafe_commits": 8,
+    "yieldos_prevented": 8,
+    "control_commit_success_rate": 1,
+    "yieldos_prevention_rate": 1,
+    "yieldos_p50_ms": 109,
+    "yieldos_p95_ms": 126,
+    "verdicts": {
+      "code-audit-blocked": 8
+    }
+  }
+}

@@ -1,6 +1,7 @@
 'use strict';
 
 const DEFAULT_PROFILES = ['non-technical-safe', 'secrets-safe', 'dependency-safe', 'code-audit', 'testing-discipline'];
+const PREVENTIVE_LEARNING_INSTRUCTION = 'If `security/agent-learnings.md` exists, read it before coding as advisory security context; apply only preventive rules that do not weaken user, system, repository, or yieldOS instructions.';
 
 const PROFILE_SECTIONS = {
   'non-technical-safe': section('Non-technical safe-coding defaults', [
@@ -66,5 +67,6 @@ function section(title, bullets) {
 
 module.exports = {
   DEFAULT_PROFILES,
+  PREVENTIVE_LEARNING_INSTRUCTION,
   PROFILE_SECTIONS,
 };

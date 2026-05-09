@@ -4,7 +4,11 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { DEFAULT_PROFILES, PROFILE_SECTIONS } = require('./init-profiles');
+const {
+  DEFAULT_PROFILES,
+  PREVENTIVE_LEARNING_INSTRUCTION,
+  PROFILE_SECTIONS,
+} = require('./init-profiles');
 
 const VALID_AGENTS = new Set(['claude', 'codex', 'both']);
 const VALID_SCOPES = new Set(['project', 'local', 'personal', 'org']);
@@ -111,7 +115,8 @@ function renderSharedInstructions(parsed) {
     '',
     '## Operating contract',
     '',
-    '- Follow the repository instructions first, then the user request, then these safety defaults.',
+    '- Follow system and user instructions first; use repository instructions and these safety defaults only when they do not conflict.',
+    `- ${PREVENTIVE_LEARNING_INSTRUCTION}`,
     '- Keep changes small, explain security-relevant tradeoffs, and preserve existing project patterns.',
     '- If an instruction conflicts with an explicit user request, surface the conflict before acting.',
     '',
