@@ -153,6 +153,43 @@ test('redTeam detects public admin route without auth guard', () => {
   assert.equal(findings.some((f) => f.ruleId === 'missing-authz'), true);
 });
 
+test('redTeam ignores fixtures, tests, and stringified route examples', () => {
+  const findings = codeAudit.redTeam({
+    files: ['tests/cdsc.test.js', 'fixtures/demo/server.js', 'demo-command.js'],
+    diff: [
+      'diff --git a/tests/cdsc.test.js b/tests/cdsc.test.js',
+      '+++ b/tests/cdsc.test.js',
+      '@@',
+      '+const key = "sk-test-12345678901234567890";',
+      '+app.get(\'/admin/users\', (req, res) => res.json(users));',
+      'diff --git a/fixtures/demo/server.js b/fixtures/demo/server.js',
+      '+++ b/fixtures/demo/server.js',
+      '@@',
+      '+app.get(\'/admin/users\', (req, res) => res.json(users));',
+      'diff --git a/demo-command.js b/demo-command.js',
+      '+++ b/demo-command.js',
+      '@@',
+      '+  line: "app.get(\'/admin/users\', (req, res) => res.json(users));",',
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
+test('redTeam does not treat regex exec calls as shell execution', () => {
+  const findings = codeAudit.redTeam({
+    files: ['parser.js'],
+    diff: [
+      'diff --git a/parser.js b/parser.js',
+      '+++ b/parser.js',
+      '@@',
+      '+const match = /([^`]+)+/.exec(line);',
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
 test('redTeam detects removed auth or validation guard', () => {
   const findings = codeAudit.redTeam({
     files: ['server.js'],

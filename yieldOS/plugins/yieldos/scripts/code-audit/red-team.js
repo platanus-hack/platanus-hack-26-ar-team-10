@@ -18,6 +18,7 @@ function redTeam(input) {
   const lines = parseChangedLines(input.diff || '');
   const findings = [];
   for (const item of lines) {
+    if (isAuditExemptFile(item.file)) continue;
     for (const finder of FINDERS) {
       const finding = finder(item, input);
       if (finding && hasExploitEvidence(finding)) findings.push(finding);
@@ -93,7 +94,7 @@ function hardcodedSecret(item) {
 
 function missingAuthz(item) {
   if (item.sign !== '+') return null;
-  const route = /\b(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/.exec(item.code);
+  const route = /^\s*(?:app|router)\s*\.\s*(?:get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/.exec(item.code);
   if (!route) return null;
   if (!/(admin|private|settings|billing|users|account|dashboard)/i.test(route[1])) return null;
   if (/(requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)/.test(item.code)) return null;
@@ -121,7 +122,7 @@ function sqlInjection(item) {
 
 function shellInjection(item) {
   if (item.sign !== '+') return null;
-  if (!/\b(?:exec|execSync)\s*\(/.test(item.code)) return null;
+  if (!/(?:^|[^\w.])(?:exec|execSync)\s*\(/.test(item.code)) return null;
   if (!/(\+|\$\{|\breq\.|\bprocess\.argv\b)/.test(item.code)) return null;
   return makeFinding(item, 'shell-injection', 'high', 'Interpolated shell command', {
     attackerControlledInput: 'Request, argument, or variable data can reach a shell command.',
@@ -209,4 +210,9 @@ function dangerousInstructionEdit(item) {
   });
 }
 
-module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence };
+function isAuditExemptFile(file) {
+  const normalized = String(file || '').replace(/\\/g, '/');
+  return /(?:^|\/)(?:tests?|__tests__|fixtures?)\//.test(normalized) || /\.test\.[cm]?[jt]sx?$/.test(normalized);
+}
+
+module.exports = { redTeam, parseAddedLines, parseChangedLines, hasExploitEvidence, isAuditExemptFile };
