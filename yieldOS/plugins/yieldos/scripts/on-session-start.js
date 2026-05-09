@@ -9,6 +9,7 @@ const instructionWatcher = require('./instruction-watcher');
 const settingsValidator = require('./analyzers/settings-validator');
 const injectionScanner = require('./injection-scanner');
 const logger = require('./logger');
+const ui = require('./ui');
 
 function readStdinSync() {
   try { return fs.readFileSync(0, 'utf8'); }
@@ -52,9 +53,9 @@ async function main() {
   try {
     policyResult = await policyFetcher.getPolicy({ forceRefresh: true });
   } catch (err) {
-    process.stderr.write(`[yieldOS] policy refresh failed: ${err.message}\n`);
+    ui.writeMessage(`policy refresh failed: ${err.message}`);
   }
-  process.stderr.write(`[yieldOS] policy source: ${policyResult.source}\n`);
+  ui.writeMessage(`policy source: ${policyResult.source}`);
   const policy = policyResult.policy || {};
 
   if (policy['required-settings.json']) {
@@ -86,7 +87,7 @@ async function main() {
         action: findings.length > 0 ? 'flagged for review' : 'auto-accepted',
       });
       if (findings.length > 0) {
-        process.stderr.write(`[yieldOS] AGENTS/CLAUDE.md cambió y contiene patrones sospechosos: ${c.file}\n`);
+        ui.writeMessage(`AGENTS/CLAUDE.md cambió y contiene patrones sospechosos: ${c.file}`, { action: 'block' });
       }
     }
   }

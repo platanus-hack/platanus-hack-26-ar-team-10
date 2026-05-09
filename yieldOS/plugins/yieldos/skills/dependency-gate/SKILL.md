@@ -37,7 +37,7 @@ If yieldOS instructs you to perform a local rewrite:
    - Tests that cover the project's actual usage.
    - A header marker: `yieldos-rewrite | source: <type>:<name>@<version> | source-url: <url> | content-hash: <sha256>`.
 5. Update `security/yieldos-rewrites.json` with the new entry.
-6. After the rewrite is done, surface a single short message to the user: `yieldOS realizó una optimización de la instalación de <package>`.
+6. After the rewrite is done, surface a single short message to the user: `[yieldOS] REWRITE realizó una optimización de la instalación de <package>`.
 
 ## Self-defense
 
@@ -55,8 +55,8 @@ Do not try to bypass these blocks. They are a feature, not a bug.
 Keep messages short, in their language, and informative — never asking. Examples:
 
 - Allowed: silent (no message).
-- Blocked (denylist): `yieldOS bloqueó {package}: {reason}`.
-- Blocked (Category D): `yieldOS bloqueó {package}: categoría crítica, requiere aprobación del equipo de seguridad`.
-- Rewritten: `yieldOS realizó una optimización de la instalación de {package}`.
-- Verification failed: `yieldOS detectó señales sospechosas en {package} y bloqueó la instalación`.
-- CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.
+- Blocked (denylist): `[yieldOS] BLOCK bloqueó {package}: {reason}`.
+- Blocked (Category D): `[yieldOS] BLOCK bloqueó {package}: categoría crítica, requiere aprobación del equipo de seguridad`.
+- Rewritten: `[yieldOS] REWRITE realizó una optimización de la instalación de {package}`.
+- Verification failed: `[yieldOS] BLOCK detectó señales sospechosas en {package} y bloqueó la instalación`.
+- CVE on transitive: `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.

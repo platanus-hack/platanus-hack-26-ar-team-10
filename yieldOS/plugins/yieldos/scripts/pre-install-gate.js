@@ -11,6 +11,7 @@ const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const injectionScanner = require('./injection-scanner');
 const codeAudit = require('./code-audit');
+const ui = require('./ui');
 
 const DEFAULTS = require(path.join(__dirname, '..', 'config', 'defaults.json'));
 
@@ -33,10 +34,7 @@ function projectCwd(input) {
 }
 
 function emitDecision(verdict, message, exitCode) {
-  if (message) {
-    process.stderr.write(`[yieldOS] ${message}\n`);
-  }
-  process.stderr.write(`[yieldOS:verdict] ${verdict}\n`);
+  ui.writeDecision({ verdict, action: exitCode === 2 ? 'block' : 'allow', message });
   process.exit(exitCode);
 }
 
@@ -95,20 +93,16 @@ async function processCandidates(candidates, projectRoot, policy) {
       case 'allow':
         if (decision.verdict === 'allowlist-match') logger.logAllowed(projectRoot, candidate);
         else logger.logVerified(projectRoot, candidate, decision.meta?.findings || []);
-        if (decision.message) {
-          process.stderr.write(`[yieldOS] ${decision.message}\n`);
-        }
         // Always emit machine-readable verdict so downstream tools (logs, benches,
         // QA harnesses) can identify what happened, even when the human-facing
         // message is intentionally silent.
-        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
+        ui.writeDecision(decision);
         break;
 
       case 'block-with-suggestion':
       case 'block':
         logger.logBlocked(projectRoot, candidate, decision.verdict, { findings: decision.meta?.findings });
-        process.stderr.write(`[yieldOS] ${decision.message || 'blocked'}\n`);
-        process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
+        ui.writeDecision({ ...decision, message: decision.message || 'blocked' });
         anyBlocked = true;
         break;
 
@@ -124,11 +118,10 @@ async function processCandidates(candidates, projectRoot, policy) {
             api: 'see scaffold; agent must populate via dependency-gate skill',
             marker: scaffold.indexPath,
           });
-          process.stderr.write(`[yieldOS] ${decision.message}\n`);
-          process.stderr.write(`[yieldOS:verdict] ${decision.verdict}\n`);
-          process.stderr.write(`[yieldOS:rewrite-target] ${scaffold.dir}\n`);
+          ui.writeDecision(decision);
+          process.stderr.write(`${ui.formatRewriteTarget(scaffold.dir)}\n`);
         } catch (err) {
-          process.stderr.write(`[yieldOS] error generating rewrite scaffold: ${err.message}\n`);
+          ui.writeMessage(`error generating rewrite scaffold: ${err.message}`);
         }
         anyBlocked = true;
         break;
@@ -157,8 +150,7 @@ function handleCodeAuditCommand(projectRoot, command) {
   }
 
   logger.logCodeAudit(projectRoot, audit);
-  if (audit.message) process.stderr.write(`[yieldOS] ${audit.message}\n`);
-  process.stderr.write(`[yieldOS:verdict] ${audit.verdict}\n`);
+  ui.writeAudit(audit);
   process.exit(audit.action === 'block' ? 2 : 0);
 }
 
@@ -179,7 +171,7 @@ async function main() {
   try {
     policyResult = await policyFetcher.getPolicy({ forceRefresh: false });
   } catch (err) {
-    process.stderr.write(`[yieldOS] policy fetch failed: ${err.message}\n`);
+    ui.writeMessage(`policy fetch failed: ${err.message}`);
     policyResult = { source: 'unavailable', policy: null };
   }
   const policy = policyResult.policy || {};

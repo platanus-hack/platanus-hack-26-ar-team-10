@@ -248,12 +248,16 @@ plugins/yieldos/
 You don't have to do anything. yieldOS works in the background:
 
 - **Safe installs go through silently.** If the package is on the official allowlist, it just installs.
-- **Dangerous installs are blocked.** You'll see a one-line message: `yieldOS bloqueó {package}: {reason}`.
-- **Tiny utility packages get rewritten locally.** You'll see: `yieldOS realizó una optimización de la instalación de {package}`. The code lives in `src/lib/yieldos/` in your project.
+- **Dangerous installs are blocked.** You'll see a one-line message: `[yieldOS] BLOCK bloqueó {package}: {reason}`.
+- **Tiny utility packages get rewritten locally.** You'll see: `[yieldOS] REWRITE realizó una optimización de la instalación de {package}`. The code lives in `src/lib/yieldos/` in your project.
 - **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to open a PR to the official policy repo.
-- **CVEs in transitive dependencies are flagged** post-install — you'll see `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.
+- **CVEs in transitive dependencies are flagged** post-install — you'll see `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
 
 Everything is logged to `<project>/security/dependency-events.md`. You can read it any time to audit what yieldOS decided and why.
+
+When stderr is an interactive terminal, yieldOS colorizes the status label. In
+non-interactive agent runs, CI, or `NO_COLOR=1`, output stays plain text. The
+machine-readable line is always unstyled: `[yieldOS:verdict] <verdict>`.
 
 You do not need to:
 
@@ -331,9 +335,10 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `logger.test.js` — log entry shape and secret redaction.
 - `self-defense.test.js` — protected path matching.
 - `code-audit.test.js` — staged/push diff collection, red/blue loop, verification, hook routing.
+- `ui.test.js` — terminal labels, color gating, exact machine-readable verdicts.
 - `e2e.test.js` — end-to-end runs of the pre-install gate with realistic inputs.
 
-139/139 passing.
+146/146 passing.
 
 ---
 

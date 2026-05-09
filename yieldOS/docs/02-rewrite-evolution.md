@@ -97,6 +97,6 @@ The first signal triggers a thresholds update; the others trigger improvements t
 
 ## What "rewrite" means today
 
-> A rewrite is a Category A salvage. yieldOS would rather block, but for small low-risk utilities where rewriting is safer than installing, it generates a project-local stub with a content-hash marker. The agent fills it in following the dependency-gate skill. The user sees a one-line message: `yieldOS realizó una optimización de la instalación de <package>`.
+> A rewrite is a Category A salvage. yieldOS would rather block, but for small low-risk utilities where rewriting is safer than installing, it generates a project-local stub with a content-hash marker. The agent fills it in following the dependency-gate skill. The user sees a one-line message: `[yieldOS] REWRITE realizó una optimización de la instalación de <package>`.
 
 That's it. Not a feature. A salvage.

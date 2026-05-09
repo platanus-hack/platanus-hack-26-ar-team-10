@@ -9,6 +9,7 @@ const policyFetcher = require('./policy-fetcher');
 const transitiveAuditor = require('./transitive-auditor');
 const logger = require('./logger');
 const classifiers = require('./classifiers');
+const ui = require('./ui');
 
 const DEFAULTS = require(path.join(__dirname, '..', 'config', 'defaults.json'));
 
@@ -71,16 +72,16 @@ async function main() {
 
       if (audit.cves && audit.cves.length > 0) {
         for (const c of audit.cves) {
-          process.stderr.write(`[yieldOS] CVE detectado en transitiva: ${c}\n`);
+          ui.writeMessage(`CVE detectado en transitiva: ${c}`, { action: 'block' });
         }
       }
       if (audit.denylisted && audit.denylisted.length > 0) {
         for (const d of audit.denylisted) {
-          process.stderr.write(`[yieldOS] Transitiva denylisted: ${d} (considerar rollback)\n`);
+          ui.writeMessage(`Transitiva denylisted: ${d} (considerar rollback)`, { action: 'block' });
         }
       }
     } catch (err) {
-      process.stderr.write(`[yieldOS] post-install audit error: ${err.message}\n`);
+      ui.writeMessage(`post-install audit error: ${err.message}`);
     }
   }
 

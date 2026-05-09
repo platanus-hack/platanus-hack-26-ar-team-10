@@ -44,6 +44,9 @@ test('npm install of denylisted package blocks (exit 2)', () => {
   // event-stream@3.3.6 IS in the shipped denylist, so this should block
   assert.equal(r.code, 2, `expected block but got exit ${r.code}, stderr: ${r.stderr}`);
   assert.equal(r.stderr.includes('event-stream'), true);
+  assert.equal(r.stderr.includes('[yieldOS] BLOCK'), true);
+  assert.equal(r.stderr.includes('[yieldOS:verdict] denylist-match'), true);
+  assert.equal(r.stderr.includes('\u001b['), false);
 });
 
 test('npm install of allowlisted package passes (exit 0)', () => {

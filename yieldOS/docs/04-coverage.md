@@ -60,7 +60,7 @@ Detectors: `Write` / `Edit` to:
 - `AGENTS.md`
 - `.cursorrules`
 
-**Routing**: content scanned for prompt-injection patterns (`policy/injection-patterns.json`). Detection of tier1/tier2 patterns blocks the edit. The user gets `yieldOS bloqueó edición de CLAUDE.md: detectó intento de inyección`.
+**Routing**: content scanned for prompt-injection patterns (`policy/injection-patterns.json`). Detection of tier1/tier2 patterns blocks the edit. The user gets `[yieldOS] BLOCK bloqueó edición de CLAUDE.md: detectó intento de inyección`.
 
 Patterns matched include:
 - "ignore previous instructions"
