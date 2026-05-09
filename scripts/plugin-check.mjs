@@ -45,7 +45,7 @@ function validateMarketplace(relativePath, expectedSource, sourceBase = '.') {
 
   const entry = marketplace.plugins.find((plugin) => plugin.name === 'yieldos');
   assert(entry, `${relativePath} must declare the yieldos plugin`);
-  assert(entry.version === '0.2.6', `${relativePath} must point at yieldos 0.2.6`);
+  assert(entry.version === '0.2.7', `${relativePath} must point at yieldos 0.2.7`);
   assert(entry.source === expectedSource, `${relativePath} has wrong source: ${entry.source}`);
   assert(entry.author?.name === 'platanus-hack-26-ar-team-10', `${relativePath} has wrong author`);
   assert(entry.category === 'security', `${relativePath} should classify yieldos as security`);
@@ -57,7 +57,7 @@ validateMarketplace('yieldOS/.claude-plugin/marketplace.json', './plugins/yieldo
 
 const plugin = readJson('yieldOS/plugins/yieldos/.claude-plugin/plugin.json');
 assert(plugin.name === 'yieldos', 'plugin manifest must be named yieldos');
-assert(plugin.version === '0.2.6', 'plugin manifest must be version 0.2.6');
+assert(plugin.version === '0.2.7', 'plugin manifest must be version 0.2.7');
 assert(plugin.author?.name === 'platanus-hack-26-ar-team-10', 'plugin manifest has wrong author');
 
 for (const relativePath of [

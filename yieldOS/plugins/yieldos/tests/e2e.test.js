@@ -61,7 +61,7 @@ test('npm install of allowlisted package passes (exit 0)', () => {
   });
   // react@18.3.1 IS in shipped allowlist
   assert.equal(r.code, 0, `expected allow but got exit ${r.code}, stderr: ${r.stderr}`);
-  assert.equal(hookContext(r).includes('> 🛡  Validado por yieldOS'), true);
+  assert.equal(hookContext(r).includes('+ ▎ 🛡  yieldOS  ·  Validado · allowlist'), true);
 });
 
 test('Edit to package.json reconstructs full manifest and validates added dependency', () => {
@@ -94,7 +94,7 @@ test('npm install of bcrypt (Category D) blocks', () => {
   });
   // bcrypt-extra-not-listed name contains 'bcrypt' so keyword match should trigger D
   assert.equal(r.code, 2, `expected block, stderr: ${r.stderr}`);
-  assert.equal(hookContext(r).includes('> ⛔ Bloqueado por yieldOS — categoría crítica'), true);
+  assert.equal(hookContext(r).includes('- ▎ 🛡  yieldOS  ·  Bloqueado · categoría crítica'), true);
 });
 
 test('Write to protected file is blocked by self-defense', () => {
@@ -109,7 +109,7 @@ test('Write to protected file is blocked by self-defense', () => {
   });
   assert.equal(r.code, 2);
   assert.equal(r.stderr.toLowerCase().includes('protegido') || r.stderr.toLowerCase().includes('protected'), true);
-  assert.equal(hookContext(r).includes('> ⛔ Bloqueado por yieldOS — archivo protegido'), true);
+  assert.equal(hookContext(r).includes('- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido'), true);
 });
 
 test('CLAUDE.md edit with injection pattern blocks', () => {
@@ -123,7 +123,7 @@ test('CLAUDE.md edit with injection pattern blocks', () => {
     cwd: root,
   });
   assert.equal(r.code, 2);
-  assert.equal(hookContext(r).includes('> ⛔ Bloqueado por yieldOS — inyección detectada'), true);
+  assert.equal(hookContext(r).includes('- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada'), true);
 });
 
 test('Plain Bash command on irrelevant tool returns 0', () => {

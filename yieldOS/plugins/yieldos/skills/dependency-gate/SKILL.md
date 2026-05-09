@@ -1,6 +1,6 @@
 ---
 name: dependency-gate
-description: yieldOS security gate. Loads when the agent runs install commands, edits dependency manifests, activates skills, adds MCPs, or edits instruction files. Provides context on yieldOS policy, visual stamps, and how to handle hook-blocked actions.
+description: yieldOS security gate. Loads when the agent runs install commands, edits dependency manifests, activates skills, adds MCPs, or edits instruction files. Provides context on yieldOS policy, colored visual stamps, and how to handle hook-blocked actions.
 ---
 
 # yieldOS Dependency Gate
@@ -56,20 +56,32 @@ Keep messages short, in their language, and informative — never asking.
 
 ### Visual stamp
 
-Whenever a tool call was processed by yieldOS, close your reply with the matching one-line stamp on its own final line:
+Whenever a tool call was processed by yieldOS, close your reply with the matching shield stamp on its own final block. The hook also returns the exact stamp in `hookSpecificOutput.additionalContext`; when present, copy it verbatim.
 
-| Verdict in stderr | Stamp |
+Each stamp is a markdown `diff` code block so the line renders with color: `+` green for allowed/safe, `-` red for blocked/unsafe, and `!` orange for suggestions.
+
+| Verdict in stderr | Stamp line inside the `diff` block |
 | --- | --- |
-| `allowlist-match` | `> 🛡  Validado por yieldOS` |
-| `verification-passed` | `> 🛡  Validado por yieldOS (análisis OK)` |
-| `denylist-match` | `> ⛔ Bloqueado por yieldOS — denylist` |
-| `category-d-blocked` | `> ⛔ Bloqueado por yieldOS — categoría crítica` |
-| `verification-failed` | `> ⛔ Bloqueado por yieldOS — señales sospechosas` |
-| `build-script-not-approved` | `> ⛔ Bloqueado por yieldOS — build script no aprobado` |
-| `native-suggest` | `> 💡 yieldOS sugiere usar API nativa` |
-| `category-a-rewrite` | `> ✨ yieldOS optimizó la instalación` |
-| `injection-blocked` | `> ⛔ Bloqueado por yieldOS — inyección detectada` |
-| `self-defense-block` | `> ⛔ Bloqueado por yieldOS — archivo protegido` |
+| `allowlist-match` | `+ ▎ 🛡  yieldOS  ·  Validado · allowlist` |
+| `verification-passed` | `+ ▎ 🛡  yieldOS  ·  Validado · análisis OK` |
+| `category-a-rewrite` | `+ ▎ 🛡  yieldOS  ·  Optimizado · rewrite local` |
+| `denylist-match` | `- ▎ 🛡  yieldOS  ·  Bloqueado · denylist` |
+| `category-d-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · categoría crítica` |
+| `verification-failed` | `- ▎ 🛡  yieldOS  ·  Bloqueado · señales sospechosas` |
+| `build-script-not-approved` | `- ▎ 🛡  yieldOS  ·  Bloqueado · build script no aprobado` |
+| `injection-blocked` | `- ▎ 🛡  yieldOS  ·  Bloqueado · inyección detectada` |
+| `self-defense-block` | `- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido` |
+| `native-suggest` | `! ▎ 🛡  yieldOS  ·  Sugerencia · usar API nativa` |
+
+Example:
+
+````
+Agregué numpy a requirements.txt. Para instalarlo, ejecutá pip install -r requirements.txt.
+
+```diff
++ ▎ 🛡  yieldOS  ·  Validado · allowlist
+```
+````
 
 Use a brief body only when the user needs context:
 
