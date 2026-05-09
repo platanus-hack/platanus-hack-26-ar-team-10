@@ -1,5 +1,17 @@
 # Changelog
 
+## yieldOS v0.3.6 - 2026-05-09
+
+- Add root /policy as the online source of truth for yieldOS runtime policy refreshes.
+- Validate root policy files in plugin-check.
+- Document the online policy refresh and offline fallback path.
+
+## yieldOS v0.3.5 - 2026-05-09
+
+- Handle credential-looking prompts with a no-echo security directive instead of decision:block to avoid harness reprinting the original prompt.
+- Detect secret-looking variable assignments with arbitrary or non-ASCII values.
+- Add a guided .env remediation panel and surface authorized credential-read stamps.
+
 ## yieldOS v0.3.1 - 2026-05-09
 
 - Block credential-looking prompts before they reach the model.

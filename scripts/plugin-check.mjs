@@ -40,6 +40,19 @@ function assertNoUnknownMarketplaceKeys(marketplace, relativePath) {
   }
 }
 
+const policyFiles = [
+  'allowlist.json',
+  'denylist.json',
+  'categories.json',
+  'native-equivalents.json',
+  'skills.json',
+  'mcps.json',
+  'injection-patterns.json',
+  'build-scripts-allowed.json',
+  'required-settings.json',
+  'version.json',
+];
+
 function validateMarketplace(relativePath, expectedSource, expectedVersion, sourceBase = '.') {
   const marketplace = readJson(relativePath);
   assertNoUnknownMarketplaceKeys(marketplace, relativePath);
@@ -71,6 +84,7 @@ for (const relativePath of [
   'scripts/release.test.mjs',
   'scripts/versioning.mjs',
   '.github/workflows/release.yml',
+  'policy/README.md',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
   'yieldOS/plugins/yieldos/commands/update.md',
   'yieldOS/plugins/yieldos/bin/yieldos-update',
@@ -80,11 +94,18 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/on-session-start.js',
   'yieldOS/plugins/yieldos/scripts/on-prompt-submit.js',
   'yieldOS/plugins/yieldos/scripts/credentials-scanner.js',
+  'yieldOS/plugins/yieldos/scripts/env-helper.js',
   'yieldOS/plugins/yieldos/scripts/terminal-art.js',
   'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
 ]) {
   assertFile(relativePath);
+}
+
+for (const file of policyFiles) {
+  const relativePath = `policy/${file}`;
+  assertFile(relativePath);
+  readJson(relativePath);
 }
 
 assertExecutable('install.sh');

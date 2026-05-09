@@ -315,8 +315,13 @@ async function handleCredentialsRead(input, projectRoot) {
       ].join('\n'),
     },
   };
-  // Drain stdout before exiting; otherwise the buffer is dropped on process.exit.
-  process.stdout.write(JSON.stringify(out), () => process.exit(2));
+  // Drain stdout BEFORE returning. The previous implementation passed a
+  // callback to stdout.write, but main() did not await the callback — by the
+  // time the callback fired and called process.exit(2), main() had already
+  // continued through and called process.exit(0) elsewhere, masking the
+  // intended block. Awaiting the drain Promise makes the exit deterministic.
+  await new Promise((resolve) => process.stdout.write(JSON.stringify(out), resolve));
+  process.exit(2);
 }
 
 function contentForWriteOrEdit(tool, toolInput) {
