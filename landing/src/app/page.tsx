@@ -1,6 +1,5 @@
 import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
 import { AnimatedDemoStory } from "@/components/animated-demo-story";
-import { AnimatedSecurityMockup } from "@/components/animated-security-mockup";
 import { CopyCommandButton } from "@/components/copy-command-button";
 import { MotionReveal } from "@/components/motion-reveal";
 import { ScrollProgress } from "@/components/scroll-progress";
@@ -96,8 +95,8 @@ export default function Home() {
         id="hero"
         className="pitch-section security-hero relative overflow-hidden bg-[#0e0e10] text-white"
       >
-        <div className="pitch-shell mx-auto grid max-w-7xl grid-cols-1 items-center gap-6 px-5 py-7 sm:px-8 md:grid-cols-[0.68fr_1.32fr] md:gap-8 lg:gap-12">
-          <div className="min-w-0 max-w-full">
+        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
+          <div className="min-w-0 max-w-3xl">
             <MotionReveal
               className="mb-4 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:mb-6 sm:text-[11px]"
               delay={0.06}
@@ -143,10 +142,6 @@ export default function Home() {
                 View decision demo
               </a>
             </MotionReveal>
-          </div>
-
-          <div className="hero-visual hidden min-w-0 md:block">
-            <AnimatedSecurityMockup />
           </div>
         </div>
       </section>

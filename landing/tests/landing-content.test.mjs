@@ -11,14 +11,12 @@ function read(path) {
 
 test("home page pivots to the yieldOS source-of-truth story", () => {
   const page = read("src/app/page.tsx");
-  const animatedMockup = read("src/components/animated-security-mockup.tsx");
   const animatedDemo = read("src/components/animated-demo-flow.tsx");
   const animatedStory = read("src/components/animated-demo-story.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
   const source = [
     page,
-    animatedMockup,
     animatedDemo,
     animatedStory,
     scrollProgress,
@@ -34,19 +32,13 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "View decision demo",
     "claude plugin marketplace add /path/to/vibeOS",
     "claude plugin install yieldos@yieldos-marketplace",
-    "Gate timeline",
-    "Denied path",
-    "Approved path",
     "Tool call",
-    "PreToolUse gate",
     "Verdict",
     "Allow",
     "Block",
     "Rewrite",
     "AGENTS.md",
     "curl | sh",
-    "allowlist-match",
-    "npm install nanoid",
     "Live decision demo",
     "Verdict before execution.",
     "Tool call captured",
@@ -130,6 +122,12 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "PostToolUse",
     "Claude gate",
     "View demo",
+    "Gate timeline",
+    "Denied path",
+    "Approved path",
+    "PreToolUse gate",
+    "allowlist-match",
+    "npm install nanoid",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
@@ -155,8 +153,8 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
 
 test("cinematic motion components and reduced motion styles are configured", () => {
   const packageJson = read("package.json");
+  const page = read("src/app/page.tsx");
   const reveal = read("src/components/motion-reveal.tsx");
-  const mockup = read("src/components/animated-security-mockup.tsx");
   const demo = read("src/components/animated-demo-flow.tsx");
   const story = read("src/components/animated-demo-story.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
@@ -164,7 +162,7 @@ test("cinematic motion components and reduced motion styles are configured", () 
   const globals = read("src/app/globals.css");
 
   assert.ok(packageJson.includes('"motion"'), "Expected motion dependency");
-  [reveal, mockup, demo, story, scrollProgress, typewriterTitle].forEach((source) => {
+  [reveal, demo, story, scrollProgress, typewriterTitle].forEach((source) => {
     assert.ok(source.startsWith('"use client";'), "Expected client boundary");
     assert.ok(source.includes('"motion/react"'), "Expected Motion import");
     assert.ok(source.includes("useReducedMotion"), "Expected reduced motion hook");
@@ -223,7 +221,11 @@ test("cinematic motion components and reduced motion styles are configured", () 
     globals.includes(".scroll-progress"),
     "Expected scroll progress rail styling",
   );
-  assert.ok(globals.includes(".gate-frame"), "Expected hero gate frame");
+  assert.ok(
+    !existsSync(join(root, "src/components/animated-security-mockup.tsx")),
+    "Expected temporary hero gate mockup to be removed",
+  );
+  assert.ok(!page.includes("AnimatedSecurityMockup"), "Expected hero mockup render removed");
   assert.ok(
     globals.includes(".hero-typewriter"),
     "Expected hero typewriter styling",
@@ -232,15 +234,7 @@ test("cinematic motion components and reduced motion styles are configured", () 
     globals.includes(".hero-typewriter-caret"),
     "Expected hero typewriter caret",
   );
-  assert.ok(globals.includes(".gate-flow"), "Expected dual gate flow styling");
-  assert.ok(
-    globals.includes(".gate-flow.is-denied"),
-    "Expected denied gate flow styling",
-  );
-  assert.ok(
-    globals.includes(".gate-flow.is-allowed"),
-    "Expected approved gate flow styling",
-  );
+  assert.ok(!globals.includes(".gate-flow"), "Expected removed gate flow CSS");
   assert.ok(
     !globals.includes(".gate-pulse"),
     "Expected old horizontal gate pulse to be removed",
