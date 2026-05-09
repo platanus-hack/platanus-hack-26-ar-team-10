@@ -36,6 +36,10 @@ function emitDecision(verdict, message, exitCode) {
     process.stderr.write(`[yieldOS] ${message}\n`);
   }
   process.stderr.write(`[yieldOS:verdict] ${verdict}\n`);
+  // Also emit hookSpecificOutput JSON so the agent receives the stamp instruction
+  // even on shortcut paths (self-defense, instruction-edit injection) that don't
+  // pass through processCandidates.
+  emitHookOutput([{ candidate: { name: '(file)', version: 'n/a' }, decision: { verdict } }], exitCode === 2);
   process.exit(exitCode);
 }
 
