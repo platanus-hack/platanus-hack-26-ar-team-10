@@ -3,7 +3,11 @@
 :root {
   --background: #f7f7f6;
   --foreground: #141414;
-  --acid: #e8ff00;
+  --signal-blue: #168cff;
+  --signal-red: #ff2d45;
+  --signal-blue-rgb: 22, 140, 255;
+  --signal-red-rgb: 255, 45, 69;
+  --signal-violet-rgb: 152, 77, 255;
   --charcoal: #0e0e10;
 }
 
@@ -73,6 +77,20 @@ html {
     linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
 }
 
+.theme-surface-blue {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(var(--signal-blue-rgb), 0.16), transparent 34%),
+    radial-gradient(circle at 88% 74%, rgba(var(--signal-red-rgb), 0.055), transparent 36%),
+    linear-gradient(135deg, #f5f9ff 0%, #f7f8fb 48%, #fff7f8 100%);
+}
+
+.theme-surface-red {
+  background:
+    radial-gradient(circle at 84% 18%, rgba(var(--signal-red-rgb), 0.12), transparent 33%),
+    radial-gradient(circle at 14% 72%, rgba(var(--signal-blue-rgb), 0.085), transparent 34%),
+    linear-gradient(135deg, #fff7f8 0%, #f8f9fd 52%, #f5faff 100%);
+}
+
 .snap-deck {
   position: relative;
   isolation: isolate;
@@ -137,8 +155,10 @@ html {
   width: 0.075em;
   height: 0.8em;
   margin-left: 0.055em;
-  background: var(--acid);
-  box-shadow: 0 0 22px rgba(232, 255, 0, 0.34);
+  background: linear-gradient(180deg, var(--signal-blue), var(--signal-red));
+  box-shadow:
+    0 0 20px rgba(var(--signal-blue-rgb), 0.3),
+    0 0 30px rgba(var(--signal-red-rgb), 0.18);
   transform: translateY(0.075em);
   animation: hero-caret-blink 0.88s steps(2, end) infinite;
 }
@@ -169,7 +189,9 @@ html {
 }
 
 .command-bar {
-  background-color: rgba(82, 92, 122, 0.24);
+  background:
+    linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075)),
+    rgba(22, 24, 34, 0.54);
   backdrop-filter: blur(24px) saturate(150%);
   box-shadow:
     0 18px 58px -32px rgba(0, 0, 0, 0.82),
@@ -212,8 +234,9 @@ html {
   inset: -1px;
   content: "";
   pointer-events: none;
-  border: 1px solid rgba(232, 255, 0, 0.38);
+  border: 1px solid rgba(var(--signal-blue-rgb), 0.36);
   border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(var(--signal-red-rgb), 0.16);
   opacity: 0;
   transform: scaleX(0.94);
 }
@@ -247,7 +270,7 @@ html {
   display: block;
   width: 1px;
   height: 100%;
-  background: linear-gradient(180deg, var(--acid), rgba(232, 255, 0, 0.15));
+  background: linear-gradient(180deg, var(--signal-blue), var(--signal-red));
 }
 
 .scroll-progress-labels {
@@ -279,7 +302,7 @@ html {
 }
 
 .scroll-progress-index {
-  color: rgba(232, 255, 0, 0.78);
+  color: rgba(var(--signal-blue-rgb), 0.82);
 }
 
 .ascii-backdrop {
@@ -329,7 +352,8 @@ html {
   content: "";
   pointer-events: none;
   background:
-    radial-gradient(circle at 72% 42%, rgba(232, 255, 0, 0.09), transparent 24%),
+    radial-gradient(circle at 28% 44%, rgba(var(--signal-blue-rgb), 0.1), transparent 28%),
+    radial-gradient(circle at 74% 42%, rgba(var(--signal-red-rgb), 0.09), transparent 28%),
     linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.24) 100%);
   opacity: 0.72;
 }
@@ -366,7 +390,7 @@ html {
   left: 0;
   width: 26%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  background: linear-gradient(90deg, transparent, var(--signal-blue), var(--signal-red), transparent);
 }
 
 .flow-card {
@@ -380,7 +404,9 @@ html {
   inset: 0;
   content: "";
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(232, 255, 0, 0.07), transparent 48%);
+  background:
+    linear-gradient(135deg, rgba(var(--signal-blue-rgb), 0.08), transparent 42%),
+    linear-gradient(315deg, rgba(var(--signal-red-rgb), 0.06), transparent 46%);
   opacity: 0;
   transition: opacity 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -398,7 +424,8 @@ html {
   background: linear-gradient(
     180deg,
     transparent,
-    rgba(232, 255, 0, 0.08),
+    rgba(var(--signal-blue-rgb), 0.08),
+    rgba(var(--signal-red-rgb), 0.055),
     transparent
   );
   mix-blend-mode: screen;
@@ -413,7 +440,7 @@ html {
   left: 0;
   height: 1px;
   content: "";
-  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  background: linear-gradient(90deg, transparent, var(--signal-blue), var(--signal-red), transparent);
   opacity: 0.7;
 }
 
@@ -427,7 +454,7 @@ html {
   height: 1px;
   content: "";
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  background: linear-gradient(90deg, transparent, var(--signal-blue), var(--signal-red), transparent);
   opacity: 0.55;
   transform: translateY(0);
   animation: demo-rule 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
@@ -443,7 +470,7 @@ html {
   inset: 0 auto 0 0;
   width: 2px;
   content: "";
-  background: var(--acid);
+  background: linear-gradient(180deg, var(--signal-blue), var(--signal-red));
   opacity: 0;
   transform: scaleY(0.55);
   transition:
@@ -496,7 +523,7 @@ html {
   width: 26%;
   height: 1px;
   content: "";
-  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  background: linear-gradient(90deg, transparent, var(--signal-blue), var(--signal-red), transparent);
   opacity: 0.8;
   transform: translateX(0);
   animation: belt-scan 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
@@ -511,7 +538,7 @@ html {
 }
 
 .surface-chip:hover {
-  border-color: rgba(232, 255, 0, 0.36);
+  border-color: rgba(var(--signal-red-rgb), 0.28);
   color: #f4f4f5;
   transform: translateY(-2px);
 }
@@ -527,7 +554,7 @@ html {
   left: 8%;
   height: 1px;
   content: "";
-  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  background: linear-gradient(90deg, transparent, var(--signal-blue), rgba(var(--signal-violet-rgb), 0.8), var(--signal-red), transparent);
   opacity: 0.62;
 }
 
@@ -546,7 +573,7 @@ html {
   inset: auto 12px 0;
   height: 1px;
   content: "";
-  background: linear-gradient(90deg, transparent, rgba(232, 255, 0, 0.58), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--signal-blue-rgb), 0.58), rgba(var(--signal-red-rgb), 0.5), transparent);
   opacity: 0;
   transform: translateX(-16px);
   transition:
@@ -566,14 +593,16 @@ html {
   inset: 0;
   content: "";
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(232, 255, 0, 0.08), transparent 44%);
+  background:
+    linear-gradient(135deg, rgba(var(--signal-blue-rgb), 0.09), transparent 42%),
+    linear-gradient(315deg, rgba(var(--signal-red-rgb), 0.06), transparent 46%);
   opacity: 0;
   transition: opacity 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vector-card:hover,
 .proof-card:hover {
-  border-color: rgba(24, 24, 27, 0.32);
+  border-color: rgba(var(--signal-blue-rgb), 0.34);
   transform: translateY(-3px);
 }
 
@@ -595,7 +624,7 @@ html {
   width: 2px;
   height: 1.1rem;
   content: "";
-  background: var(--acid);
+  background: linear-gradient(180deg, var(--signal-blue), var(--signal-red));
   opacity: 0.38;
   transform: scaleY(0.7);
 }
@@ -608,7 +637,7 @@ html {
   height: 0.42rem;
   content: "";
   border-radius: 999px;
-  background: var(--acid);
+  background: linear-gradient(135deg, var(--signal-blue), var(--signal-red));
   opacity: 0.72;
   transform: scale(1);
   animation: metric-blink 3.4s steps(2, end) infinite;
@@ -628,7 +657,9 @@ html {
   inset: 0;
   content: "";
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(232, 255, 0, 0.08), transparent 42%);
+  background:
+    linear-gradient(135deg, rgba(var(--signal-blue-rgb), 0.08), transparent 42%),
+    linear-gradient(315deg, rgba(var(--signal-red-rgb), 0.055), transparent 45%);
   opacity: 0;
   transition: opacity 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -652,7 +683,7 @@ html {
   inset: auto 12px 0;
   height: 1px;
   content: "";
-  background: linear-gradient(90deg, transparent, rgba(232, 255, 0, 0.58), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--signal-blue-rgb), 0.58), rgba(var(--signal-red-rgb), 0.46), transparent);
   opacity: 0.35;
 }
 
@@ -664,7 +695,7 @@ html {
   border: 1px solid transparent;
   background:
     linear-gradient(var(--charcoal), var(--charcoal)) padding-box,
-    linear-gradient(115deg, transparent, rgba(232, 255, 0, 0.48), transparent)
+    linear-gradient(115deg, transparent, rgba(var(--signal-blue-rgb), 0.52), rgba(var(--signal-red-rgb), 0.46), transparent)
       border-box;
   opacity: 0.78;
   animation: audit-border 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
@@ -859,7 +890,9 @@ html {
   .command-bar {
     width: fit-content;
     max-width: calc(100vw - 1.5rem);
-    background-color: rgba(82, 92, 122, 0.22);
+    background:
+      linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.11), rgba(var(--signal-red-rgb), 0.07)),
+      rgba(22, 24, 34, 0.56);
   }
 
   .security-hero .pitch-shell > * {

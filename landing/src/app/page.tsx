@@ -69,10 +69,10 @@ export default function Home() {
               immediate
               y={10}
             >
-              <span className="rounded border border-[rgba(232,255,0,0.28)] bg-[rgba(232,255,0,0.04)] px-2.5 py-1 text-zinc-200">
+              <span className="rounded border border-[rgba(22,140,255,0.42)] bg-[rgba(22,140,255,0.08)] px-2.5 py-1 text-zinc-200 shadow-[0_0_24px_rgba(22,140,255,0.12)]">
                 PH26 Buenos Aires
               </span>
-              <span>AI Security</span>
+              <span className="text-[rgba(255,90,110,0.72)]">AI Security</span>
             </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
@@ -122,7 +122,7 @@ export default function Home() {
 
       <section
         id="gated-vectors"
-        className="pitch-section border-y border-zinc-200 bg-[#f4f3ef]"
+        className="pitch-section theme-surface-blue border-y border-[rgba(22,140,255,0.16)]"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.74fr_1.26fr] lg:items-center lg:gap-12">
@@ -163,7 +163,7 @@ export default function Home() {
 
       <section
         id="policy-flow"
-        className="pitch-section border-b border-zinc-200 bg-white"
+        className="pitch-section theme-surface-red border-b border-[rgba(255,45,69,0.14)]"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:gap-12">
@@ -175,7 +175,7 @@ export default function Home() {
                 Five checks. No prompts.
               </h2>
             </MotionReveal>
-            <div className="policy-path review-path relative rounded-lg border border-zinc-200 bg-[#fafafa]">
+            <div className="policy-path review-path relative rounded-lg border border-[rgba(255,45,69,0.14)] bg-white/80">
               {policySteps.map((item, index) => (
                 <MotionReveal key={item.step} delay={index * 0.05} y={18}>
                   <article className="relative grid gap-3 border-b border-zinc-200 p-4 last:border-b-0 sm:grid-cols-4 sm:p-5">
@@ -200,7 +200,7 @@ export default function Home() {
 
       <section
         id="audit-trail"
-        className="pitch-section bg-[#f4f3ef]"
+        className="pitch-section theme-surface-blue"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.76fr_1.24fr] lg:items-center lg:gap-12">
@@ -212,7 +212,7 @@ export default function Home() {
                 Logs. Cache. Self-defense.
               </h2>
             </MotionReveal>
-            <div className="incident-ledger divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+            <div className="incident-ledger divide-y divide-[rgba(22,140,255,0.12)] rounded-lg border border-[rgba(22,140,255,0.14)] bg-white/85">
               {auditItems.map((item, index) => (
                 <MotionReveal key={item.label} delay={index * 0.06} y={18}>
                   <article className="log-row grid gap-3 p-4 sm:grid-cols-[150px_1fr] sm:p-5">
@@ -232,7 +232,7 @@ export default function Home() {
 
       <section
         id="proof"
-        className="pitch-section border-y border-zinc-200 bg-white"
+        className="pitch-section theme-surface-red border-y border-[rgba(255,45,69,0.14)]"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.68fr_1.32fr] lg:items-center lg:gap-12">
@@ -247,7 +247,7 @@ export default function Home() {
             <div className="proof-grid grid grid-cols-2 gap-3">
               {proofStats.map((stat, index) => (
                 <MotionReveal key={stat.label} delay={index * 0.05} y={16}>
-                  <article className="metric-tile proof-card rounded-lg border border-zinc-200 bg-[#fafafa] p-4 sm:p-6">
+                  <article className="metric-tile proof-card rounded-lg border border-[rgba(255,45,69,0.13)] bg-white/80 p-4 sm:p-6">
                     <p className="font-mono text-3xl font-semibold leading-none tracking-tight text-zinc-950 sm:text-5xl">
                       {stat.value}
                     </p>
@@ -264,7 +264,7 @@ export default function Home() {
 
       <section
         id="final-cta"
-        className="pitch-section bg-[#f4f3ef]"
+        className="pitch-section theme-surface-blue"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="audit-stamp relative overflow-hidden rounded-lg border border-zinc-200 bg-[#0e0e10] px-5 py-14 text-center text-white sm:px-8">
@@ -291,7 +291,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-zinc-200 bg-[#f4f3ef] py-5">
+      <footer className="theme-surface-blue border-t border-[rgba(22,140,255,0.16)] py-5">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 font-mono text-xs text-zinc-500 sm:flex-row sm:px-8">
           <p>yieldOS</p>
           <p>PH26 Buenos Aires / AI Security</p>

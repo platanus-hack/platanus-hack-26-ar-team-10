@@ -27,12 +27,12 @@ const decisions = [
 
 function toneClass(tone: string) {
   if (tone === "rewrite") {
-    return "border-[rgba(232,255,0,0.34)] bg-[rgba(232,255,0,0.055)] text-[var(--acid)]";
+    return "border-[rgba(var(--signal-blue-rgb),0.34)] bg-[rgba(var(--signal-blue-rgb),0.06)] text-[var(--signal-blue)]";
   }
   if (tone === "native") {
-    return "border-white/10 bg-white/[0.04] text-zinc-200";
+    return "border-[rgba(var(--signal-blue-rgb),0.18)] bg-[rgba(var(--signal-blue-rgb),0.045)] text-blue-100";
   }
-  return "border-red-300/20 bg-red-400/[0.055] text-red-100";
+  return "border-[rgba(var(--signal-red-rgb),0.28)] bg-[rgba(var(--signal-red-rgb),0.07)] text-red-100";
 }
 
 export function AnimatedDemoFlow() {
@@ -51,7 +51,9 @@ export function AnimatedDemoFlow() {
           <div className="scan-sweep" aria-hidden="true" />
           <div className="grid grid-cols-[1fr_auto] border-b border-white/10 px-3 py-2.5 font-mono text-xs text-zinc-500 sm:px-4 sm:py-3">
             <span>verdicts</span>
-            <span className="hidden text-[var(--acid)] sm:inline">allow / block</span>
+            <span className="hidden bg-[linear-gradient(90deg,var(--signal-blue),var(--signal-red))] bg-clip-text text-transparent sm:inline">
+              allow / block
+            </span>
           </div>
           <div className="divide-y divide-white/10">
             {decisions.map((decision, index) => (
@@ -87,7 +89,7 @@ export function AnimatedDemoFlow() {
 
       <div className="hidden rounded-lg border border-white/10 bg-white/[0.04] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-3 lg:block">
         <div className="relative grid min-h-full overflow-hidden rounded-md border border-white/10 bg-[#f4f3ef] text-zinc-950">
-          <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--acid),transparent)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--signal-blue),var(--signal-red),transparent)]" />
           <div className="grid content-center p-5">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[11px]">
               audit

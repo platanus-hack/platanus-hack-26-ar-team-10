@@ -229,8 +229,13 @@ test("cinematic motion components and reduced motion styles are configured", () 
   );
   assert.ok(!scrollAwareHeader.includes("showArrow={false}"), "Expected install button arrow to be restored");
   assert.ok(!scrollAwareHeader.includes("install-marks"), "Expected icon marks to be removed from the install pill");
-  assert.ok(globals.includes("--acid: #e8ff00"), "Expected acid accent");
+  assert.ok(globals.includes("--signal-blue: #168cff"), "Expected blue security accent");
+  assert.ok(globals.includes("--signal-red: #ff2d45"), "Expected red security accent");
+  assert.ok(!globals.includes("--acid"), "Expected old acid accent variable to be removed");
+  assert.ok(!globals.includes("e8ff00"), "Expected old acid yellow value to be removed");
   assert.ok(globals.includes(".pitch-section"), "Expected full-screen sections");
+  assert.ok(page.includes("theme-surface-blue"), "Expected blue-tinted surface sections");
+  assert.ok(page.includes("theme-surface-red"), "Expected red-tinted surface sections");
   assert.ok(globals.includes(".snap-deck::before"), "Expected page-wide grid layer");
   assert.ok(
     globals.includes(".pitch-section:not(.security-hero)::before"),
@@ -281,8 +286,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
   assert.ok(!globals.includes(".install-marks"), "Expected install pill mark styling to be removed");
   assert.ok(
-    globals.includes("background-color: rgba(82, 92, 122, 0.24)"),
-    "Expected capsule glass nav color",
+    globals.includes("linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075))"),
+    "Expected capsule glass nav to use blue/red theme",
   );
   assert.ok(globals.includes(".intro-header .command-bar"), "Expected topbar entry animation");
   assert.ok(globals.includes("@keyframes intro-topbar"), "Expected topbar keyframes");

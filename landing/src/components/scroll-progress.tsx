@@ -51,7 +51,7 @@ export function ScrollProgress() {
 
       <div className="scroll-progress-mobile fixed inset-x-0 bottom-0 z-40 h-px bg-black/10 2xl:hidden">
         <motion.span
-          className="block h-px origin-left bg-[var(--acid)]"
+          className="block h-px origin-left bg-[linear-gradient(90deg,var(--signal-blue),var(--signal-red))]"
           style={{ scaleX: reduceMotion ? 1 : scaleX }}
         />
       </div>
