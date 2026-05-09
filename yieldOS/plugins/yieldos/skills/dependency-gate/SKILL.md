@@ -52,11 +52,51 @@ Do not try to bypass these blocks. They are a feature, not a bug.
 
 ## What to tell the user
 
-Keep messages short, in their language, and informative — never asking. Examples:
+Keep messages short, in their language, and informative — never asking.
 
-- Allowed: silent (no message).
-- Blocked (denylist): `yieldOS bloqueó {package}: {reason}`.
-- Blocked (Category D): `yieldOS bloqueó {package}: categoría crítica, requiere aprobación del equipo de seguridad`.
-- Rewritten: `yieldOS realizó una optimización de la instalación de {package}`.
-- Verification failed: `yieldOS detectó señales sospechosas en {package} y bloqueó la instalación`.
-- CVE on transitive: `yieldOS detectó CVE en transitiva {pkg}: {cve_id}`.
+### Visual stamp — always include when yieldOS intervened
+
+Whenever a tool call you ran was processed by the yieldOS gate (regardless of allow / block / rewrite / native-suggest), close your reply to the user with a one-line **visual stamp** on its own line. Use the matching variant:
+
+| Verdict in stderr                  | Stamp to append at the end of your message |
+|------------------------------------|---------------------------------------------|
+| `allowlist-match`                  | `> 🛡  Validado por yieldOS`                |
+| `verification-passed`              | `> 🛡  Validado por yieldOS (análisis OK)`  |
+| `denylist-match`                   | `> ⛔ Bloqueado por yieldOS — denylist`     |
+| `category-d-blocked`               | `> ⛔ Bloqueado por yieldOS — categoría crítica` |
+| `verification-failed`              | `> ⛔ Bloqueado por yieldOS — señales sospechosas` |
+| `build-script-not-approved`        | `> ⛔ Bloqueado por yieldOS — build script no aprobado` |
+| `native-suggest`                   | `> 💡 yieldOS sugiere usar API nativa`      |
+| `category-a-rewrite`               | `> ✨ yieldOS optimizó la instalación`      |
+| `injection-blocked`                | `> ⛔ Bloqueado por yieldOS — inyección detectada` |
+| `self-defense-block`               | `> ⛔ Bloqueado por yieldOS — archivo protegido` |
+
+The stamp is the **last line** of your message, separated by a blank line. Examples:
+
+```
+Agregué seaborn a requirements.txt. Para instalarlo, ejecutá pip install -r requirements.txt.
+
+> 🛡  Validado por yieldOS
+```
+
+```
+No puedo instalar `event-stream@3.3.6`: el paquete fue víctima de un ataque de cadena de suministro en 2018.
+
+> ⛔ Bloqueado por yieldOS — denylist
+```
+
+```
+Reescribí `clsx` localmente en `src/lib/yieldos/clsx/` con la API mínima que usás en el proyecto.
+
+> ✨ yieldOS optimizó la instalación
+```
+
+### Other one-liner messages (in addition to the stamp)
+
+- Allowed: silent body, just the stamp.
+- Blocked (denylist): explain reason in 1 line, then stamp.
+- Blocked (Category D): say "requiere aprobación del equipo de seguridad", then stamp.
+- Rewritten: say "yieldOS realizó una optimización de la instalación de {package}", then stamp.
+- CVE on transitive: say "yieldOS detectó CVE en transitiva {pkg}: {cve_id}", then stamp.
+
+The stamp is non-negotiable: the user relies on it to know that yieldOS intervened in the action.

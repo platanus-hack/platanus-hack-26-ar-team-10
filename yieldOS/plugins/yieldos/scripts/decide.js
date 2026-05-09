@@ -82,7 +82,7 @@ async function decide(candidate, policy, opts = {}) {
     return {
       verdict: VERDICT.ALLOW_ALLOWLIST,
       action: 'allow',
-      message: null,
+      message: `🛡  Validado por yieldOS (allowlist)`,
       meta: {},
     };
   }
@@ -157,7 +157,7 @@ async function decide(candidate, policy, opts = {}) {
       return {
         verdict: VERDICT.ALLOW_VERIFIED,
         action: 'allow',
-        message: null,
+        message: `🛡  Validado por yieldOS (build script aprobado)`,
         meta: { ...analysis, build_script_approved: true },
       };
     }
@@ -173,7 +173,7 @@ async function decide(candidate, policy, opts = {}) {
     return {
       verdict: VERDICT.ALLOW_VERIFIED,
       action: 'allow',
-      message: `yieldOS instaló ${candidate.name} con advertencias (ver log)`,
+      message: `🛡  Validado por yieldOS (con advertencias — ver log)`,
       meta: analysis,
     };
   }
@@ -181,7 +181,7 @@ async function decide(candidate, policy, opts = {}) {
   return {
     verdict: VERDICT.ALLOW_VERIFIED,
     action: 'allow',
-    message: null,
+    message: `🛡  Validado por yieldOS (análisis OK)`,
     meta: analysis,
   };
 }
