@@ -30,6 +30,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "PH26 Buenos Aires",
     "Install yieldOS",
     "View decision demo",
+    "$ claude plugin install yieldos@yieldos-marketplace",
     "claude plugin marketplace add /path/to/vibeOS",
     "claude plugin install yieldos@yieldos-marketplace",
     "AI Security",

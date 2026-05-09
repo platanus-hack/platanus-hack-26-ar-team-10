@@ -124,23 +124,14 @@ export default function Home() {
               </p>
             </MotionReveal>
             <MotionReveal
-              className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-8 sm:flex-row"
+              className="mt-6 flex items-center justify-center sm:mt-8"
               delay={3.28}
               immediate
               y={14}
             >
-              <CopyCommandButton
-                command={installCommand}
-                label="Install yieldOS"
-                variant="light"
-                className="h-10 sm:h-11"
-              />
-              <a
-                href="#demo-flow"
-                className="inline-flex h-10 items-center justify-center rounded-md border border-white/15 bg-white/[0.06] px-4 text-sm font-medium text-white transition hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10] active:translate-y-px sm:h-11"
-              >
-                View decision demo
-              </a>
+              <p className="rounded border border-white/10 bg-black/20 px-3 py-2 font-mono text-[11px] text-zinc-400 backdrop-blur-sm sm:text-xs">
+                $ claude plugin install yieldos@yieldos-marketplace
+              </p>
             </MotionReveal>
           </div>
         </div>
