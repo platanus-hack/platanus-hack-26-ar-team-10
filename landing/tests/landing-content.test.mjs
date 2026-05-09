@@ -29,8 +29,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
 
   [
     "yieldOS",
-    "AI agent actions, gated.",
-    "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
+    "Safe coding for non-tech people.",
+    "yieldOS checks what AI agents install, edit, and run before anything happens.",
     "PH26 Buenos Aires",
     "Install yieldOS",
     "View decision demo",
@@ -149,6 +149,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Blocked Install",
     "Hash-approved agent instructions",
     "A security gate before your AI agent runs anything.",
+    "AI agent actions, gated.",
+    "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
     "$ claude plugin install yieldos@yieldos-marketplace",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);

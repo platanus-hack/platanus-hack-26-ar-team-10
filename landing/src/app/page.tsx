@@ -9,7 +9,7 @@ import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
   "claude plugin marketplace add /path/to/vibeOS\nclaude plugin install yieldos@yieldos-marketplace";
-const heroTitle = "AI agent actions, gated.";
+const heroTitle = "Safe coding for non-tech people.";
 
 const gatedVectors = [
   { title: "Packages", detail: "9 managers." },
@@ -77,13 +77,13 @@ export default function Home() {
             </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
-              lines={["AI agent actions,", "gated."]}
+              lines={["Safe coding for", "non-tech people."]}
               className="hero-title font-semibold leading-[0.92]"
               startDelayMs={900}
             />
             <MotionReveal delay={3.05} immediate y={12}>
               <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
-                Claude Code asks to install, edit or run tooling. yieldOS decides first.
+                yieldOS checks what AI agents install, edit, and run before anything happens.
               </p>
             </MotionReveal>
             <MotionReveal
