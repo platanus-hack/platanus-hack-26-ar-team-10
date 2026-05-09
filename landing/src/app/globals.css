@@ -344,14 +344,97 @@ html {
 }
 
 .command-bar {
+  position: relative;
+  color: #18181b;
   background:
-    linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075)),
-    rgba(22, 24, 34, 0.54);
-  backdrop-filter: blur(24px) saturate(150%);
+    linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.05), rgba(var(--signal-red-rgb), 0.04)),
+    rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(28px) saturate(155%);
   box-shadow:
-    0 18px 58px -32px rgba(0, 0, 0, 0.82),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.045);
+    0 22px 70px -46px rgba(0, 0, 0, 0.86),
+    0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -1px 0 rgba(24, 24, 27, 0.08);
+}
+
+.command-bar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.command-bar::before,
+.command-bar::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 7.5rem;
+  content: "";
+  pointer-events: none;
+  opacity: 0.58;
+}
+
+.command-bar::before {
+  left: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 24% 38%, rgba(var(--signal-blue-rgb), 0.24), transparent 35%),
+    linear-gradient(135deg, rgba(var(--signal-blue-rgb), 0.18), transparent 72%);
+  mask-image: linear-gradient(90deg, black, transparent 82%);
+}
+
+.command-bar::after {
+  right: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 74% 42%, rgba(var(--signal-red-rgb), 0.2), transparent 38%),
+    linear-gradient(225deg, rgba(var(--signal-red-rgb), 0.16), transparent 72%);
+  mask-image: linear-gradient(270deg, black, transparent 82%);
+}
+
+.nav-left {
+  grid-column: 1;
+  justify-self: start;
+  color: rgba(24, 24, 27, 0.68);
+}
+
+.nav-brand {
+  grid-column: 2;
+  justify-self: center;
+  color: #111113;
+}
+
+.nav-right {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.nav-demo-button {
+  color: #ffffff;
+  background:
+    linear-gradient(100deg, rgba(var(--signal-blue-rgb), 0.92), rgba(var(--signal-violet-rgb), 0.54), rgba(var(--signal-red-rgb), 0.82)),
+    #111113;
+  box-shadow:
+    0 12px 34px -24px rgba(0, 0, 0, 0.76),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.nav-demo-button span {
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.nav-demo-button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 16px 40px -24px rgba(0, 0, 0, 0.84),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .intro-header .command-bar {
@@ -361,7 +444,8 @@ html {
 }
 
 .intro-brand,
-.intro-nav {
+.intro-nav,
+.intro-status {
   opacity: 0;
   transform: translateY(-5px);
   animation: intro-part 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -373,6 +457,10 @@ html {
 
 .intro-nav {
   animation-delay: 380ms;
+}
+
+.intro-status {
+  animation-delay: 460ms;
 }
 
 .scroll-progress {
@@ -1026,11 +1114,11 @@ html {
   }
 
   .command-bar {
-    width: fit-content;
-    max-width: calc(100vw - 1.5rem);
-    background:
-      linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.11), rgba(var(--signal-red-rgb), 0.07)),
-      rgba(22, 24, 34, 0.56);
+    width: min(100%, calc(100vw - 1rem));
+    max-width: calc(100vw - 1rem);
+    grid-template-columns: 1fr auto 1fr;
+    padding-right: 0.55rem;
+    padding-left: 1rem;
   }
 
   .security-hero .pitch-shell > * {
@@ -1212,7 +1300,8 @@ html {
 
   .intro-header .command-bar,
   .intro-brand,
-  .intro-nav {
+  .intro-nav,
+  .intro-status {
     opacity: 1;
     transform: none;
     animation: none;

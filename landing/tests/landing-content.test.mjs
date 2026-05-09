@@ -304,8 +304,11 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
   assert.ok(scrollAwareHeader.includes("intro-header"), "Expected staged topbar intro class");
   assert.ok(!scrollAwareHeader.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
-  assert.ok(!scrollAwareHeader.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
-  assert.ok(scrollAwareHeader.includes("intro-nav flex"), "Expected mobile-visible nav links");
+  assert.ok(scrollAwareHeader.includes("yieldOS home"), "Expected centered yieldOS brand in panoramic nav");
+  assert.ok(scrollAwareHeader.includes("nav-left"), "Expected left nav region");
+  assert.ok(scrollAwareHeader.includes("nav-brand"), "Expected centered brand region");
+  assert.ok(scrollAwareHeader.includes("nav-right"), "Expected right nav action region");
+  assert.ok(scrollAwareHeader.includes("nav-demo-button"), "Expected compact right-side demo CTA");
   assert.ok(!scrollAwareHeader.includes("Install plugin"), "Expected install plugin CTA removed from navbar");
   assert.ok(!scrollAwareHeader.includes("CopyCommandButton"), "Expected navbar copy button removed");
   assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
@@ -321,9 +324,11 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(!globals.includes("rotateX(66deg)"), "Expected tilted roll-axis rotation to be removed");
   assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
   assert.ok(
-    globals.includes("linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075))"),
-    "Expected capsule glass nav to use blue/red theme",
+    globals.includes("rgba(255, 255, 255, 0.9)"),
+    "Expected panoramic nav to use a light capsule surface",
   );
+  assert.ok(globals.includes(".command-bar::before"), "Expected left panoramic nav color wash");
+  assert.ok(globals.includes(".command-bar::after"), "Expected right panoramic nav color wash");
   assert.ok(globals.includes(".intro-header .command-bar"), "Expected topbar entry animation");
   assert.ok(globals.includes("@keyframes intro-topbar"), "Expected topbar keyframes");
   assert.ok(
