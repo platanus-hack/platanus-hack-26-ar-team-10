@@ -388,7 +388,7 @@ test('code audit resolves git -C target before collecting staged diff', () => {
   const result = codeAudit.auditGitCommand(outer, `git -C ${inner} commit -m audit-test`);
 
   assert.equal(result.action, 'block');
-  assert.equal(fs.realpathSync(result.projectRoot), fs.realpathSync(inner));
+  assert.equal(result.projectRoot, sh(inner, ['rev-parse', '--show-toplevel']));
   assert.deepEqual(result.files, ['config.js']);
   assert.equal(result.findings.some((finding) => finding.ruleId === 'hardcoded-secret'), true);
 });

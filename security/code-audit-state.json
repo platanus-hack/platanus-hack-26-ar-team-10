@@ -2,7 +2,7 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:28a03dd7d1165db30cde5ec1684e32a3d169bcef33a40e764153cc0c313f2b87",
+  "diff_hash": "sha256:4f19f9dfa3732e2df9ec979a59bd81769664fe2f26384d3ac1c503dbac9ee8de",
   "range": "9be4262aa765045716747ddde830ff11969273f7..HEAD",
   "files": [
     ".github/workflows/plugin.yml",
