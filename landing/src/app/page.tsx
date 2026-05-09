@@ -54,13 +54,6 @@ export default function Home() {
     <main className="snap-deck min-h-dvh bg-[#0e0e10] text-zinc-950">
       <header className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-3 text-white">
         <div className="command-bar mx-auto flex h-16 w-fit max-w-[calc(100vw-1.5rem)] items-center gap-2 overflow-hidden rounded-[22px] border border-white/15 bg-white/[0.075] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:gap-4 sm:px-2.5">
-          <a
-            href="#hero"
-            className="intro-brand brand-mark flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.1] font-mono text-[13px] font-semibold tracking-tight text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10]"
-            aria-label="yieldOS home"
-          >
-            y
-          </a>
           <nav
             className="intro-nav hidden items-center gap-5 px-2 text-sm font-semibold text-zinc-300 md:flex"
             aria-label="Primary navigation"

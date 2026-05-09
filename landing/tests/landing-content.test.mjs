@@ -247,8 +247,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
   assert.ok(page.includes("intro-header"), "Expected staged topbar intro class");
-  assert.ok(page.includes("intro-brand"), "Expected staged brand intro class");
-  assert.ok(page.includes("brand-mark"), "Expected capsule nav brand mark");
+  assert.ok(!page.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
+  assert.ok(!page.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
   assert.ok(page.includes("!h-11"), "Expected capsule topbar install button");
   assert.ok(page.includes("!w-[166px]"), "Expected fixed capsule topbar install button");
   assert.ok(
