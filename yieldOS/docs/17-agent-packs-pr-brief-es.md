@@ -130,6 +130,10 @@ yield.agent-pack.yaml
 
 Importante: la web no instala nada. Solo genera el manifest. La validacion real ocurre despues con `yieldos-pack verify`.
 
+La lista de perfiles debe ser amplia porque son reglas internas de yieldOS ya revisadas: secretos, dependencias, auditoria de codigo, red, base de datos, produccion, git, testing, costo y modo read-only. La lista de skills, en cambio, debe ser curada: solo aparecen skills que ya existen en `policy/skills.json`.
+
+No agregamos upload libre de skills. Es relevante permitir skills propias de empresa en el futuro, pero solo con review: source URL, content hash, scripts incluidos, permisos requeridos y justificacion del owner. El browser no puede validar eso por si solo.
+
 ### 5. Pack interno para dogfooding
 
 Se agrego un pack interno:
@@ -190,6 +194,7 @@ No hace todavia:
 - instalacion automatica de MCP servers externos
 - enforcement duro igual en Cursor, Copilot o Windsurf
 - zip export con todos los archivos generados desde la web
+- upload libre de skills custom desde la web
 - panel SaaS, RBAC, excepciones, auditoria por organizacion o SIEM
 - vector DB
 - prueba matematica de que el codigo generado es seguro
@@ -237,6 +242,7 @@ Estos no bloquean el PR, pero hay que tenerlos claros:
 - Cursor, Copilot y Windsurf son guidance/adapters, no gates duros como Claude Code con hooks.
 - `policy/skills.json` todavia permite algunas skills third-party por nombre y no por hash. Para una version mas fuerte, deberiamos exigir hash para third-party.
 - El builder web usa una lista curada estatica. No lee policy en vivo.
+- Las skills custom todavia deben entrar por review manual de policy, no por upload directo.
 - El parser YAML es intencionalmente chico y soporta el subset que generamos. No es un parser YAML completo.
 - El flujo web descarga solo `yield.agent-pack.yaml`; no descarga todavia un zip con todos los outputs generados.
 

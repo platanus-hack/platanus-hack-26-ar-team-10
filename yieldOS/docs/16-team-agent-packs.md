@@ -206,6 +206,8 @@ For the non-technical builder story, the pack should behave like a safety rail r
 - the agent stops and explains in plain language before actions that touch secrets, auth, data deletion, spend, deployment, or production
 - changes stay small, reversible, and verified
 
+The builder should expose the full reviewed safety-profile catalog, but the approved-skill list should stay curated. Adding arbitrary custom skills from the browser is not safe enough yet because the browser cannot prove source, scripts, permissions, or content hashes. The right path is a review flow that turns a custom skill into an explicit `policy/skills.json` entry first.
+
 ## Dogfooding Pack
 
 yieldOS should run its own pack before offering packs to users.
@@ -285,6 +287,7 @@ Still intentionally out of scope:
 - Global installation into `~/.agents/skills`.
 - Automatic installation of external MCP servers.
 - Zip exports with generated files from the browser.
+- Browser upload of arbitrary custom skills. Teams can package custom skills only after policy review captures source URL, content hash, bundled scripts, permission scope, and owner rationale.
 - Organization admin, exception workflows, and remote policy sync.
 
 Those belong after we prove the repo-local pack loop is useful and low-friction.

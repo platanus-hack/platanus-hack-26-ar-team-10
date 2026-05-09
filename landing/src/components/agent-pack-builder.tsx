@@ -38,6 +38,11 @@ const agents: ToggleOption[] = [
 
 const profiles: ToggleOption[] = [
   {
+    key: "read-only",
+    label: "read-only",
+    description: "Keep the agent in analysis and review mode until editing is requested.",
+  },
+  {
     key: "secrets-safe",
     label: "secrets-safe",
     description: "Block credential reads and secret-handling regressions.",
@@ -53,13 +58,48 @@ const profiles: ToggleOption[] = [
     description: "Require security review state for sensitive changes.",
   },
   {
+    key: "network-safe",
+    label: "network-safe",
+    description: "Block remote bootstrap, vendored code, and private data egress.",
+  },
+  {
+    key: "db-safe",
+    label: "db-safe",
+    description: "Default database work to read-only and require approval for writes.",
+  },
+  {
+    key: "production-safe",
+    label: "production-safe",
+    description: "Require explicit approval before deploys or live infrastructure changes.",
+  },
+  {
     key: "git-safe",
     label: "git-safe",
     description: "Protect push, commit, and instruction-file workflows.",
   },
+  {
+    key: "testing-discipline",
+    label: "testing-discipline",
+    description: "Require fresh, scoped verification before claiming work is complete.",
+  },
+  {
+    key: "cost-aware",
+    label: "cost-aware",
+    description: "Prefer scoped scans and warn before costly agent work.",
+  },
 ];
 
 const skills: ToggleOption[] = [
+  {
+    key: "skill:init",
+    label: "skill:init",
+    description: "Official setup skill for creating baseline agent instructions.",
+  },
+  {
+    key: "skill:review",
+    label: "skill:review",
+    description: "Official code-review workflow for pull requests and diffs.",
+  },
   {
     key: "skill:dependency-gate",
     label: "skill:dependency-gate",
@@ -219,7 +259,14 @@ export function AgentPackBuilder() {
     agents.map((agent) => agent.key),
   );
   const [selectedProfiles, setSelectedProfiles] = useState(() =>
-    profiles.slice(0, 3).map((profile) => profile.key),
+    [
+      "secrets-safe",
+      "dependency-safe",
+      "code-audit",
+      "network-safe",
+      "git-safe",
+      "testing-discipline",
+    ],
   );
   const [selectedSkills, setSelectedSkills] = useState(() =>
     skills.map((skill) => skill.key),
@@ -273,6 +320,22 @@ export function AgentPackBuilder() {
           values={selectedSkills}
           onToggle={(key) => setSelectedSkills((values) => toggleValue(values, key))}
         />
+        <section className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-5">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-400">
+            Custom skills
+          </h2>
+          <div className="mt-4 rounded-md border border-dashed border-zinc-300 bg-[#fafafa] p-3">
+            <p className="text-sm font-medium text-zinc-950">
+              Custom skills require policy review.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-zinc-600">
+              Teams should submit a source URL, content hash, bundled script
+              list, permission scope, and owner rationale before a skill appears
+              in this builder. Browser upload is intentionally disabled until
+              yieldOS can verify the artifact against policy.
+            </p>
+          </div>
+        </section>
         <ToggleGrid
           title="Approved MCPs"
           options={mcps}

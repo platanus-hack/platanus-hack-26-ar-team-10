@@ -207,8 +207,20 @@ test("agent packs page provides a downloadable pack builder", () => {
     "secrets-safe",
     "dependency-safe",
     "code-audit",
+    "read-only",
+    "network-safe",
+    "db-safe",
+    "production-safe",
+    "git-safe",
+    "testing-discipline",
+    "cost-aware",
+    "skill:init",
+    "skill:review",
     "skill:dependency-gate",
     "skill:security-review",
+    "Custom skills require policy review",
+    "source URL",
+    "content hash",
     "mcp:filesystem",
     "URL.createObjectURL",
     "download",
@@ -219,6 +231,10 @@ test("agent packs page provides a downloadable pack builder", () => {
   assert.ok(
     !source.includes("skill:security-audit"),
     "Builder should not emit skills missing from policy/skills.json",
+  );
+  assert.ok(
+    !source.includes("type=\"file\""),
+    "Builder should not accept unvalidated skill uploads in the browser",
   );
 });
 
