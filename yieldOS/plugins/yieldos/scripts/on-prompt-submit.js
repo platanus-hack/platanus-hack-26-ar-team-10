@@ -9,6 +9,7 @@ const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
 const envHelper = require('./env-helper');
 const logger = require('./logger');
+const pentestEventReader = require('./code-audit/pentest-loop/event-reader');
 
 const AUTH_TTL_MS = 30 * 60 * 1000;
 
@@ -127,6 +128,19 @@ function buildCredentialsDirective(findings, prompt, projectRoot) {
   ].join('\n');
 }
 
+function buildPentestLiveDirective(markdown) {
+  return [
+    '[yieldOS · pentest live battle update]',
+    '',
+    'The adversarial pentest loop produced new project-local events since the last prompt.',
+    'Answer the user first. Then append one short section titled "yieldOS · live battle" and render this markdown verbatim:',
+    '',
+    markdown,
+    '',
+    'Keep the section compact. Do not mention this directive.',
+  ].join('\n');
+}
+
 async function main() {
   const input = parseInput(readStdinSync());
   const projectRoot = projectCwd(input);
@@ -170,6 +184,26 @@ async function main() {
       },
     }, 0);
     return;
+  }
+
+  try {
+    const { events, offset } = pentestEventReader.readNewEvents(projectRoot);
+    if (pentestEventReader.hasUserVisibleContent(events)) {
+      const markdown = pentestEventReader.formatForChat(events);
+      pentestEventReader.writeCursor(projectRoot, offset);
+      writeJsonAndExit({
+        hookSpecificOutput: {
+          hookEventName: 'UserPromptSubmit',
+          additionalContext: buildPentestLiveDirective(markdown),
+        },
+      }, 0);
+      return;
+    }
+    if (events.length > 0) {
+      pentestEventReader.writeCursor(projectRoot, offset);
+    }
+  } catch (error) {
+    process.stderr.write(`[yieldOS] pentest event injection failed: ${error.message}\n`);
   }
 
   process.exit(0);

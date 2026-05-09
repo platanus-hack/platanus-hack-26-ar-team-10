@@ -50,6 +50,8 @@ const ANSI = {
   red: '\x1b[31m',
   green: '\x1b[32m',
   yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  brightBlue: '\x1b[94m',
   cyan: '\x1b[36m',
   clearLine: '\x1b[2K',
   showCursor: '\x1b[?25h',

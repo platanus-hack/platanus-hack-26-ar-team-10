@@ -10,6 +10,7 @@ const settingsValidator = require('./analyzers/settings-validator');
 const injectionScanner = require('./injection-scanner');
 const logger = require('./logger');
 const ui = require('./ui');
+const pentestAutoLauncher = require('./code-audit/pentest-loop/auto-launcher');
 
 function readStdinSync() {
   try { return fs.readFileSync(0, 'utf8'); }
@@ -74,7 +75,36 @@ async function main() {
     }
   }
 
+  handleInstructionChanges(projectRoot, policy);
+  maybeAutoLaunchPentest(projectRoot);
+
+  process.exit(0);
+}
+
+function pentestAutoLaunchEnabled(env = process.env) {
+  const value = String(env.YIELDOS_PENTEST_AUTO || env.YIELDOS_PENTEST || '').toLowerCase();
+  return ['1', 'true', 'on', 'auto'].includes(value);
+}
+
+function maybeAutoLaunchPentest(projectRoot, env = process.env) {
+  if (!pentestAutoLaunchEnabled(env)) return { status: 'disabled' };
+  try {
+    const result = pentestAutoLauncher.launch(projectRoot, { maxRounds: 50, convergenceClean: 5 });
+    if (result.status === 'launched') {
+      ui.writeMessage(`pentest loop launched in background (pid=${result.pid}). tail -f ${path.relative(projectRoot, result.log)} para ver el feed con colores.`);
+    } else if (result.status === 'already-running') {
+      ui.writeMessage(`pentest loop already running (pid=${result.pid}).`);
+    }
+    return result;
+  } catch (error) {
+    ui.writeMessage(`pentest auto-launch failed: ${error.message}`);
+    return { status: 'failed', reason: error.message };
+  }
+}
+
+function handleInstructionChanges(projectRoot, policy) {
   const changes = instructionWatcher.checkAll(projectRoot);
+  const logged = [];
   for (const c of changes) {
     if (c.status === 'changed') {
       const findings = policy['injection-patterns.json']
@@ -86,16 +116,26 @@ async function main() {
         diff: findings.length > 0 ? `${findings.length} injection signals detected` : 'content changed',
         action: findings.length > 0 ? 'flagged for review' : 'auto-accepted',
       });
+      logged.push({ file: c.file, action: findings.length > 0 ? 'flagged for review' : 'auto-accepted', findings });
       if (findings.length > 0) {
         ui.writeMessage(`AGENTS/CLAUDE.md cambió y contiene patrones sospechosos: ${c.file}`, { action: 'block' });
+      } else {
+        instructionWatcher.acceptChange(projectRoot, c.file, c.newHash);
       }
     }
   }
-
-  process.exit(0);
+  return { changes, logged };
 }
 
-main().catch((err) => {
-  process.stderr.write(`[yieldOS:fatal] ${err.message}\n`);
-  process.exit(0);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    process.stderr.write(`[yieldOS:fatal] ${err.message}\n`);
+    process.exit(0);
+  });
+}
+
+module.exports = {
+  handleInstructionChanges,
+  maybeAutoLaunchPentest,
+  pentestAutoLaunchEnabled,
+};

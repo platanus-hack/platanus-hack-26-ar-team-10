@@ -67,7 +67,7 @@ test('logTransitiveAudit summarizes audit', () => {
   const fp = logger.logTransitiveAudit(root, { name: 'express', version: '4.19.2' }, {
     whitelisted: ['debug@4.3.4'],
     aged: ['cookie@0.6.0'],
-    downgraded: [],
+    downgraded: [{ name: 'fresh-package', from: '2.0.0', to: '1.9.0' }],
     denylisted: [],
     cves: [],
     complete: true,
@@ -75,6 +75,8 @@ test('logTransitiveAudit summarizes audit', () => {
   const content = fs.readFileSync(fp, 'utf8');
   assert.equal(content.includes('Transitive Audit'), true);
   assert.equal(content.includes('debug'), true);
+  assert.equal(content.includes('Recommended downgrade due to insufficient age'), true);
+  assert.equal(content.includes('Downgraded due to insufficient age'), false);
 });
 
 test('sanitize redacts likely tokens', () => {

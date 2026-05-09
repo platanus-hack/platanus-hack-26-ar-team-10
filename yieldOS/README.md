@@ -2,7 +2,7 @@
 
 **One security gate for every dependency, skill, and instruction your AI agent touches — built for humans and AI agents.**
 
-yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec.
+yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec, `/yieldos:init` for preview-first agent instruction generation, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
 
 → Full design documentation in [`docs/`](docs/README.md).
 
@@ -111,6 +111,38 @@ Audit command summaries are appended to `security/audit-events.md` without raw
 findings, prompts, full diffs, or secrets.
 
 Detail: [docs/13-audit-command.md](docs/13-audit-command.md).
+
+---
+
+## Init command
+
+Generate reviewable `AGENTS.md` and `CLAUDE.md` safety instructions:
+
+```text
+/yieldos:init
+```
+
+Default mode previews the generated files. Add `--write` only after reviewing the output.
+
+Detail: [docs/14-custom-instructions.md](docs/14-custom-instructions.md).
+
+## Pentest loop
+
+Run a visible red-team / blue-team loop with persistent local lessons:
+
+```text
+/yieldos:pentest --max-rounds 3 --converge 2 --dry-run
+```
+
+For longer audits, `yieldos-pentest launch` starts a detached run,
+`yieldos-pentest watch` tails the colored terminal feed, and
+`yieldos-pentest stop` clears the background process. Chat-visible red/blue
+events are written through markdown diff blocks instead of raw ANSI escapes.
+State is written under `security/pentest-memory.md`,
+`security/pentest-history.json`, `security/pentest-state.json`,
+`security/pentest-live.log`, and `security/pentest-events.jsonl`.
+
+Detail: [docs/15-pentest-loop.md](docs/15-pentest-loop.md).
 
 ---
 

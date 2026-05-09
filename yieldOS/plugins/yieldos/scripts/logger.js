@@ -170,7 +170,7 @@ function logTransitiveAudit(projectRoot, parent, audit) {
     'Parent install': `${parent.name}@${parent.version}`,
     'Validated by whitelist': audit.whitelisted,
     'Validated by 10-day rule': audit.aged,
-    'Downgraded due to insufficient age': audit.downgraded,
+    'Recommended downgrade due to insufficient age': audit.downgraded,
     'Denylist alerts': audit.denylisted,
     'CVE alerts (OSV)': audit.cves,
     'Audit completeness': audit.complete ? 'complete' : 'incomplete',

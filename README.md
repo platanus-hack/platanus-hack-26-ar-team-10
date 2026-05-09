@@ -10,6 +10,8 @@ It also protects credentials: prompts that look like they contain API keys trigg
 
 It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`. For user-invoked review, `/yieldos:audit` runs Deepsec on demand, scoped to changed code by default, and keeps a small command log at `security/audit-events.md`.
 
+For project setup and deeper review, yieldOS also ships `/yieldos:init` to generate preview-first `AGENTS.md` / `CLAUDE.md` safety instructions, plus `/yieldos:pentest` for an explicit red-team / blue-team adversarial loop with persistent local memory.
+
 Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
 
 ## Install
@@ -60,6 +62,26 @@ Useful variants:
 ```
 
 Deepsec is external tooling. If it is not installed, `/yieldos:audit setup` prints the setup steps.
+
+## Init And Pentest
+
+Generate reviewable agent instructions:
+
+```text
+/yieldos:init
+```
+
+Run an adversarial red/blue loop:
+
+```text
+/yieldos:pentest --max-rounds 3 --converge 2 --dry-run
+```
+
+For longer audits, use `yieldos-pentest launch`, `yieldos-pentest watch`, and
+`yieldos-pentest stop`. The terminal feed stays colored in a real TTY, and new
+red/blue events can also surface in Claude Code chat through markdown diff
+blocks. The pentest loop stores local state under `security/pentest-*` files so
+rounds and lessons can be inspected later.
 
 Maintainers publish a new plugin version from the repository root with:
 
