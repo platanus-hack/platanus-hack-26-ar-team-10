@@ -10,8 +10,11 @@ const decide = require('./decide').decide;
 const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const injectionScanner = require('./injection-scanner');
+const credentialsScanner = require('./credentials-scanner');
+const terminalArt = require('./terminal-art');
 
 const DEFAULTS = require(path.join(__dirname, '..', 'config', 'defaults.json'));
+const AUTH_TTL_MS = 30 * 60 * 1000;
 
 function readStdinSync() {
   try {
@@ -50,9 +53,12 @@ const STAMP_BY_VERDICT = {
   'category-a-rewrite': shieldBlock('+', 'Optimizado · rewrite local'),
   'injection-blocked': shieldBlock('-', 'Bloqueado · inyección detectada'),
   'self-defense-block': shieldBlock('-', 'Bloqueado · archivo protegido'),
+  'credentials-read-blocked': shieldBlock('-', 'Bloqueado · lectura de credenciales sin autorización'),
+  'credentials-read-authorized': shieldBlock('+', 'Validado · lectura de credenciales autorizada'),
 };
 
 const VERDICT_PRIORITY = [
+  'credentials-read-blocked',
   'denylist-match',
   'category-d-blocked',
   'verification-failed',
@@ -61,6 +67,7 @@ const VERDICT_PRIORITY = [
   'self-defense-block',
   'category-a-rewrite',
   'native-suggest',
+  'credentials-read-authorized',
   'verification-passed',
   'allowlist-match',
 ];
@@ -202,6 +209,99 @@ async function handleInstructionEdit(input, projectRoot, policy) {
   return false;
 }
 
+function authFlagPath(projectRoot) {
+  return path.join(projectRoot, 'security', '.yieldos-credentials-authorized');
+}
+
+function isAuthorizationActive(projectRoot) {
+  const filePath = authFlagPath(projectRoot);
+  if (!fs.existsSync(filePath)) return false;
+
+  try {
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const authorizedAt = new Date(data.authorized_at).getTime();
+    const ttl = Number(data.ttl_ms || AUTH_TTL_MS);
+    return Number.isFinite(authorizedAt) && Number.isFinite(ttl) && Date.now() - authorizedAt < ttl;
+  } catch (_) {
+    return false;
+  }
+}
+
+function buildCredentialsReadWarning() {
+  const art = terminalArt.randomAlertArt();
+  return [
+    '```diff',
+    '- ╔════════════════════════════════════════════════════════════════╗',
+    '- ║   🛡  yieldOS  ·  LECTURA DE CREDENCIALES BLOQUEADA            ║',
+    '- ╚════════════════════════════════════════════════════════════════╝',
+    '-',
+    ...art.split('\n').map((line) => `- ${line}`),
+    '-',
+    '- El agente intentó leer un archivo de credenciales (.env / .ssh / .aws / etc).',
+    '- Riesgo concreto si autorizás:',
+    '-   - El agente puede ver claves de API, tokens y contraseñas.',
+    '-   - Esos valores pueden quedar en el contexto del modelo.',
+    '-   - Un prompt-injection posterior podría exfiltrarlas.',
+    '-',
+    '- Para autorizar la lectura por 30 minutos en este proyecto, respondé',
+    '- EXACTAMENTE con esta frase, sin nada antes ni después:',
+    '+   AUTORIZO A LEER LAS CREDENCIALES',
+    '-',
+    '- Si no querés autorizar, seguí la conversación normalmente.',
+    '```',
+  ].join('\n');
+}
+
+function writeJsonAndExit(payload, exitCode) {
+  process.stdout.write(JSON.stringify(payload), () => process.exit(exitCode));
+}
+
+async function handleCredentialsRead(input, projectRoot) {
+  const tool = input.tool_name;
+  const toolInput = input.tool_input || {};
+  if (tool !== 'Read') return false;
+
+  const target = toolInput.file_path || toolInput.path || '';
+  if (!credentialsScanner.isCredentialsPath(target)) return false;
+
+  if (isAuthorizationActive(projectRoot)) {
+    logger.appendEntry(projectRoot, 'Credentials Read Allowed (under active authorization)', {
+      File: target,
+      Note: 'agent read a credentials file with active user authorization',
+    });
+    process.stderr.write(`${terminalArt.statusLine('[yieldOS] lectura de credenciales autorizada (ventana activa)', 'success')}\n`);
+    process.stderr.write('[yieldOS:verdict] credentials-read-authorized\n');
+    return true;
+  }
+
+  logger.appendEntry(projectRoot, 'Credentials Read Blocked (no authorization)', {
+    File: target,
+    'Required action': 'user must reply with the exact phrase "AUTORIZO A LEER LAS CREDENCIALES"',
+    'Authorization TTL': '30 minutes once granted',
+  });
+  process.stderr.write(`${terminalArt.alertLine(`lectura bloqueada: ${path.basename(target)} requiere autorización explícita`)}\n`);
+  process.stderr.write('[yieldOS:verdict] credentials-read-blocked\n');
+
+  writeJsonAndExit({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      additionalContext: [
+        'yieldOS blocked a credentials-file Read.',
+        'Verdict: credentials-read-blocked.',
+        'Surface this warning to the user verbatim:',
+        '',
+        buildCredentialsReadWarning(),
+        '',
+        'Then append this yieldOS stamp on a separate final block:',
+        STAMP_BY_VERDICT['credentials-read-blocked'],
+        '',
+        'Do not retry the Read until the user replies with the exact phrase: AUTORIZO A LEER LAS CREDENCIALES',
+      ].join('\n'),
+    },
+  }, 2);
+  return true;
+}
+
 async function processCandidates(candidates, projectRoot, policy) {
   let anyBlocked = false;
   const interventions = [];
@@ -271,6 +371,7 @@ async function main() {
   const ti = input.tool_input || {};
 
   await handleSelfDefense(input, projectRoot);
+  if (await handleCredentialsRead(input, projectRoot)) return;
 
   let policyResult;
   try {

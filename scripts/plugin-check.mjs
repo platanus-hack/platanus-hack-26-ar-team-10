@@ -79,6 +79,8 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/post-install-audit.js',
   'yieldOS/plugins/yieldos/scripts/on-session-start.js',
   'yieldOS/plugins/yieldos/scripts/on-prompt-submit.js',
+  'yieldOS/plugins/yieldos/scripts/credentials-scanner.js',
+  'yieldOS/plugins/yieldos/scripts/terminal-art.js',
   'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
 ]) {
