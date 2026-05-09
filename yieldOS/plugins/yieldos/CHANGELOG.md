@@ -1,5 +1,11 @@
 # Changelog
 
+## yieldOS v0.4.1 - 2026-05-09
+
+- Add on-demand yieldOS audit command.
+- Expose yieldos-audit executable and /yieldos:audit command.
+- Log sanitized audit summaries to security/audit-events.md.
+
 ## yieldOS v0.4.0 - 2026-05-09
 
 - Add commit/push code-audit loop with deterministic red-team and blue-team fixes
