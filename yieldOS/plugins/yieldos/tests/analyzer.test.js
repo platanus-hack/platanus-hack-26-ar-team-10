@@ -10,6 +10,7 @@ const versionComparator = require('../scripts/analyzers/version-comparator');
 const obfuscation = require('../scripts/analyzers/obfuscation-detector');
 const binary = require('../scripts/analyzers/binary-detector');
 const lockfileValidator = require('../scripts/analyzers/lockfile-validator');
+const analyzers = require('../scripts/analyzers');
 
 test('static-patterns: detects eval', () => {
   const findings = staticPatterns.scanCode('var x = eval("danger");');
@@ -143,4 +144,32 @@ test('lockfile-validator: package-lock.json is valid for npm', () => {
   // we can't really mock fs here; just check the static map
   assert.equal(lockfileValidator.LOCKFILES.npm, 'package-lock.json');
   assert.equal(lockfileValidator.LOCKFILES.pnpm, 'pnpm-lock.yaml');
+});
+
+test('analyzePackage wires npm provenance findings into the final tier', async () => {
+  let seenProvenanceArgs = null;
+  const result = await analyzers.analyzePackage(
+    { manager: 'npm', name: 'demo', version: '1.0.0' },
+    {
+      osv: false,
+      minAgeDays: 0,
+      fetchNpmMetadata: async () => ({
+        version: '1.0.0',
+        repository: { url: 'https://github.com/demo/demo' },
+      }),
+      provenanceChecker: async (...args) => {
+        seenProvenanceArgs = args;
+        return {
+          tier: 'tier1',
+          verdict: 'provenance-repo-mismatch',
+          reason: 'provenance mismatch',
+        };
+      },
+    },
+  );
+
+  assert.equal(result.tier, 'tier1');
+  assert.equal(result.verdict, 'flagged');
+  assert.equal(result.findings.some((finding) => finding.id === 'npm-provenance'), true);
+  assert.deepEqual(seenProvenanceArgs.slice(0, 3), ['demo', '1.0.0', 'https://github.com/demo/demo']);
 });

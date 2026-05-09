@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require('node:path');
+
 const npm = require('./npm');
 const pnpm = require('./pnpm');
 const yarn = require('./yarn');
@@ -80,7 +82,7 @@ function splitChained(cmd) {
 
 function classifyWriteOrEdit(filePath, content = '', oldContent = null) {
   if (!filePath) return [];
-  const base = filePath.split('/').pop();
+  const base = path.posix.basename(filePath.replace(/\\/g, '/'));
 
   if (/^CLAUDE\.md$/i.test(base) || /^AGENTS\.md$/i.test(base) || /^\.cursorrules$/i.test(base)) {
     return [{

@@ -137,7 +137,7 @@ function parseGoMod(content) {
 }
 
 function parseManifest(filePath, content) {
-  const base = path.basename(filePath || '');
+  const base = path.posix.basename(String(filePath || '').replace(/\\/g, '/'));
   if (base === 'package.json') return parsePackageJson(content);
   if (/^requirements.*\.txt$/i.test(base)) return parseRequirementsTxt(content);
   if (base === 'pyproject.toml') return parsePyprojectToml(content);

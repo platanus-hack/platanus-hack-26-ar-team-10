@@ -7,7 +7,7 @@ const { execFileSync } = require('node:child_process');
 const { collectStagedDiff, collectPushDiff, collectBaseDiff, restageFiles } = require('./git');
 const { redTeam } = require('./red-team');
 
-const STATE_FILE = path.join('security', 'code-audit-state.json');
+const STATE_FILE = 'security/code-audit-state.json';
 const DEFAULT_BLOCKING_BY_MODE = {
   commit: ['critical', 'high'],
   push: ['critical', 'high', 'medium'],
@@ -22,7 +22,7 @@ function writeAuditState(projectRoot, audit, options = {}) {
   const file = statePath(projectRoot);
   const content = auditStateContent(audit);
   const previous = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
-  const changed = previous !== content;
+  const changed = !sameAuditStateContent(previous, content);
   const committed = isAuditStateCommitted(projectRoot, content);
 
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -70,10 +70,38 @@ function isAuditStateCommitted(projectRoot, expectedContent) {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     });
-    return committed === expectedContent;
+    return sameAuditStateContent(committed, expectedContent);
   } catch (_) {
     return false;
   }
+}
+
+function sameAuditStateContent(left, right) {
+  if (sameText(left, right)) return true;
+  try {
+    return JSON.stringify(stableAuditState(JSON.parse(left))) === JSON.stringify(stableAuditState(JSON.parse(right)));
+  } catch (_) {
+    return false;
+  }
+}
+
+function stableAuditState(state) {
+  if (!state || typeof state !== 'object') return state;
+  const stable = { ...state };
+  delete stable.range;
+  delete stable.files;
+  return stable;
+}
+
+function sameText(left, right) {
+  if (left === null || left === undefined || right === null || right === undefined) {
+    return left === right;
+  }
+  return normalizeEol(left) === normalizeEol(right);
+}
+
+function normalizeEol(value) {
+  return String(value).replace(/\r\n/g, '\n');
 }
 
 function verifyAuditState(projectRoot, options = {}) {
@@ -145,4 +173,7 @@ module.exports = {
   readAuditState,
   verifyAuditState,
   collectInput,
+  sameAuditStateContent,
+  sameText,
+  normalizeEol,
 };

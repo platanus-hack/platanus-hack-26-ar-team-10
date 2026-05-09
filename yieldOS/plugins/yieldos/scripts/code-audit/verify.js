@@ -39,10 +39,14 @@ function detectProjectChecks(projectRoot) {
     const testScript = pkg.scripts && pkg.scripts.test;
     if (typeof testScript !== 'string') return [];
     if (/no test specified|exit 1/i.test(testScript)) return [];
-    return [{ name: 'npm test', command: 'npm', args: ['test'] }];
+    return [{ name: 'npm test', command: npmCommand(), args: ['test'] }];
   } catch (_) {
     return [];
   }
+}
+
+function npmCommand() {
+  return process.platform === 'win32' ? 'npm.cmd' : 'npm';
 }
 
 function runDetectedChecks(projectRoot) {
@@ -57,6 +61,7 @@ function runDetectedChecks(projectRoot) {
       encoding: 'utf8',
       timeout: 30000,
       env: { ...process.env, CI: '1' },
+      shell: process.platform === 'win32',
     });
     return {
       name: check.name,
@@ -80,4 +85,4 @@ function trimOutput(value) {
   return String(value).slice(0, 2000);
 }
 
-module.exports = { verifyFix, detectProjectChecks, runDetectedChecks };
+module.exports = { verifyFix, detectProjectChecks, runDetectedChecks, npmCommand };
