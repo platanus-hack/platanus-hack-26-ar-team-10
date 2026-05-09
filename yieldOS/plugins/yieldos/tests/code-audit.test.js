@@ -39,6 +39,10 @@ function runHook(root, command) {
   return { code: r.status, stderr: r.stderr || '', stdout: r.stdout || '' };
 }
 
+function normalizePathForAssert(filePath) {
+  return String(filePath || '').replace(/\\/g, '/');
+}
+
 test('collectStagedDiff returns staged names and unified diff', () => {
   const root = tmpRepo();
   fs.writeFileSync(path.join(root, 'app.js'), 'console.log(process.env.SECRET_TOKEN);\n');
@@ -388,7 +392,7 @@ test('code audit resolves git -C target before collecting staged diff', () => {
   const result = codeAudit.auditGitCommand(outer, `git -C ${inner} commit -m audit-test`);
 
   assert.equal(result.action, 'block');
-  assert.equal(result.projectRoot, sh(inner, ['rev-parse', '--show-toplevel']));
+  assert.equal(normalizePathForAssert(result.projectRoot), normalizePathForAssert(sh(inner, ['rev-parse', '--show-toplevel'])));
   assert.deepEqual(result.files, ['config.js']);
   assert.equal(result.findings.some((finding) => finding.ruleId === 'hardcoded-secret'), true);
 });
