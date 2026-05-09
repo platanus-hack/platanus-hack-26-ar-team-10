@@ -62,6 +62,8 @@ html {
 .hero-title {
   font-size: clamp(2.7rem, 5.4vw, 4.8rem);
   max-width: 11ch;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .hero-typewriter {

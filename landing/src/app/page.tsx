@@ -96,9 +96,9 @@ export default function Home() {
         className="pitch-section security-hero relative overflow-hidden bg-[#0e0e10] text-white"
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="min-w-0 max-w-3xl">
+          <div className="mx-auto flex min-w-0 max-w-3xl flex-col items-center text-center">
             <MotionReveal
-              className="mb-4 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:mb-6 sm:text-[11px]"
+              className="mb-4 flex flex-wrap items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:mb-6 sm:text-[11px]"
               delay={0.06}
               immediate
               y={10}
@@ -119,12 +119,12 @@ export default function Home() {
               className="hero-title font-semibold leading-[0.92]"
             />
             <MotionReveal delay={0.72} immediate y={12}>
-              <p className="mt-5 max-w-full text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-7">
+              <p className="mx-auto mt-5 max-w-full text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-7">
                 Claude Code tries to run something. yieldOS decides first.
               </p>
             </MotionReveal>
             <MotionReveal
-              className="mt-6 flex flex-wrap items-center gap-3 sm:mt-8"
+              className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-8"
               delay={0.86}
               immediate
               y={14}
