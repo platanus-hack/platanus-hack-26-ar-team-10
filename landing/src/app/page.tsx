@@ -64,17 +64,6 @@ export default function Home() {
         <div className="ascii-backdrop" aria-hidden="true" />
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
-            <MotionReveal
-              className="mb-4 flex flex-wrap items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:mb-6 sm:text-[11px]"
-              delay={0.38}
-              immediate
-              y={10}
-            >
-              <span className="rounded border border-[rgba(22,140,255,0.42)] bg-[rgba(22,140,255,0.08)] px-2.5 py-1 text-zinc-200 shadow-[0_0_24px_rgba(22,140,255,0.12)]">
-                PH26 Buenos Aires
-              </span>
-              <span className="text-[rgba(255,90,110,0.72)]">AI Security</span>
-            </MotionReveal>
             <TypewriterHeroTitle
               text={heroTitle}
               lines={["Unlock coding for", "non technical talent"]}
@@ -293,7 +282,7 @@ export default function Home() {
       <footer className="theme-surface-blue border-t border-[rgba(22,140,255,0.16)] py-5">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 font-mono text-xs text-zinc-500 sm:flex-row sm:px-8">
           <p>yieldOS</p>
-          <p>PH26 Buenos Aires / AI Security</p>
+          <p>Safe coding for non technical talent</p>
         </div>
       </footer>
     </main>

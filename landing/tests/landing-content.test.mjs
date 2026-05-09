@@ -34,14 +34,13 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "non technical talent",
     "SAFE -&gt;",
     "yieldOS checks what AI agents install, edit, and run before anything happens.",
-    "PH26 Buenos Aires",
+    "Safe coding for non technical talent",
     "Install yieldOS",
     "View decision demo",
     "claude plugin marketplace add /path/to/vibeOS",
     "claude plugin install yieldos@yieldos-marketplace",
     "OrbitalInstallPill",
     "Copy yieldOS install command",
-    "AI Security",
     "Verdict",
     "Allow",
     "Block",
@@ -156,6 +155,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Claude Code asks to install, edit or run tooling. yieldOS decides first.",
     "Safe coding for non-tech people.",
     "$ claude plugin install yieldos@yieldos-marketplace",
+    "PH26 Buenos Aires",
+    "AI Security",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
