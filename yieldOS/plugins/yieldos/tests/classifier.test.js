@@ -150,6 +150,21 @@ test('claude plugin add', () => {
   assert.equal(out[0].name, 'some-plugin');
 });
 
+test('claude mcp add yields MCP candidate', () => {
+  const out = classifyBashCommand('claude mcp add filesystem npx @modelcontextprotocol/server-filesystem /tmp');
+  assert.equal(out.length, 1);
+  assert.equal(out[0].type, 'mcp');
+  assert.equal(out[0].manager, 'mcp');
+  assert.equal(out[0].name, 'mcp:filesystem');
+});
+
+test('claude mcp add-json yields MCP candidate', () => {
+  const out = classifyBashCommand('claude mcp add-json postgres \'{"command":"node"}\'');
+  assert.equal(out.length, 1);
+  assert.equal(out[0].type, 'mcp');
+  assert.equal(out[0].name, 'mcp:postgres');
+});
+
 test('git clone is vendoring', () => {
   const out = classifyBashCommand('git clone https://github.com/lodash/lodash.git');
   assert.equal(out[0].type, 'vendored-code');

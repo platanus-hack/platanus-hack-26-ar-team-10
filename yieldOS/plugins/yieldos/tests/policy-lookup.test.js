@@ -86,3 +86,7 @@ test('ecosystem mapping for pnpm is npm', () => {
 test('ecosystem mapping for poetry is python', () => {
   assert.equal(lookup.ecosystemFor({ manager: 'poetry' }), 'python');
 });
+
+test('ecosystem mapping for MCPs is mcp', () => {
+  assert.equal(lookup.ecosystemFor({ manager: 'mcp' }), 'mcp');
+});

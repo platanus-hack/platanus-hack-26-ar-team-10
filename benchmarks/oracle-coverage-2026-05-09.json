@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "generated_at": "2026-05-09T17:49:59.420Z",
+  "generated_at": "2026-05-09T22:43:04.146Z",
   "summary": {
-    "total_templates": 35,
+    "total_contracts": 35,
     "by_status": {
       "benchmarked": 11,
-      "template-only": 21,
+      "contract-only": 21,
       "active-adapter": 3
     },
     "by_kind": {
@@ -54,7 +54,7 @@
       "description": "Requires baseline fail plus fixed pass for supported CDSC contracts."
     }
   ],
-  "templates": [
+  "oracle_contracts": [
     {
       "id": "missing-authz",
       "title": "Sensitive route without authorization guard",
@@ -73,7 +73,7 @@
       "title": "Broken object level authorization",
       "severity": "high",
       "kind": "cdsc-http",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "owasp-api-top-10-2023:API1 Broken Object Level Authorization",
@@ -113,7 +113,7 @@
       "title": "NoSQL selector or operator injection",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A03 Injection",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -163,7 +163,7 @@
       "title": "Dangerous file upload stored or served as executable content",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A05 Security Misconfiguration",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -202,7 +202,7 @@
       "title": "Untrusted HTML rendered without sanitization",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A03 Injection",
         "cwe:CWE-79 Cross-site Scripting"
@@ -214,7 +214,7 @@
       "title": "State-changing browser request without CSRF defense",
       "severity": "medium",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "owasp-cheat-sheet:CSRF Prevention",
@@ -253,7 +253,7 @@
       "title": "Weak cryptography or predictable security token",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A02 Cryptographic Failures",
         "owasp-api-top-10-2023:API2 Broken Authentication",
@@ -266,7 +266,7 @@
       "title": "Dangerous production security configuration",
       "severity": "medium",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A05 Security Misconfiguration",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -305,7 +305,7 @@
       "title": "Unbounded resource consumption or missing rate limit",
       "severity": "medium",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API4 Unrestricted Resource Consumption",
         "owasp-llm-top-10-2025:LLM10 Unbounded Consumption",
@@ -319,7 +319,7 @@
       "title": "Unsafe trust of third-party API response",
       "severity": "medium",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API10 Unsafe Consumption of APIs",
         "owasp-top-10-2021:A08 Software and Data Integrity Failures",
@@ -358,7 +358,7 @@
       "title": "Persistent memory or retrieved content poisons future agent behavior",
       "severity": "high",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM01 Prompt Injection",
         "owasp-llm-top-10-2025:LLM08 Vector and Embedding Weaknesses",
@@ -371,7 +371,7 @@
       "title": "Agent has excessive tool functionality, permissions, or autonomy",
       "severity": "high",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM06 Excessive Agency",
         "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
@@ -384,7 +384,7 @@
       "title": "System/developer prompt or hidden policy disclosed",
       "severity": "medium",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM07 System Prompt Leakage",
         "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
@@ -397,7 +397,7 @@
       "title": "RAG/vector content poisoning or cross-tenant retrieval leak",
       "severity": "high",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM08 Vector and Embedding Weaknesses",
         "owasp-llm-top-10-2025:LLM01 Prompt Injection",
@@ -410,7 +410,7 @@
       "title": "Broken authentication or session verification",
       "severity": "critical",
       "kind": "cdsc-http",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A07 Identification and Authentication Failures",
         "owasp-api-top-10-2023:API2 Broken Authentication",
@@ -423,7 +423,7 @@
       "title": "Broken object property authorization or mass assignment",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API3 Broken Object Property Level Authorization",
         "owasp-top-10-2021:A01 Broken Access Control",
@@ -436,7 +436,7 @@
       "title": "Excessive sensitive data exposure in API response",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API3 Broken Object Property Level Authorization",
         "owasp-top-10-2021:A01 Broken Access Control",
@@ -449,7 +449,7 @@
       "title": "Unrestricted access to sensitive business flow",
       "severity": "medium",
       "kind": "cdsc-http",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API6 Unrestricted Access to Sensitive Business Flows",
         "owasp-top-10-2021:A04 Insecure Design",
@@ -462,7 +462,7 @@
       "title": "Unsafe deserialization of untrusted data",
       "severity": "high",
       "kind": "static-diff",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A08 Software and Data Integrity Failures",
         "cwe:CWE-502 Deserialization of Untrusted Data"
@@ -474,7 +474,7 @@
       "title": "LLM output reaches sensitive sink without validation",
       "severity": "high",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM05 Improper Output Handling",
         "owasp-top-10-2021:A03 Injection",
@@ -487,7 +487,7 @@
       "title": "Training, fine-tuning, model, or embedding data poisoning",
       "severity": "high",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM04 Data and Model Poisoning",
         "owasp-llm-top-10-2025:LLM03 Supply Chain",
@@ -500,7 +500,7 @@
       "title": "LLM misinformation used for critical decision",
       "severity": "medium",
       "kind": "agent-permission",
-      "status": "template-only",
+      "status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM09 Misinformation",
         "owasp-top-10-2021:A04 Insecure Design",
@@ -512,7 +512,7 @@
   "limits": [
     "benchmarked means covered by a committed benchmark case, not whole-class proof",
     "active-demo means there is a runnable demo/proof path for at least one fixture",
-    "active-adapter means a policy/evidence adapter exists, but not every template in that family is benchmarked",
-    "template-only means the oracle contract is defined but needs an executable fixture or adapter before product claims"
+    "active-adapter means a policy/evidence adapter exists, but not every contract in that family is benchmarked",
+    "contract-only means the oracle contract is defined but needs an executable fixture or adapter before product claims"
   ]
 }

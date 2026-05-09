@@ -21,13 +21,19 @@ jobs:
           node-version: "22"
       - name: Validate marketplace and plugin structure
         run: node scripts/plugin-check.mjs
+      - name: Validate policy structure
+        run: node scripts/policy-check.mjs
       - name: Run release helper tests
         run: node --test scripts/*.test.mjs
       - name: Check installer and updater shell syntax
         run: |
           sh -n install.sh
+          sh -n yieldOS/plugins/yieldos/bin/yieldos-audit
+          sh -n yieldOS/plugins/yieldos/bin/yieldos-init
           sh -n yieldOS/plugins/yieldos/bin/yieldos-oracle
           sh -n yieldOS/plugins/yieldos/bin/yieldos-oracle-demo
+          sh -n yieldOS/plugins/yieldos/bin/yieldos-pack
+          sh -n yieldOS/plugins/yieldos/bin/yieldos-pentest
           sh -n yieldOS/plugins/yieldos/bin/yieldos-update
       - name: Run plugin tests
         working-directory: yieldOS/plugins/yieldos

@@ -37,6 +37,11 @@ pnpm install
 
 Then complete `.deepsec/data/<id>/INFO.md`.
 
+Security boundary: yieldOS prefers a trusted `deepsec` found on `PATH`. A
+repo-local `.deepsec/node_modules/.bin/deepsec` is ignored unless the user sets
+`YIELDOS_TRUST_PROJECT_DEEPSEC=1`, because a malicious repository can otherwise
+ship a fake executable and get code execution during review.
+
 ## Logging
 
 Each run appends a small summary to:

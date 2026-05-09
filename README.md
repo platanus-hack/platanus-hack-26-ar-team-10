@@ -4,126 +4,114 @@
 
 Track: AI Security
 
-yieldOS is an oracle-driven security harness for AI coding agents, starting with protected Claude Code repos and CI-verified workflows. It gates risky agent actions before they happen and now normalizes acceptance evidence through executable oracles: policy checks, pack locks, code-audit state, project tests, and counterexample replays.
+**Oracle-driven security harness for AI coding agents.**
 
-The model can propose. The oracle decides.
+AI coding agents can install dependencies, add tools, edit instruction files, read secrets, and commit code faster than a human reviewer can inspect every step. yieldOS puts a deterministic security layer in front of those actions for Claude Code projects: the model can propose, but policy and executable evidence decide.
 
-It also protects credentials: prompts that look like they contain API keys trigger a no-echo security directive with a guided `.env` remediation panel, and reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar credential paths require the exact local authorization phrase `AUTORIZO A LEER LAS CREDENCIALES`.
+## What Works Today
 
-It now also audits source-code changes before `git commit` and `git push`: staged or outgoing diffs are red-teamed, safe fixes are applied when possible, and machine-verifiable audit state is written under `security/`. For user-invoked review, `/yieldos:audit` runs Deepsec on demand, scoped to changed code by default, and keeps a small command log at `security/audit-events.md`.
+- Claude Code plugin hooks for `SessionStart`, `UserPromptSubmit`, `PreToolUse`, and `PostToolUse`.
+- Pre-action gating for package installs, skill installs, direct MCP additions, manifest dependency edits, vendored code, remote shell installers, instruction-file edits, protected yieldOS evidence, and credential-file reads.
+- Credential protection: reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar paths require the exact local phrase `AUTORIZO A LEER LAS CREDENCIALES`.
+- Commit/push source-code audit with red-team findings, deterministic blue-team fixes when safe, and commit-bound `security/code-audit-state.json`.
+- Oracle runner with scoped `pass`, `fail`, and `unknown` results. For sensitive actions, `unknown` blocks by default.
+- Counterexample-driven proof demo for missing auth: baseline fail plus fixed pass.
+- Team agent packs that validate approved skills, MCPs, playbooks, profiles, oracles, generated files, and pack locks.
+- `/yieldos:audit`, `/yieldos:init`, `/yieldos:pack`, `/yieldos:oracle`, `/yieldos:oracle-demo`, `/yieldos:pentest`, and `/yieldos:update` plugin commands.
 
-For project setup and deeper review, yieldOS also ships `/yieldos:init` to generate preview-first `AGENTS.md` / `CLAUDE.md` safety instructions, `/yieldos:pack` to compile policy-validated team agent packs into reviewable host-native guidance files, `/yieldos:oracle` to list available pass/fail/unknown checks, `yieldos-oracle run ...` to execute scoped checks, `/yieldos:oracle-demo` to show a baseline-fail plus fixed-pass proof, plus `/yieldos:pentest` for an explicit red-team / blue-team adversarial loop with persistent local memory.
+## Demo For Reviewers
 
-Team agent packs let a repo carry one reviewed source of truth for approved skills, MCPs, safety profiles, playbooks, oracles, and target agents. Packs distribute approved rules and guidance; they do not enforce by themselves. The compiler validates the manifest against policy, then can generate `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. `yieldos-pack verify` also requires a lock when generated files are active and checks lock metadata plus file hashes.
-
-Runtime policy lives in [`policy/`](./policy). Installed plugins refresh that online policy first and fall back to the bundled `policy-cache/` snapshot when offline.
-
-## Install
+Install from the public marketplace:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
 ```
 
-Manual install:
-
-```bash
-claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
-claude plugins install yieldos@yieldos
-```
-
-## Update
-
-Once installed, update yieldOS from Claude Code with:
-
-```text
-/yieldos:update
-```
-
-Or from a terminal:
-
-```bash
-claude plugins marketplace update yieldos
-claude plugins update yieldos@yieldos
-```
-
-Run `/reload-plugins` or restart Claude Code after updating so hooks switch to the new cached version.
-
-## Audit
-
-Run a changed-code source audit from Claude Code:
-
-```text
-/yieldos:audit
-```
-
-Useful variants:
-
-```text
-/yieldos:audit --staged
-/yieldos:audit --working
-/yieldos:audit --base origin/main
-/yieldos:audit --full
-```
-
-Deepsec is external tooling. If it is not installed, `/yieldos:audit setup` prints the setup steps.
-
-## Oracles
-
-List available security oracles:
-
-```text
-/yieldos:oracle list
-```
-
-Run the visible missing-auth proof demo:
+Run the visible oracle proof:
 
 ```text
 /yieldos:oracle-demo missing-auth
 ```
 
-An oracle result is scoped: `pass`, `fail`, or `unknown`. For sensitive actions, `unknown` blocks by default.
+Expected demo beats:
 
-## Init And Pentest
+1. A vulnerable admin route returns `200` without auth.
+2. yieldOS writes a scoped contract and replay.
+3. The baseline replay fails.
+4. The fixed route returns `401`.
+5. The fixed replay passes.
+6. The proof artifacts are hashable evidence under `security/oracles/`.
 
-Generate reviewable agent instructions:
+Run an explicit changed-code audit:
 
 ```text
-/yieldos:init
+/yieldos:audit
 ```
 
-Preview the internal dogfood agent pack:
-
-```text
-/yieldos:pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml
-```
-
-Run an adversarial red/blue loop:
+Run the local adversarial loop:
 
 ```text
 /yieldos:pentest --max-rounds 3 --converge 2 --dry-run
 ```
 
-For longer audits, use `yieldos-pentest launch`, `yieldos-pentest watch`, and
-`yieldos-pentest stop`. The terminal feed stays colored in a real TTY, and new
-red/blue events can also surface in Claude Code chat through markdown diff
-blocks. The pentest loop stores local state under `security/pentest-*` files so
-rounds and lessons can be inspected later.
+Current benchmark evidence is summarized in [`benchmarks/README.md`](./benchmarks/README.md). The real-repo benchmark shows the tested workflow attacks were blocked before commit; it does not claim the target repositories are fully secure.
 
-Open the local live dashboard when you want a browser view of the same
-red/blue stream:
+## Repository Map
+
+| Path | Purpose |
+| --- | --- |
+| [`install.sh`](./install.sh) | Claude Code plugin installer. |
+| [`policy/`](./policy) | Runtime policy source of truth: allowlist, denylist, skills, MCPs, categories, native equivalents, settings, and injection patterns. |
+| [`yieldOS/plugins/yieldos/`](./yieldOS/plugins/yieldos) | The actual Claude Code plugin: hooks, commands, scripts, dashboard, shipped policy cache, and tests. |
+| [`yieldOS/docs/`](./yieldOS/docs) | Product and architecture docs. The docs index separates shipped surfaces from forward-looking plans. |
+| [`yieldOS/fixtures/oracle-demo/`](./yieldOS/fixtures/oracle-demo) | Runnable missing-auth baseline/fixed demo fixtures. |
+| [`yieldOS/packs/`](./yieldOS/packs) | Dogfood team agent pack manifest. |
+| [`benchmarks/`](./benchmarks) | Checked-in benchmark reports and benchmark notes. |
+| [`landing/`](./landing) | Next.js landing page, isolated from the plugin runtime. |
+
+## Validate Locally
+
+Plugin runtime supports Node.js 18+. The root/landing toolchain is pinned to Node.js 22.x.
 
 ```bash
-yieldos-pentest dashboard --start
-yieldos-pentest dashboard --status
-yieldos-pentest dashboard --stop
+sh install.sh --dry-run
+node scripts/plugin-check.mjs
+npm test
 ```
 
-The dashboard listens on `http://127.0.0.1:5473` by default. Session-start
-dashboard launch is opt-in only: set `YIELDOS_DASHBOARD_AUTO=1` or
-`YIELDOS_DASHBOARD=auto` if you want Claude Code sessions to start it
-automatically.
+For plugin-only iteration:
 
-Maintainers publish a new plugin version from the repository root with:
+```bash
+cd yieldOS/plugins/yieldos
+node --test tests/*.test.js
+```
+
+For landing-only iteration:
+
+```bash
+npm --prefix ./landing ci
+npm --prefix ./landing run lint
+npm --prefix ./landing run build
+```
+
+If Claude Code plugin support is available locally:
+
+```bash
+claude plugins validate .
+claude plugins validate yieldOS/plugins/yieldos
+```
+
+## Current Boundaries
+
+- Strong runtime enforcement is Claude Code hook enforcement. Codex, Cursor, Copilot, and Windsurf outputs generated by agent packs are reviewable guidance unless paired with host policy, yieldOS verification, or CI.
+- Deepsec is optional external tooling for `/yieldos:audit`; yieldOS prints setup guidance if it is unavailable.
+- Oracle `pass` means the exact scoped subject passed the exact configured check. It is not a blanket proof that the whole repository is secure.
+- Team agent packs validate MCP policy references and approved tool lists. Direct `claude mcp add` commands are blocked until source and tool-surface validation exists; reviewed MCP activation should go through pack verification.
+- Dockerfile scanning and a standalone lockfile CI gate are design notes, not shipped runtime behavior.
+
+## Release
+
+Maintainers publish a plugin release from the repository root:
 
 ```bash
 node scripts/release.mjs bump patch --note "Describe the change"
@@ -135,26 +123,7 @@ git tag yieldos--vX.Y.Z
 git push origin main yieldos--vX.Y.Z
 ```
 
-Claude Code uses the plugin version in `plugin.json` and the marketplace manifests to decide whether `/plugin update` has something new to install, so every release must bump those files together.
-
-Reload or restart Claude Code after installing. The plugin is declared from this repository's root marketplace manifest and lives at:
-
-```text
-yieldOS/plugins/yieldos
-```
-
-## Validate Locally
-
-```bash
-sh install.sh --dry-run
-claude plugins validate .
-claude plugins validate yieldOS/plugins/yieldos
-
-cd yieldOS/plugins/yieldos
-node --test tests/*.test.js
-```
-
-Requires Claude Code with plugin support and Node.js 18+.
+Claude Code uses the plugin version in `yieldOS/plugins/yieldos/.claude-plugin/plugin.json` plus the marketplace manifests to decide whether an update is available.
 
 ## Team
 

@@ -6,7 +6,7 @@
 
 **Architecture:** Keep real-repo benchmarking separate from controlled fixture benchmarking. Real-repo reports prove workflow behavior in real repositories; fixture reports exercise every deterministic rule and safe control; coverage reports explain oracle maturity without overstating runnable proof.
 
-**Tech Stack:** Node.js ESM scripts, existing yieldOS pre-install hook, existing oracle template modules, `node:test`.
+**Tech Stack:** Node.js ESM scripts, existing yieldOS pre-install hook, existing oracle contract data modules, `node:test`.
 
 ---
 
@@ -29,8 +29,8 @@
 - Create: `benchmarks/oracle-coverage-2026-05-09.json`
 - Test: `yieldOS/plugins/yieldos/tests/oracle-coverage-report.test.js`
 
-- [x] Read current oracle templates and public oracle registry.
-- [x] Label every template as `benchmarked`, `active-demo`, `active-adapter`, or `template-only`.
+- [x] Read current oracle contracts and public oracle registry.
+- [x] Label every contract as `benchmarked`, `active-demo`, `active-adapter`, or `contract-only`.
 - [x] Write summary totals by status and kind.
 - [x] Test that known benchmarked code-audit cases and active adapters are represented.
 

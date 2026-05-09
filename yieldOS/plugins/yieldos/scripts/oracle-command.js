@@ -48,9 +48,9 @@ async function runOracleCommand(projectRoot, argv = process.argv.slice(2), optio
   const root = parsed.options.projectRoot || projectRoot;
   if (parsed.command === 'help') return { exitCode: 0, message: usage() };
   if (parsed.command === 'list') return { exitCode: 0, message: renderList(listOracles(), parsed.options), oracles: listOracles() };
-  if (parsed.command === 'templates') {
+  if (parsed.command === 'templates' || parsed.command === 'contracts') {
     const templates = listTemplates();
-    return { exitCode: 0, message: renderTemplates(templates, parsed.options), templates };
+    return { exitCode: 0, message: renderContracts(templates, parsed.options), contracts: templates, templates };
   }
   if (parsed.command !== 'run') return { exitCode: 2, message: `yieldOS oracle error: unknown command: ${parsed.command}` };
   if (!parsed.oracleId) return { exitCode: 2, message: 'yieldOS oracle error: run needs an oracle id' };
@@ -104,12 +104,12 @@ function renderList(oracles, options = {}) {
   ].join('\n');
 }
 
-function renderTemplates(templates, options = {}) {
-  if (options.json) return `${JSON.stringify(templates, null, 2)}\n`;
+function renderContracts(contracts, options = {}) {
+  if (options.json) return `${JSON.stringify(contracts, null, 2)}\n`;
   return [
-    'yieldOS oracle templates',
+    'yieldOS oracle contracts',
     '',
-    ...templates.map((item) => {
+    ...contracts.map((item) => {
       const standards = item.standards.map((standard) => standard.id).join('; ');
       return `- ${item.id} (${item.kind}, ${item.severity}) - ${item.title} [${standards}]`;
     }),
@@ -134,7 +134,8 @@ function usage() {
     '',
     'usage:',
     '  yieldos-oracle list [--json]',
-    '  yieldos-oracle templates [--json]',
+    '  yieldos-oracle contracts [--json]',
+    '  yieldos-oracle templates [--json]  # legacy alias',
     '  yieldos-oracle run code-audit-state [--mode commit|push|pr] [--base origin/main] [--json]',
     '  yieldos-oracle run agent-pack-lock --pack yield.agent-pack.yaml [--json]',
     '  yieldos-oracle run instruction-policy --file AGENTS.md [--json]',
@@ -165,6 +166,7 @@ module.exports = {
   runKnownOracle,
   runOracleCommand,
   renderList,
-  renderTemplates,
+  renderContracts,
+  renderTemplates: renderContracts,
   renderResult,
 };

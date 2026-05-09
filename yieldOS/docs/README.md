@@ -24,7 +24,7 @@ This directory captures every design decision behind yieldOS, why it exists, and
 18. [Oracle demo script](22-oracle-demo-script.md) — *visible demo flow for judges and non-technical viewers*
 19. [Oracle evals](23-oracle-evals.md) — *cost, flake, and deterministic-resolution metrics*
 20. [Hackathon pitch](24-hackathon-pitch.md) — *current story, hard objections, and demo framing*
-21. [Oracle template catalog](25-oracle-template-catalog.md) — *research-backed oracle cases for validation and benchmarks*
+21. [Oracle contract catalog](25-oracle-contract-catalog.md) — *research-backed oracle cases for validation and benchmarks*
 
 ## Planning docs (not yet implemented)
 
@@ -61,4 +61,4 @@ Every doc here was written by capturing the conversation that produced yieldOS. 
 - **Adversarial pentest loop** → how red-team and blue-team agent rounds persist lessons, stream terminal colors, surface chat-rendered events, and expose a local dashboard across runs.
 - **Agent rules and playbooks** → how yieldOS should turn external agent rules, skills, and policies into scoped playbooks and generated adapters.
 - **Team agent packs** → how yieldOS packages approved skills, MCPs, profiles, rules, and playbooks for teams while keeping policy as the authority.
-- **Oracle template catalog** → how yieldOS maps OWASP/MITRE risk families into acceptance templates for validation and benchmarks.
+- **Oracle contract catalog** → how yieldOS maps OWASP/MITRE risk families into acceptance contracts for validation and benchmarks.

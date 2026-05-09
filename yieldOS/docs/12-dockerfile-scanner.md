@@ -28,7 +28,7 @@ We are not building a Docker security scanner that competes with Trivy, Grype, o
 
 ```
             ┌────────────────────────────────────────┐
-            │  PreToolUse: Bash | Write | Edit       │
+            │  PreToolUse: Bash | Write | Edit | Read │
             └───────────────────┬────────────────────┘
                                 ↓
                     ┌──────────────────────┐

@@ -16,6 +16,34 @@ const policy = {
   'categories.json': categories,
   'native-equivalents.json': natives,
   'build-scripts-allowed.json': { entries: [{ key: 'npm:bcrypt' }] },
+  'skills.json': {
+    entries: [
+      {
+        key: 'skill:init',
+        category: 'official',
+        vendor: 'anthropic',
+      },
+      {
+        key: 'skill:dependency-gate',
+        category: 'self',
+        vendor: 'yieldos',
+      },
+    ],
+  },
+  'mcps.json': {
+    entries: [
+      {
+        key: 'mcp:filesystem',
+        approved_tools: ['read_file', 'list_directory'],
+        scope: 'read-only',
+      },
+      {
+        key: 'mcp:claude-in-chrome',
+        approved_tools: [],
+        scope: 'blocked-by-default',
+      },
+    ],
+  },
 };
 
 const opts = { osv: false };
@@ -74,6 +102,43 @@ test('Native equivalent triggers native verdict', async () => {
   const d = await decide(candidate, policy, opts);
   assert.equal(d.verdict, VERDICT.ALLOW_NATIVE);
   assert.equal(d.action, 'block-with-suggestion');
+});
+
+test('approved-name direct MCP candidate is blocked until source and tools are verified', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:filesystem', version: 'latest', command: 'claude mcp add filesystem' };
+  const d = await decide(candidate, policy, opts);
+  assert.equal(d.verdict, VERDICT.BLOCK_MCP);
+  assert.equal(d.action, 'block');
+  assert.equal(d.meta.reason, 'mcp-direct-add-requires-tool-surface-verification');
+});
+
+test('blocked MCP candidate is blocked from MCP policy', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:claude-in-chrome', version: 'latest', command: 'claude mcp add claude-in-chrome' };
+  const d = await decide(candidate, policy, opts);
+  assert.equal(d.verdict, VERDICT.BLOCK_MCP);
+  assert.equal(d.action, 'block');
+  assert.equal(d.meta.reason, 'mcp-blocked-by-default');
+});
+
+test('unlisted MCP candidate is blocked by default', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:not-approved', version: 'latest', command: 'claude mcp add not-approved' };
+  const d = await decide(candidate, policy, opts);
+  assert.equal(d.verdict, VERDICT.BLOCK_MCP);
+  assert.equal(d.action, 'block');
+});
+
+test('approved skill candidate is allowed from skills policy', async () => {
+  const candidate = { type: 'skill', manager: 'skills', name: 'init', version: 'latest', command: 'npx skills add init' };
+  const d = await decide(candidate, policy, opts);
+  assert.equal(d.verdict, VERDICT.ALLOW_SKILL);
+  assert.equal(d.action, 'allow');
+});
+
+test('unlisted skill candidate is blocked by default', async () => {
+  const candidate = { type: 'skill', manager: 'skills', name: 'evil-skill', version: 'latest', command: 'npx skills add evil-skill' };
+  const d = await decide(candidate, policy, opts);
+  assert.equal(d.verdict, VERDICT.BLOCK_SKILL);
+  assert.equal(d.action, 'block');
 });
 
 test('Allowlist beats native', async () => {

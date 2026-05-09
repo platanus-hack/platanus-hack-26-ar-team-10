@@ -1,4 +1,4 @@
-# Oracle Template Catalog
+# Oracle Contract Catalog
 
 The oracle catalog is the research-backed backlog for validation and benchmarks. It lives as executable data in:
 
@@ -9,12 +9,14 @@ yieldOS/plugins/yieldos/scripts/oracles/templates/
 Use it from the CLI:
 
 ```bash
-yieldos-oracle templates --json
+yieldos-oracle contracts --json
 ```
 
-## What A Template Means
+The CLI also keeps `yieldos-oracle templates` as a compatibility alias; the public concept is an oracle contract.
 
-Each template defines:
+## What An Oracle Contract Means
+
+Each contract defines:
 
 - standards mapping: OWASP Web/API/LLM, OWASP Cheat Sheets, and CWE where applicable.
 - detection signals: code or policy shapes worth turning into deterministic checks.
@@ -27,7 +29,7 @@ This is deliberately stricter than a scanner rule. A scanner can report a suspic
 
 ## Covered Families
 
-The current catalog has 35 templates:
+The current catalog has 35 contracts:
 
 - Web/API authorization: `missing-authz`, `idor-bola`, `removed-security-guard`, `broken-authentication`.
 - API object properties and data exposure: `mass-assignment-bopla`, `excessive-data-exposure`.
@@ -52,16 +54,16 @@ Primary references used for the catalog:
 
 The next benchmark phase should not measure only whether `yieldos-oracle` exits quickly. It should measure:
 
-- detection accuracy per template: true positive, false positive, and `unknown` correctness.
+- detection accuracy per contract: true positive, false positive, and `unknown` correctness.
 - evidence completeness: whether the result contains source, input, sink, exploit path, and impact.
-- replay reliability for runtime templates: baseline/fixed pass rate and flake rate.
+- replay reliability for runtime contracts: baseline/fixed pass rate and flake rate.
 - artifact weight: bytes written under `security/oracles/**`.
 - cost controls: runtime duration, local process count, token/tool-call budget where an agent is involved.
 - real-repo behavior: pass/fail/unknown on repos that were not created for the demo.
 
 ## Boundaries
 
-The catalog is not a claim that every template has a complete runnable oracle today. It is the acceptance contract for turning each security family into a tested oracle. Existing runnable coverage remains:
+The catalog is not a claim that every contract has a complete runnable oracle today. It is the acceptance contract for turning each security family into a tested oracle. Existing runnable coverage remains:
 
 - `instruction-policy`
 - `agent-pack-lock`
@@ -70,4 +72,4 @@ The catalog is not a claim that every template has a complete runnable oracle to
 - `cdsc-replay`
 - `cdsc-proof`
 
-Templates that are not yet runnable should still be used for benchmark design. A benchmark should clearly label each case as `benchmarked`, `active-adapter`, `active-demo`, or `template-only`.
+Contracts that are not yet runnable should still be used for benchmark design. A benchmark should clearly label each case as `benchmarked`, `active-adapter`, `active-demo`, or `contract-only`.

@@ -12,11 +12,12 @@ const uv = require('./uv');
 const cargo = require('./cargo');
 const go = require('./go');
 const skills = require('./skills');
+const mcps = require('./mcps');
 const vendoring = require('./vendoring');
 const binaries = require('./binaries');
 const manifests = require('./manifests');
 
-const ALL = [npm, pnpm, yarn, bun, pip, poetry, uv, cargo, go, skills, vendoring, binaries];
+const ALL = [npm, pnpm, yarn, bun, pip, poetry, uv, cargo, go, skills, mcps, vendoring, binaries];
 const MANIFEST_FILENAMES = /^(?:package\.json|requirements.*\.txt|pyproject\.toml|Pipfile|Cargo\.toml|go\.mod)$/i;
 
 function classifyBashCommand(command) {

@@ -14,15 +14,103 @@ const PATCHABLE_SEVERITIES = ['critical', 'high', 'medium'];
 const PUSH_BLOCKING_SEVERITIES = ['critical', 'high', 'medium'];
 
 function isGitCommit(command) {
-  return /^\s*git\s+commit(?:\s|$)/.test(command || '');
+  return gitSubcommand(command) === 'commit';
 }
 
 function isGitPush(command) {
-  return /^\s*git\s+push(?:\s|$)/.test(command || '');
+  return gitSubcommand(command) === 'push';
 }
 
 function isGitAuditCommand(command) {
   return isGitCommit(command) || isGitPush(command);
+}
+
+function gitSubcommand(command) {
+  for (const innerCommand of extractShellEvalCommands(command || '')) {
+    const subcommand = gitSubcommand(innerCommand);
+    if (subcommand) return subcommand;
+  }
+
+  for (const segment of splitShellSegments(stripQuotedText(command || ''))) {
+    const tokens = segment.trim().split(/\s+/).filter(Boolean);
+    const subcommand = gitSubcommandFromTokens(tokens);
+    if (subcommand) return subcommand;
+  }
+  return null;
+}
+
+function extractShellEvalCommands(command) {
+  const out = [];
+  const re = /(?:^|[;&|]\s*)(?:(?:sudo|command)\s+)*(?:env(?:\s+[A-Za-z_][A-Za-z0-9_]*=\S+)*\s+)?(?:(?:\/usr\/bin\/env\s+)?(?:bash|sh|zsh|\/bin\/bash|\/bin\/sh|\/bin\/zsh))\s+(?:-[A-Za-z]*\s+)*-[A-Za-z]*c[A-Za-z]*\s+(["'])([\s\S]*?)\1/g;
+  let match;
+  while ((match = re.exec(String(command))) !== null) {
+    out.push(match[2]);
+  }
+  return out;
+}
+
+function stripQuotedText(command) {
+  let out = '';
+  let inSingle = false;
+  let inDouble = false;
+  let escaped = false;
+
+  for (const ch of String(command)) {
+    if (escaped) {
+      out += inSingle || inDouble ? ' ' : ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && !inSingle) {
+      escaped = true;
+      out += inDouble ? ' ' : ch;
+      continue;
+    }
+    if (ch === "'" && !inDouble) {
+      inSingle = !inSingle;
+      out += ' ';
+      continue;
+    }
+    if (ch === '"' && !inSingle) {
+      inDouble = !inDouble;
+      out += ' ';
+      continue;
+    }
+    out += inSingle || inDouble ? ' ' : ch;
+  }
+
+  return out;
+}
+
+function splitShellSegments(command) {
+  return String(command)
+    .split(/(?:&&|\|\||;|\n)/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+}
+
+function gitSubcommandFromTokens(tokens) {
+  let index = 0;
+  while (tokens[index] && /^[A-Za-z_][A-Za-z0-9_]*=/.test(tokens[index])) index += 1;
+  if (tokens[index] === 'env') {
+    index += 1;
+    while (tokens[index] && /^[A-Za-z_][A-Za-z0-9_]*=/.test(tokens[index])) index += 1;
+  }
+  if (tokens[index] === 'command') index += 1;
+
+  const gitToken = tokens[index] || '';
+  if (gitToken !== 'git' && !/\/git$/.test(gitToken)) return null;
+  index += 1;
+
+  while (tokens[index] && tokens[index].startsWith('-')) {
+    const flag = tokens[index];
+    index += 1;
+    if (flag === '-C' || flag === '-c' || flag === '--git-dir' || flag === '--work-tree') {
+      index += 1;
+    }
+  }
+
+  return tokens[index] === 'commit' || tokens[index] === 'push' ? tokens[index] : null;
 }
 
 function auditGitCommand(projectRoot, command, options = {}) {
@@ -245,6 +333,8 @@ module.exports = {
   isGitAuditCommand,
   isGitCommit,
   isGitPush,
+  gitSubcommand,
+  stripQuotedText,
   redTeam,
   MAX_FIX_ITERATIONS,
   writeAuditState,

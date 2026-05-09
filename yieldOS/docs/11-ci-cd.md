@@ -14,11 +14,11 @@ The same policy that protects agents should protect those paths too. The cheapes
 
 ## First principle: one policy, multiple enforcement points
 
-The policy repo (`policy-yieldos`) is the single source of truth. Both the agent-side hook and the CI gate fetch from it through `policy-fetcher.js`. When a team adds a package to the allowlist via PR, both enforcement points pick it up on next refresh. There is no separate CI policy.
+The root `policy/` directory in this repository is the single source of truth for the current plugin. Installed plugins fetch it online-first through `policy-fetcher.js` and fall back to the shipped `policy-cache/` snapshot. A future CI gate should use the same files and must not introduce a separate CI-only policy.
 
 ```
                   ┌────────────────────────────┐
-                  │  policy-yieldos (origin)   │
+                  │  repo /policy (origin)     │
                   └──────────┬─────────────────┘
                              │
               ┌──────────────┴──────────────┐

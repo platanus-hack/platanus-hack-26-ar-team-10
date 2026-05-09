@@ -34,11 +34,11 @@ claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
 claude plugins install yieldos@yieldos
 
 # Optional: run the test suite
-cd plugins/yieldos
+cd yieldOS/plugins/yieldos
 node --test tests/*.test.js
 ```
 
-That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` tool call.
+That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` / `Read` tool call.
 
 Requires Node.js 18+ for `fetch` and `node:test`.
 
@@ -397,7 +397,7 @@ You don't have to do anything. yieldOS works in the background:
 - **Safe installs go through silently.** If the package is on the official allowlist, it just installs.
 - **Dangerous installs are blocked.** You'll see a one-line message: `[yieldOS] BLOCK bloqueó {package}: {reason}`.
 - **Tiny utility packages get rewritten locally.** You'll see: `[yieldOS] REWRITE realizó una optimización de la instalación de {package}`. The code lives in `src/lib/yieldos/` in your project.
-- **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to open a PR to the official policy repo.
+- **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to update the reviewed root `policy/` files through a normal PR.
 - **CVEs in transitive dependencies are flagged** post-install — you'll see `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
 
 Everything is logged to `<project>/security/dependency-events.md`. You can read it any time to audit what yieldOS decided and why.
@@ -412,7 +412,7 @@ You do not need to:
 - Edit allowlist or denylist.
 - Run any commands manually.
 
-If you want to add a package that yieldOS blocked, the path is: open a PR to the [official policy repo](https://github.com/platanus-hack/policy-yieldos).
+If you want to add a package that yieldOS blocked, the path is: open a PR that updates the reviewed root [`policy/`](../policy) files and keeps the plugin `policy-cache/` synchronized.
 
 ---
 
@@ -420,7 +420,7 @@ If you want to add a package that yieldOS blocked, the path is: open a PR to the
 
 If you are an AI coding agent operating in a project protected by yieldOS:
 
-1. **Hooks run regardless of your intent.** `PreToolUse` intercepts every `Bash`, `Write`, and `Edit` call. If yieldOS returns exit code `2`, the action did not run.
+1. **Hooks run regardless of your intent.** `PreToolUse` intercepts `Bash`, `Write`, `Edit`, and `Read` calls. If yieldOS returns exit code `2`, the action did not run.
 
 2. **Read the verdict from stderr.** Lines starting with `[yieldOS:verdict]` carry the machine-readable verdict:
 
@@ -434,11 +434,16 @@ If you are an AI coding agent operating in a project protected by yieldOS:
    | `verification-passed`         | Action ran. Continue.                                                                |
    | `native-suggest`              | Use the native API mentioned. Do not install.                                        |
    | `build-script-not-approved`   | Build script not in `policy/build-scripts-allowed.json`. Tell the user.              |
+   | `skill-approved`              | The approved skill action ran. Continue.                                             |
+   | `skill-blocked`               | Do not retry. The skill is not approved in `policy/skills.json`.                     |
+   | `mcp-blocked`                 | Do not retry direct MCP registration. Use a reviewed agent pack/tool-surface flow.   |
    | `self-defense-block`          | You attempted to modify a yieldOS-protected file. Stop. This is not a bug.           |
    | `injection-blocked`           | Detected prompt-injection in instruction-file edit. Reconsider the edit.             |
    | `code-audit-fix-applied`      | A security fix was applied to staged code. Review the change and rerun `git commit`. |
    | `code-audit-blocked`          | Source-code audit found unresolved blocking risk. Fix it before committing/pushing.  |
    | `code-audit-clean`            | The audited commit or push diff passed. Continue.                                    |
+   | `credentials-read-blocked`    | Do not read the credential file unless the user grants the exact authorization phrase. |
+   | `credentials-read-authorized` | The credential read is inside an active project-local authorization window.          |
 
 3. **The rewrite flow (Category A)**: when yieldOS blocks with `category-a-rewrite`, follow the `dependency-gate` skill that's loaded automatically.
 
@@ -471,7 +476,7 @@ Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacte
 ## Tests
 
 ```bash
-cd plugins/yieldos
+cd yieldOS/plugins/yieldos
 node --test tests/*.test.js
 ```
 
@@ -508,6 +513,18 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |
 | [docs/11-ci-cd.md](docs/11-ci-cd.md) | Planned CI/CD enforcement. |
 | [docs/12-dockerfile-scanner.md](docs/12-dockerfile-scanner.md) | Planned Dockerfile scanner. |
+| [docs/13-audit-command.md](docs/13-audit-command.md) | On-demand Deepsec source-code audit. |
+| [docs/14-custom-instructions.md](docs/14-custom-instructions.md) | Preview-first AGENTS.md / CLAUDE.md generation. |
+| [docs/15-pentest-loop.md](docs/15-pentest-loop.md) | Red-team / blue-team loop with persistent local lessons. |
+| [docs/16-agent-rules-and-playbooks.md](docs/16-agent-rules-and-playbooks.md) | Planning and research for reviewed playbooks. |
+| [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md) | Policy-validated team agent packs. |
+| [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md) | Oracle-driven pass/fail/unknown acceptance model. |
+| [docs/20-oracle-evidence-artifacts.md](docs/20-oracle-evidence-artifacts.md) | Hashable generated evidence boundaries. |
+| [docs/21-counterexample-driven-security-contracts.md](docs/21-counterexample-driven-security-contracts.md) | Baseline-fail plus fixed-pass security contracts. |
+| [docs/22-oracle-demo-script.md](docs/22-oracle-demo-script.md) | Missing-auth proof demo flow. |
+| [docs/23-oracle-evals.md](docs/23-oracle-evals.md) | Oracle evaluation and benchmark framing. |
+| [docs/24-hackathon-pitch.md](docs/24-hackathon-pitch.md) | Hackathon story, objections, and demo framing. |
+| [docs/25-oracle-contract-catalog.md](docs/25-oracle-contract-catalog.md) | Oracle contract catalog for validation and benchmarks. |
 
 ---
 
@@ -515,7 +532,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 
 - It is not a replacement for `npm audit` / Dependabot / Snyk. It is a pre-install gate plus a transitive auditor; existing tools still cover known CVEs in installed code.
 - It is not an "auto-customization assistant" — the rewrite path exists only for tiny, low-risk packages where rewriting is safer than installing. The customization to your project is a side effect, not the goal.
-- It is not editable locally. Allowlist and denylist live in the official policy repo by design.
+- Installed policy is not edited locally. Reviewed policy changes go through this repository's root `policy/` files and are shipped into the plugin cache on release.
 - It is not a daemon. It is a set of hooks that the Claude Code harness invokes on the right events. The "always-on" feel comes from being hooked into every relevant tool call.
 
 ---

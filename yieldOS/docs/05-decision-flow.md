@@ -7,7 +7,7 @@ Every install candidate goes through the same 5-check flow. Decisions are determ
 ```
                       ┌───────────────────────────────────┐
                       │  PreToolUse hook fires             │
-                      │  Bash | Write | Edit               │
+                      │  Bash | Write | Edit | Read        │
                       └───────────────┬───────────────────┘
                                       ↓
                       ┌───────────────────────────────────┐
@@ -17,8 +17,8 @@ Every install candidate goes through the same 5-check flow. Decisions are determ
                       └───────────────┬───────────────────┘
                               yes ┌───┴───┐ no
                                   ↓       ↓
-                              BLOCK    ┌───────────────────────────┐
-                              exit 2   │  Instruction-file edit?    │
+                             BLOCK    ┌───────────────────────────┐
+                             exit 2   │  Instruction-file edit?    │
                                        └───────────┬────────────────┘
                                               yes ┌┴┐ no
                                                   ↓  ↓
@@ -75,6 +75,12 @@ Every install candidate goes through the same 5-check flow. Decisions are determ
                                       ↓                                         │
                                 Audit findings logged ←─────────────────────────┘
 ```
+
+Credential reads short-circuit before package classification. If a `Read` targets
+`.env`, cloud credentials, SSH keys, Kubernetes config, Docker credentials, or a
+private-key filename, yieldOS blocks unless the user has granted the exact
+project-local authorization phrase. The credential path never falls through to
+package analysis.
 
 ## Check-by-check semantics
 
@@ -186,6 +192,9 @@ User msg by verdict:
 | `verification-passed` | allow | 0 | (silent or warning) |
 | `verification-failed` | block | 2 | `[yieldOS] BLOCK detectó señales sospechosas…` |
 | `build-script-not-approved` | block | 2 | `[yieldOS] BLOCK bloqueó <pkg>: requiere aprobación de build scripts` |
+| `skill-approved` | allow | 0 | `[yieldOS] ALLOW aprobó <skill>: skill listada en policy/skills.json` |
+| `skill-blocked` | block | 2 | `[yieldOS] BLOCK bloqueó <skill>: skill no aprobada en policy/skills.json` |
+| `mcp-blocked` | block | 2 | `[yieldOS] BLOCK bloqueó <mcp>: requiere validación de fuente y tool surface vía yieldos-pack` |
 | `injection-blocked` | block | 2 | `[yieldOS] BLOCK bloqueó edición de <file>: detectó intento de inyección` |
 | `self-defense-block` | block | 2 | `[yieldOS] BLOCK bloqueó modificación de archivo protegido…` |
 | `code-audit-clean` | allow | 0 | `[yieldOS] ALLOW code-audit: clean` |
@@ -193,6 +202,8 @@ User msg by verdict:
 | `code-audit-fix-applied` | block | 2 | `[yieldOS] FIXED code-audit applied fix; rerun git commit` |
 | `code-audit-blocked` | block | 2 | `[yieldOS] BLOCK code-audit blocked unresolved risk` |
 | `code-audit-verification-failed` | block | 2 | `[yieldOS] BLOCK code-audit verification failed` |
+| `credentials-read-blocked` | block | 2 | `[yieldOS] BLOCK lectura de credenciales sin autorización` |
+| `credentials-read-authorized` | allow | 0 | `[yieldOS] ALLOW lectura de credenciales autorizada` |
 
 Human-facing lines are colorized only for interactive terminals and stay plain
 text under CI, `NO_COLOR=1`, or non-TTY agent runs. Verdict lines stay exact and
@@ -201,9 +212,12 @@ unstyled: `[yieldOS:verdict] <verdict>`.
 ## Code audit: commit and push
 
 For `git commit`, yieldOS audits `git diff --cached`. For `git push`, it audits
-commits ahead of the configured upstream branch. The source-code audit is not
-part of the dependency 5-check flow; it uses the dedicated red-team/blue-team
-loop documented in [10-code-audit.md](10-code-audit.md).
+commits ahead of the configured upstream branch. The detector also catches common
+shell wrappers such as `cd app && git commit`, `git -C app commit`,
+`command git push`, `env ... git push`, `bash -lc "git commit"`,
+`sh -c "git push"`, and absolute `.../git commit` paths. The
+source-code audit is not part of the dependency 5-check flow; it uses the
+dedicated red-team/blue-team loop documented in [10-code-audit.md](10-code-audit.md).
 
 The hook writes:
 

@@ -15,7 +15,11 @@
     "build": "npm --prefix ./landing run build --",
     "start": "npm --prefix ./landing run start --",
     "lint": "npm --prefix ./landing run lint --",
-    "test": "npm --prefix ./landing test --",
+    "test": "npm run test:root && npm run test:plugin && npm run test:landing",
+    "test:root": "node --test scripts/*.test.mjs",
+    "test:plugin": "cd yieldOS/plugins/yieldos && node --test tests/*.test.js",
+    "test:landing": "npm --prefix ./landing test --",
+    "policy:check": "node scripts/policy-check.mjs",
     "benchmark:real-repos": "node scripts/real-repo-benchmark.mjs"
   },
   "overrides": {

@@ -36,7 +36,7 @@ Alternative considered: only `PreToolUse`. Rejected because we need post-install
 
 ## D4 — Centrally curated policy
 
-**Decision**: all policy (allowlist, denylist, categories, etc.) lives at `github.com/platanus-hack/policy-yieldos/policy/`. The user does not edit policy locally.
+**Decision**: all runtime policy (allowlist, denylist, categories, skills, MCPs, injection patterns, etc.) lives in this repository's root `policy/` directory and is mirrored into the plugin's shipped `policy-cache/` on release. The user does not edit installed policy locally.
 
 **Rationale**: see [docs/07-policy.md](07-policy.md). Local editing is a footgun.
 

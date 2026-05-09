@@ -168,7 +168,7 @@ test('yieldos-oracle list command is registered and executable', async () => {
   assert.equal(fs.statSync(bin).mode & 0o111, 0o111);
 });
 
-test('oracle template catalog covers current red-team rules and researched standards', () => {
+test('oracle contract catalog covers current red-team rules and researched standards', () => {
   const catalog = oracleTemplates.listTemplates();
   const ids = new Set(catalog.map((item) => item.id));
   const standards = new Set(catalog.flatMap((item) => item.standards.map((standard) => standard.family)));
@@ -195,7 +195,7 @@ test('oracle template catalog covers current red-team rules and researched stand
     'llm-data-model-poisoning',
     'llm-misinformation-critical-decision',
     'persistent-memory-prompt-injection',
-  ].forEach((id) => assert.equal(ids.has(id), true, `missing template for ${id}`));
+  ].forEach((id) => assert.equal(ids.has(id), true, `missing oracle contract for ${id}`));
 
   ['owasp-top-10-2021', 'owasp-api-top-10-2023', 'owasp-llm-top-10-2025', 'cwe'].forEach((family) => {
     assert.equal(standards.has(family), true, `missing standard family ${family}`);
@@ -203,7 +203,7 @@ test('oracle template catalog covers current red-team rules and researched stand
   assert.equal(catalog.length >= 30, true);
 });
 
-test('oracle template catalog includes expanded benchmark-hardening mappings', () => {
+test('oracle contract catalog includes expanded benchmark-hardening mappings', () => {
   const idor = oracleTemplates.getTemplate('idor-bola');
   const resource = oracleTemplates.getTemplate('unrestricted-resource-consumption');
   const upload = oracleTemplates.getTemplate('dangerous-file-upload');
@@ -216,11 +216,11 @@ test('oracle template catalog includes expanded benchmark-hardening mappings', (
   assert.equal(memory.kind, 'agent-permission');
 });
 
-test('oracle templates are benchmarkable acceptance contracts, not prose only', () => {
+test('oracle contracts are benchmarkable acceptance contracts, not prose only', () => {
   const catalog = oracleTemplates.listTemplates();
   const ids = new Set(catalog.map((item) => item.id));
 
-  assert.equal(ids.size, catalog.length, 'template ids must be unique');
+  assert.equal(ids.size, catalog.length, 'oracle contract ids must be unique');
 
   for (const item of catalog) {
     assert.equal(typeof item.id, 'string');
@@ -239,7 +239,7 @@ test('oracle templates are benchmarkable acceptance contracts, not prose only', 
   }
 });
 
-test('oracle template accessors do not expose mutable catalog internals', () => {
+test('oracle contract accessors do not expose mutable catalog internals', () => {
   const first = oracleTemplates.getTemplate('missing-authz');
   first.standards[0].id = 'mutated';
 
@@ -247,14 +247,14 @@ test('oracle template accessors do not expose mutable catalog internals', () => 
   assert.equal(fresh.standards[0].id, 'A01 Broken Access Control');
 });
 
-test('yieldos-oracle templates command renders catalog for benchmark planning', async () => {
+test('yieldos-oracle contracts command renders catalog for benchmark planning', async () => {
   const json = await oracleCommand.runOracleCommand(tmpProject(), ['templates', '--json']);
-  const text = await oracleCommand.runOracleCommand(tmpProject(), ['templates']);
+  const text = await oracleCommand.runOracleCommand(tmpProject(), ['contracts']);
 
   assert.equal(json.exitCode, 0);
   assert.equal(JSON.parse(json.message).length >= 30, true);
   assert.equal(text.exitCode, 0);
-  assert.equal(text.message.includes('yieldOS oracle templates'), true);
+  assert.equal(text.message.includes('yieldOS oracle contracts'), true);
   assert.equal(text.message.includes('missing-authz'), true);
   assert.equal(text.message.includes('prompt-injection'), true);
 });

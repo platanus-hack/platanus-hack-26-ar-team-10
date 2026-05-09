@@ -217,7 +217,10 @@ function dangerousInstructionEdit(item) {
 
 function isAuditExemptFile(file) {
   const normalized = String(file || '').replace(/\\/g, '/');
-  return /(?:^|\/)(?:tests?|__tests__|fixtures?)\//.test(normalized) || /\.test\.[cm]?[jt]sx?$/.test(normalized);
+  if (/(?:^|\/)(?:AGENTS|CLAUDE)\.md$/i.test(normalized) || /\.cursorrules$/i.test(normalized)) return false;
+  return /(?:^|\/)(?:tests?|__tests__|fixtures?)\//.test(normalized)
+    || /\.test\.[cm]?[jt]sx?$/.test(normalized)
+    || /\.(?:md|mdx|txt)$/i.test(normalized);
 }
 
 function codeShape(code) {

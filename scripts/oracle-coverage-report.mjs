@@ -40,7 +40,7 @@ function requireValue(flag, value) {
 }
 
 function buildCoverageReport() {
-  const templates = oracleTemplates.listTemplates().map((item) => {
+  const contracts = oracleTemplates.listTemplates().map((item) => {
     const status = coverageStatus(item.id);
     return {
       id: item.id,
@@ -57,9 +57,9 @@ function buildCoverageReport() {
     version: 1,
     generated_at: new Date().toISOString(),
     summary: {
-      total_templates: templates.length,
-      by_status: countBy(templates.map((item) => item.status)),
-      by_kind: countBy(templates.map((item) => item.kind)),
+      total_contracts: contracts.length,
+      by_status: countBy(contracts.map((item) => item.status)),
+      by_kind: countBy(contracts.map((item) => item.kind)),
     },
     runnable_oracles: registry.listOracles().map((oracle) => ({
       id: oracle.id,
@@ -67,12 +67,12 @@ function buildCoverageReport() {
       maturity: oracle.maturity,
       description: oracle.description,
     })),
-    templates,
+    oracle_contracts: contracts,
     limits: [
       'benchmarked means covered by a committed benchmark case, not whole-class proof',
       'active-demo means there is a runnable demo/proof path for at least one fixture',
-      'active-adapter means a policy/evidence adapter exists, but not every template in that family is benchmarked',
-      'template-only means the oracle contract is defined but needs an executable fixture or adapter before product claims',
+      'active-adapter means a policy/evidence adapter exists, but not every contract in that family is benchmarked',
+      'contract-only means the oracle contract is defined but needs an executable fixture or adapter before product claims',
     ],
   };
 }
@@ -81,7 +81,7 @@ function coverageStatus(id) {
   if (BENCHMARKED_TEMPLATE_IDS.has(id)) return 'benchmarked';
   if (ACTIVE_DEMO_TEMPLATE_IDS.has(id)) return 'active-demo';
   if (ACTIVE_ADAPTER_TEMPLATE_IDS.has(id)) return 'active-adapter';
-  return 'template-only';
+  return 'contract-only';
 }
 
 function writeReport(outFile, report) {
@@ -100,7 +100,7 @@ function usage() {
   return [
     'Usage: node scripts/oracle-coverage-report.mjs --out benchmarks/<file>.json',
     '',
-    'Writes a template-to-evidence coverage report for yieldOS oracle claims.',
+    'Writes a contract-to-evidence coverage report for yieldOS oracle claims.',
   ].join('\n');
 }
 

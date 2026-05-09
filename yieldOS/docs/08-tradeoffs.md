@@ -16,7 +16,7 @@ Cost of giving this up: a sophisticated attack that mimics a legitimate package'
 
 What we could have done: a `/yieldos allow <pkg>` slash command that adds to a per-project allowlist file.
 
-What we did: only PRs to the official policy repo modify allowlist/denylist.
+What we did: only reviewed PRs to the root `policy/` files modify allowlist/denylist.
 
 Why: local allowlists are a footgun. A user under pressure adds the malicious package to their own list. Policy as a shared trust artifact has higher integrity.
 
@@ -52,19 +52,19 @@ Why: OSV's free API is rate-limited. Hitting it on every install of `react` (whi
 
 Cost: a CVE published in the last hour might miss a freshly-checked install. Mitigated by the cache being per-version (not per-name) and the rate of new critical CVEs being lower than 1/hour for any given package.
 
-## We gave up parsing manifest diffs
+## We narrowed manifest diff parsing
 
 What we considered: when the agent edits `package.json` to add a new dep, parse the diff, identify the added packages, and run them through the gate.
 
-What we did: pass-through on manifest edits. The actual install command (when the agent runs `npm install`) is gated separately.
+What we do now: reconstruct dependency additions and version changes from supported manifest edits, then run those candidates through the same policy decision flow as install commands.
 
-Why: manifest parsing is fragile (every package manager has its own format). A bug in the parser could either falsely block legitimate edits (matplotlib false positive — see decision log) or miss a malicious package added in a complex format. The Bash gate is the real defense.
+Why: full manifest parsing is fragile, but total pass-through left a gap where an agent could introduce an unreviewed dependency before any install command ran. The compromise is narrow: inspect supported dependency manifests only, ignore no-op edits, and still gate the actual install command later.
 
-Cost: an attacker who edits `package.json` and gets it shipped (without running `npm install` locally) could land a dep that runs in CI. Mitigated by the 10-day-rule transitive audit + CI ought to be running yieldOS too.
+Cost: unsupported manifest formats can still slip past edit-time detection. Mitigated by install-command gating and by keeping planned CI lockfile enforcement separate until implemented.
 
-## We gave up gate over the manifest
+## We gave up broad file-edit gating
 
-This is essentially the same trade-off restated: the manifest is data, the install is action. We gate the action.
+yieldOS does not block every source-file edit. It gates dependency acquisition, instruction edits, protected evidence, credential reads, and commit/push boundaries. Source-code security review happens when the agent tries to commit or push, and through explicit `/yieldos:audit`.
 
 ## We gave up multi-language symmetry in v1
 

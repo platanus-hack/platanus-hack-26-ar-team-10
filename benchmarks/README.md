@@ -8,7 +8,7 @@ This directory stores sanitized benchmark reports for yieldOS. Reports are commi
 | --- | --- | --- |
 | `real-repo-benchmark-*.json` | The real `pre-install-gate.js` blocks the same unsafe staged changes in disposable clones of real repositories. | Whole-repo security, false-positive rate, or deep framework understanding. |
 | `code-audit-benchmark-*.json` | The deterministic code-audit gate blocks, fixes, and allows controlled fixture commits as expected. | Behavior on every framework shape or runtime exploitability. |
-| `oracle-coverage-*.json` | Which oracle templates are benchmarked, active adapters/demos, or still template-only. | That template-only cases are implemented. |
+| `oracle-coverage-*.json` | Which oracle contracts are benchmarked, active adapters/demos, or still contract-only. | That contract-only cases are implemented. |
 
 ## Commands
 
@@ -46,8 +46,8 @@ Use `--include-raw-logs` only for local debugging. Raw logs and raw-output hashe
 
 ### `oracle-coverage-2026-05-09.json`
 
-- Oracle templates: 35 total.
-- Status: 11 benchmarked, 3 active-adapter, 21 template-only.
+- Oracle contracts: 35 total.
+- Status: 11 benchmarked, 3 active-adapter, 21 contract-only.
 - Kinds: 4 `cdsc-http`, 20 `static-diff`, 2 `dependency-policy`, 2 `instruction-policy`, 7 `agent-permission`.
 
 ## Legacy Report

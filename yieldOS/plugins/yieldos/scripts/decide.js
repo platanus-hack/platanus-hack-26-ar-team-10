@@ -10,6 +10,10 @@ const VERDICT = {
   ALLOW_NATIVE: 'native-suggest',
   ALLOW_ALLOWLIST: 'allowlist-match',
   BLOCK_DENYLIST: 'denylist-match',
+  ALLOW_SKILL: 'skill-approved',
+  BLOCK_SKILL: 'skill-blocked',
+  ALLOW_MCP: 'mcp-approved',
+  BLOCK_MCP: 'mcp-blocked',
   BLOCK_CATEGORY_D: 'category-d-blocked',
   REWRITE_CATEGORY_A: 'category-a-rewrite',
   ALLOW_VERIFIED: 'verification-passed',
@@ -68,6 +72,14 @@ async function versionExistsOnRegistry(candidate, timeoutMs = 4000) {
 }
 
 async function decide(candidate, policy, opts = {}) {
+  if (candidate.type === 'skill' || candidate.manager === 'skills') {
+    return decideSkill(candidate, policy['skills.json']);
+  }
+
+  if (candidate.type === 'mcp' || candidate.manager === 'mcp') {
+    return decideMcp(candidate, policy['mcps.json']);
+  }
+
   const native = lookup.nativeEquivalent(candidate, policy['native-equivalents.json']);
   if (native) {
     return {
@@ -200,6 +212,87 @@ async function decide(candidate, policy, opts = {}) {
   };
 }
 
+function decideSkill(candidate, skillPolicy = {}) {
+  const entry = findSkillEntry(candidate, skillPolicy);
+  if (!entry) {
+    return {
+      verdict: VERDICT.BLOCK_SKILL,
+      action: 'block',
+      message: `yieldOS bloqueó ${candidate.name}: skill no aprobada en policy/skills.json`,
+      meta: { reason: 'skill-unlisted' },
+    };
+  }
+
+  return {
+    verdict: VERDICT.ALLOW_SKILL,
+    action: 'allow',
+    message: `yieldOS aprobó ${candidate.name}: skill listada en policy/skills.json`,
+    meta: {
+      category: entry.category || 'unknown',
+      vendor: entry.vendor || 'unknown',
+    },
+  };
+}
+
+function findSkillEntry(candidate, skillPolicy = {}) {
+  if (!skillPolicy || !Array.isArray(skillPolicy.entries)) return null;
+  const key = candidate.name && candidate.name.startsWith('skill:')
+    ? candidate.name
+    : `skill:${candidate.name}`;
+  return skillPolicy.entries.find((entry) => entry.key === key || entry.key?.startsWith(`${key}@`)) || null;
+}
+
+function decideMcp(candidate, mcpPolicy = {}) {
+  const entry = findMcpEntry(candidate, mcpPolicy);
+  if (!entry) {
+    return {
+      verdict: VERDICT.BLOCK_MCP,
+      action: 'block',
+      message: `yieldOS bloqueó ${candidate.name}: MCP no aprobado en policy/mcps.json`,
+      meta: { reason: 'mcp-unlisted' },
+    };
+  }
+
+  if (entry.scope === 'blocked-by-default') {
+    return {
+      verdict: VERDICT.BLOCK_MCP,
+      action: 'block',
+      message: `yieldOS bloqueó ${candidate.name}: MCP bloqueado por policy/mcps.json`,
+      meta: { reason: 'mcp-blocked-by-default', scope: entry.scope },
+    };
+  }
+
+  if (!entry.allow_direct_add) {
+    return {
+      verdict: VERDICT.BLOCK_MCP,
+      action: 'block',
+      message: `yieldOS bloqueó ${candidate.name}: MCP requiere validación de fuente y tool surface vía yieldos-pack`,
+      meta: {
+        reason: 'mcp-direct-add-requires-tool-surface-verification',
+        scope: entry.scope || 'unknown',
+      },
+    };
+  }
+
+  return {
+    verdict: VERDICT.ALLOW_MCP,
+    action: 'allow',
+    message: `yieldOS aprobó ${candidate.name}: MCP listado en policy/mcps.json`,
+    meta: {
+      approved_tools: entry.approved_tools || [],
+      scope: entry.scope || 'unknown',
+    },
+  };
+}
+
+function findMcpEntry(candidate, mcpPolicy = {}) {
+  if (!mcpPolicy || !Array.isArray(mcpPolicy.entries)) return null;
+  const key = candidate.name && candidate.name.startsWith('mcp:')
+    ? candidate.name
+    : `mcp:${candidate.name}`;
+  return mcpPolicy.entries.find((entry) => entry.key === key) || null;
+}
+
 function normalizeMetadataForEval(metadata, candidate) {
   if (!metadata) return null;
   if (metadata.versions && candidate.version && candidate.version !== 'latest') {
@@ -211,4 +304,4 @@ function normalizeMetadataForEval(metadata, candidate) {
   return metadata;
 }
 
-module.exports = { decide, VERDICT, hasConcreteRegistryVersion, versionExistsOnRegistry };
+module.exports = { decide, VERDICT, hasConcreteRegistryVersion, versionExistsOnRegistry, decideSkill, decideMcp };

@@ -35,7 +35,7 @@ Use the report type that matches the claim:
 
 - real-repo reports prove hook behavior in disposable clones of real repositories,
 - code-audit fixture reports prove deterministic block/fix/allow outcomes across controlled cases,
-- oracle-coverage reports show which templates are implemented, active, or still contracts.
+- oracle-coverage reports show which oracle contracts are implemented, active, or still contract-only.
 
 Run the current benchmark family:
 
@@ -58,9 +58,9 @@ The checked-in `benchmarks/oracle-coverage-2026-05-09.json` records 35 templates
 
 - 11 benchmarked,
 - 3 active-adapter,
-- 21 template-only.
+- 21 contract-only.
 
-Template-only means the oracle contract exists, but yieldOS should not claim runnable proof for it yet.
+Contract-only means the oracle contract exists, but yieldOS should not claim runnable proof for it yet.
 
 ## Real-Repo Workflow Benchmark
 

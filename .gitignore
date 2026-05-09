@@ -12,4 +12,5 @@ yarn-error.log*
 .pnpm-debug.log*
 dev-server*.log
 .env*
+.deepsec/
 .vercel
