@@ -10,6 +10,7 @@ const decide = require('./decide').decide;
 const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const injectionScanner = require('./injection-scanner');
+const codeAudit = require('./code-audit');
 
 const DEFAULTS = require(path.join(__dirname, '..', 'config', 'defaults.json'));
 
@@ -137,6 +138,30 @@ async function processCandidates(candidates, projectRoot, policy) {
   return anyBlocked;
 }
 
+function handleCodeAuditCommand(projectRoot, command) {
+  if (!codeAudit.isGitAuditCommand(command)) return false;
+  let audit;
+  try {
+    audit = codeAudit.auditGitCommand(projectRoot, command);
+  } catch (err) {
+    audit = {
+      handled: true,
+      verdict: 'code-audit-verification-failed',
+      action: 'block',
+      mode: /^\s*git\s+push/.test(command) ? 'push' : 'commit',
+      files: [],
+      findings: [],
+      patch: null,
+      message: `yieldOS code-audit failed: ${err.message}`,
+    };
+  }
+
+  logger.logCodeAudit(projectRoot, audit);
+  if (audit.message) process.stderr.write(`[yieldOS] ${audit.message}\n`);
+  process.stderr.write(`[yieldOS:verdict] ${audit.verdict}\n`);
+  process.exit(audit.action === 'block' ? 2 : 0);
+}
+
 async function main() {
   const raw = readStdinSync();
   const input = parseInput(raw);
@@ -145,6 +170,10 @@ async function main() {
   const ti = input.tool_input || {};
 
   await handleSelfDefense(input, projectRoot);
+
+  if (tool === 'Bash') {
+    handleCodeAuditCommand(projectRoot, ti.command || '');
+  }
 
   let policyResult;
   try {

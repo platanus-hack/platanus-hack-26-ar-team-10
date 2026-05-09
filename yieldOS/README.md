@@ -36,6 +36,20 @@ Requires Node.js 18+ for `fetch` and `node:test`.
 
 ---
 
+## Code audit
+
+yieldOS also audits source-code changes before `git commit` and `git push`.
+This is separate from dependency security: dependency allowlists, denylists,
+native equivalents, and rewrites do not decide code-audit outcomes.
+
+The code-audit loop red-teams the changed code, applies one minimal deterministic
+blue-team fix per pass, re-scans after each patch, and stops after a hard limit.
+It then logs the result to `security/code-audit-events.md`.
+
+→ Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
+
+---
+
 ## High-level flow
 
 ```
@@ -217,11 +231,12 @@ plugins/yieldos/
 │   ├── injection-scanner.js    ← prompt-injection patterns
 │   ├── instruction-watcher.js  ← hash CLAUDE.md/AGENTS.md
 │   ├── transitive-auditor.js   ← post-install lockfile audit
+│   ├── code-audit/             ← commit/push source-code audit loop
 │   ├── classifiers/   (12 detectors)
 │   ├── analyzers/     (9 modules)
 │   └── rewriter/      (Category A scaffold gen)
 ├── skills/dependency-gate/SKILL.md
-└── tests/  (node:test, 122 tests)
+└── tests/  (node:test)
 ```
 
 → Detail: [docs/06-architecture.md](docs/06-architecture.md).
@@ -315,9 +330,10 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `instruction-watcher.test.js` — hash-based change detection on `CLAUDE.md`/`AGENTS.md`.
 - `logger.test.js` — log entry shape and secret redaction.
 - `self-defense.test.js` — protected path matching.
+- `code-audit.test.js` — staged/push diff collection, red/blue loop, verification, hook routing.
 - `e2e.test.js` — end-to-end runs of the pre-install gate with realistic inputs.
 
-122/122 passing.
+139/139 passing.
 
 ---
 
@@ -334,6 +350,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/07-policy.md](docs/07-policy.md) | Policy fetching, the three-layer cache, refresh triggers, PR flow. |
 | [docs/08-tradeoffs.md](docs/08-tradeoffs.md) | What we gave up on purpose and why. |
 | [docs/09-decision-log.md](docs/09-decision-log.md) | Every meaningful decision in order, with rationale. |
+| [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |
 
 ---
 
