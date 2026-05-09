@@ -74,28 +74,44 @@ async function main() {
     }
   }
 
+  handleInstructionChanges(projectRoot, policy);
+
+  process.exit(0);
+}
+
+function handleInstructionChanges(projectRoot, policy) {
   const changes = instructionWatcher.checkAll(projectRoot);
+  const logged = [];
   for (const c of changes) {
     if (c.status === 'changed') {
       const findings = policy['injection-patterns.json']
         ? injectionScanner.scan(c.content, policy['injection-patterns.json'].patterns)
         : [];
+      const action = findings.length > 0 ? 'flagged for review' : 'auto-accepted';
       logger.logInstructionChange(projectRoot, c.file, {
         previousHash: c.previousHash,
         newHash: c.newHash,
         diff: findings.length > 0 ? `${findings.length} injection signals detected` : 'content changed',
-        action: findings.length > 0 ? 'flagged for review' : 'auto-accepted',
+        action,
       });
+      logged.push({ file: c.file, action, findings });
       if (findings.length > 0) {
         ui.writeMessage(`AGENTS/CLAUDE.md cambió y contiene patrones sospechosos: ${c.file}`, { action: 'block' });
+      } else {
+        instructionWatcher.acceptChange(projectRoot, c.file, c.newHash);
       }
     }
   }
-
-  process.exit(0);
+  return { changes, logged };
 }
 
-main().catch((err) => {
-  process.stderr.write(`[yieldOS:fatal] ${err.message}\n`);
-  process.exit(0);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    process.stderr.write(`[yieldOS:fatal] ${err.message}\n`);
+    process.exit(0);
+  });
+}
+
+module.exports = {
+  handleInstructionChanges,
+};

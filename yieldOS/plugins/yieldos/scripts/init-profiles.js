@@ -9,7 +9,7 @@ const PROFILE_SECTIONS = {
     'When asked to review, lead with findings and exact file references.',
   ]),
   'secrets-safe': section('Secrets and credentials safety', [
-    'Do not read `.env`, private keys, cloud credentials, or production secrets unless the user explicitly authorizes that exact read.',
+    'Credential files, private keys, cloud credentials, and production secrets require explicit user authorization before access.',
     'Never paste raw credentials into chat, logs, commits, PRs, or generated docs.',
     'If a secret appears in source, remove the exposure path and tell the user it must be rotated.',
   ]),
@@ -34,7 +34,7 @@ const PROFILE_SECTIONS = {
     'When production access is required, state the exact command, environment, and rollback plan first.',
   ]),
   'network-safe': section('Network and bootstrap safety', [
-    'Do not run remote shell installers, `curl | sh`, vendored code, or downloaded binaries without checking the source and explaining the risk.',
+    'Do not run remote shell installers, vendored code, or downloaded binaries without checking the source and explaining the risk.',
     'Prefer pinned versions and official package managers over ad hoc downloads.',
     'Avoid sending private code, diffs, logs, or secrets to third-party services unless the user requested it.',
   ]),

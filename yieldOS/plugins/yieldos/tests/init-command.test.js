@@ -7,6 +7,8 @@ const os = require('node:os');
 const path = require('node:path');
 
 const init = require('../scripts/init-command');
+const injectionScanner = require('../scripts/injection-scanner');
+const injectionPatterns = require('../policy-cache/injection-patterns.json');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 
@@ -82,6 +84,19 @@ test('runInit keeps local scope Claude-only and previews the local target', () =
   assert.equal(rejected.message.includes('--agent claude'), true);
   assert.equal(preview.exitCode, 0);
   assert.equal(preview.message.includes('--- CLAUDE.local.md ---'), true);
+});
+
+test('generated instructions do not trigger yieldOS instruction injection scanner', () => {
+  const files = init.renderInstructionFiles({
+    agent: 'both',
+    scope: 'project',
+    profiles: Object.keys(init.PROFILE_SECTIONS),
+  });
+
+  for (const file of files) {
+    const findings = injectionScanner.scan(file.content, injectionPatterns.patterns);
+    assert.deepEqual(findings, [], `${file.path} should not contain injection-like guidance`);
+  }
 });
 
 test('init command markdown and executable are registered', () => {
