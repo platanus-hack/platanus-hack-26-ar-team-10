@@ -2,6 +2,7 @@ import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
 import { AnimatedDemoStory } from "@/components/animated-demo-story";
 import { CopyCommandButton } from "@/components/copy-command-button";
 import { MotionReveal } from "@/components/motion-reveal";
+import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
@@ -52,36 +53,7 @@ const proofStats = [
 export default function Home() {
   return (
     <main className="snap-deck min-h-dvh bg-[#0e0e10] text-zinc-950">
-      <header className="site-header intro-header fixed inset-x-0 top-0 z-50 px-3 py-3 text-white">
-        <div className="command-bar mx-auto flex h-16 w-fit max-w-[calc(100vw-1.5rem)] items-center gap-2 overflow-hidden rounded-[22px] border border-white/15 bg-white/[0.075] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:gap-4 sm:px-2.5">
-          <nav
-            className="intro-nav hidden items-center gap-5 px-2 text-sm font-semibold text-zinc-300 md:flex"
-            aria-label="Primary navigation"
-          >
-            {[
-              ["Demo", "#demo-flow"],
-              ["Coverage", "#gated-vectors"],
-              ["Policy", "#policy-flow"],
-            ].map(([label, href]) => (
-              <a
-                key={href}
-                className="rounded px-1 py-2 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
-                href={href}
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-          <div className="intro-install flex items-center">
-            <CopyCommandButton
-              command={installCommand}
-              label="Install plugin"
-              variant="dark"
-              className="command-pill command-pulse !h-11 !w-[166px] max-w-none !gap-2 overflow-hidden whitespace-nowrap !rounded-xl !border-white/15 bg-[#1f1f25] !px-3 !py-0 font-mono !text-[12px] leading-none text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] [&>span]:whitespace-nowrap [&_[aria-hidden=true]]:!text-[12px]"
-            />
-          </div>
-        </div>
-      </header>
+      <ScrollAwareHeader installCommand={installCommand} />
       <ScrollProgress />
 
       <section

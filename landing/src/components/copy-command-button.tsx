@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
 type CopyCommandButtonProps = {
@@ -8,6 +9,8 @@ type CopyCommandButtonProps = {
   scrollTargetId?: string;
   variant?: "primary" | "light" | "quiet" | "dark";
   className?: string;
+  prefix?: ReactNode;
+  showArrow?: boolean;
 };
 
 const variants = {
@@ -52,6 +55,8 @@ export function CopyCommandButton({
   scrollTargetId,
   variant = "primary",
   className = "",
+  prefix,
+  showArrow = true,
 }: CopyCommandButtonProps) {
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<number | null>(null);
@@ -89,10 +94,13 @@ export function CopyCommandButton({
       className={`inline-flex h-11 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium transition ${focusStyle} ${variants[variant]} ${className}`}
       aria-label={`${label}: copy ${command}`}
     >
+      {prefix}
       <span aria-live="polite">{copied ? "Copied" : label}</span>
-      <span className="font-mono text-xs" aria-hidden="true">
-        -&gt;
-      </span>
+      {showArrow ? (
+        <span className="font-mono text-xs" aria-hidden="true">
+          -&gt;
+        </span>
+      ) : null}
     </button>
   );
 }

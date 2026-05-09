@@ -13,12 +13,14 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
   const page = read("src/app/page.tsx");
   const animatedDemo = read("src/components/animated-demo-flow.tsx");
   const animatedStory = read("src/components/animated-demo-story.tsx");
+  const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
   const source = [
     page,
     animatedDemo,
     animatedStory,
+    scrollAwareHeader,
     scrollProgress,
     typewriterTitle,
   ].join("\n");
@@ -57,6 +59,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "security/dependency-events.md",
     "[yieldOS:verdict] category-a-rewrite",
     "ScrollProgress",
+    "ScrollAwareHeader",
     "Hero",
     "Demo",
     "Coverage",
@@ -164,6 +167,8 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
     component.includes("navigator.clipboard.writeText"),
     "Expected clipboard write behavior",
   );
+  assert.ok(component.includes("prefix?: ReactNode"), "Expected optional button prefix");
+  assert.ok(component.includes("showArrow = true"), "Expected optional arrow rendering");
 });
 
 test("cinematic motion components and reduced motion styles are configured", () => {
@@ -172,6 +177,7 @@ test("cinematic motion components and reduced motion styles are configured", () 
   const reveal = read("src/components/motion-reveal.tsx");
   const demo = read("src/components/animated-demo-flow.tsx");
   const story = read("src/components/animated-demo-story.tsx");
+  const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
   const globals = read("src/app/globals.css");
@@ -211,8 +217,34 @@ test("cinematic motion components and reduced motion styles are configured", () 
     scrollProgress.includes("useTransform"),
     "Expected transformed progress value",
   );
+  assert.ok(scrollAwareHeader.startsWith('"use client";'), "Expected scroll-aware header client boundary");
+  assert.ok(
+    scrollAwareHeader.includes('data-visible={visible}'),
+    "Expected scroll-aware header visibility state",
+  );
+  assert.ok(
+    scrollAwareHeader.includes("window.requestAnimationFrame(update)"),
+    "Expected requestAnimationFrame scroll direction handling",
+  );
+  assert.ok(
+    scrollAwareHeader.includes("showArrow={false}"),
+    "Expected reference-style install button without arrow",
+  );
+  assert.ok(
+    scrollAwareHeader.includes("install-marks"),
+    "Expected icon marks inside the install pill",
+  );
   assert.ok(globals.includes("--acid: #e8ff00"), "Expected acid accent");
   assert.ok(globals.includes(".pitch-section"), "Expected full-screen sections");
+  assert.ok(globals.includes(".snap-deck::before"), "Expected page-wide grid layer");
+  assert.ok(
+    globals.includes(".pitch-section:not(.security-hero)::before"),
+    "Expected section-level grid layer",
+  );
+  assert.ok(
+    globals.includes("background-size: 72px 72px"),
+    "Expected extended square grid rhythm",
+  );
   assert.ok(
     existsSync(join(root, "public/yieldos-ascii-bg.webp")),
     "Expected optimized ascii background asset",
@@ -246,11 +278,13 @@ test("cinematic motion components and reduced motion styles are configured", () 
   );
   assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
-  assert.ok(page.includes("intro-header"), "Expected staged topbar intro class");
-  assert.ok(!page.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
-  assert.ok(!page.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
-  assert.ok(page.includes("!h-11"), "Expected capsule topbar install button");
-  assert.ok(page.includes("!w-[166px]"), "Expected fixed capsule topbar install button");
+  assert.ok(scrollAwareHeader.includes("intro-header"), "Expected staged topbar intro class");
+  assert.ok(!scrollAwareHeader.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
+  assert.ok(!scrollAwareHeader.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
+  assert.ok(scrollAwareHeader.includes("!h-12"), "Expected larger reference-style topbar install button");
+  assert.ok(scrollAwareHeader.includes("!w-[190px]"), "Expected fixed reference-style install pill");
+  assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
+  assert.ok(globals.includes(".install-marks"), "Expected install pill mark styling");
   assert.ok(
     globals.includes("background-color: rgba(82, 92, 122, 0.24)"),
     "Expected capsule glass nav color",
