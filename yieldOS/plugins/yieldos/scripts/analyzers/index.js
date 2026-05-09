@@ -68,11 +68,23 @@ async function analyzePackage(candidate, opts = {}) {
   const findings = [];
   const tiers = [];
 
+  const SUPPORTED_NPM = candidate.manager === 'npm' || candidate.manager === 'pnpm' || candidate.manager === 'yarn' || candidate.manager === 'bun';
+  const SUPPORTED_PY = candidate.manager === 'pip' || candidate.manager === 'poetry' || candidate.manager === 'uv';
+
   let metadata = null;
-  if (candidate.manager === 'npm' || candidate.manager === 'pnpm' || candidate.manager === 'yarn' || candidate.manager === 'bun') {
+  if (SUPPORTED_NPM) {
     metadata = await fetchNpmMetadata(candidate.name, candidate.version);
-  } else if (candidate.manager === 'pip' || candidate.manager === 'poetry' || candidate.manager === 'uv') {
+  } else if (SUPPORTED_PY) {
     metadata = await fetchPypiMetadata(candidate.name, candidate.version);
+  } else {
+    // Manager not supported by analyzers (cargo, go, etc.). Skip deep analysis;
+    // allowlist/denylist/category-D already ran upstream, so reaching here means
+    // the package is not in any list. Allow with a tier3 note.
+    return {
+      tier: 'tier3',
+      findings: [{ id: 'analyzer-unsupported-manager', severity: 'tier3', note: `analyzer does not support manager: ${candidate.manager}` }],
+      verdict: 'inconclusive',
+    };
   }
 
   if (!metadata) {
