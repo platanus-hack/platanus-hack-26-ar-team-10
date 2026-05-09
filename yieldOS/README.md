@@ -44,7 +44,8 @@ native equivalents, and rewrites do not decide code-audit outcomes.
 
 The code-audit loop red-teams the changed code, applies one minimal deterministic
 blue-team fix per pass, re-scans after each patch, and stops after a hard limit.
-It then logs the result to `security/code-audit-events.md`.
+It then logs the result to `security/code-audit-events.md` and writes
+machine-verifiable state to `security/code-audit-state.json`.
 
 → Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
 
@@ -334,11 +335,11 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `instruction-watcher.test.js` — hash-based change detection on `CLAUDE.md`/`AGENTS.md`.
 - `logger.test.js` — log entry shape and secret redaction.
 - `self-defense.test.js` — protected path matching.
-- `code-audit.test.js` — staged/push diff collection, red/blue loop, verification, hook routing.
+- `code-audit.test.js` — staged/push diff collection, red/blue loop, audit state, CI verification, hook routing.
 - `ui.test.js` — terminal labels, color gating, exact machine-readable verdicts.
 - `e2e.test.js` — end-to-end runs of the pre-install gate with realistic inputs.
 
-146/146 passing.
+151/151 passing.
 
 ---
 

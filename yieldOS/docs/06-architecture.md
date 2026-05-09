@@ -188,9 +188,10 @@ PreToolUse hook
 
 3. **OSV cache** — `~/.claude/plugins/yieldos/.osv-cache/`. Per-package `<ecosystem>__<name>__<version>.json`. TTL 1 hour. Avoids hammering OSV API for the same `(pkg, version)` repeatedly.
 
-## Logging
+## Logging And Audit State
 
 Every hook can append to `<project>/security/dependency-events.md`. Format: markdown sections, append-only, secret-redacted.
+Code audit also appends human-readable events to `<project>/security/code-audit-events.md` and writes the latest machine-verifiable state to `<project>/security/code-audit-state.json`.
 
 ```
 ## YYYY-MM-DD HH:mm - <Heading>
@@ -231,6 +232,8 @@ Paths protected from agent edit:
 /.claude/plugins/yieldos/**
 /.claude-plugin/{plugin.json,hooks/,scripts/,policy-cache/,config/}
 /security/dependency-events.md
+/security/code-audit-events.md
+/security/code-audit-state.json
 /security/yieldos-rewrites.json
 /security/.yieldos-instruction-hashes.json
 ```

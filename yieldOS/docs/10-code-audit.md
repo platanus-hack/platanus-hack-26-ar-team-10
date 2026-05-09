@@ -16,7 +16,7 @@ ahead of the configured upstream branch.
 
 ## Red Team / Blue Team Loop
 
-The commit path is a bounded loop, not a one-shot scan. It runs up to five fix
+The commit path is a bounded loop, not a one-shot scan. It runs up to three fix
 passes:
 
 1. Collect changed code from git.
@@ -68,6 +68,27 @@ Events are appended to:
 security/code-audit-events.md
 ```
 
+The latest machine-verifiable audit state is written to:
+
+```
+security/code-audit-state.json
+```
+
+The state file stores the audited diff source, range, file list, verdict,
+iteration count, unresolved findings, verification summary, and a `sha256` hash
+of the exact audited source diff. Generated audit files are excluded from the
+diff before hashing:
+
+- `security/code-audit-events.md`
+- `security/code-audit-state.json`
+
+For commits, the hash is based on `git diff --cached --unified=80`. For push or
+PR verification, it is based on the merge-base diff. The hook stages the state
+file on commit audits so the evidence can travel with the source change. On
+push, if the exact state is not already committed in `HEAD`, the hook writes and
+stages it, then blocks the push so the evidence can be committed before CI
+verifies it.
+
 Machine-readable verdicts:
 
 - `code-audit-clean`
@@ -79,3 +100,16 @@ Machine-readable verdicts:
 When a fix is applied, the original git command is blocked intentionally. The
 working tree and staged diff now contain the fix, so the user or agent should
 review and rerun the commit.
+
+## CI Verification
+
+CI should not call an LLM. It can verify the stored state cheaply:
+
+```bash
+node yieldOS/plugins/yieldos/scripts/code-audit/ci-verify.js --mode pr --base origin/main
+```
+
+The verifier recalculates the current diff hash, compares it with
+`security/code-audit-state.json`, and reruns the deterministic red-team
+detectors. It fails if the state is missing, stale, or if blocking findings
+remain.

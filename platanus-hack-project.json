@@ -1,5 +1,5 @@
 {
-  "project-name": "<FILL THIS>",
-  "project-oneliner-spanish": "<FILL THIS>",
-  "project-description-spanish": "<FILL THIS>"
+  "project-name": "yieldOS",
+  "project-oneliner-spanish": "A security gate for AI coding agents that blocks risky dependencies, instructions, and source-code changes before they land in the repository.",
+  "project-description-spanish": "yieldOS is a Claude Code plugin that acts as a security layer between an AI coding agent and a project. It intercepts package installs, skills, MCPs, instruction edits, commits, and pushes; then automatically allows, blocks, rewrites, or audits the action based on deterministic policy and evidence. Its code-audit loop red-teams source diffs, applies small deterministic blue-team fixes when safe, re-scans, records verifiable audit state, and blocks unresolved high-risk changes before they reach the repo."
 }

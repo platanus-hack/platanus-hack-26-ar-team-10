@@ -4,8 +4,9 @@ const { collectStagedDiff, collectPushDiff } = require('./git');
 const { redTeam } = require('./red-team');
 const { blueTeam } = require('./blue-team');
 const { verifyFix } = require('./verify');
+const { writeAuditState, readAuditState, verifyAuditState } = require('./state');
 
-const MAX_FIX_ITERATIONS = 5;
+const MAX_FIX_ITERATIONS = 3;
 const PATCHABLE_SEVERITIES = ['critical', 'high', 'medium'];
 const PUSH_BLOCKING_SEVERITIES = ['critical', 'high', 'medium'];
 
@@ -26,7 +27,7 @@ function auditGitCommand(projectRoot, command, options = {}) {
   const input = mode === 'push' ? collectPushDiff(projectRoot) : collectStagedDiff(projectRoot);
 
   if (input.files.length === 0 || !input.diff) {
-    return result('code-audit-clean', 'allow', mode, input, [], null, 'yieldOS code-audit: no code changes to audit');
+    return result('code-audit-clean', 'allow', mode, input, [], null, 'yieldOS code-audit: no code changes to audit', null, { maxIterations: 0 });
   }
 
   if (mode === 'push') {
@@ -39,15 +40,15 @@ function auditGitCommand(projectRoot, command, options = {}) {
 function auditPush(input) {
   const findings = redTeam(input);
   if (findings.length === 0) {
-    return result('code-audit-clean', 'allow', 'push', input, [], null, 'yieldOS code-audit: clean');
+    return result('code-audit-clean', 'allow', 'push', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations: 0 });
   }
 
   const highest = highestSeverity(findings);
   if (PUSH_BLOCKING_SEVERITIES.includes(highest)) {
-    return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`);
+    return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`, null, { maxIterations: 0 });
   }
 
-  return result('code-audit-warning', 'allow', 'push', input, findings, null, 'yieldOS code-audit found low-risk code; see log');
+  return result('code-audit-warning', 'allow', 'push', input, findings, null, 'yieldOS code-audit found low-risk code; see log', null, { maxIterations: 0 });
 }
 
 function auditCommit(projectRoot, initialInput, options) {
@@ -73,21 +74,21 @@ function auditCommit(projectRoot, initialInput, options) {
     patch.limitReached = findings.length > 0 && patches.length >= maxIterations;
     const verification = verifyFix(projectRoot);
     if (!verification.ok) {
-      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, verificationFailureMessage(patch), verification);
+      return result('code-audit-verification-failed', 'block', 'commit', input, findings, patch, verificationFailureMessage(patch), verification, { maxIterations });
     }
-    return result('code-audit-fix-applied', 'block', 'commit', input, findings, patch, fixAppliedMessage(patch), verification);
+    return result('code-audit-fix-applied', 'block', 'commit', input, findings, patch, fixAppliedMessage(patch), verification, { maxIterations });
   }
 
   if (findings.length === 0) {
-    return result('code-audit-clean', 'allow', 'commit', input, [], null, 'yieldOS code-audit: clean');
+    return result('code-audit-clean', 'allow', 'commit', input, [], null, 'yieldOS code-audit: clean', null, { maxIterations });
   }
 
   const highest = highestSeverity(findings);
   if (highest === 'critical' || highest === 'high') {
-    return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`);
+    return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`, null, { maxIterations });
   }
 
-  return result('code-audit-warning', 'allow', 'commit', input, findings, null, `yieldOS code-audit found ${highest}-risk code; see log`);
+  return result('code-audit-warning', 'allow', 'commit', input, findings, null, `yieldOS code-audit found ${highest}-risk code; see log`, null, { maxIterations });
 }
 
 function highestSeverity(findings) {
@@ -121,16 +122,20 @@ function unique(items) {
   return Array.from(new Set(items));
 }
 
-function result(verdict, action, mode, input, findings, patch, message, verification = null) {
+function result(verdict, action, mode, input, findings, patch, message, verification = null, meta = {}) {
   return {
     handled: true,
     verdict,
     action,
     mode,
+    diffSource: input.diffSource,
+    diffHash: input.diffHash,
+    range: input.range,
     files: input.files,
     findings,
     patch,
     verification,
+    maxIterations: meta.maxIterations || 0,
     message,
   };
 }
@@ -145,4 +150,7 @@ module.exports = {
   isGitPush,
   redTeam,
   MAX_FIX_ITERATIONS,
+  writeAuditState,
+  readAuditState,
+  verifyAuditState,
 };

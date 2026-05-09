@@ -110,9 +110,9 @@ This was a deliberate decision after a real bug (matplotlib false positive) — 
 ## What is NOT gated
 
 - **README.md / docs** — pure data, not instructions to the agent. Reading them is fine; if the agent considers acting on a command found inside, that command goes through the normal Bash gate when executed.
-- **Code edits** to project files (e.g., `src/index.ts`) — yieldOS does not gate code itself. It gates the *acquisition* of foreign code.
+- **Raw code edits** to project files (e.g., `src/index.ts`) — yieldOS does not block every `Write` or `Edit` to normal source files. Source-code security is audited later at `git commit` and `git push` by `code-audit`.
 - **`.gitignore`, `LICENSE`, `Dockerfile`, etc.** — out of scope.
-- **Git operations other than `clone`** (commit, push, pull) — not relevant to dependency security.
+- **Git operations other than `clone`, `commit`, and `push`** — pull, status, log, etc. are not relevant to dependency or source-code security.
 
 ## Coverage matrix
 
@@ -123,6 +123,7 @@ This was a deliberate decision after a real bug (matplotlib false positive) — 
 | MCP addition | (planned) | block | mcps.json |
 | Instruction file edit | injection scanner | allow if clean, block if tier1/tier2 | injection-patterns.json |
 | `git clone` | vendoring classifier | block | (no per-repo allowlist today) |
+| `git commit` / `git push` | code-audit | block high/critical; block medium before push | deterministic detectors |
 | `curl ... \| sh` | binaries classifier | block | (no per-host allowlist today) |
 | Manifest edit | classifyWriteOrEdit | pass-through | n/a |
 

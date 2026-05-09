@@ -11,6 +11,7 @@ const codeAudit = require('../scripts/code-audit');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const HOOK_PATH = path.join(PLUGIN_ROOT, 'scripts', 'pre-install-gate.js');
+const CI_VERIFY_PATH = path.join(PLUGIN_ROOT, 'scripts', 'code-audit', 'ci-verify.js');
 
 function sh(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
@@ -45,6 +46,21 @@ test('collectStagedDiff returns staged names and unified diff', () => {
 
   assert.deepEqual(auditInput.files, ['app.js']);
   assert.equal(auditInput.diff.includes('+console.log(process.env.SECRET_TOKEN);'), true);
+});
+
+test('collectStagedDiff ignores generated audit files for hash and files', () => {
+  const root = tmpRepo();
+  fs.mkdirSync(path.join(root, 'security'));
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 1;\n');
+  fs.writeFileSync(path.join(root, 'security', 'code-audit-events.md'), 'log\n');
+  fs.writeFileSync(path.join(root, 'security', 'code-audit-state.json'), '{"old":true}\n');
+  sh(root, ['add', 'app.js', 'security/code-audit-events.md', 'security/code-audit-state.json']);
+
+  const auditInput = codeAudit.collectStagedDiff(root);
+
+  assert.deepEqual(auditInput.files, ['app.js']);
+  assert.equal(auditInput.diff.includes('code-audit-state.json'), false);
+  assert.equal(auditInput.diffHash.startsWith('sha256:'), true);
 });
 
 test('collectPushDiff returns commits ahead of upstream', () => {
@@ -195,6 +211,7 @@ test('code audit loops through bounded red-team and blue-team passes', () => {
 
   assert.equal(result.verdict, 'code-audit-fix-applied');
   assert.equal(result.patch.iterations, 2);
+  assert.equal(codeAudit.MAX_FIX_ITERATIONS, 3);
   assert.equal(app.includes('SECRET_TOKEN'), false);
   assert.equal(server.includes("res.redirect('/')"), true);
 });
@@ -278,11 +295,101 @@ test('pre-install hook applies fix on git commit and blocks original command', (
   const r = runHook(root, 'git commit -m "leak secret"');
   const content = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
   const log = fs.readFileSync(path.join(root, 'security', 'code-audit-events.md'), 'utf8');
+  const state = JSON.parse(fs.readFileSync(path.join(root, 'security', 'code-audit-state.json'), 'utf8'));
+  const stagedFiles = sh(root, ['diff', '--cached', '--name-only']);
 
   assert.equal(r.code, 2);
   assert.equal(r.stderr.includes('[yieldOS:verdict] code-audit-fix-applied'), true);
   assert.equal(content.includes('SECRET_TOKEN'), false);
   assert.equal(log.includes('code-audit-fix-applied'), true);
+  assert.equal(state.diff_hash.startsWith('sha256:'), true);
+  assert.equal(state.max_iterations, 3);
+  assert.equal(state.verdict, 'code-audit-fix-applied');
+  assert.equal(stagedFiles.includes('security/code-audit-state.json'), true);
+});
+
+test('verifyAuditState passes for matching staged diff and fails after source changes', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 1;\n');
+  sh(root, ['add', 'app.js']);
+
+  const result = codeAudit.auditGitCommand(root, 'git commit -m audit-test');
+  codeAudit.writeAuditState(root, result, { stage: true });
+
+  const ok = codeAudit.verifyAuditState(root, { mode: 'commit' });
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 2;\n');
+  sh(root, ['add', 'app.js']);
+  const stale = codeAudit.verifyAuditState(root, { mode: 'commit' });
+
+  assert.equal(ok.ok, true);
+  assert.equal(stale.ok, false);
+  assert.equal(stale.reason, 'diff-hash-mismatch');
+});
+
+test('ci verifier validates stored state against merge-base diff', () => {
+  const remote = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-code-audit-remote-'));
+  sh(remote, ['init', '--bare']);
+
+  const root = tmpRepo();
+  sh(root, ['remote', 'add', 'origin', remote]);
+  sh(root, ['push', '-u', 'origin', 'main']);
+
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 1;\n');
+  sh(root, ['add', 'app.js']);
+  sh(root, ['commit', '-m', 'safe change']);
+
+  const audit = codeAudit.auditGitCommand(root, 'git push');
+  codeAudit.writeAuditState(root, audit);
+
+  const ok = spawnSync('node', [CI_VERIFY_PATH, '--mode', 'pr', '--base', 'origin/main'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 2;\n');
+  sh(root, ['add', 'app.js']);
+  sh(root, ['commit', '-m', 'stale change']);
+  const stale = spawnSync('node', [CI_VERIFY_PATH, '--mode', 'pr', '--base', 'origin/main'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.equal(stale.status, 2);
+  assert.equal(stale.stderr.includes('diff-hash-mismatch'), true);
+});
+
+test('pre-install hook blocks git push when audit state must be committed', () => {
+  const remote = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-code-audit-remote-'));
+  sh(remote, ['init', '--bare']);
+
+  const root = tmpRepo();
+  sh(root, ['remote', 'add', 'origin', remote]);
+  sh(root, ['push', '-u', 'origin', 'main']);
+
+  fs.writeFileSync(path.join(root, 'app.js'), 'const value = 1;\n');
+  sh(root, ['add', 'app.js']);
+  sh(root, ['commit', '-m', 'safe change']);
+
+  const first = runHook(root, 'git push');
+  const stagedFiles = sh(root, ['diff', '--cached', '--name-only']);
+  const state = JSON.parse(fs.readFileSync(path.join(root, 'security', 'code-audit-state.json'), 'utf8'));
+
+  assert.equal(first.code, 2);
+  assert.equal(first.stderr.includes('[yieldOS:verdict] code-audit-blocked'), true);
+  assert.equal(first.stderr.includes('commit security/code-audit-state.json'), true);
+  assert.equal(stagedFiles.includes('security/code-audit-state.json'), true);
+  assert.equal(state.verdict, 'code-audit-clean');
+
+  const repeat = runHook(root, 'git push');
+  assert.equal(repeat.code, 2);
+  assert.equal(repeat.stderr.includes('commit security/code-audit-state.json'), true);
+
+  sh(root, ['commit', '-m', 'add code audit state']);
+  const second = runHook(root, 'git push');
+
+  assert.equal(second.code, 0, second.stderr);
+  assert.equal(second.stderr.includes('[yieldOS:verdict] code-audit-clean'), true);
 });
 
 test('pre-install hook blocks git push with unresolved high finding', () => {

@@ -149,6 +149,28 @@ function handleCodeAuditCommand(projectRoot, command) {
     };
   }
 
+  if (audit.files && audit.files.length > 0) {
+    try {
+      const shouldStageState = audit.mode === 'commit' || (audit.mode === 'push' && audit.action !== 'block');
+      const stateWrite = codeAudit.writeAuditState(projectRoot, audit, { stage: shouldStageState });
+      if (audit.mode === 'push' && audit.action !== 'block' && !stateWrite.committed) {
+        audit = {
+          ...audit,
+          verdict: 'code-audit-blocked',
+          action: 'block',
+          message: 'yieldOS code-audit wrote verification state; commit security/code-audit-state.json and rerun git push',
+        };
+      }
+    } catch (err) {
+      audit = {
+        ...audit,
+        verdict: 'code-audit-verification-failed',
+        action: 'block',
+        message: `yieldOS code-audit could not write verification state: ${err.message}`,
+      };
+    }
+  }
+
   logger.logCodeAudit(projectRoot, audit);
   ui.writeAudit(audit);
   process.exit(audit.action === 'block' ? 2 : 0);
