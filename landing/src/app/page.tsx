@@ -59,28 +59,36 @@ export default function Home() {
 
       <section
         id="hero"
-        className="pitch-section security-hero relative overflow-hidden bg-[#0e0e10] text-white"
+        className="pitch-section security-hero relative overflow-x-clip bg-[#0e0e10] text-white"
       >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
+        <div className="pitch-shell mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
             <TypewriterHeroTitle
               text={heroTitle}
               lines={["Unlock coding for", "non technical talent"]}
               className="hero-title font-semibold leading-[0.92]"
-              startDelayMs={900}
+              startDelayMs={500}
             />
-            <MotionReveal delay={3.05} immediate y={12}>
-              <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
-                yieldOS checks what AI agents install, edit, and run before anything happens.
+            <MotionReveal
+              className="mx-auto mt-4 w-full sm:mt-5"
+              delay={3.5}
+              immediate
+              y={10}
+            >
+              <p className="mx-auto max-w-md text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">
+                yieldOS keeps watch. You keep building.
               </p>
             </MotionReveal>
             <MotionReveal
-              className="mt-6 flex items-center justify-center sm:mt-8"
-              delay={3.28}
+              className="mx-auto mt-4 w-full max-w-[min(100%,36rem)] sm:mt-5"
+              delay={4.1}
               immediate
               y={14}
             >
-              <TerminalInstallCommand command={installCommand} />
+              <TerminalInstallCommand
+                command={installCommand}
+                startDelayMs={4100}
+              />
             </MotionReveal>
           </div>
         </div>

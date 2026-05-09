@@ -1,5 +1,5 @@
 {
-  "project-name": "<FILL THIS>",
-  "project-oneliner-spanish": "<FILL THIS>",
-  "project-description-spanish": "<FILL THIS>"
+  "project-name": "yieldOS",
+  "project-oneliner-spanish": "Capa de seguridad que decide antes de ejecutar lo que instalan, editan o ejecutan los agentes de IA.",
+  "project-description-spanish": "yieldOS permite, bloquea o reescribe acciones de agentes (dependencias, skills, MCPs, instrucciones, vendoring y binarios) con políticas y trazas, para que el software construido con IA no llegue a producción con cambios riesgosos."
 }

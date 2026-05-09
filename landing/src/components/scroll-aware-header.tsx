@@ -54,16 +54,16 @@ export function ScrollAwareHeader() {
           {navItems.map(([label, href]) => (
             <a
               key={href}
-              className="rounded-full px-2.5 py-1.5 transition hover:bg-zinc-950/[0.06] hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20"
+              className="nav-link inline-flex h-8 items-center rounded-full px-3"
               href={href}
             >
-              {label}
+              <span className="nav-link-label">{label}</span>
             </a>
           ))}
         </nav>
         <a
           href="#hero"
-          className="intro-brand nav-brand text-base font-semibold tracking-[-0.04em] transition hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20 sm:text-lg"
+          className="intro-brand nav-brand text-base font-semibold tracking-[-0.04em] sm:text-lg"
           aria-label="yieldOS home"
         >
           yieldOS
@@ -71,10 +71,10 @@ export function ScrollAwareHeader() {
         <div className="intro-status nav-right">
           <a
             href="#demo-flow"
-            className="nav-demo-button inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20"
+            className="nav-demo-button inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold"
           >
-            Demo
-            <span aria-hidden="true">-&gt;</span>
+            <span className="nav-demo-label">Demo</span>
+            <span className="nav-demo-arrow" aria-hidden="true">-&gt;</span>
           </a>
         </div>
       </div>
