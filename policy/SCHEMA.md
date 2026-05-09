@@ -132,6 +132,7 @@ version: 0.1
 kind: yield.agent-pack
 name: company-safe-defaults
 profiles:
+  - non-technical-safe
   - secrets-safe
   - dependency-safe
 agents:
@@ -156,6 +157,13 @@ playbooks:
     - security-audit
     - skill-review
     - mcp-review
+oracles:
+  include:
+    - code-audit-state
+    - agent-pack-lock
+    - instruction-policy
+    - project-tests
+    - cdsc-proof
 evidence:
   pack_lock: yield.agent-pack.lock.json
 ```
@@ -165,6 +173,9 @@ Rules:
 - Pack entries must reference `policy/` keys or reviewed yieldOS playbooks.
 - Packs may generate `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, skills, reports, and lockfiles.
 - Packs must not silently install unreviewed skills or MCPs.
+- Packs may declare approved oracles, but they do not execute them by themselves.
+- `oracles.include` must reference reviewed yieldOS oracle IDs only.
+- The pack lock records oracle IDs and registry version; it does not prove those oracles ran.
 - Runtime enforcement strength must be explicit per target agent.
 - Generated outputs should be previewed before writing, tracked by a pack lock, and verified against that lock metadata plus file hashes when the files are active in the repo.
 - Vector retrieval can recommend pack entries, but reviewed manifest entries decide what becomes active.

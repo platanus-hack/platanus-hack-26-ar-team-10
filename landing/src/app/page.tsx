@@ -1,16 +1,14 @@
 import { AgentPackSection } from "@/components/agent-pack-section";
-import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
-import { AnimatedDemoStory } from "@/components/animated-demo-story";
 import { CopyCommandButton } from "@/components/copy-command-button";
 import { MotionReveal } from "@/components/motion-reveal";
+import { OracleDemoFlow } from "@/components/oracle-demo-flow";
 import { OrbitalInstallPill } from "@/components/orbital-install-pill";
 import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
 
 const installCommand =
   "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh";
-const heroTitle = "Safe coding for AI agent teams";
+const heroTitle = "Oracle-driven security harness for AI coding agents";
 
 const gatedVectors = [
   { title: "Packages", detail: "9 managers." },
@@ -46,10 +44,10 @@ const auditItems = [
 ];
 
 const proofStats = [
-  { value: "250+", label: "local tests" },
+  { value: "0", label: "CI model calls in verifier" },
+  { value: "3", label: "oracle result states" },
+  { value: "2", label: "CDSC proof sides" },
   { value: "7", label: "gated vectors" },
-  { value: "9", label: "package managers detected" },
-  { value: "1163", label: "benchmark cases" },
 ];
 
 export default function Home() {
@@ -64,15 +62,12 @@ export default function Home() {
       >
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
-            <TypewriterHeroTitle
-              text={heroTitle}
-              lines={["Safe coding for", "AI agent teams"]}
-              className="hero-title font-semibold leading-[0.92]"
-              startDelayMs={900}
-            />
+            <h1 className="hero-title font-semibold leading-[0.92]">
+              {heroTitle}
+            </h1>
             <MotionReveal delay={3.05} immediate y={12}>
               <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
-                yieldOS checks what AI agents install, edit, and run before anything happens.
+                yieldOS wraps protected Claude Code repos and CI-verified workflows with executable oracles. The model can propose. The oracle decides.
               </p>
             </MotionReveal>
             <MotionReveal
@@ -95,16 +90,17 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[0.64fr_1.36fr] lg:items-end lg:gap-10">
             <MotionReveal>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Decision demo
+                Oracle proof demo
               </p>
-              <h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight text-balance sm:mt-5 sm:text-5xl">
-                Before it runs.
+              <h2 className="mt-3 max-w-lg text-3xl font-semibold leading-tight text-balance sm:mt-5 sm:text-5xl">
+                Baseline fail. Fixed pass.
               </h2>
             </MotionReveal>
-            <AnimatedDemoStory />
           </div>
 
-          <AnimatedDemoFlow />
+          <div className="mt-6">
+            <OracleDemoFlow />
+          </div>
         </div>
       </section>
 
@@ -231,7 +227,7 @@ export default function Home() {
                 Prototype proof
               </p>
               <h2 className="mt-4 max-w-lg text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-                Working, not hypothetical.
+                Baseline fail. Fixed pass.
               </h2>
             </MotionReveal>
             <div className="proof-grid grid grid-cols-2 gap-3">
@@ -262,7 +258,7 @@ export default function Home() {
               No silent installs.
             </p>
             <h2 className="mx-auto mt-5 max-w-2xl text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-              Give agents a boundary they cannot bypass.
+              Give agents an evidence boundary.
             </h2>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <CopyCommandButton
@@ -271,10 +267,10 @@ export default function Home() {
                 variant="light"
               />
               <a
-                href="#demo-flow"
+                href="/oracle-demo"
                 className="inline-flex h-11 items-center justify-center rounded-md border border-white/15 bg-white/[0.06] px-4 text-sm font-medium text-white transition hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10] active:translate-y-px"
               >
-                View decision demo
+                View oracle demo
               </a>
             </div>
           </div>
@@ -284,7 +280,7 @@ export default function Home() {
       <footer className="theme-surface-light border-t border-zinc-200/80 py-5">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 font-mono text-xs text-zinc-500 sm:flex-row sm:px-8">
           <p>yieldOS</p>
-          <p>AI-agent security gate</p>
+          <p>Oracle-driven security harness</p>
         </div>
       </footer>
     </main>

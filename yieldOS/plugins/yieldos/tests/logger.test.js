@@ -98,3 +98,21 @@ test('logSelfDefense logs entry', () => {
   const content = fs.readFileSync(fp, 'utf8');
   assert.equal(content.includes('Self-Defense Trigger'), true);
 });
+
+test('security logs reject symlink traversal', () => {
+  if (process.platform === 'win32') return;
+  const root = tmpProject();
+  const outside = tmpProject();
+  fs.symlinkSync(outside, path.join(root, 'security'), 'dir');
+
+  assert.throws(
+    () => logger.logAllowed(root, {
+      type: 'library',
+      name: 'react',
+      version: '18.3.1',
+      source: 'npm',
+      command: 'npm install react@18.3.1',
+    }),
+    /security log path must not traverse a symlink|security log path realpath/,
+  );
+});

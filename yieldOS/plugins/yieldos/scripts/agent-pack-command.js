@@ -13,6 +13,7 @@ const {
   VALID_PLAYBOOKS,
 } = require('./agent-pack-playbooks');
 const { parseManifest } = require('./agent-pack-yaml');
+const { knownOracleIds } = require('./oracles/registry');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const VALID_ACTIONS = new Set(['preview', 'write', 'verify']);
@@ -69,7 +70,7 @@ function runPack(projectRoot, argv = process.argv.slice(2), options = {}) {
     const compiled = compilePack(projectRoot, parsed.packPath, options);
     if (parsed.action === 'verify') {
       const verification = verifyInstalledFiles(projectRoot, compiled);
-      return { exitCode: 0, message: renderVerify(compiled, verification), files: compiled.files, pack: compiled.pack };
+      return { exitCode: 0, message: renderVerify(compiled, verification), files: compiled.files, pack: compiled.pack, verification };
     }
     if (parsed.action === 'preview') {
       return { exitCode: 0, message: renderPreview(projectRoot, compiled), files: compiled.files, pack: compiled.pack };
@@ -149,6 +150,7 @@ function validatePack(pack, policy) {
   const skills = validateSkills(pack.skills, policy.skills);
   const mcps = validateMcps(pack.mcps, policy.mcps);
   const playbooks = validatePlaybooks(pack.playbooks);
+  const oracles = validateOracles(pack.oracles);
   const warnings = agents
     .filter((agent) => TARGET_STRENGTH[agent] === 'guidance-only')
     .map((agent) => `${agent} output is guidance-only; runtime enforcement depends on that host.`);
@@ -159,9 +161,19 @@ function validatePack(pack, policy) {
     skills,
     mcps,
     playbooks,
+    oracles,
     warnings,
     policyVersion: policy.skills.version || policy.mcps.version || 'unknown',
   };
+}
+
+function validateOracles(oraclesConfig = {}) {
+  const included = asArray(oraclesConfig?.include || [], 'oracles.include');
+  const known = knownOracleIds();
+  for (const oracle of included) {
+    if (!known.has(oracle)) throw new Error(`${oracle} is not a reviewed yieldOS oracle`);
+  }
+  return included;
 }
 
 function validatePlaybooks(playbooksConfig = {}) {
@@ -429,6 +441,8 @@ function appendPackSection(content, pack, validation) {
     `- Approved skills: ${validation.skills.map((item) => item.key).join(', ') || 'none'}`,
     `- Approved MCPs: ${validation.mcps.map((item) => item.key).join(', ') || 'none'}`,
     `- Active playbooks: ${validation.playbooks.join(', ') || 'none'}`,
+    `- Approved oracles: ${validation.oracles.join(', ') || 'none'}`,
+    '- This pack declares approved oracles. Run yieldos-oracle or CI to execute them.',
     '- Treat generated adapters as reviewed project guidance; runtime enforcement depends on the target agent.',
     '',
     ...renderSafetyContractLines(),
@@ -454,6 +468,11 @@ function renderReport(pack, validation, files) {
     '',
     '## Approved MCPs',
     ...(validation.mcps.length ? validation.mcps.map((mcp) => `- ${mcp.key}: ${mcp.approved_tools.join(', ')}`) : ['- none']),
+    '',
+    '## Approved Oracles',
+    ...(validation.oracles.length ? validation.oracles.map((oracle) => `- ${oracle}`) : ['- none']),
+    '',
+    'This pack declares approved oracles. Run yieldos-oracle or CI to execute them.',
     '',
     '## Generated Files',
     ...files.map((file) => `- ${file.path}`),
@@ -483,6 +502,10 @@ function renderLock(pack, validation, files) {
     }),
     mcps: validation.mcps,
     playbooks: validation.playbooks,
+    oracles: {
+      registry_version: '0.1',
+      include: validation.oracles,
+    },
     generated_files: files.map((file) => ({ path: file.path, sha256: sha256(file.content) })),
   };
 }
@@ -540,6 +563,7 @@ function lockMetadata(lock) {
     skills: Array.isArray(lock.skills) ? lock.skills : null,
     mcps: Array.isArray(lock.mcps) ? lock.mcps : null,
     playbooks: Array.isArray(lock.playbooks) ? lock.playbooks : null,
+    oracles: lock.oracles && typeof lock.oracles === 'object' ? lock.oracles : null,
   };
 }
 
@@ -656,5 +680,6 @@ module.exports = {
   compilePack,
   parseArgs,
   runPack,
+  validateOracles,
   usage,
 };

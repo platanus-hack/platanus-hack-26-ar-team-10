@@ -14,8 +14,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 body {
@@ -129,50 +129,6 @@ html {
   margin-left: auto;
 }
 
-.hero-typewriter {
-  position: relative;
-  display: block;
-}
-
-.hero-typewriter-layout {
-  display: block;
-  visibility: hidden;
-}
-
-.hero-typewriter-copy {
-  position: absolute;
-  inset: 0;
-  display: block;
-}
-
-.hero-typewriter-line {
-  display: block;
-  white-space: nowrap;
-}
-
-.hero-safe-word {
-  position: relative;
-  display: inline-block;
-}
-
-.hero-safe-marker {
-  position: absolute;
-  bottom: calc(100% - 0.02em);
-  left: 42%;
-  display: block;
-  width: 7.6em;
-  height: 2.4em;
-  color: rgba(255, 255, 255, 0.88);
-  font-family: var(--font-mono);
-  font-size: clamp(0.46rem, 0.15em, 0.64rem);
-  font-weight: 650;
-  letter-spacing: 0.14em;
-  line-height: 1;
-  pointer-events: none;
-  text-transform: uppercase;
-  transform: translateX(-46%) rotate(-5deg);
-}
-
 .hero-safe-label {
   position: absolute;
   top: 0;
@@ -217,23 +173,6 @@ html {
   border-bottom: 1.75px solid rgba(255, 255, 255, 0.86);
   content: "";
   transform: rotate(18deg);
-}
-
-.hero-typewriter-caret {
-  display: inline-block;
-  width: 0.075em;
-  height: 0.8em;
-  margin-left: 0.055em;
-  background: linear-gradient(180deg, var(--signal-bright), var(--signal-muted));
-  box-shadow:
-    0 0 20px rgba(var(--signal-bright-rgb), 0.3),
-    0 0 30px rgba(var(--signal-muted-rgb), 0.18);
-  transform: translateY(0.075em);
-  animation: hero-caret-blink 0.88s steps(2, end) infinite;
-}
-
-.hero-typewriter-caret[data-complete="true"] {
-  opacity: 0.72;
 }
 
 .orbital-install-pill {
@@ -1294,7 +1233,6 @@ html {
   }
 
   .scan-sweep,
-  .hero-typewriter-caret,
   .scanned-belt::before,
   .flow-rail-pulse,
   .demo-cinema::before,

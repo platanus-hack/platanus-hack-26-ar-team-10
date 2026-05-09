@@ -40,7 +40,7 @@ Current implementation:
 - `yieldos-pack verify --pack yield.agent-pack.yaml` validates the pack. If generated files already exist, it requires the pack lock and verifies lock metadata plus generated file hashes against the active repo files.
 - `yieldos-pack preview --pack yield.agent-pack.yaml` renders every generated file for review.
 - `yieldos-pack write --pack yield.agent-pack.yaml` writes reviewed output and refuses to overwrite existing files unless `--force` is passed.
-- `/agent-packs` in the landing app builds and downloads a `yield.agent-pack.yaml` source manifest for a team to put at a repo root.
+- `/agent-packs` in the landing app builds and downloads a `yield.agent-pack.yaml` source manifest for a team to put at a repo root. It ships presets for non-technical safe defaults, engineering-team defaults, and security-review work.
 - Generated instructions, rules, and skills include a non-technical user safety contract: deterministic policy before model judgment, allowed does not mean proven safe, unapproved skills/MCPs/dependencies/scripts/binaries stay blocked, and the agent must stop and explain plainly before secret, auth, data deletion, cost, deployment, or production-risk work.
 
 ## External Signals
@@ -73,6 +73,7 @@ name: company-safe-defaults
 description: Safe coding defaults for team agent work.
 
 profiles:
+  - non-technical-safe
   - secrets-safe
   - dependency-safe
   - code-audit

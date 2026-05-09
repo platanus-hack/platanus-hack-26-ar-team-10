@@ -125,6 +125,28 @@ playbooks:
   assert.equal(result.message.includes('unreviewed-workflow is not a reviewed yieldOS playbook'), true);
 });
 
+test('runPack verify rejects oracles that are not reviewed by yieldOS', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: bad-oracle
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+oracles:
+  include:
+    - unreviewed-oracle
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('unreviewed-oracle is not a reviewed yieldOS oracle'), true);
+});
+
 test('runPack verify rejects MCP tools outside the approved surface', () => {
   const root = tmpProject();
   writePack(root, `
@@ -356,6 +378,8 @@ test('pack lock records hashes for generated files', () => {
   assert.equal(lock.skills[0].policy_entry_sha256.startsWith('sha256:'), true);
   assert.equal(Object.hasOwn(lock.skills[0], 'content_sha256'), false);
   assert.equal(lock.mcps[0].key, 'mcp:filesystem');
+  assert.deepEqual(lock.oracles.include, ['code-audit-state', 'agent-pack-lock', 'instruction-policy']);
+  assert.equal(lock.oracles.registry_version, '0.1');
   assert.equal(lock.generated_files.some((file) => file.path === '.cursor/rules/yieldos-security.mdc'), true);
   assert.equal(lock.generated_files.some((file) => file.path === '.cursor/skills/agent-pack-review/SKILL.md'), true);
 });
@@ -399,6 +423,7 @@ playbooks:
   const cursorSkill = result.files.find((file) => file.path === '.cursor/skills/agent-pack-review/SKILL.md');
 
   assert.equal(result.exitCode, 0);
+  assert.equal(result.message.includes('This pack declares approved oracles. Run yieldos-oracle or CI to execute them.'), true);
   [
     '.cursor/rules/yieldos-security.mdc',
     '.github/copilot-instructions.md',

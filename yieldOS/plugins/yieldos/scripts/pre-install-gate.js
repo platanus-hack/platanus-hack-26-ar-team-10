@@ -193,7 +193,41 @@ async function handleSelfDefense(input, projectRoot) {
       logger.logSelfDefense(projectRoot, { action: 'Bash:rm', target: cmd });
       emitDecision('self-defense-block', 'yieldOS bloqueó eliminación de archivos protegidos', 2);
     }
+    if (isProtectedBashMutation(cmd, projectRoot)) {
+      logger.logSelfDefense(projectRoot, { action: 'Bash:protected-mutation', target: cmd });
+      emitDecision('self-defense-block', 'yieldOS bloqueó modificación de evidencia protegida', 2);
+    }
   }
+}
+
+function isProtectedBashMutation(command, projectRoot = process.cwd()) {
+  const cmd = String(command || '').replace(/\\/g, '/');
+  if (!referencesProtectedSecurityPath(cmd, projectRoot)) {
+    return false;
+  }
+  return /(?:^|\s)(?:rm|mv|cp|tee|truncate|sed|dd)\b|>{1,2}|\b(?:writeFileSync|appendFileSync|createWriteStream|openSync|rmSync|unlinkSync|renameSync|copyFileSync|writeFile|appendFile|unlink|rename)\b|\bwrite_text\s*\(|\bopen\s*\([^)]*,\s*['"][wa]/.test(cmd);
+}
+
+function referencesProtectedSecurityPath(command, projectRoot) {
+  const cmd = String(command || '').replace(/\\/g, '/');
+  const protectedLeaf = '(?:oracles/|code-audit-state\\.json|code-audit-events\\.md|dependency-events\\.md|audit-events\\.md|yieldos-rewrites\\.json)';
+  const boundary = '(?:^|[\\s"\'`=:(])';
+  const relativePattern = new RegExp(`${boundary}(?:\\./)?security/${protectedLeaf}`);
+  if (relativePattern.test(cmd)) return true;
+
+  const root = path.resolve(projectRoot || process.cwd()).replace(/\\/g, '/').replace(/\/+$/, '');
+  if (root && cmd.includes(`${root}/security/`)) {
+    const absoluteProjectPattern = new RegExp(escapeRegExp(`${root}/security/`) + protectedLeaf);
+    if (absoluteProjectPattern.test(cmd)) return true;
+  }
+
+  const pathToken = '/[^\\s"\'`<>|;&]*';
+  const absoluteSecurityPattern = new RegExp(`${boundary}${pathToken}/security/${protectedLeaf}`);
+  return absoluteSecurityPattern.test(cmd);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 async function handleInstructionEdit(input, projectRoot, policy) {
@@ -475,5 +509,5 @@ async function main() {
 
 main().catch((err) => {
   process.stderr.write(`[yieldOS:fatal] ${err.message}\n`);
-  process.exit(0);
+  process.exit(2);
 });

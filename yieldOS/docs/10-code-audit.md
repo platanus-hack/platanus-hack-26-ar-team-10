@@ -122,6 +122,7 @@ diff before hashing:
 
 - `security/code-audit-events.md`
 - `security/code-audit-state.json`
+- `security/oracles/**`
 
 For commits, the hash is based on `git diff --cached --unified=80`. For push or
 PR verification, it is based on the merge-base diff. The hook stages the state

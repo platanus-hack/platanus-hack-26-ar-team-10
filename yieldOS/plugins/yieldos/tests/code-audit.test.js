@@ -365,6 +365,24 @@ test('audit state git object path stays repo-posix on every platform', () => {
   assert.equal(auditState.STATE_FILE, 'security/code-audit-state.json');
 });
 
+test('audit state write rejects security directory symlink traversal', () => {
+  if (process.platform === 'win32') return;
+  const root = tmpRepo();
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-code-audit-outside-'));
+  fs.symlinkSync(outside, path.join(root, 'security'), 'dir');
+
+  assert.throws(
+    () => auditState.writeAuditState(root, {
+      mode: 'commit',
+      diffSource: 'staged',
+      diffHash: 'sha256:test',
+      verdict: 'code-audit-clean',
+      action: 'allow',
+    }),
+    /audit state path must not traverse a symlink/,
+  );
+});
+
 test('audit verification resolves npm command for the current platform', () => {
   const command = auditVerify.npmCommand();
   assert.equal(command, process.platform === 'win32' ? 'npm.cmd' : 'npm');
@@ -385,6 +403,14 @@ test('ci verifier validates stored state against merge-base diff', () => {
   const audit = codeAudit.auditGitCommand(root, 'git push');
   codeAudit.writeAuditState(root, audit);
 
+  const uncommitted = spawnSync('node', [CI_VERIFY_PATH, '--mode', 'pr', '--base', 'origin/main'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  sh(root, ['add', auditState.STATE_FILE]);
+  sh(root, ['commit', '-m', 'commit audit state']);
+
   const ok = spawnSync('node', [CI_VERIFY_PATH, '--mode', 'pr', '--base', 'origin/main'], {
     cwd: root,
     encoding: 'utf8',
@@ -398,6 +424,8 @@ test('ci verifier validates stored state against merge-base diff', () => {
     encoding: 'utf8',
   });
 
+  assert.equal(uncommitted.status, 2);
+  assert.equal(uncommitted.stderr.includes('audit-state-not-committed'), true);
   assert.equal(ok.status, 0, ok.stderr);
   assert.equal(stale.status, 2);
   assert.equal(stale.stderr.includes('diff-hash-mismatch'), true);

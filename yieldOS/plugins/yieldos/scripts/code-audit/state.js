@@ -6,6 +6,7 @@ const { execFileSync } = require('node:child_process');
 
 const { collectStagedDiff, collectPushDiff, collectBaseDiff, restageFiles } = require('./git');
 const { redTeam } = require('./red-team');
+const artifacts = require('../oracles/artifacts');
 
 const STATE_FILE = 'security/code-audit-state.json';
 const DEFAULT_BLOCKING_BY_MODE = {
@@ -15,7 +16,9 @@ const DEFAULT_BLOCKING_BY_MODE = {
 };
 
 function statePath(projectRoot) {
-  return path.join(projectRoot, STATE_FILE);
+  const file = path.join(projectRoot, STATE_FILE);
+  assertNoSymlinkTraversal(path.resolve(projectRoot), path.resolve(file), 'audit state path');
+  return file;
 }
 
 function writeAuditState(projectRoot, audit, options = {}) {
@@ -27,7 +30,9 @@ function writeAuditState(projectRoot, audit, options = {}) {
 
   fs.mkdirSync(path.dirname(file), { recursive: true });
   if (changed) fs.writeFileSync(file, content);
-  if (changed && options.stage) restageFiles(projectRoot, [STATE_FILE]);
+  if (options.stage) {
+    restageFiles(projectRoot, [STATE_FILE, ...artifactPaths(audit.oracleArtifacts || audit.oracle_artifacts || [])]);
+  }
   return { file, changed, committed };
 }
 
@@ -56,6 +61,7 @@ function buildAuditState(audit) {
     findings: summarizeFindings(audit.findings || []),
     resolved_findings: audit.patch?.appliedFindings || [],
     verification: summarizeVerification(audit.verification),
+    oracle_artifacts: summarizeOracleArtifacts(audit.oracleArtifacts || audit.oracle_artifacts || []),
   };
 }
 
@@ -124,6 +130,23 @@ function verifyAuditState(projectRoot, options = {}) {
     return { ok: false, reason: 'diff-hash-mismatch', state, current: input };
   }
 
+  if ((mode === 'push' || mode === 'pr') && !isAuditStateCommitted(projectRoot, fs.readFileSync(statePath(projectRoot), 'utf8'))) {
+    return { ok: false, reason: 'audit-state-not-committed', state, current: input };
+  }
+
+  const artifactVerification = artifacts.verifyArtifactReferences(projectRoot, state.oracle_artifacts || [], {
+    gitRef: mode === 'push' || mode === 'pr' ? 'HEAD' : null,
+  });
+  if (!artifactVerification.ok) {
+    return {
+      ok: false,
+      reason: artifactFailureReason(artifactVerification.failed),
+      state,
+      current: input,
+      artifacts: artifactVerification,
+    };
+  }
+
   const blockingSeverities = options.blockingSeverities || DEFAULT_BLOCKING_BY_MODE[mode] || DEFAULT_BLOCKING_BY_MODE.pr;
   const findings = redTeam(input);
   const blockingFindings = findings.filter((finding) => blockingSeverities.includes(finding.severity));
@@ -163,6 +186,40 @@ function summarizeVerification(verification) {
   };
 }
 
+function summarizeOracleArtifacts(oracleArtifacts) {
+  return (oracleArtifacts || []).map((artifact) => ({
+    type: artifact.type,
+    path: artifact.path,
+    sha256: artifact.sha256,
+    bytes: artifact.bytes,
+  }));
+}
+
+function artifactPaths(oracleArtifacts) {
+  return (oracleArtifacts || []).map((artifact) => artifact.path).filter(Boolean);
+}
+
+function artifactFailureReason(failed = []) {
+  if (failed.some((item) => item.reason === 'missing')) return 'oracle-artifact-missing';
+  if (failed.some((item) => item.reason === 'not-committed')) return 'oracle-artifact-not-committed';
+  return 'oracle-artifact-hash-mismatch';
+}
+
+function assertNoSymlinkTraversal(root, target, label) {
+  const relative = path.relative(root, target);
+  if (!relative) return;
+  let current = root;
+  for (const part of relative.split(path.sep).filter(Boolean)) {
+    current = path.join(current, part);
+    try {
+      if (fs.lstatSync(current).isSymbolicLink()) throw new Error(`${label} must not traverse a symlink`);
+    } catch (err) {
+      if (err.code === 'ENOENT') break;
+      throw err;
+    }
+  }
+}
+
 module.exports = {
   STATE_FILE,
   statePath,
@@ -176,4 +233,7 @@ module.exports = {
   sameAuditStateContent,
   sameText,
   normalizeEol,
+  summarizeOracleArtifacts,
+  artifactPaths,
+  artifactFailureReason,
 };

@@ -1,0 +1,23 @@
+{
+  "version": "0.1",
+  "baseline": {
+    "cwd": "yieldOS/fixtures/oracle-demo",
+    "command": "${NODE}",
+    "args": ["vulnerable-server.js"],
+    "health_url": "http://127.0.0.1:${PORT}/healthz",
+    "base_url": "http://127.0.0.1:${PORT}",
+    "ready_timeout_ms": 10000,
+    "request_timeout_ms": 5000,
+    "env_allowlist": ["NODE_ENV", "PORT"]
+  },
+  "fixed": {
+    "cwd": "yieldOS/fixtures/oracle-demo",
+    "command": "${NODE}",
+    "args": ["fixed-server.js"],
+    "health_url": "http://127.0.0.1:${PORT}/healthz",
+    "base_url": "http://127.0.0.1:${PORT}",
+    "ready_timeout_ms": 10000,
+    "request_timeout_ms": 5000,
+    "env_allowlist": ["NODE_ENV", "PORT"]
+  }
+}

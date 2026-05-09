@@ -7,6 +7,7 @@ const { verifyFix } = require('./verify');
 const { writeAuditState, readAuditState, verifyAuditState, buildAuditState } = require('./state');
 const agents = require('./agents');
 const { applyAgentPatch } = require('./agents/patch');
+const { attachCdscArtifacts } = require('../oracles/cdsc/missing-auth-contract');
 
 const MAX_FIX_ITERATIONS = 3;
 const PATCHABLE_SEVERITIES = ['critical', 'high', 'medium'];
@@ -35,10 +36,10 @@ function auditGitCommand(projectRoot, command, options = {}) {
   }
 
   if (mode === 'push') {
-    return auditPush(projectRoot, input, agentOptions, agentMeta);
+    return attachCdscArtifacts(projectRoot, auditPush(projectRoot, input, agentOptions, agentMeta));
   }
 
-  return auditCommit(projectRoot, input, options, agentOptions, agentMeta);
+  return attachCdscArtifacts(projectRoot, auditCommit(projectRoot, input, options, agentOptions, agentMeta));
 }
 
 function auditPush(projectRoot, input, agentOptions, agentMeta) {

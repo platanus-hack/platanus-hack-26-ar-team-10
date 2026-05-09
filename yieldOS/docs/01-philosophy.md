@@ -40,15 +40,15 @@ So the user is **deliberately not** in the loop. Every decision yieldOS makes is
 | A locally-managed allowlist | All policy lives in the official repo. Local edits don't exist by design. |
 | A daemon | It is a set of hooks the Claude Code harness invokes. There is no background process. |
 
-## The three guarantees
+## Dependency-Gate Contract
 
-yieldOS guarantees that, while it is enabled and its policy is reachable:
+The dependency gate enforces three narrow contracts while yieldOS is enabled and its policy is reachable:
 
-1. **No allowlisted-or-curated install will ever be silently denied.** If something is on the allowlist or it passes verification cleanly, it installs.
+1. **Allowlisted-or-curated installs should not be silently denied.** If something is on the allowlist or it passes verification cleanly, the gate allows it.
 2. **No denylisted install will succeed.** Hard block, exit code 2, logged.
 3. **No critical-category install (crypto, auth, ORM, framework, build tool…) will succeed without explicit human curation.** The path is a PR to the policy repo.
 
-Everything else (Category A rewrites, transitive audits, native suggestions, manifest edits) is a refinement on top of these three.
+Everything else (Category A rewrites, transitive audits, native suggestions, manifest edits) is a refinement on top of these dependency-specific contracts. Broader repo safety is handled by scoped oracles, audit state, and evidence, not by a global safety guarantee.
 
 ## Five principles
 

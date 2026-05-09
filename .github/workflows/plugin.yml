@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
@@ -24,10 +26,15 @@ jobs:
       - name: Check installer and updater shell syntax
         run: |
           sh -n install.sh
+          sh -n yieldOS/plugins/yieldos/bin/yieldos-oracle
+          sh -n yieldOS/plugins/yieldos/bin/yieldos-oracle-demo
           sh -n yieldOS/plugins/yieldos/bin/yieldos-update
       - name: Run plugin tests
         working-directory: yieldOS/plugins/yieldos
         run: node --test tests/*.test.js
+      - name: Verify committed code-audit oracle state
+        if: github.event_name == 'pull_request'
+        run: node yieldOS/plugins/yieldos/scripts/code-audit/ci-verify.js --mode pr --base "origin/${{ github.base_ref }}"
       - name: Install landing dependencies
         working-directory: landing
         run: npm ci

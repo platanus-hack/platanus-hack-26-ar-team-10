@@ -10,6 +10,7 @@ const packOutputs = [
   ["Adapters", ".cursor + .github + .windsurf"],
   ["Skills", ".claude + .agents + .cursor + .windsurf"],
   ["Evidence", "yield.agent-pack.lock.json"],
+  ["Oracles", "code-audit-state + cdsc-proof"],
   ["Report", ".yield/pack-report.md"],
 ];
 
@@ -37,9 +38,9 @@ export function AgentPackSection() {
               Package company rules once.
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-6 text-zinc-600 sm:text-base sm:leading-7">
-              Choose approved skills, MCPs, safety profiles, and playbooks.
-              yieldOS compiles them into reviewable agent files and records what
-              was generated and verified.
+              Choose approved skills, MCPs, safety profiles, playbooks, and
+              oracles. Packs distribute company rules; run yieldos-oracle,
+              installed hooks, or CI verification to execute checks.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <CopyCommandButton

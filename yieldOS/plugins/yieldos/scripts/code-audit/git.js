@@ -7,6 +7,9 @@ const AUDIT_PATHS = [
   'security/code-audit-events.md',
   'security/code-audit-state.json',
 ];
+const AUDIT_PATH_PREFIXES = [
+  'security/oracles/',
+];
 
 function git(projectRoot, args, opts = {}) {
   const out = execFileSync('git', args, {
@@ -51,7 +54,12 @@ function restageFiles(projectRoot, files) {
 }
 
 function nonAuditFiles(files) {
-  return (files || []).filter((file) => !AUDIT_PATHS.includes(normalizeGitPath(file)));
+  return (files || []).filter((file) => !isAuditPath(file));
+}
+
+function isAuditPath(file) {
+  const normalized = normalizeGitPath(file);
+  return AUDIT_PATHS.includes(normalized) || AUDIT_PATH_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
 
 function normalizeGitPath(file) {
@@ -75,5 +83,7 @@ module.exports = {
   restageFiles,
   hashDiff,
   AUDIT_PATHS,
+  AUDIT_PATH_PREFIXES,
+  isAuditPath,
   nonAuditFiles,
 };

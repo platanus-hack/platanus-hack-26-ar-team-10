@@ -4,6 +4,7 @@ name: yieldos-internal-security
 description: Internal yieldOS security harness pack for dogfooding agent rules, skills, MCP policy, and playbooks.
 
 profiles:
+  - non-technical-safe
   - secrets-safe
   - dependency-safe
   - code-audit
@@ -48,6 +49,14 @@ playbooks:
     - mcp-review
     - instruction-file-review
     - agent-pack-review
+
+oracles:
+  include:
+    - code-audit-state
+    - agent-pack-lock
+    - instruction-policy
+    - project-tests
+    - cdsc-proof
 
 evidence:
   decisions_dir: .yield/decisions

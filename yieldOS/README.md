@@ -1,8 +1,10 @@
 # yieldOS
 
-**One security gate for every dependency, skill, and instruction your AI agent touches — built for humans and AI agents.**
+**Oracle-driven security harness for AI coding agents.**
 
-yieldOS is a Claude Code plugin that intercepts every install command, skill activation, MCP addition, and instruction-file edit. It decides automatically — without putting a human in the loop — whether to allow, block, or rewrite the action, based on a centrally curated policy. It also exposes `/yieldos:audit` for on-demand source-code review powered by Deepsec, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
+yieldOS is a Claude Code plugin and CI-verifiable harness that intercepts risky agent actions, then accepts or rejects sensitive changes through scoped oracles. It decides automatically — without asking the model to be the final authority — whether evidence is `pass`, `fail`, or `unknown`. It also exposes `/yieldos:audit` for on-demand source-code review, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, `/yieldos:oracle` for oracle discovery, `yieldos-oracle run ...` for scoped checks, `/yieldos:oracle-demo` for a visible counterexample proof, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
+
+The model can propose. The oracle decides.
 
 → Full design documentation in [`docs/`](docs/README.md).
 
@@ -12,7 +14,7 @@ yieldOS is a Claude Code plugin that intercepts every install command, skill act
 
 AI coding agents install code on behalf of users. Every `npm install`, every `pip install`, every skill or MCP added is a trust decision that the user usually never sees. The history of supply-chain attacks (`event-stream`, `node-ipc`, `ua-parser-js`, `colors`, `crossenv`) shows the cost of getting that decision wrong.
 
-yieldOS makes the trust decision **before** the install runs, deterministically, against a policy that is curated centrally and shipped with the plugin so it works offline.
+yieldOS makes trust decisions **before** risky work is accepted, against policy and executable evidence that can be checked without model calls.
 
 → More: [docs/01-philosophy.md](docs/01-philosophy.md).
 
@@ -94,6 +96,24 @@ an LLM or model API key.
 
 Detail: [docs/10-code-audit.md](docs/10-code-audit.md).
 
+## Oracles
+
+List available oracles:
+
+```text
+/yieldos:oracle list
+```
+
+Run the missing-auth proof demo:
+
+```text
+/yieldos:oracle-demo missing-auth
+```
+
+Oracles normalize existing checks into scoped `pass`, `fail`, and `unknown` evidence. For sensitive actions, `unknown` blocks by default. The first counterexample-driven security contract proves one class: an unauthenticated request to a sensitive route must return `401` or `403`, with baseline-fail plus fixed-pass evidence.
+
+Detail: [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md).
+
 ## Audit command
 
 Run changed-code source review from Claude Code:
@@ -142,7 +162,7 @@ yieldos-pack preview --pack yieldOS/packs/yieldos-internal-security/yield.agent-
 yieldos-pack write --pack yield.agent-pack.yaml
 ```
 
-The compiler validates referenced skills and MCP tool surfaces against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. `yieldos-pack verify` validates the manifest; once generated files are active, it requires the pack lock and checks lock metadata plus recorded file hashes. Claude Code has the strongest runtime enforcement through installed yieldOS hooks; other adapters are host-native guidance until paired with yieldOS verification, CI, or managed host policy.
+The compiler validates referenced skills, MCP tool surfaces, playbooks, and oracle IDs against policy before writing. Output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. `yieldos-pack verify` validates the manifest; once generated files are active, it requires the pack lock and checks lock metadata plus recorded file hashes. Packs declare approved oracles, but they do not execute them by themselves; run `yieldos-oracle`, installed hooks, or CI verification for enforcement. Claude Code has the strongest runtime enforcement through installed yieldOS hooks; other adapters are host-native guidance until paired with yieldOS verification, CI, or managed host policy.
 
 Detail: [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md).
 
@@ -476,7 +496,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 
 | File | What's inside |
 |---|---|
-| [docs/01-philosophy.md](docs/01-philosophy.md) | First principles. Why the user is not in the loop. The three guarantees. |
+| [docs/01-philosophy.md](docs/01-philosophy.md) | First principles. Why deterministic policy comes before model judgment. |
 | [docs/02-rewrite-evolution.md](docs/02-rewrite-evolution.md) | The most-iterated decision: how "rewrite" went from replacement to last-resort salvage. |
 | [docs/03-categories.md](docs/03-categories.md) | The four categories A/B/C/D, the keyword fallback, the threshold check. |
 | [docs/04-coverage.md](docs/04-coverage.md) | Every vector yieldOS gates: packages, skills, MCPs, instruction files, vendoring, binaries. |

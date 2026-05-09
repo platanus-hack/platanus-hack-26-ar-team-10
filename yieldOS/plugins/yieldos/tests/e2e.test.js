@@ -64,6 +64,57 @@ test('npm install of allowlisted package passes (exit 0)', () => {
   assert.equal(hookContext(r).includes('+ ▎ 🛡  yieldOS  ·  Validado · allowlist'), true);
 });
 
+test('hook fails closed when security log path cannot be written', () => {
+  const root = tmpProject();
+  fs.writeFileSync(path.join(root, 'security'), 'not a directory');
+
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'npm install react@18.3.1' },
+    cwd: root,
+  });
+
+  assert.equal(r.code, 2);
+  assert.equal(r.stderr.includes('[yieldOS:fatal]'), true);
+});
+
+test('Bash writes to oracle evidence are blocked by self-defense', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'echo tamper > security/oracles/demo/manifest.json' },
+    cwd: root,
+  });
+
+  assert.equal(r.code, 2);
+  assert.equal(r.stderr.includes('self-defense-block'), true);
+});
+
+test('Bash writes to absolute oracle evidence paths are blocked by self-defense', () => {
+  const root = tmpProject();
+  const target = path.join(root, 'security/oracles/demo/manifest.json');
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: `echo tamper > ${target}` },
+    cwd: root,
+  });
+
+  assert.equal(r.code, 2);
+  assert.equal(r.stderr.includes('self-defense-block'), true);
+});
+
+test('Bash interpreter writes to oracle evidence are blocked by self-defense', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'node -e "fs.writeFileSync(\'security/oracles/demo/manifest.json\', \'tamper\')"' },
+    cwd: root,
+  });
+
+  assert.equal(r.code, 2);
+  assert.equal(r.stderr.includes('self-defense-block'), true);
+});
+
 test('Edit to package.json reconstructs full manifest and validates added dependency', () => {
   const root = tmpProject();
   const filePath = path.join(root, 'package.json');
