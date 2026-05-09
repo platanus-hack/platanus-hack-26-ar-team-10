@@ -248,7 +248,7 @@ html {
   mix-blend-mode: screen;
   opacity: var(--ascii-opacity-low);
   transform: translate3d(0, 0, 0) scale(1.04);
-  animation: ascii-drift 18s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  animation: ascii-presence 1400ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
 }
 
 .security-hero::before {
@@ -676,16 +676,13 @@ html {
   }
 }
 
-@keyframes ascii-drift {
-  0%,
-  100% {
-    opacity: var(--ascii-opacity-low);
-    transform: translate3d(-1.2%, -0.8%, 0) scale(1.04);
+@keyframes ascii-presence {
+  from {
+    opacity: 0;
   }
 
-  45% {
-    opacity: var(--ascii-opacity-high);
-    transform: translate3d(1.2%, 0.8%, 0) scale(1.065);
+  to {
+    opacity: var(--ascii-opacity-low);
   }
 }
 

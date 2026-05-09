@@ -222,7 +222,8 @@ test("cinematic motion components and reduced motion styles are configured", () 
     globals.includes('url("/yieldos-ascii-bg.webp")'),
     "Expected ascii asset to be used as background",
   );
-  assert.ok(globals.includes("@keyframes ascii-drift"), "Expected ascii background drift");
+  assert.ok(globals.includes("@keyframes ascii-presence"), "Expected static ascii background reveal");
+  assert.ok(!globals.includes("ascii-drift"), "Expected lateral ascii background drift to be removed");
   assert.ok(
     globals.includes("min-height: max(100vh, 100dvh)"),
     "Expected desktop full-screen section height",
