@@ -13,6 +13,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
   const page = read("src/app/page.tsx");
   const animatedDemo = read("src/components/animated-demo-flow.tsx");
   const animatedStory = read("src/components/animated-demo-story.tsx");
+  const orbitalInstall = read("src/components/orbital-install-pill.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
@@ -20,6 +21,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     page,
     animatedDemo,
     animatedStory,
+    orbitalInstall,
     scrollAwareHeader,
     scrollProgress,
     typewriterTitle,
@@ -32,9 +34,10 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "PH26 Buenos Aires",
     "Install yieldOS",
     "View decision demo",
-    "$ claude plugin install yieldos@yieldos-marketplace",
     "claude plugin marketplace add /path/to/vibeOS",
     "claude plugin install yieldos@yieldos-marketplace",
+    "OrbitalInstallPill",
+    "Copy yieldOS install command",
     "AI Security",
     "Verdict",
     "Allow",
@@ -146,6 +149,7 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Blocked Install",
     "Hash-approved agent instructions",
     "A security gate before your AI agent runs anything.",
+    "$ claude plugin install yieldos@yieldos-marketplace",
   ].forEach((text) => {
     assert.ok(!source.includes(text), `Expected old anon copy to be removed: ${text}`);
   });
@@ -167,8 +171,8 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
     component.includes("navigator.clipboard.writeText"),
     "Expected clipboard write behavior",
   );
-  assert.ok(component.includes("prefix?: ReactNode"), "Expected optional button prefix");
   assert.ok(component.includes("-&gt;"), "Expected install button arrow rendering");
+  assert.ok(!component.includes("prefix?: ReactNode"), "Expected navbar-only prefix experiment to be removed");
   assert.ok(!component.includes("showArrow"), "Expected arrow toggle experiment to be removed");
 });
 
@@ -178,6 +182,7 @@ test("cinematic motion components and reduced motion styles are configured", () 
   const reveal = read("src/components/motion-reveal.tsx");
   const demo = read("src/components/animated-demo-flow.tsx");
   const story = read("src/components/animated-demo-story.tsx");
+  const orbitalInstall = read("src/components/orbital-install-pill.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const typewriterTitle = read("src/components/typewriter-hero-title.tsx");
@@ -219,6 +224,15 @@ test("cinematic motion components and reduced motion styles are configured", () 
     "Expected transformed progress value",
   );
   assert.ok(scrollAwareHeader.startsWith('"use client";'), "Expected scroll-aware header client boundary");
+  assert.ok(orbitalInstall.startsWith('"use client";'), "Expected orbital install pill client boundary");
+  assert.ok(
+    orbitalInstall.includes("navigator.clipboard.writeText"),
+    "Expected orbital install pill to copy the command",
+  );
+  assert.ok(
+    orbitalInstall.includes('aria-live="polite"'),
+    "Expected orbital install pill copied state announcement",
+  );
   assert.ok(
     scrollAwareHeader.includes('data-visible={visible}'),
     "Expected scroll-aware header visibility state",
@@ -290,13 +304,17 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(scrollAwareHeader.includes("intro-header"), "Expected staged topbar intro class");
   assert.ok(!scrollAwareHeader.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
   assert.ok(!scrollAwareHeader.includes("yieldOS home"), "Expected capsule nav home mark to be removed");
-  assert.ok(scrollAwareHeader.includes("install-nav-button"), "Expected custom install CTA styling hook");
-  assert.ok(scrollAwareHeader.includes("install-prompt"), "Expected terminal prompt inside install CTA");
-  assert.ok(scrollAwareHeader.includes("!h-11"), "Expected compact topbar install button");
-  assert.ok(scrollAwareHeader.includes("!w-[184px]"), "Expected refined fixed install pill");
+  assert.ok(scrollAwareHeader.includes("intro-nav flex"), "Expected mobile-visible nav links");
+  assert.ok(!scrollAwareHeader.includes("Install plugin"), "Expected install plugin CTA removed from navbar");
+  assert.ok(!scrollAwareHeader.includes("CopyCommandButton"), "Expected navbar copy button removed");
   assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
   assert.ok(!globals.includes(".install-marks"), "Expected install pill mark styling to be removed");
-  assert.ok(globals.includes(".install-prompt"), "Expected install CTA prompt mark styling");
+  assert.ok(page.includes("<OrbitalInstallPill"), "Expected orbital install pill in hero");
+  assert.ok(!page.includes("$ claude plugin install yieldos@yieldos-marketplace"), "Expected raw hero command text to be replaced");
+  assert.ok(globals.includes(".orbital-install-pill"), "Expected orbital install pill styling");
+  assert.ok(globals.includes(".orbital-pill-aura"), "Expected orbiting texture layer");
+  assert.ok(globals.includes("@keyframes orbital-spin"), "Expected orbit animation");
+  assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected blue/red color cycling");
   assert.ok(
     globals.includes("linear-gradient(90deg, rgba(var(--signal-blue-rgb), 0.12), rgba(var(--signal-red-rgb), 0.075))"),
     "Expected capsule glass nav to use blue/red theme",

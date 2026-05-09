@@ -232,6 +232,219 @@ html {
   opacity: 0.72;
 }
 
+.orbital-install-pill {
+  position: relative;
+  display: inline-grid;
+  width: min(100%, 38rem);
+  place-items: center;
+  border: 0;
+  padding: 0;
+  color: #ffffff;
+  cursor: pointer;
+  background: transparent;
+}
+
+.orbital-install-pill:focus-visible {
+  outline: none;
+}
+
+.orbital-install-pill:focus-visible .orbital-pill-core {
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.62),
+    0 0 0 6px rgba(var(--signal-blue-rgb), 0.22),
+    0 26px 82px -46px rgba(var(--signal-red-rgb), 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.orbital-pill-aura {
+  position: absolute;
+  inset: -18px -26px;
+  border-radius: 999px;
+  pointer-events: none;
+  animation: orbital-spin 9s linear infinite;
+}
+
+.orbital-pill-aura::before {
+  position: absolute;
+  inset: 9px 18px;
+  content: "";
+  border-radius: inherit;
+  background:
+    conic-gradient(
+      from 90deg,
+      transparent 0deg,
+      rgba(var(--signal-blue-rgb), 0.54) 48deg,
+      transparent 116deg,
+      rgba(var(--signal-red-rgb), 0.48) 192deg,
+      transparent 292deg,
+      rgba(var(--signal-blue-rgb), 0.34) 336deg,
+      transparent 360deg
+    );
+  filter: blur(10px);
+  opacity: 0.72;
+}
+
+.orbital-dot {
+  position: absolute;
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 999px;
+}
+
+.orbital-dot-blue {
+  top: 50%;
+  left: 0.45rem;
+  background: var(--signal-blue);
+  box-shadow: 0 0 18px rgba(var(--signal-blue-rgb), 0.72);
+}
+
+.orbital-dot-red {
+  right: 0.45rem;
+  bottom: 50%;
+  background: var(--signal-red);
+  box-shadow: 0 0 18px rgba(var(--signal-red-rgb), 0.72);
+}
+
+.orbital-dot-quiet {
+  top: 0.42rem;
+  left: 57%;
+  width: 0.3rem;
+  height: 0.3rem;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.38);
+}
+
+.orbital-pill-core {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100vw - 2rem, 38rem);
+  min-height: 3.3rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.72rem;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.55rem 0.62rem;
+  background:
+    linear-gradient(100deg, #070a12, #11142a 42%, #1a0910 72%, #08080d) padding-box,
+    linear-gradient(
+      108deg,
+      rgba(var(--signal-blue-rgb), 0.9),
+      rgba(var(--signal-violet-rgb), 0.38),
+      rgba(var(--signal-red-rgb), 0.82)
+    )
+    border-box;
+  box-shadow:
+    0 26px 82px -46px rgba(var(--signal-red-rgb), 0.7),
+    0 24px 74px -50px rgba(var(--signal-blue-rgb), 0.92),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.orbital-pill-core::before,
+.orbital-pill-core::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.orbital-pill-core::before {
+  background-image:
+    radial-gradient(circle at 22% 32%, rgba(var(--signal-blue-rgb), 0.28), transparent 18%),
+    radial-gradient(circle at 72% 62%, rgba(var(--signal-red-rgb), 0.24), transparent 22%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.075) 0,
+      rgba(255, 255, 255, 0.075) 1px,
+      transparent 1px,
+      transparent 18px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.05) 0,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  mix-blend-mode: screen;
+  opacity: 0.42;
+  animation: orbital-texture-drift 7s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+}
+
+.orbital-pill-core::after {
+  background: linear-gradient(
+    105deg,
+    transparent 10%,
+    rgba(var(--signal-blue-rgb), 0.3),
+    rgba(var(--signal-red-rgb), 0.24),
+    transparent 78%
+  );
+  background-size: 190% 100%;
+  opacity: 0.42;
+  animation: orbital-color-pan 5.8s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+}
+
+.orbital-install-pill:hover .orbital-pill-core {
+  transform: translateY(-1px) scale(1.012);
+  box-shadow:
+    0 28px 92px -40px rgba(var(--signal-red-rgb), 0.84),
+    0 28px 84px -44px rgba(var(--signal-blue-rgb), 0.96),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.orbital-pill-prompt,
+.orbital-pill-command,
+.orbital-pill-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.orbital-pill-prompt {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border: 1px solid rgba(var(--signal-blue-rgb), 0.34);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(var(--signal-blue-rgb), 0.12);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.orbital-pill-command {
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1.15vw, 0.84rem);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.88);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orbital-pill-copy {
+  display: grid;
+  min-width: 4rem;
+  height: 2.1rem;
+  place-items: center;
+  border: 1px solid rgba(var(--signal-red-rgb), 0.28);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.84);
+  background: rgba(var(--signal-red-rgb), 0.12);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .site-header {
   background: linear-gradient(
     180deg,
@@ -271,8 +484,7 @@ html {
 }
 
 .intro-brand,
-.intro-nav,
-.intro-install {
+.intro-nav {
   opacity: 0;
   transform: translateY(-5px);
   animation: intro-part 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -284,92 +496,6 @@ html {
 
 .intro-nav {
   animation-delay: 380ms;
-}
-
-.intro-install {
-  animation-delay: 460ms;
-}
-
-.command-pill {
-  position: relative;
-}
-
-.install-nav-button {
-  isolation: isolate;
-  border: 1px solid transparent !important;
-  background:
-    linear-gradient(#10131b, #090b11) padding-box,
-    linear-gradient(
-      105deg,
-      rgba(var(--signal-blue-rgb), 0.72),
-      rgba(var(--signal-violet-rgb), 0.38) 48%,
-      rgba(var(--signal-red-rgb), 0.66)
-    )
-    border-box !important;
-  box-shadow:
-    0 14px 34px -24px rgba(0, 0, 0, 0.92),
-    0 0 22px -16px rgba(var(--signal-blue-rgb), 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-.install-prompt {
-  display: grid;
-  width: 1.55rem;
-  height: 1.55rem;
-  flex: 0 0 auto;
-  place-items: center;
-  margin-left: -0.18rem;
-  border: 1px solid rgba(var(--signal-blue-rgb), 0.26);
-  border-radius: 999px;
-  background: rgba(var(--signal-blue-rgb), 0.1);
-  color: rgba(var(--signal-blue-rgb), 0.95);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.install-nav-button > span[aria-live="polite"] {
-  letter-spacing: -0.01em;
-}
-
-.install-nav-button > span[aria-hidden="true"] {
-  display: grid;
-  width: 1.55rem;
-  height: 1.55rem;
-  flex: 0 0 auto;
-  place-items: center;
-  margin-right: -0.18rem;
-  border: 1px solid rgba(var(--signal-red-rgb), 0.22);
-  border-radius: 999px;
-  background: rgba(var(--signal-red-rgb), 0.1);
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.62rem;
-  line-height: 1;
-  transition:
-    background 180ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.install-nav-button:hover > span[aria-hidden="true"] {
-  background: rgba(var(--signal-red-rgb), 0.18);
-  transform: translateX(1px);
-}
-
-.command-pill::after {
-  position: absolute;
-  inset: -1px;
-  content: "";
-  pointer-events: none;
-  border: 1px solid rgba(var(--signal-blue-rgb), 0.36);
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(var(--signal-red-rgb), 0.16);
-  opacity: 0;
-  transform: scaleX(0.94);
-}
-
-.command-pulse::after {
-  animation: command-pulse 4.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 .scroll-progress {
@@ -877,17 +1003,35 @@ html {
   }
 }
 
-@keyframes command-pulse {
-  0%,
-  72%,
-  100% {
-    opacity: 0;
-    transform: scaleX(0.94);
+@keyframes orbital-spin {
+  from {
+    transform: rotate(0deg);
   }
-  22%,
-  36% {
-    opacity: 0.72;
-    transform: scaleX(1);
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbital-color-pan {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes orbital-texture-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0);
+    opacity: 0.32;
+  }
+
+  to {
+    transform: translate3d(1.5%, 0, 0);
+    opacity: 0.54;
   }
 }
 
@@ -1112,6 +1256,38 @@ html {
   .scroll-progress-mobile {
     background: rgba(24, 24, 27, 0.16);
   }
+
+  .orbital-install-pill {
+    width: min(100%, 21rem);
+  }
+
+  .orbital-pill-aura {
+    inset: -14px -18px;
+  }
+
+  .orbital-pill-core {
+    min-height: 3rem;
+    gap: 0.48rem;
+    padding: 0.45rem 0.5rem;
+  }
+
+  .orbital-pill-prompt,
+  .orbital-pill-copy {
+    width: 1.85rem;
+    height: 1.85rem;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .orbital-pill-copy {
+    font-size: 0;
+  }
+
+  .orbital-pill-copy::before {
+    content: "copy";
+    font-size: 0.54rem;
+    letter-spacing: 0.08em;
+  }
 }
 
 @media (max-width: 767px) and (max-height: 760px) {
@@ -1152,6 +1328,7 @@ html {
   }
 
   .scan-sweep,
+  .orbital-pill-aura,
   .hero-typewriter-caret,
   .scanned-belt::before,
   .flow-rail-pulse,
@@ -1173,8 +1350,7 @@ html {
 
   .intro-header .command-bar,
   .intro-brand,
-  .intro-nav,
-  .intro-install {
+  .intro-nav {
     opacity: 1;
     transform: none;
     animation: none;

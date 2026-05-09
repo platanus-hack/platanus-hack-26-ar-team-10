@@ -2,19 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { CopyCommandButton } from "@/components/copy-command-button";
-
-type ScrollAwareHeaderProps = {
-  installCommand: string;
-};
-
 const navItems = [
   ["Demo", "#demo-flow"],
   ["Coverage", "#gated-vectors"],
   ["Policy", "#policy-flow"],
 ];
 
-export function ScrollAwareHeader({ installCommand }: ScrollAwareHeaderProps) {
+export function ScrollAwareHeader() {
   const [visible, setVisible] = useState(true);
   const lastYRef = useRef(0);
   const tickingRef = useRef(false);
@@ -54,7 +48,7 @@ export function ScrollAwareHeader({ installCommand }: ScrollAwareHeaderProps) {
     >
       <div className="command-bar mx-auto flex h-16 w-fit max-w-[calc(100vw-1.5rem)] items-center gap-2 overflow-hidden rounded-[22px] border border-white/15 bg-white/[0.075] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl sm:gap-4 sm:px-2.5">
         <nav
-          className="intro-nav hidden items-center gap-5 px-2 text-sm font-semibold text-zinc-300 md:flex"
+          className="intro-nav flex items-center gap-3 px-2 text-xs font-semibold text-zinc-300 sm:gap-5 sm:text-sm"
           aria-label="Primary navigation"
         >
           {navItems.map(([label, href]) => (
@@ -67,19 +61,6 @@ export function ScrollAwareHeader({ installCommand }: ScrollAwareHeaderProps) {
             </a>
           ))}
         </nav>
-        <div className="intro-install flex items-center">
-          <CopyCommandButton
-            command={installCommand}
-            label="Install plugin"
-            variant="dark"
-            prefix={
-              <span className="install-prompt" aria-hidden="true">
-                $
-              </span>
-            }
-            className="install-nav-button command-pill command-pulse !h-11 !w-[184px] max-w-none !justify-between !gap-2 overflow-hidden whitespace-nowrap !rounded-full !px-2.5 !py-0 font-mono !text-[12px] leading-none text-zinc-100 [&>span]:whitespace-nowrap"
-          />
-        </div>
       </div>
     </header>
   );

@@ -2,6 +2,7 @@ import { AnimatedDemoFlow } from "@/components/animated-demo-flow";
 import { AnimatedDemoStory } from "@/components/animated-demo-story";
 import { CopyCommandButton } from "@/components/copy-command-button";
 import { MotionReveal } from "@/components/motion-reveal";
+import { OrbitalInstallPill } from "@/components/orbital-install-pill";
 import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { TypewriterHeroTitle } from "@/components/typewriter-hero-title";
@@ -53,7 +54,7 @@ const proofStats = [
 export default function Home() {
   return (
     <main className="snap-deck min-h-dvh bg-[#0e0e10] text-zinc-950">
-      <ScrollAwareHeader installCommand={installCommand} />
+      <ScrollAwareHeader />
       <ScrollProgress />
 
       <section
@@ -91,9 +92,7 @@ export default function Home() {
               immediate
               y={14}
             >
-              <p className="rounded border border-white/10 bg-black/20 px-3 py-2 font-mono text-[11px] text-zinc-400 backdrop-blur-sm sm:text-xs">
-                $ claude plugin install yieldos@yieldos-marketplace
-              </p>
+              <OrbitalInstallPill command={installCommand} />
             </MotionReveal>
           </div>
         </div>
