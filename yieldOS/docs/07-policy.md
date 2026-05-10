@@ -1,13 +1,13 @@
 # Policy management
 
-All policy lives at `github.com/platanus-hack/platanus-hack-26-ar-team-10/policy/`. Installed plugins fetch the raw files from that directory. Policy is **not** editable locally.
+All policy lives at `github.com/platanus-hack/platanus-hack-26-ar-team-10/policy/`. Installed plugins fetch the raw JSON files from that directory and fall back to the shipped `policy-cache/` snapshot when offline. Policy is **not** editable locally.
 
 ## Policy files
 
 ```
 policy/
-├── allowlist.json              ← <ecosystem>:<name>@<version> approved to install
-├── denylist.json               ← <ecosystem>:<name>@<version> blocked
+├── allowlist.json              ← reviewed allow decisions for <ecosystem>:<name>[@version]
+├── denylist.json               ← reviewed deny decisions with severity and references
 ├── categories.json             ← A/B/C/D + keyword fallback for unlisted
 ├── native-equivalents.json     ← which packages have a native API replacement
 ├── skills.json                 ← skill name → content hash
@@ -27,6 +27,30 @@ Three reasons:
 2. **Curation is a shared trust artifact.** When 100 users use the same policy, they benefit from the work of every PR reviewer. When they each maintain their own, nobody benefits.
 
 3. **Updates flow naturally.** A new supply-chain attack disclosed today can be added to denylist via PR; every yieldOS user picks it up on their next session.
+
+## Package policy shape
+
+`allowlist.json` and `denylist.json` are runtime JSON, not prose. The stable identity is still `key`, for example `npm:react@18.3.1`, `npm:react`, or `python:requests==2.31.0`.
+
+Allowlist entries require:
+
+- `decision: "allow"`
+- `category`
+- `reviewed_by`
+- `reviewed_at`
+- `rationale`
+- `allow_any_version: true` only for name-only entries
+
+Denylist entries require:
+
+- `decision: "deny"`
+- `reason`
+- `severity`
+- `reviewed_by`
+- `reviewed_at`
+- `source_urls`
+
+Runtime precedence is intentionally fail-closed: denylist wins before native-equivalent suggestions and allowlist matches. A package cannot be both allowlisted and denylisted without `scripts/policy-check.mjs` failing.
 
 ## Three-layer cache
 
@@ -88,8 +112,9 @@ The user does not edit policy locally. To add a package to the allowlist or deny
 
 ## What changes are valid in a PR
 
-- Add a package to allowlist with a pinned version: `npm:lodash@4.17.21`.
-- Add a package to denylist with a reason.
+- Add a package to allowlist with a pinned version and rationale: `npm:lodash@4.17.21`.
+- Add a name-only allowlist only when `allow_any_version: true` is justified.
+- Add a package to denylist with a reason, severity, and source reference.
 - Promote a package between categories (A → B, etc.).
 - Add a native equivalent for a package.
 - Add a skill content hash.
@@ -101,7 +126,7 @@ The user does not edit policy locally. To add a package to the allowlist or deny
 
 - Removing entries from the denylist without strong justification (the denylist is conservative and prefers false positives).
 - Bulk allowlisting without per-package review.
-- Wildcard matches (`npm:lodash.*`) — every entry is an exact match.
+- Wildcard matches (`npm:lodash.*`). Use a pinned key or an explicit name-only key with `allow_any_version: true`.
 
 ## Required-settings enforcement
 

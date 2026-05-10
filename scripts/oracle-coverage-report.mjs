@@ -48,6 +48,7 @@ function buildCoverageReport() {
       severity: item.severity,
       kind: item.kind,
       status,
+      contract_status: item.status,
       standards: item.standards.map((standard) => `${standard.family}:${standard.id}`),
       benchmark_case: BENCHMARKED_TEMPLATE_IDS.has(item.id),
     };

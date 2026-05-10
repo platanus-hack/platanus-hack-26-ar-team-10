@@ -14,7 +14,7 @@
       "author": {
         "name": "platanus-hack-26-ar-team-10"
       },
-      "source": "./yieldOS/plugins/yieldos",
+      "source": "./dist/yieldos-plugin",
       "category": "security"
     }
   ]

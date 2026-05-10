@@ -27,8 +27,30 @@ function writeJson(filePath, value) {
 function makePolicyRoot(overrides = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-policy-'));
   const base = {
-    'allowlist.json': { version: 'test', entries: [{ key: 'npm:react' }] },
-    'denylist.json': { version: 'test', entries: [{ key: 'npm:event-stream', reason: 'known incident' }] },
+    'allowlist.json': {
+      version: 'test',
+      entries: [{
+        key: 'npm:react',
+        category: 'framework',
+        decision: 'allow',
+        allow_any_version: true,
+        reviewed_by: 'test',
+        reviewed_at: '2026-05-10',
+        rationale: 'trusted fixture package',
+      }],
+    },
+    'denylist.json': {
+      version: 'test',
+      entries: [{
+        key: 'npm:event-stream',
+        decision: 'deny',
+        reason: 'known incident',
+        severity: 'critical',
+        reviewed_by: 'test',
+        reviewed_at: '2026-05-10',
+        source_urls: ['https://example.test/advisory'],
+      }],
+    },
     'categories.json': { version: 'test', A_safe_to_rewrite: [], D_never_rewrite: [] },
     'native-equivalents.json': { version: 'test', entries: {} },
     'skills.json': {
@@ -109,4 +131,88 @@ test('validatePolicyRoot rejects malformed non-entry policy schemas', () => {
   assert.equal(errors.some((error) => error.includes('injection-patterns.json patterns must be a non-empty array')), true);
   assert.equal(errors.some((error) => error.includes('required-settings.json managers must be an object')), true);
   assert.equal(errors.some((error) => error.includes('version.json version must be a string')), true);
+});
+
+test('validatePolicyRoot rejects allowlist entries without explicit rolling-version metadata', () => {
+  const root = makePolicyRoot({
+    'allowlist.json': {
+      version: 'test',
+      entries: [{
+        key: 'npm:rolling-package',
+        category: 'fixture',
+        decision: 'allow',
+        reviewed_by: 'test',
+        reviewed_at: '2026-05-10',
+        rationale: 'missing allow_any_version should fail',
+      }],
+    },
+  });
+
+  const errors = validatePolicyRoot(root);
+  assert.equal(errors.some((error) => error.includes('name-only entry requires allow_any_version: true')), true);
+});
+
+test('validatePolicyRoot rejects denylist entries without security metadata', () => {
+  const root = makePolicyRoot({
+    'denylist.json': {
+      version: 'test',
+      entries: [{ key: 'npm:known-bad', decision: 'deny', reason: 'known incident' }],
+    },
+  });
+
+  const errors = validatePolicyRoot(root);
+  assert.equal(errors.some((error) => error.includes('denylist.json entries[0].severity must be critical')), true);
+  assert.equal(errors.some((error) => error.includes('denylist.json entries[0].source_urls must be an array')), true);
+});
+
+test('validatePolicyRoot rejects denylist entries with empty source references', () => {
+  const root = makePolicyRoot({
+    'denylist.json': {
+      version: 'test',
+      entries: [{
+        key: 'npm:known-bad',
+        decision: 'deny',
+        reason: 'known incident',
+        severity: 'high',
+        reviewed_by: 'test',
+        reviewed_at: '2026-05-10',
+        source_urls: [],
+      }],
+    },
+  });
+
+  const errors = validatePolicyRoot(root);
+  assert.equal(errors.some((error) => error.includes('source_urls must include at least one entry')), true);
+});
+
+test('validatePolicyRoot rejects allowlist and denylist conflicts', () => {
+  const root = makePolicyRoot({
+    'allowlist.json': {
+      version: 'test',
+      entries: [{
+        key: 'npm:conflicted',
+        category: 'fixture',
+        decision: 'allow',
+        allow_any_version: true,
+        reviewed_by: 'test',
+        reviewed_at: '2026-05-10',
+        rationale: 'conflict fixture',
+      }],
+    },
+    'denylist.json': {
+      version: 'test',
+      entries: [{
+        key: 'npm:conflicted@1.0.0',
+        decision: 'deny',
+        reason: 'conflict fixture',
+        severity: 'high',
+        reviewed_by: 'test',
+        reviewed_at: '2026-05-10',
+        source_urls: ['https://example.test/advisory'],
+      }],
+    },
+  });
+
+  const errors = validatePolicyRoot(root);
+  assert.equal(errors.some((error) => error.includes('conflicts with allowlist name entry npm:conflicted')), true);
 });

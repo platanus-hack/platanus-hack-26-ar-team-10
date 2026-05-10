@@ -223,12 +223,14 @@ test('oracle contract catalog includes expanded benchmark-hardening mappings', (
 test('oracle contracts are benchmarkable acceptance contracts, not prose only', () => {
   const catalog = oracleTemplates.listTemplates();
   const ids = new Set(catalog.map((item) => item.id));
+  const statuses = new Set(['active-adapter', 'active-demo', 'contract-only']);
 
   assert.equal(ids.size, catalog.length, 'oracle contract ids must be unique');
 
   for (const item of catalog) {
     assert.equal(typeof item.id, 'string');
     assert.equal(item.id.length > 0, true);
+    assert.equal(statuses.has(item.status), true, `${item.id} needs explicit product status`);
     assert.equal(item.standards.length > 0, true, `${item.id} needs standards`);
     assert.equal(item.evidence.required.length >= 4, true, `${item.id} needs evidence requirements`);
     assert.equal(item.acceptance.pass.length > 0, true, `${item.id} needs pass criteria`);
@@ -259,6 +261,7 @@ test('yieldos-oracle contracts command renders catalog for benchmark planning', 
   assert.equal(JSON.parse(json.message).length >= 30, true);
   assert.equal(text.exitCode, 0);
   assert.equal(text.message.includes('yieldOS oracle contracts'), true);
+  assert.equal(text.message.includes('missing-authz (active-demo, cdsc-http, high)'), true);
   assert.equal(text.message.includes('missing-authz'), true);
   assert.equal(text.message.includes('prompt-injection'), true);
 });
