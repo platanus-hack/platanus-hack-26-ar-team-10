@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const DEFAULTS = require(path.join(PLUGIN_ROOT, 'config', 'defaults.json'));
+const auditEvents = require('./audit-events');
 
 const SECRET_PATTERNS = [
   /(?:password|passwd|secret|token|api[_-]?key|access[_-]?key|private[_-]?key)\s*[:=]\s*\S+/gi,
@@ -89,6 +90,7 @@ function renderField(key, value) {
 
 function appendEntry(projectRoot, heading, fields) {
   const logPath = ensureLogDir(projectRoot);
+  appendStructuredEvent(projectRoot, heading, fields);
   return appendEntryToFile(logPath, heading, fields);
 }
 
@@ -107,6 +109,18 @@ function appendEntryToFile(logPath, heading, fields) {
 
 function logCodeAudit(projectRoot, audit) {
   const logPath = ensureSecurityLog(projectRoot, 'code-audit-events.md');
+  appendStructuredEvent(projectRoot, 'Code Audit', {
+    Mode: audit.mode,
+    Verdict: audit.verdict,
+    Action: audit.action,
+    Files: audit.files,
+    Findings: (audit.findings || []).map((f) => `${f.severity}:${f.ruleId}:${f.file} - ${f.title}`),
+    'Patch applied': audit.patch?.fixed ? 'yes' : 'no',
+    'Patch passes': audit.patch?.iterations,
+    'Patched files': audit.patch?.files || [],
+    Verification: summarizeVerification(audit.verification),
+    Message: audit.message,
+  });
   return appendEntryToFile(logPath, 'Code Audit', {
     Mode: audit.mode,
     Verdict: audit.verdict,
@@ -119,6 +133,48 @@ function logCodeAudit(projectRoot, audit) {
     Verification: summarizeVerification(audit.verification),
     Message: audit.message,
   });
+}
+
+function appendStructuredEvent(projectRoot, heading, fields = {}) {
+  auditEvents.appendAuditEvent({
+    projectRoot,
+    eventType: eventTypeForHeading(heading),
+    decision: decisionForHeading(heading, fields),
+    subject: subjectForFields(fields),
+    payload: { heading, fields },
+  });
+}
+
+function eventTypeForHeading(heading) {
+  if (/code audit/i.test(heading)) return 'code_audit.decision';
+  if (/self-defense/i.test(heading)) return 'self_defense.block';
+  if (/credential/i.test(heading)) return 'credential.decision';
+  if (/instruction/i.test(heading)) return 'instruction.change';
+  if (/transitive/i.test(heading)) return 'dependency.transitive_audit';
+  return 'hook.decision';
+}
+
+function decisionForHeading(heading, fields = {}) {
+  const text = `${heading} ${fields.Action || ''} ${fields.Verdict || ''} ${fields['Block reason'] || ''}`.toLowerCase();
+  if (/\b(block|blocked|deny|failed|failure)\b/.test(text)) return 'block';
+  if (/\b(allow|allowed|verified|granted|clean|passed|applied)\b/.test(text)) return 'allow';
+  if (/\b(rewrite|rewritten)\b/.test(text)) return 'rewrite';
+  return 'record';
+}
+
+function subjectForFields(fields = {}) {
+  if (fields.Name || fields.Type || fields.Version || fields.Source) {
+    return {
+      kind: fields.Type || 'dependency',
+      name: fields.Name,
+      version: fields.Version,
+      source: fields.Source,
+    };
+  }
+  if (fields.File) return { kind: 'file', path: fields.File };
+  if (fields.Target) return { kind: 'path', path: fields.Target };
+  if (fields.Mode) return { kind: 'code-audit', mode: fields.Mode };
+  return { kind: 'yieldos-event' };
 }
 
 function summarizeVerification(verification) {

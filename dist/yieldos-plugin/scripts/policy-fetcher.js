@@ -7,6 +7,7 @@ const https = require('node:https');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const DEFAULTS = require(path.join(PLUGIN_ROOT, 'config', 'defaults.json'));
+const policyManifest = require('./policy-manifest');
 
 function expandHome(p) {
   return p.startsWith('~') ? path.join(os.homedir(), p.slice(1)) : p;
@@ -15,6 +16,8 @@ function expandHome(p) {
 const RUNTIME_DIR = expandHome(DEFAULTS.cache.runtime_dir);
 const SHIPPED_DIR = path.join(PLUGIN_ROOT, 'policy-cache');
 const TTL_MS = DEFAULTS.cache.ttl_seconds * 1000;
+const MANIFEST_FILE = DEFAULTS.policy.manifest_file || policyManifest.MANIFEST_FILE;
+const EXPECTED_MANIFEST_SHA256 = DEFAULTS.policy.manifest_sha256 || null;
 
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
@@ -64,42 +67,81 @@ function buildUrl(file) {
     .replace('{file}', file);
 }
 
-async function refreshFromOrigin() {
-  ensureDir(RUNTIME_DIR);
-  const results = {};
-  for (const file of DEFAULTS.policy.files) {
-    const url = buildUrl(file);
-    try {
-      const body = await fetchUrl(url);
-      const parsed = JSON.parse(body);
-      fs.writeFileSync(path.join(RUNTIME_DIR, file), JSON.stringify(parsed, null, 2));
-      results[file] = parsed;
-    } catch (err) {
-      results[file] = null;
+async function refreshBundleFromOrigin({
+  runtimeDir = RUNTIME_DIR,
+  files = DEFAULTS.policy.files,
+  manifestFile = MANIFEST_FILE,
+  expectedManifestSha256 = EXPECTED_MANIFEST_SHA256,
+  fetchText = async (file) => fetchUrl(buildUrl(file)),
+} = {}) {
+  const parent = path.dirname(runtimeDir);
+  ensureDir(parent);
+  const tempDir = path.join(parent, `${path.basename(runtimeDir)}.next-${process.pid}-${Date.now()}`);
+  fs.rmSync(tempDir, { recursive: true, force: true });
+  fs.mkdirSync(tempDir, { recursive: true, mode: 0o700 });
+
+  try {
+    const manifestBody = await fetchText(manifestFile);
+    if (typeof manifestBody !== 'string') throw new Error(`empty response for ${manifestFile}`);
+    fs.writeFileSync(path.join(tempDir, manifestFile), manifestBody);
+
+    for (const file of files) {
+      const body = await fetchText(file);
+      if (typeof body !== 'string') throw new Error(`empty response for ${file}`);
+      fs.writeFileSync(path.join(tempDir, file), body);
     }
+
+    const loaded = policyManifest.readVerifiedPolicyBundle(tempDir, {
+      files,
+      expectedManifestSha256,
+      manifestFile,
+      baseLabel: 'online-policy',
+    });
+    if (!loaded) {
+      const verification = policyManifest.verifyPolicyBundle(tempDir, {
+        files,
+        expectedManifestSha256,
+        manifestFile,
+        baseLabel: 'online-policy',
+      });
+      throw new Error(`policy integrity verification failed: ${verification.errors.join('; ')}`);
+    }
+
+    fs.rmSync(runtimeDir, { recursive: true, force: true });
+    fs.renameSync(tempDir, runtimeDir);
+    return loaded;
+  } catch (error) {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    throw error;
   }
-  return results;
+}
+
+async function refreshFromOrigin() {
+  const loaded = await refreshBundleFromOrigin();
+  return loaded.policy;
+}
+
+function loadFromPolicyDirectory(dir, {
+  files = DEFAULTS.policy.files,
+  manifestFile = MANIFEST_FILE,
+  expectedManifestSha256 = EXPECTED_MANIFEST_SHA256,
+} = {}) {
+  const loaded = policyManifest.readVerifiedPolicyBundle(dir, {
+    files,
+    expectedManifestSha256,
+    manifestFile,
+    baseLabel: path.basename(dir),
+  });
+  return loaded ? loaded.policy : null;
 }
 
 function loadFromRuntimeCache() {
   if (!fs.existsSync(RUNTIME_DIR)) return null;
-  const result = {};
-  for (const file of DEFAULTS.policy.files) {
-    const data = readJsonSafe(path.join(RUNTIME_DIR, file));
-    if (!data) return null;
-    result[file] = data;
-  }
-  return result;
+  return loadFromPolicyDirectory(RUNTIME_DIR);
 }
 
 function loadFromShippedCache() {
-  const result = {};
-  for (const file of DEFAULTS.policy.files) {
-    const data = readJsonSafe(path.join(SHIPPED_DIR, file));
-    if (!data) return null;
-    result[file] = data;
-  }
-  return result;
+  return loadFromPolicyDirectory(SHIPPED_DIR);
 }
 
 function isRuntimeCacheStale() {
@@ -115,8 +157,7 @@ async function getPolicy({ forceRefresh = false } = {}) {
 
   try {
     const fresh = await refreshFromOrigin();
-    const allFresh = Object.values(fresh).every((v) => v !== null);
-    if (allFresh) return { source: 'online', policy: fresh };
+    if (fresh) return { source: 'online', policy: fresh };
   } catch (_) {
     // fall through
   }
@@ -133,6 +174,8 @@ async function getPolicy({ forceRefresh = false } = {}) {
 module.exports = {
   getPolicy,
   refreshFromOrigin,
+  refreshBundleFromOrigin,
+  loadFromPolicyDirectory,
   loadFromRuntimeCache,
   loadFromShippedCache,
   isRuntimeCacheStale,

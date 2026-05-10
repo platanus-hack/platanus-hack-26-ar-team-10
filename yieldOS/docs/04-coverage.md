@@ -118,7 +118,7 @@ Detector: `Read` against credential-looking paths:
 - `.ssh/`, `.aws/`, `.kube/`, `.gcloud/`, `.docker/`
 - private-key filenames such as `id_rsa`
 
-**Routing**: blocked unless the user has just replied with the exact phrase `AUTORIZO A LEER LAS CREDENCIALES`. The authorization window is local to the project and expires after 30 minutes.
+**Routing**: structured `Read` calls are blocked unless the latest user prompt in the Claude transcript exactly matches the nonce phrase generated for that credential path. `Bash` is blocked when recursive project credential sentinels are present because shell commands have unrestricted filesystem access and cannot be made target-bound by the hook.
 
 ## 9. Git commit and push audit
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## yieldOS v0.12.0 - 2026-05-10
+
+- Add enterprise-grade productization controls for install trust, policy integrity, credential authorization, audit events, provider egress, evidence classification, governance, and runtime module boundaries.
+
 ## yieldOS v0.11.1 - 2026-05-10
 
 - Harden code-audit coverage for docs/example secrets, raw error responses, and unbounded request body buffering.

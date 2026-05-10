@@ -23,14 +23,18 @@ yieldOS makes trust decisions **before** risky work is accepted, against policy 
 ## Quickstart
 
 ```bash
-# 1. Install from the public marketplace
-curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+# 1. Download and verify the pinned release installer
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/checksums.txt
+shasum -a 256 -c checksums.txt --ignore-missing
+sh install.sh --dry-run
+sh install.sh
 ```
 
 Manual install:
 
 ```bash
-claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
+claude plugins marketplace add yieldos/yieldos
 claude plugins install yieldos@yieldos
 
 # Optional: run the test suite
@@ -60,6 +64,8 @@ claude plugins update yieldos@yieldos
 ```
 
 After updating, run `/reload-plugins` or restart Claude Code so hooks switch from the old cache path to the new version.
+
+Supported adapters, data flows, and claim boundaries are documented in [docs/enterprise-boundaries.md](docs/enterprise-boundaries.md).
 
 Maintainers should release through the version helper from the repository root:
 
@@ -327,24 +333,26 @@ Detectors cover npm, pnpm, yarn, bun, pip, poetry, uv, cargo, go, skills, vendor
 
 ---
 
-## Policy — three-layer cache, online-first
+## Policy — manifest-pinned cache
 
 ```
                   ┌──────────────────────────┐
-                  │   Online (origin)        │
-                  │ github.com/.../policy/   │   ← source of truth
+                  │   Online candidate       │
+                  │ github.com/.../policy/   │
+                  │ manifest must match pin  │
                   └─────────────┬────────────┘
-                                │ fetch (each session)
+                                │ verify sha256 manifest + files
                                 ↓
                   ┌──────────────────────────┐
                   │   Runtime cache          │   ~/.claude/plugins/yieldos/
                   │   TTL 5 min              │   .runtime-cache/
+                  │   manifest-verified      │
                   └─────────────┬────────────┘
-                                │ fallback if origin unreachable
+                                │ fallback if origin unavailable or untrusted
                                 ↓
                   ┌──────────────────────────┐
                   │   Shipped cache          │   plugin/policy-cache/
-                  │   updated on release     │   always present
+                  │   release-pinned         │   always present
                   └──────────────────────────┘
 ```
 
@@ -352,6 +360,8 @@ Refresh triggers:
 - `SessionStart` — force refresh (ignore TTL).
 - `UserPromptSubmit` — refresh if stale.
 - `PreToolUse` — refresh if TTL expired.
+
+Online refresh is accepted only when `policy/manifest.json` matches the manifest hash pinned in the installed plugin and every policy file matches the manifest. Otherwise yieldOS falls back to the last verified runtime cache or the shipped release cache.
 
 → Detail: [docs/07-policy.md](docs/07-policy.md).
 
@@ -371,9 +381,11 @@ plugins/yieldos/
 │   ├── on-session-start.js     ← SessionStart entry
 │   ├── on-prompt-submit.js     ← UserPromptSubmit entry
 │   ├── decide.js               ← 5-check flow
-│   ├── policy-fetcher.js       ← three-layer cache
+│   ├── policy-fetcher.js       ← manifest-pinned policy cache
 │   ├── policy-lookup.js        ← lists/categories lookups
 │   ├── logger.js               ← append-only, secret-redacted
+│   ├── audit-event-checkpoint.js ← outside-repo event tail anchor
+│   ├── audit-events.js         ← structured event hash chain
 │   ├── self-defense.js         ← protected-path detection
 │   ├── injection-scanner.js    ← prompt-injection patterns
 │   ├── instruction-watcher.js  ← hash CLAUDE.md/AGENTS.md
@@ -400,7 +412,7 @@ You don't have to do anything. yieldOS works in the background:
 - **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to update the reviewed root `policy/` files through a normal PR.
 - **CVEs in transitive dependencies are flagged** post-install — you'll see `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
 
-Everything is logged to `<project>/security/dependency-events.md`. You can read it any time to audit what yieldOS decided and why.
+Everything is logged to `<project>/security/dependency-events.md`; structured, hash-chained events are also written to `<project>/security/yieldos-events.jsonl`, with the latest sequence/hash checkpointed outside the repo under `~/.cache/yieldos/audit-events/`. You can read either project file any time to audit what yieldOS decided and why.
 
 When stderr is an interactive terminal, yieldOS colorizes the status label. In
 non-interactive agent runs, CI, or `NO_COLOR=1`, output stays plain text. The
@@ -412,7 +424,7 @@ You do not need to:
 - Edit allowlist or denylist.
 - Run any commands manually.
 
-If you want to add a package that yieldOS blocked, the path is: open a PR that updates the reviewed root [`policy/`](../policy) files and keeps the plugin `policy-cache/` synchronized.
+If you want to add a package that yieldOS blocked, the path is: open a PR that updates the reviewed root [`policy/`](../policy) files, run `node scripts/generate-policy-manifest.mjs`, and ship the updated manifest pin with the plugin release.
 
 ---
 
@@ -442,8 +454,8 @@ If you are an AI coding agent operating in a project protected by yieldOS:
    | `code-audit-fix-applied`      | A security fix was applied to staged code. Review the change and rerun `git commit`. |
    | `code-audit-blocked`          | Source-code audit found unresolved blocking risk. Fix it before committing/pushing.  |
    | `code-audit-clean`            | The audited commit or push diff passed. Continue.                                    |
-   | `credentials-read-blocked`    | Do not read the credential file unless the user grants the exact authorization phrase. |
-   | `credentials-read-authorized` | The credential read is inside an active project-local authorization window.          |
+   | `credentials-read-blocked`    | Do not read credential files through `Read` or `Bash` unless yieldOS gives a target nonce and the user sends it exactly. |
+   | `credentials-read-authorized` | The structured `Read` retry has transcript proof of the target-bound nonce.          |
 
 3. **The rewrite flow (Category A)**: when yieldOS blocks with `category-a-rewrite`, follow the `dependency-gate` skill that's loaded automatically.
 
@@ -469,7 +481,7 @@ If you are an AI coding agent operating in a project protected by yieldOS:
 - `Required Settings Applied` — yieldOS inserted missing manager settings.
 - `Code Audit` — commit/push source-code audit result in `security/code-audit-events.md`.
 
-Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacted before being written.
+Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacted before being written. The structured log uses sequence numbers, previous/current event hashes, and an outside-repo checkpoint to make local tampering or tail truncation visible during review.
 
 ---
 
@@ -489,6 +501,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `injection-scanner.test.js` — prompt-injection patterns against fixtures and shipped patterns.
 - `instruction-watcher.test.js` — hash-based change detection on `CLAUDE.md`/`AGENTS.md`.
 - `logger.test.js` — log entry shape and secret redaction.
+- `audit-events.test.js` — structured JSONL event chain, redaction, lock ordering, and protected event paths.
 - `self-defense.test.js` — protected path matching.
 - `code-audit.test.js` — staged/push diff collection, red/blue loop, audit state, CI verification, hook routing.
 - `code-audit-agents.test.js` — optional local Claude/Codex agent boundary and patch validation.
@@ -507,7 +520,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/04-coverage.md](docs/04-coverage.md) | Every vector yieldOS gates: packages, skills, MCPs, instruction files, vendoring, binaries. |
 | [docs/05-decision-flow.md](docs/05-decision-flow.md) | The full 5-check pipeline plus pre/post-hook details. |
 | [docs/06-architecture.md](docs/06-architecture.md) | Plugin layout, module dependency graph, runtime sequences, three caches. |
-| [docs/07-policy.md](docs/07-policy.md) | Policy fetching, the three-layer cache, refresh triggers, PR flow. |
+| [docs/07-policy.md](docs/07-policy.md) | Policy fetching, manifest-pinned cache, refresh triggers, PR flow. |
 | [docs/08-tradeoffs.md](docs/08-tradeoffs.md) | What we gave up on purpose and why. |
 | [docs/09-decision-log.md](docs/09-decision-log.md) | Every meaningful decision in order, with rationale. |
 | [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |
@@ -523,8 +536,8 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/21-counterexample-driven-security-contracts.md](docs/21-counterexample-driven-security-contracts.md) | Baseline-fail plus fixed-pass security contracts. |
 | [docs/22-oracle-demo-script.md](docs/22-oracle-demo-script.md) | Missing-auth proof demo flow. |
 | [docs/23-oracle-evals.md](docs/23-oracle-evals.md) | Oracle evaluation and benchmark framing. |
-| [docs/24-hackathon-pitch.md](docs/24-hackathon-pitch.md) | Hackathon story, objections, and demo framing. |
 | [docs/25-oracle-contract-catalog.md](docs/25-oracle-contract-catalog.md) | Oracle contract catalog for validation and benchmarks. |
+| [docs/enterprise-boundaries.md](docs/enterprise-boundaries.md) | Current enforcement levels, data flows, and claim rules. |
 
 ---
 

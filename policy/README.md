@@ -1,11 +1,11 @@
 # yieldOS Policy
 
-This directory is the online source of truth for yieldOS policy files. The installed plugin carries a `policy-cache/` release snapshot for offline use, but local edits to that cache are not policy authority.
+This directory is the reviewed source for yieldOS policy files. Installed plugins carry a `policy-cache/` release snapshot and a pinned `manifest.json` hash. Local edits to the cache are not policy authority.
 
-Installed plugins refresh these files from:
+Installed plugins can fetch candidate policy bundles from:
 
 ```text
-https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/policy/<file>
+https://raw.githubusercontent.com/yieldos/yieldos/main/policy/<file>
 ```
 
 Refresh behavior:
@@ -13,7 +13,8 @@ Refresh behavior:
 - `SessionStart` forces a policy refresh.
 - `UserPromptSubmit` and `PreToolUse` refresh when the runtime cache TTL expires.
 - The default TTL is 5 minutes.
-- If the network or `/policy/` is unavailable, yieldOS falls back to the runtime cache and then to the bundled `policy-cache/` snapshot shipped inside the plugin.
+- A fetched bundle is accepted only when `manifest.json` matches the manifest hash pinned in the installed plugin and every file matches the manifest.
+- If the network is unavailable or the fetched bundle fails integrity checks, yieldOS falls back to the last verified runtime cache and then to the bundled `policy-cache/` snapshot shipped inside the plugin.
 
 Policy files:
 
@@ -26,6 +27,7 @@ Policy files:
 - `required-settings.json` documents package-manager hardening.
 - `skills.json` and `mcps.json` list approved Claude Code extensions.
 - `version.json` is the cache invalidation marker.
+- `manifest.json` pins the exact policy file hashes for the release.
 
 Runtime precedence:
 
@@ -36,4 +38,4 @@ Runtime precedence:
 
 Allowlist keys may be pinned (`npm:react@18.3.1`) or name-only (`npm:react`). Name-only entries must set `allow_any_version: true` with a rationale so reviewers can distinguish an intentional rolling allowance from an accidental broad match.
 
-To update policy, open a PR against this directory, include the review rationale in JSON, keep `policy-cache/` in sync, run `node scripts/policy-check.mjs`, and bump `version.json` when the policy decision set changes.
+To update policy, open a PR against this directory, include the review rationale in JSON, bump `version.json` when the policy decision set changes, run `node scripts/generate-policy-manifest.mjs`, and then run `node scripts/policy-check.mjs`. The generator syncs `policy-cache/`, writes `manifest.json`, updates `version.json.hash`, and pins the manifest hash in plugin defaults.

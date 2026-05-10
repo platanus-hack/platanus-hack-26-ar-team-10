@@ -12,6 +12,7 @@ permissions:
 jobs:
   plugin:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
@@ -44,6 +45,8 @@ jobs:
         run: node scripts/policy-check.mjs
       - name: Run release helper tests
         run: node --test scripts/*.test.mjs
+      - name: Run repository secret smoke scan
+        run: node scripts/secret-scan-smoke.mjs
       - name: Check installer and updater shell syntax
         run: |
           sh -n install.sh

@@ -29,6 +29,11 @@ test('protected: code audit state files', () => {
   assert.equal(sd.isProtectedPath('/proj/security/code-audit-state.json'), true);
 });
 
+test('protected: structured yieldOS audit event files', () => {
+  assert.equal(sd.isProtectedPath('/proj/security/yieldos-events.jsonl'), true);
+  assert.equal(sd.isProtectedPath('/proj/security/.yieldos-events.lock'), true);
+});
+
 test('protected: yieldos-rewrites.json', () => {
   assert.equal(sd.isProtectedPath('/proj/security/yieldos-rewrites.json'), true);
 });
@@ -117,6 +122,31 @@ test('protected via symlink to a target that does not exist yet', () => {
     true,
     'dangling symlink whose target is protected must still block the write',
   );
+});
+
+test('protected via parent symlink into runtime credential auth cache', () => {
+  const dir = tmpDir();
+  const runtimeRoot = path.join(dir, 'credential-auth');
+  fs.mkdirSync(runtimeRoot, { recursive: true });
+  const previousRoot = process.env.YIELDOS_CREDENTIAL_AUTH_ROOT;
+  process.env.YIELDOS_CREDENTIAL_AUTH_ROOT = runtimeRoot;
+
+  const link = path.join(dir, 'runtime-link');
+  fs.symlinkSync(runtimeRoot, link, 'dir');
+
+  try {
+    assert.equal(
+      sd.isProtectedPath(path.join(link, 'signing-key')),
+      true,
+      'symlinks pointing into the credential auth cache must be detected via realpath',
+    );
+  } finally {
+    if (previousRoot === undefined) {
+      delete process.env.YIELDOS_CREDENTIAL_AUTH_ROOT;
+    } else {
+      process.env.YIELDOS_CREDENTIAL_AUTH_ROOT = previousRoot;
+    }
+  }
 });
 
 test('not protected: regular file under /tmp (sanity check, no false positives from realpath)', () => {

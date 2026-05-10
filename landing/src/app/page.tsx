@@ -9,9 +9,9 @@ import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ViewReadmeButton } from "@/components/view-readme-button";
 
 const installCommand =
-  "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh";
+  "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh && curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt && shasum -a 256 -c checksums.txt --ignore-missing && sh install.sh";
 const repoUrl =
-  "https://github.com/platanus-hack/platanus-hack-26-ar-team-10";
+  "https://github.com/yieldos/yieldos";
 const readmeUrl = `${repoUrl}#readme`;
 const heroTitle = "Unlock safe coding for technical and non-technical talent";
 
@@ -35,7 +35,7 @@ export default function Home() {
             </h1>
             <MotionReveal className="self-stretch text-left" delay={0.05} immediate y={12}>
               <p className="mt-5 w-full max-w-[58ch] text-left text-base leading-7 text-zinc-600 sm:mt-6 sm:text-lg sm:leading-8">
-                yieldOS sits between your AI coding agent and your project. It automatically blocks malicious packages, prompt injections, and unsafe code changes before they reach your repo — with deterministic checks, not the AI&rsquo;s opinion.
+                yieldOS sits between your AI coding agent and your project. It blocks policy-covered risky actions before sensitive steps, verifies selected fixes with scoped oracle contracts, and escalates uncovered cases instead of trusting the AI&rsquo;s opinion.
               </p>
             </MotionReveal>
             <MotionReveal
@@ -154,15 +154,16 @@ export default function Home() {
 
             <MotionReveal delay={0.05}>
               <p className="mt-5 text-[15px] leading-[1.65] text-zinc-600 sm:mt-6 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
-                Same security checks, two ways:{" "}
+                Same security checks, two routing paths:{" "}
                 <strong className="font-semibold text-zinc-950">
                   Claude Opus 4.7
                 </strong>{" "}
-                reviewing your changes vs the{" "}
+                review candidates vs the{" "}
                 <strong className="font-semibold text-zinc-950">
                   Oracle
                 </strong>{" "}
-                running deterministic rules. Same task, very different bill.
+                running deterministic rules. The current numbers are local-review
+                evidence, not provider billing proof.
               </p>
             </MotionReveal>
           </div>
@@ -173,9 +174,9 @@ export default function Home() {
 
           <MotionReveal className="mt-6 sm:mt-8" delay={0.15}>
             <p className="max-w-3xl text-xs leading-5 text-zinc-500 sm:text-[13px] sm:leading-6">
-              Time is wall-clock latency per check. Cost is the model spend
-              per risky review. The oracle never calls a model &mdash; that&rsquo;s
-              where every saved second and every saved cent comes from.
+              Time is wall-clock latency per check. Cost is an assumption-based
+              routing estimate from the local-review reports. The oracle path
+              does not call a model for deterministic checks.
             </p>
           </MotionReveal>
         </div>
@@ -227,7 +228,7 @@ export default function Home() {
           </div>
           <div className="mt-10 flex flex-col gap-2 border-t border-zinc-200/80 pt-6 font-mono text-[11px] text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
             <p>© 2026 yieldOS · Oracle-driven security harness</p>
-            <p>Built for the Platanus hackathon</p>
+            <p>Local-first security contracts for coding agents</p>
           </div>
         </div>
       </footer>

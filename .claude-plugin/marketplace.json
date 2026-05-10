@@ -1,18 +1,18 @@
 {
   "name": "yieldos",
   "metadata": {
-    "description": "yieldOS Claude Code plugin marketplace for AI agent supply-chain security."
+    "description": "yieldOS Claude Code plugin marketplace for agent-action security."
   },
   "owner": {
-    "name": "platanus-hack-26-ar-team-10"
+    "name": "yieldos"
   },
   "plugins": [
     {
       "name": "yieldos",
       "description": "Security gate for Claude Code. Intercepts dependency installs, skills, MCP additions, instruction edits, source-code audits, generated agent instructions, adversarial pentest loops, dashboard streams, and policy-validated team agent packs.",
-      "version": "0.11.1",
+      "version": "0.12.0",
       "author": {
-        "name": "platanus-hack-26-ar-team-10"
+        "name": "yieldOS"
       },
       "source": "./dist/yieldos-plugin",
       "category": "security"

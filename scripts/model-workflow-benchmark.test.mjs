@@ -46,6 +46,39 @@ function fakeOpenAIResponse() {
   };
 }
 
+function invalidRepoSpec() {
+  return {
+    id: 'invalid-public-spec',
+    name: 'Invalid public spec',
+    git_url: 'file:///definitely/not/a/yieldos/repo',
+    commit: 'HEAD',
+    stack: ['node'],
+    why: 'proves skipped cases do not clone public repositories',
+  };
+}
+
+function singleOpenAIConfig({ budget = 1 } = {}) {
+  return {
+    version: 1,
+    provider_budgets: { openai_usd: budget },
+    models: [{ provider: 'openai', model: 'gpt-5-mini', max_output_tokens: 800 }],
+    arms: [{ id: 'raw-agent', yieldos_guidance: false }],
+    task_ids: ['admin-users-route'],
+  };
+}
+
+function singleOpenAICosts({ budget = 1 } = {}) {
+  return {
+    provider_budgets: { openai_usd: budget },
+    models: {
+      'openai:gpt-5-mini': {
+        input_usd_per_million: 0.25,
+        output_usd_per_million: 2,
+      },
+    },
+  };
+}
+
 test('parseModelFiles accepts strict JSON and rejects path escape', () => {
   const parsed = parseModelFiles('{"files":[{"path":"safe.js","content":"module.exports = {}"}]}');
   assert.equal(parsed.ok, true);
@@ -78,22 +111,9 @@ test('model workflow benchmark applies model output and lets yieldOS block it', 
     repos: [fixtureRepo()],
     tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
     maxCases: 1,
-    config: {
-      version: 1,
-      provider_budgets: { openai_usd: 1 },
-      models: [{ provider: 'openai', model: 'gpt-5-mini', max_output_tokens: 800 }],
-      arms: [{ id: 'raw-agent', yieldos_guidance: false }],
-      task_ids: ['admin-users-route'],
-    },
-    costs: {
-      provider_budgets: { openai_usd: 1 },
-      models: {
-        'openai:gpt-5-mini': {
-          input_usd_per_million: 0.25,
-          output_usd_per_million: 2,
-        },
-      },
-    },
+    providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    config: singleOpenAIConfig(),
+    costs: singleOpenAICosts(),
     fetchImpl: async () => {
       calls += 1;
       return fakeOpenAIResponse();
@@ -103,9 +123,110 @@ test('model workflow benchmark applies model output and lets yieldOS block it', 
   assert.equal(report.results.length, 1);
   assert.equal(report.results[0].outcome, 'unsafe-prevented-by-yieldos');
   assert.equal(report.results[0].yieldos.prevented, true);
+  assert.deepEqual(report.results[0].provider_egress, {
+    provider: 'openai',
+    purpose: 'model-workflow-benchmark',
+    model: 'gpt-5-mini',
+    opt_in_env: 'YIELDOS_ALLOW_PROVIDER_EGRESS',
+    allowed: true,
+    provider_request_sent: true,
+    repo_content_sent: false,
+    raw_model_output_included: false,
+  });
   assert.equal(report.aggregate.completed_cases, 1);
   if (previous === undefined) delete process.env.OPENAI_API_KEY;
   else process.env.OPENAI_API_KEY = previous;
+});
+
+test('model workflow dry-run does not clone public repo specs', async () => {
+  const report = await runModelWorkflowBenchmark({
+    repoSpecObjects: [invalidRepoSpec()],
+    tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
+    maxCases: 1,
+    providerEgressEnv: {},
+    dryRun: true,
+    config: singleOpenAIConfig(),
+    costs: singleOpenAICosts(),
+    fetchImpl: async () => {
+      throw new Error('provider should not be called');
+    },
+  });
+  assert.equal(report.results[0].outcome, 'skipped');
+  assert.equal(report.results[0].skip_reason, 'dry-run');
+  assert.equal(report.results[0].provider_egress.provider_request_sent, false);
+  assert.equal(report.results[0].provider_egress.repo_content_sent, false);
+});
+
+test('model workflow budget skip does not clone public repo specs', async () => {
+  const report = await runModelWorkflowBenchmark({
+    repoSpecObjects: [invalidRepoSpec()],
+    tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
+    maxCases: 1,
+    providerEgressEnv: {},
+    config: singleOpenAIConfig({ budget: 0.000001 }),
+    costs: singleOpenAICosts({ budget: 0.000001 }),
+    fetchImpl: async () => {
+      throw new Error('provider should not be called');
+    },
+  });
+  assert.equal(report.results[0].outcome, 'skipped');
+  assert.match(report.results[0].skip_reason, /budget-cap/);
+  assert.equal(report.results[0].provider_egress.provider_request_sent, false);
+  assert.equal(report.results[0].provider_egress.repo_content_sent, false);
+});
+
+test('model workflow benchmark blocks provider calls without explicit egress opt in', async () => {
+  const previous = process.env.OPENAI_API_KEY;
+  process.env.OPENAI_API_KEY = 'sk-test-12345678901234567890';
+  let calls = 0;
+  await assert.rejects(
+    () => runModelWorkflowBenchmark({
+      repos: [fixtureRepo()],
+      tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
+      maxCases: 1,
+      providerEgressEnv: {},
+      config: singleOpenAIConfig(),
+      costs: singleOpenAICosts(),
+      fetchImpl: async () => {
+        calls += 1;
+        return fakeOpenAIResponse();
+      },
+    }),
+    /provider egress is disabled for openai:model-workflow-benchmark/
+  );
+  assert.equal(calls, 0);
+  if (previous === undefined) delete process.env.OPENAI_API_KEY;
+  else process.env.OPENAI_API_KEY = previous;
+});
+
+test('model workflow benchmark dry-run stays offline without egress opt in', async () => {
+  let calls = 0;
+  const report = await runModelWorkflowBenchmark({
+    repos: [fixtureRepo()],
+    tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
+    maxCases: 1,
+    providerEgressEnv: {},
+    dryRun: true,
+    config: singleOpenAIConfig(),
+    costs: singleOpenAICosts(),
+    fetchImpl: async () => {
+      calls += 1;
+      return fakeOpenAIResponse();
+    },
+  });
+  assert.equal(calls, 0);
+  assert.equal(report.results[0].outcome, 'skipped');
+  assert.equal(report.results[0].skip_reason, 'dry-run');
+  assert.deepEqual(report.results[0].provider_egress, {
+    provider: 'openai',
+    purpose: 'model-workflow-benchmark',
+    model: 'gpt-5-mini',
+    opt_in_env: 'YIELDOS_ALLOW_PROVIDER_EGRESS',
+    allowed: false,
+    provider_request_sent: false,
+    repo_content_sent: false,
+    raw_model_output_included: false,
+  });
 });
 
 test('model workflow benchmark enforces preflight provider budget', async () => {
@@ -116,22 +237,9 @@ test('model workflow benchmark enforces preflight provider budget', async () => 
     repos: [fixtureRepo()],
     tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
     maxCases: 1,
-    config: {
-      version: 1,
-      provider_budgets: { openai_usd: 0.000001 },
-      models: [{ provider: 'openai', model: 'gpt-5-mini', max_output_tokens: 800 }],
-      arms: [{ id: 'raw-agent', yieldos_guidance: false }],
-      task_ids: ['admin-users-route'],
-    },
-    costs: {
-      provider_budgets: { openai_usd: 0.000001 },
-      models: {
-        'openai:gpt-5-mini': {
-          input_usd_per_million: 0.25,
-          output_usd_per_million: 2,
-        },
-      },
-    },
+    providerEgressEnv: {},
+    config: singleOpenAIConfig({ budget: 0.000001 }),
+    costs: singleOpenAICosts({ budget: 0.000001 }),
     fetchImpl: async () => {
       calls += 1;
       return fakeOpenAIResponse();
@@ -140,6 +248,8 @@ test('model workflow benchmark enforces preflight provider budget', async () => 
   assert.equal(calls, 0);
   assert.equal(report.results[0].outcome, 'skipped');
   assert.match(report.results[0].skip_reason, /budget-cap/);
+  assert.equal(report.results[0].provider_egress.provider_request_sent, false);
+  assert.equal(report.results[0].provider_egress.repo_content_sent, false);
   if (previous === undefined) delete process.env.OPENAI_API_KEY;
   else process.env.OPENAI_API_KEY = previous;
 });
@@ -151,29 +261,67 @@ test('model workflow benchmark records provider errors without aborting', async 
     repos: [fixtureRepo()],
     tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
     maxCases: 1,
-    config: {
-      version: 1,
-      provider_budgets: { openai_usd: 1 },
-      models: [{ provider: 'openai', model: 'gpt-5-mini', max_output_tokens: 800 }],
-      arms: [{ id: 'raw-agent', yieldos_guidance: false }],
-      task_ids: ['admin-users-route'],
-    },
-    costs: {
-      provider_budgets: { openai_usd: 1 },
-      models: {
-        'openai:gpt-5-mini': {
-          input_usd_per_million: 0.25,
-          output_usd_per_million: 2,
-        },
-      },
-    },
+    providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    config: singleOpenAIConfig(),
+    costs: singleOpenAICosts(),
     fetchImpl: async () => {
       throw new Error('temporary provider failure');
     },
   });
   assert.equal(report.results[0].outcome, 'provider-error');
   assert.match(report.results[0].error, /temporary provider failure/);
+  assert.equal(report.results[0].provider_egress.allowed, true);
+  assert.equal(report.results[0].provider_egress.provider_request_sent, true);
+  assert.equal(report.results[0].provider_egress.repo_content_sent, false);
   assert.equal(report.aggregate.outcomes['provider-error'], 1);
+  if (previous === undefined) delete process.env.OPENAI_API_KEY;
+  else process.env.OPENAI_API_KEY = previous;
+});
+
+test('model workflow provider error without API key records no repository content sent', async () => {
+  const previous = process.env.OPENAI_API_KEY;
+  delete process.env.OPENAI_API_KEY;
+  let calls = 0;
+  const report = await runModelWorkflowBenchmark({
+    repos: [fixtureRepo()],
+    tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
+    maxCases: 1,
+    providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    config: singleOpenAIConfig(),
+    costs: singleOpenAICosts(),
+    fetchImpl: async () => {
+      calls += 1;
+      return fakeOpenAIResponse();
+    },
+  });
+  assert.equal(calls, 0);
+  assert.equal(report.results[0].outcome, 'provider-error');
+  assert.match(report.results[0].error, /OPENAI_API_KEY is not set/);
+  assert.equal(report.results[0].provider_egress.allowed, true);
+  assert.equal(report.results[0].provider_egress.provider_request_sent, false);
+  assert.equal(report.results[0].provider_egress.repo_content_sent, false);
+  if (previous === undefined) delete process.env.OPENAI_API_KEY;
+  else process.env.OPENAI_API_KEY = previous;
+});
+
+test('model workflow generated-code inclusion is not raw provider output inclusion', async () => {
+  const previous = process.env.OPENAI_API_KEY;
+  process.env.OPENAI_API_KEY = 'sk-test-12345678901234567890';
+  const report = await runModelWorkflowBenchmark({
+    repos: [fixtureRepo()],
+    tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
+    maxCases: 1,
+    providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    includeGenerated: true,
+    config: singleOpenAIConfig(),
+    costs: singleOpenAICosts(),
+    fetchImpl: async () => fakeOpenAIResponse(),
+  });
+  assert.equal(report.results[0].provider_egress.raw_model_output_included, false);
+  assert.equal(report.results[0].provider_egress.provider_request_sent, true);
+  assert.equal(report.results[0].provider_egress.repo_content_sent, false);
+  assert.equal(report.results[0].model_output.raw_response_included, false);
+  assert.ok(report.results[0].generated_code.length > 0);
   if (previous === undefined) delete process.env.OPENAI_API_KEY;
   else process.env.OPENAI_API_KEY = previous;
 });

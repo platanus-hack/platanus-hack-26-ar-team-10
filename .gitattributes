@@ -1,0 +1,3 @@
+/policy/*.json text eol=lf
+/yieldOS/plugins/yieldos/policy-cache/*.json text eol=lf
+/dist/yieldos-plugin/policy-cache/*.json text eol=lf

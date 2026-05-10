@@ -1,6 +1,6 @@
 {
   "policy": {
-    "repo": "platanus-hack/platanus-hack-26-ar-team-10",
+    "repo": "yieldos/yieldos",
     "branch": "main",
     "path": "policy",
     "files": [
@@ -15,7 +15,10 @@
       "required-settings.json",
       "version.json"
     ],
-    "raw_url_template": "https://raw.githubusercontent.com/{repo}/{branch}/{path}/{file}"
+    "raw_url_template": "https://raw.githubusercontent.com/{repo}/{branch}/{path}/{file}",
+    "manifest_file": "manifest.json",
+    "manifest_sha256": "sha256:779a1edd7a20b20c2b4cb7a0b4f7aa81642ee3b0b064099c0726f36a3f3e0731",
+    "integrity": "pinned-manifest-sha256"
   },
   "cache": {
     "runtime_dir": "~/.claude/plugins/yieldos/.runtime-cache",
@@ -39,6 +42,17 @@
     "category_a_max_unpacked_kb": 50,
     "category_a_max_direct_deps": 1
   },
-  "managers_v1": ["npm", "pnpm", "pip"],
-  "managers_v2": ["yarn", "bun", "poetry", "uv", "cargo", "go"]
+  "managers_v1": [
+    "npm",
+    "pnpm",
+    "pip"
+  ],
+  "managers_v2": [
+    "yarn",
+    "bun",
+    "poetry",
+    "uv",
+    "cargo",
+    "go"
+  ]
 }
