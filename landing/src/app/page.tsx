@@ -2,6 +2,7 @@ import { AgentPackSection } from "@/components/agent-pack-section";
 import { AgentsInstallButton } from "@/components/agents-install-button";
 import { CopyCommandButton } from "@/components/copy-command-button";
 import { DefenseLayers } from "@/components/defense-layers";
+import { ExternalDefenseTerminal } from "@/components/external-defense-terminal";
 import { HeroGridAccents } from "@/components/hero-grid-accents";
 import { InstallCommandPill } from "@/components/install-command-pill";
 import { MotionReveal } from "@/components/motion-reveal";
@@ -150,6 +151,35 @@ export default function Home() {
       </section>
 
       <section
+        id="external-attacks"
+        className="pitch-section bg-[#0a0a0c] text-white"
+      >
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="max-w-2xl">
+            <MotionReveal>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400 sm:text-[11px]">
+                External defense
+              </p>
+              <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
+                Live in your editor.
+              </h2>
+            </MotionReveal>
+
+            <MotionReveal delay={0.05}>
+              <p className="mt-5 text-[15px] leading-[1.65] text-zinc-400 sm:mt-6 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
+                Every risky action your AI agent tries gets intercepted before
+                it touches your repo. Here&rsquo;s what you actually see.
+              </p>
+            </MotionReveal>
+          </div>
+
+          <MotionReveal className="mt-8 sm:mt-12" delay={0.1} y={18}>
+            <ExternalDefenseTerminal />
+          </MotionReveal>
+        </div>
+      </section>
+
+      <section
         id="benchmarks"
         className="pitch-section theme-surface-smoke border-b border-zinc-200/80"
       >
@@ -157,7 +187,7 @@ export default function Home() {
           <div className="max-w-2xl">
             <MotionReveal>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Benchmarks
+                Internal defense · benchmarks
               </p>
               <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-zinc-950 sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
                 Agent vs oracle.
