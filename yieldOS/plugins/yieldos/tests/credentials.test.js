@@ -12,6 +12,7 @@ const PRE_TOOL_HOOK = path.join(PLUGIN_ROOT, 'scripts', 'pre-install-gate.js');
 const PROMPT_HOOK = path.join(PLUGIN_ROOT, 'scripts', 'on-prompt-submit.js');
 const AUTH_PHRASE = 'AUTORIZO A LEER LAS CREDENCIALES';
 const credentialAuth = require('../scripts/credential-auth');
+const credentialsScanner = require('../scripts/credentials-scanner');
 
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-credentials-'));
@@ -487,6 +488,17 @@ test('PreToolUse blocks Bash reads of explicit credential paths outside the proj
 
   assert.equal(result.code, 2);
   assert.equal(result.stderr.includes('[yieldOS:verdict] credentials-read-blocked'), true);
+});
+
+test('Bash credential path scanner preserves Windows separators before dotfiles', () => {
+  assert.equal(
+    credentialsScanner.commandReferencesCredentialPath(String.raw`cat D:\a\_temp\yieldos-outside-secrets-abc\.env`, tmpProject()),
+    true,
+  );
+  assert.equal(
+    credentialsScanner.commandReferencesCredentialPath(String.raw`type C:\Users\runneradmin\AppData\Local\Temp\secrets\.aws\credentials`, tmpProject()),
+    true,
+  );
 });
 
 test('runtime cache authorization without transcript evidence does not grant a credentials read', () => {

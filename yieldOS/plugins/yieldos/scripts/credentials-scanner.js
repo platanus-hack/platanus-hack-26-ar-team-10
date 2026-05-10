@@ -83,16 +83,23 @@ function isCredentialsPath(filePath) {
 }
 
 function tokenLooksPathLike(token) {
-  return /^(?:~\/|\.{1,2}\/|\/)/.test(token) || token.includes('/');
+  return /^(?:~[\\/]|\.{1,2}[\\/]|\/|[A-Za-z]:[\\/]|\\\\)/.test(token)
+    || token.includes('/')
+    || token.includes('\\');
+}
+
+function isWindowsPathToken(token) {
+  return /^[A-Za-z]:[\\/]/.test(token) || /^\\\\[^\\]+\\[^\\]+/.test(token);
 }
 
 function shellPathTokens(command) {
   const tokens = [];
   const matches = String(command || '').matchAll(/[^\s"'`<>|;&(){}]+/g);
   for (const match of matches) {
-    const token = match[0]
-      .replace(/\\([./~-])/g, '$1')
-      .replace(/^[=:,]+|[,:]+$/g, '');
+    const rawToken = match[0].replace(/^[=:,]+|[,:]+$/g, '');
+    const token = isWindowsPathToken(rawToken)
+      ? rawToken
+      : rawToken.replace(/\\([./~-])/g, '$1');
     if (token) tokens.push(token);
   }
   return tokens;
@@ -153,6 +160,7 @@ module.exports = {
   SECRET_PATTERNS,
   commandReferencesCredentialPath,
   isCredentialsPath,
+  isWindowsPathToken,
   projectHasCredentialSentinel,
   scan,
 };
