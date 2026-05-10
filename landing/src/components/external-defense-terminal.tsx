@@ -41,7 +41,7 @@ const scenarios: Scenario[] = [
   },
   {
     id: "api-key",
-    prompt: "this is my api key sk-9f3jk2hsd8sk93jdkasndj2na87",
+    prompt: "this is my api key [redacted-demo-token]",
     blockTitle: "yieldOS",
     bashArg: "credentials scanner",
     outputLines: [
