@@ -32,6 +32,10 @@ function handleCodeAuditCommand(projectRoot, command, options = {}) {
     try {
       const shouldStageState = audit.mode === 'commit' || (audit.mode === 'push' && audit.action !== 'block');
       const stateWrite = codeAudit.writeAuditState(auditRoot, audit, { stage: shouldStageState });
+      audit = {
+        ...audit,
+        savedFiles: stateWrite.changed ? ['security/code-audit-state.json'] : [],
+      };
       if (audit.mode === 'push' && audit.action !== 'block' && !stateWrite.committed) {
         audit = {
           ...audit,

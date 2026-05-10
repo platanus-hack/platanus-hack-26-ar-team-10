@@ -57,6 +57,30 @@ test('formatAuditFindings shows a small bounded finding summary', () => {
   assert.equal(out[4].includes('... 1 more finding(s)'), true);
 });
 
+test('formatArtifactLines prints concise evidence paths', () => {
+  const out = ui.formatArtifactLines([
+    { label: 'saved', path: 'security/code-audit-state.json' },
+    { label: 'contract', path: 'security/oracles/missing-authz-demo/contract.json' },
+    { label: 'proof', path: 'security/oracles/missing-authz-demo/proof-manifest.json' },
+  ], { color: false });
+
+  assert.deepEqual(out, [
+    '[yieldOS] SAVED security/code-audit-state.json',
+    '[yieldOS] CONTRACT security/oracles/missing-authz-demo/contract.json',
+    '[yieldOS] PROOF security/oracles/missing-authz-demo/proof-manifest.json',
+  ]);
+});
+
+test('formatArtifactLines colors labels only when color is enabled', () => {
+  const out = ui.formatArtifactLines([
+    { label: 'contract', path: 'security/oracles/missing-authz-demo/contract.json' },
+  ], { color: true });
+
+  assert.equal(out[0].includes('\u001b['), true);
+  assert.equal(out[0].includes('[yieldOS]'), true);
+  assert.equal(out[0].includes('\u001b[36mCONTRACT\u001b[0m security/oracles/missing-authz-demo/contract.json'), true);
+});
+
 test('shouldColor respects tty, NO_COLOR, and CI', () => {
   assert.equal(ui.shouldColor({ isTTY: true }, {}), true);
   assert.equal(ui.shouldColor({ isTTY: true }, { NO_COLOR: '1' }), false);
