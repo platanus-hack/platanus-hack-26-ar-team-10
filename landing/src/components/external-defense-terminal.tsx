@@ -1,32 +1,4 @@
-function PixelRobot() {
-  // Robot pixelado mini, color heredado de currentColor (naranja).
-  return (
-    <svg
-      viewBox="0 0 40 48"
-      width="34"
-      height="42"
-      aria-hidden="true"
-      className="text-orange-400"
-    >
-      <rect x="6" y="0" width="28" height="22" fill="currentColor" />
-      <rect x="12" y="6" width="5" height="5" fill="#0a0a0c" />
-      <rect x="23" y="6" width="5" height="5" fill="#0a0a0c" />
-      <rect x="13" y="16" width="14" height="2" fill="#0a0a0c" />
-      <rect x="2" y="24" width="36" height="14" fill="currentColor" />
-      <rect x="6" y="40" width="8" height="8" fill="currentColor" />
-      <rect x="26" y="40" width="8" height="8" fill="currentColor" />
-    </svg>
-  );
-}
-
-const requirements = [
-  "Requirement already satisfied: pandas in /opt/anaconda3/lib/python3.12/site-packages (2.2.3)",
-  "Requirement already satisfied: numpy>=1.26.0 in /opt/anaconda3/lib/python3.12/site-packages (from pandas) (2.4.2)",
-  "Requirement already satisfied: python-dateutil>=2.8.2 in /opt/anaconda3/lib/python3.12/site-packages (from pandas) (2.9.0.post0)",
-  "Requirement already satisfied: pytz>=2020.1 in /opt/anaconda3/lib/python3.12/site-packages (from pandas) (2025.2)",
-  "Requirement already satisfied: tzdata>=2022.7 in /opt/anaconda3/lib/python3.12/site-packages (from pandas) (2025.3)",
-  "Requirement already satisfied: six>=1.5 in /opt/anaconda3/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)",
-];
+import Image from "next/image";
 
 export function ExternalDefenseTerminal() {
   return (
@@ -52,14 +24,21 @@ export function ExternalDefenseTerminal() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1.05fr]">
             <div>
               <p className="text-center font-semibold text-white">
-                Welcome back Mauro!
+                Welcome back, Mauro!
               </p>
               <div className="mt-2 flex justify-center">
-                <PixelRobot />
+                <Image
+                  src="/logos/claude-code.png"
+                  alt="Claude Code"
+                  width={48}
+                  height={48}
+                  className="block"
+                  priority
+                />
               </div>
               <p className="mt-3 text-zinc-400">
-                <span className="text-white">Opus 4.7 (1M context)</span> with
-                hi… · API Usage Billing
+                <span className="text-white">Opus 4.7 (1M context)</span> ·
+                API Usage Billing
               </p>
               <p className="text-zinc-500">· Mauro&rsquo;s Individual Org</p>
               <p className="text-zinc-500">~/Desktop/tensorflow-demo</p>
@@ -81,7 +60,7 @@ export function ExternalDefenseTerminal() {
         <div className="mt-3 rounded-md bg-zinc-900/80 px-3 py-1.5 sm:mt-4">
           <p>
             <span className="text-zinc-500">›</span>{" "}
-            <span className="text-zinc-100">instala pandas</span>
+            <span className="text-zinc-100">install pandas</span>
           </p>
         </div>
 
@@ -94,12 +73,12 @@ export function ExternalDefenseTerminal() {
 
         {/* Pipe-indented output */}
         <div className="mt-1 pl-3">
-          {requirements.map((line) => (
-            <p key={line} className="text-zinc-400">
-              <span className="text-zinc-700">│</span>{" "}
-              <span className="break-words">{line}</span>
-            </p>
-          ))}
+          <p className="text-zinc-400">
+            <span className="text-zinc-700">│</span>{" "}
+            <span className="break-words">
+              Requirement already satisfied: pandas (2.2.3) + 5 deps
+            </span>
+          </p>
           <p className="text-zinc-500">
             <span className="text-zinc-700">└</span>{" "}
             <span>Allowed by auto mode classifier</span>
@@ -109,7 +88,7 @@ export function ExternalDefenseTerminal() {
         {/* Agent summary */}
         <p className="mt-3 text-zinc-200">
           <span className="text-emerald-400">●</span>{" "}
-          pandas ya está instalado (versión 2.2.3) en{" "}
+          pandas is already installed (v2.2.3) at{" "}
           <span style={{ color: "rgb(120, 153, 255)" }}>/opt/anaconda3.</span>
         </p>
 
@@ -118,7 +97,7 @@ export function ExternalDefenseTerminal() {
           <span className="font-bold">+</span>
           <span className="text-zinc-700">│</span>
           <span aria-hidden>🛡</span>
-          <span>yieldOS · Validado · allowlist</span>
+          <span>yieldOS · Validated · allowlist</span>
         </p>
       </div>
     </div>
