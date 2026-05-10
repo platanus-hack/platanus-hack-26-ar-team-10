@@ -152,6 +152,6 @@ The visual dashboard is a standalone HTML file generated from the local-review J
 
 ## Local Review Reports
 
-Reports with `local-review` in the filename are intended for hackathon and local inspection first. They are useful for expert review because the claims are bounded, sanitized, and reproducible from the included commands, but public marketing claims should be regenerated from a clean checkout and current provider pricing.
+Reports with `local-review` in the filename are intended for local inspection first. They are useful for expert review because the claims are bounded, sanitized, and reproducible from the included commands, but public marketing claims should be regenerated from a clean checkout and current provider pricing.
 
 `npm run evidence:verify -- benchmarks/*benchmark*.json benchmarks/oracle-coverage-*.json` classifies reports as `PUBLIC` or `INTERNAL` and exits non-zero when any report is not public proof. A rejected report can still guide product decisions, but it must not become public proof until the missing clean-run requirements are fixed.

@@ -4,7 +4,7 @@
 
 **Executable security contracts for AI coding agents.**
 
-AI coding agents can install dependencies, add tools, edit instruction files, read secrets, and commit code faster than a human reviewer can inspect every step. yieldOS is an oracle-driven security harness that turns risky agent actions into security contracts, counterexamples, and proof-of-fix evidence. The model can propose. The oracle decides.
+AI coding agents can install dependencies, add tools, edit instruction files, read secrets, and commit code faster than manual review can inspect every step. yieldOS is an oracle-driven security harness that turns risky agent actions into security contracts, counterexamples, and proof-of-fix evidence. The model can propose. The oracle decides.
 
 ## What Works Today
 

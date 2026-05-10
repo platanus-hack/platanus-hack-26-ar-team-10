@@ -1,6 +1,6 @@
 # Local Review Benchmark Summary - 2026-05-10
 
-This is a local-review benchmark package for yieldOS. It is useful for product and hackathon review, but the `local-review` reports should be regenerated from a clean checkout before becoming public claims.
+This is a local-review benchmark package for yieldOS. It is useful for product and technical review, but the `local-review` reports should be regenerated from a clean checkout before becoming public claims.
 
 ## Reports
 
@@ -43,7 +43,7 @@ The coverage-calibration report is a more realistic presentation layer than a pu
 - Immediate correct-decision rate: 83.33%.
 - Deeper-review candidate rate: 16.67%.
 
-The two deeper-review candidates are common engineering shapes rather than artificial failures: a mounted admin router where the sensitive path is split across lines/modules, and a Prisma raw SQL helper shape outside the current string-query matcher. This is the right framing for judges: yieldOS has a strong measured boundary today, and the benchmark makes future oracle coverage explicit instead of pretending prevention is universal.
+The two deeper-review candidates are common engineering shapes rather than artificial failures: a mounted admin router where the sensitive path is split across lines/modules, and a Prisma raw SQL helper shape outside the current string-query matcher. This is the right framing for enterprise security review: yieldOS has a strong measured boundary today, and the benchmark makes future oracle coverage explicit instead of pretending prevention is universal.
 
 ## False Positives
 

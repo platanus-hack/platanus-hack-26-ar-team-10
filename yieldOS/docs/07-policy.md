@@ -25,7 +25,7 @@ Three reasons:
 
 1. **Local edits are a footgun.** A user under pressure adds the malicious package to their local allowlist to "make it work". The protection is bypassed silently.
 
-2. **Curation is a shared trust artifact.** When 100 users use the same policy, they benefit from the work of every PR reviewer. When they each maintain their own, nobody benefits.
+2. **Curation is a shared trust artifact.** When 100 users use the same policy, they benefit from the work of every PR review. When they each maintain their own, nobody benefits.
 
 3. **Updates flow through release trust.** A new supply-chain attack disclosed today can be added to denylist via PR, then shipped with a regenerated manifest and plugin pin. Installed clients reject mutable `main` drift until the release pin changes.
 
