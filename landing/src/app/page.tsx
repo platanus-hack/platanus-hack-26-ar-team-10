@@ -1,14 +1,18 @@
 import { AgentPackSection } from "@/components/agent-pack-section";
+import { AgentsInstallButton } from "@/components/agents-install-button";
 import { CopyCommandButton } from "@/components/copy-command-button";
+import { HeroGridAccents } from "@/components/hero-grid-accents";
+import { InstallCommandPill } from "@/components/install-command-pill";
 import { MotionReveal } from "@/components/motion-reveal";
 import { OracleDemoFlow } from "@/components/oracle-demo-flow";
-import { OrbitalInstallPill } from "@/components/orbital-install-pill";
 import { ScrollAwareHeader } from "@/components/scroll-aware-header";
-import { ScrollProgress } from "@/components/scroll-progress";
+import { ViewReadmeButton } from "@/components/view-readme-button";
 
 const installCommand =
   "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh";
-const heroTitle = "Executable security contracts for AI coding agents";
+const readmeUrl =
+  "https://github.com/platanus-hack/platanus-hack-26-ar-team-10#readme";
+const heroTitle = "Unlock safe coding for technical and non-technical talent";
 
 const gatedVectors = [
   { title: "Packages", detail: "9 managers." },
@@ -54,29 +58,38 @@ export default function Home() {
   return (
     <main className="snap-deck min-h-dvh bg-[#0e0e10] text-zinc-950">
       <ScrollAwareHeader />
-      <ScrollProgress />
 
       <section
         id="hero"
-        className="pitch-section security-hero relative overflow-hidden bg-[#0e0e10] text-white"
+        className="pitch-section security-hero relative overflow-hidden bg-[#fafafa] text-zinc-950"
       >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="mx-auto flex min-w-0 max-w-5xl flex-col items-center text-center">
-            <h1 className="hero-title font-semibold leading-[0.92]">
+        <HeroGridAccents />
+        <div className="pitch-shell relative z-10 mx-auto w-full max-w-7xl px-4 py-7 sm:px-6">
+          <div className="ml-0 mr-auto flex max-w-3xl flex-col items-start text-left">
+            <h1 className="hero-title text-left font-semibold leading-[0.95] tracking-[-0.025em] text-zinc-950">
               {heroTitle}
             </h1>
-            <MotionReveal delay={3.05} immediate y={12}>
-              <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
-                yieldOS turns risky agent changes into contracts, counterexamples, and proof-of-fix evidence. Under the hood, it is an oracle-driven security harness: the model can propose, but the oracle decides.
+            <MotionReveal className="self-stretch text-left" delay={0.05} immediate y={12}>
+              <p className="mt-5 w-full max-w-[58ch] text-left text-base leading-7 text-zinc-600 sm:mt-6 sm:text-lg sm:leading-8">
+                yieldOS sits between your AI coding agent and your project. It automatically blocks malicious packages, prompt injections, and unsafe code changes before they reach your repo — with deterministic checks, not the AI&rsquo;s opinion.
               </p>
             </MotionReveal>
             <MotionReveal
-              className="mt-6 flex items-center justify-center sm:mt-8"
-              delay={3.28}
+              className="mt-7 flex flex-col items-start gap-3 self-start sm:mt-8 sm:flex-row sm:items-center"
+              delay={0.12}
               immediate
               y={14}
             >
-              <OrbitalInstallPill command={installCommand} />
+              <AgentsInstallButton command={installCommand} />
+              <ViewReadmeButton href={readmeUrl} />
+            </MotionReveal>
+            <MotionReveal
+              className="mt-4 flex items-start self-start sm:mt-5"
+              delay={0.18}
+              immediate
+              y={10}
+            >
+              <InstallCommandPill command={installCommand} />
             </MotionReveal>
           </div>
         </div>

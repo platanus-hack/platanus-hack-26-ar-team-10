@@ -13,21 +13,21 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
   const page = read("src/app/page.tsx");
   const agentPackSection = read("src/components/agent-pack-section.tsx");
   const oracleFlow = read("src/components/oracle-demo-flow.tsx");
-  const orbitalInstall = read("src/components/orbital-install-pill.tsx");
+  const agentsInstall = read("src/components/agents-install-button.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const source = [
     page,
     agentPackSection,
     oracleFlow,
-    orbitalInstall,
+    agentsInstall,
     scrollAwareHeader,
     scrollProgress,
   ].join("\n");
 
   [
     "yieldOS",
-    "Executable security contracts for AI coding agents",
+    "Unlock safe coding for technical and non-technical talent",
     "contracts, counterexamples, and proof-of-fix evidence",
     "Oracle-driven",
     "security harness",
@@ -36,9 +36,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Install yieldOS",
     "View contract demo",
     "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh",
-    "curl ... | sh",
-    "OrbitalInstallPill",
-    "Copy yieldOS install command",
+    "AgentsInstallButton",
+    "copy install command",
     "AGENTS.md",
     "curl | sh",
     "Contract proof demo",
@@ -321,45 +320,43 @@ test("cinematic motion components and reduced motion styles are configured", () 
   const page = read("src/app/page.tsx");
   const reveal = read("src/components/motion-reveal.tsx");
   const oracleFlow = read("src/components/oracle-demo-flow.tsx");
-  const orbitalInstall = read("src/components/orbital-install-pill.tsx");
+  const agentsInstall = read("src/components/agents-install-button.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const globals = read("src/app/globals.css");
 
   assert.ok(packageJson.includes('"motion"'), "Expected motion dependency");
-  [reveal, scrollProgress].forEach((source) => {
-    assert.ok(source.startsWith('"use client";'), "Expected client boundary");
-    assert.ok(source.includes('"motion/react"'), "Expected Motion import");
-    assert.ok(source.includes("useReducedMotion"), "Expected reduced motion hook");
-  });
+  assert.ok(reveal.startsWith('"use client";'), "Expected client boundary");
+  assert.ok(reveal.includes('"motion/react"'), "Expected Motion import");
+  assert.ok(reveal.includes("useReducedMotion"), "Expected reduced motion hook");
+  assert.ok(scrollProgress.startsWith('"use client";'), "Expected scroll progress client boundary");
   assert.ok(
     reveal.includes("animate={reduceMotion || !immediate ? undefined : { opacity: 1, y: 0 }}"),
     "Expected immediate reveals to animate on page load",
   );
   assert.ok(!existsSync(join(root, "src/components/typewriter-hero-title.tsx")), "Expected unused typewriter hero component to stay removed");
   assert.ok(!globals.includes(".hero-typewriter"), "Expected unused typewriter CSS to stay removed");
-  assert.ok(scrollProgress.includes("useScroll"), "Expected scroll-driven progress");
   assert.ok(
-    scrollProgress.includes("useTransform"),
-    "Expected transformed progress value",
+    scrollProgress.includes("requestAnimationFrame"),
+    "Expected scroll progress to throttle updates with rAF",
+  );
+  assert.ok(
+    scrollProgress.includes("scaleY") && scrollProgress.includes("scaleX"),
+    "Expected scroll progress to drive transforms directly",
   );
   assert.ok(scrollAwareHeader.startsWith('"use client";'), "Expected scroll-aware header client boundary");
-  assert.ok(orbitalInstall.startsWith('"use client";'), "Expected orbital install pill client boundary");
+  assert.ok(agentsInstall.startsWith('"use client";'), "Expected agents install button client boundary");
   assert.ok(
-    orbitalInstall.includes("navigator.clipboard.writeText"),
-    "Expected orbital install pill to copy the command",
+    agentsInstall.includes("navigator.clipboard.writeText"),
+    "Expected install button to copy the command",
   );
   assert.ok(
-    orbitalInstall.includes('aria-live="polite"'),
-    "Expected orbital install pill copied state announcement",
-  );
-  assert.ok(
-    scrollAwareHeader.includes('data-visible={visible}'),
-    "Expected scroll-aware header visibility state",
+    scrollAwareHeader.includes('data-scrolled={scrolled}'),
+    "Expected scroll-aware header to expose scrolled state",
   );
   assert.ok(
     scrollAwareHeader.includes("window.requestAnimationFrame(update)"),
-    "Expected requestAnimationFrame scroll direction handling",
+    "Expected requestAnimationFrame-throttled scroll updates",
   );
   assert.ok(!scrollAwareHeader.includes("showArrow={false}"), "Expected install button arrow to be restored");
   assert.ok(!scrollAwareHeader.includes("install-marks"), "Expected icon marks to be removed from the install pill");
@@ -379,8 +376,12 @@ test("cinematic motion components and reduced motion styles are configured", () 
   assert.ok(globals.includes(".snap-deck::before"), "Expected page-wide grid layer");
   assert.ok(!globals.includes(".snap-deck::after"), "Expected page-wide random color grid cells to be removed");
   assert.ok(
-    globals.includes(".pitch-section::before"),
-    "Expected section-level grid layer across every section",
+    globals.includes(".security-hero::before"),
+    "Expected dedicated grid layer in the light hero",
+  );
+  assert.ok(
+    globals.includes(".pitch-section.text-white::before"),
+    "Expected dark-section grid layer for sections that opt in",
   );
   assert.ok(
     !globals.includes(".pitch-section:not(.security-hero)::after"),
@@ -421,71 +422,45 @@ test("cinematic motion components and reduced motion styles are configured", () 
     oracleFlow.includes("PASS scoped acceptance"),
     "Expected compact oracle proof flow",
   );
-  assert.ok(globals.includes(".command-bar"), "Expected command bar styling");
   assert.ok(globals.includes(".site-header"), "Expected transparent header styling");
-  assert.ok(scrollAwareHeader.includes("intro-header"), "Expected staged topbar intro class");
   assert.ok(!scrollAwareHeader.includes("brand-mark"), "Expected capsule nav letter mark to be removed");
-  assert.ok(scrollAwareHeader.includes("yieldOS home"), "Expected centered yieldOS brand in panoramic nav");
-  assert.ok(scrollAwareHeader.includes("nav-left"), "Expected left nav region");
-  assert.ok(scrollAwareHeader.includes("nav-brand"), "Expected centered brand region");
-  assert.ok(scrollAwareHeader.includes("nav-right"), "Expected right nav action region");
-  assert.ok(scrollAwareHeader.includes("nav-demo-button"), "Expected compact right-side demo CTA");
-  assert.ok(
-    globals.includes(".nav-demo-button {\n  border: 1px solid"),
-    "Expected demo nav CTA to be outline-only",
-  );
-  assert.ok(globals.includes(".nav-demo-button {\n  border: 1px solid") && globals.includes("background: transparent;"), "Expected demo nav CTA background to be removed");
-  assert.ok(scrollAwareHeader.includes("liquid-glass-nav"), "Expected liquid glass nav styling hook");
-  assert.ok(scrollAwareHeader.includes("max-w-[min(940px"), "Expected less dominant panoramic nav width");
-  assert.ok(scrollAwareHeader.includes("h-14"), "Expected more compact panoramic nav height");
+  assert.ok(scrollAwareHeader.includes("yieldOS home"), "Expected yieldOS brand in nav");
+  assert.ok(scrollAwareHeader.includes("h-14"), "Expected compact navbar height");
   assert.ok(!scrollAwareHeader.includes("Install plugin"), "Expected install plugin CTA removed from navbar");
   assert.ok(!scrollAwareHeader.includes("CopyCommandButton"), "Expected navbar copy button removed");
-  assert.ok(globals.includes('.site-header[data-visible="false"]'), "Expected nav to hide while scrolling down");
+  assert.ok(!scrollAwareHeader.includes("liquid-glass-nav"), "Expected liquid glass nav styling to be removed");
+  assert.ok(!scrollAwareHeader.includes("nav-demo-button"), "Expected pill demo CTA to be removed");
+  assert.ok(!scrollAwareHeader.includes("intro-header"), "Expected staged intro animation to be removed");
+  assert.ok(!globals.includes(".command-bar"), "Expected liquid glass command bar styling to be removed");
+  assert.ok(!globals.includes(".nav-demo-button"), "Expected demo CTA pill styling to be removed");
+  assert.ok(!globals.includes("@keyframes intro-topbar"), "Expected topbar entry animation to be removed");
+  assert.ok(!globals.includes("@keyframes orbital-color-pan"), "Expected orbital pill sheen animation to be removed");
+  assert.ok(!globals.includes('.site-header[data-visible="false"]'), "Expected nav to remain visible at all times");
+  assert.ok(globals.includes('.site-header[data-scrolled="true"]'), "Expected nav to gain a subtle backdrop on scroll");
+  assert.ok(scrollAwareHeader.includes("data-scrolled"), "Expected nav to expose scroll state");
   assert.ok(!globals.includes(".install-marks"), "Expected install pill mark styling to be removed");
-  assert.ok(page.includes("<OrbitalInstallPill"), "Expected orbital install pill in hero");
+  assert.ok(page.includes("<AgentsInstallButton"), "Expected agents install button in hero");
   assert.ok(!page.includes("$ claude plugin install yieldos@yieldos-marketplace"), "Expected raw hero command text to be replaced");
-  assert.ok(globals.includes(".orbital-install-pill"), "Expected orbital install pill styling");
-  assert.ok(!orbitalInstall.includes("orbital-pill-aura"), "Expected rotating orbit layer to be removed");
-  assert.ok(!globals.includes(".orbital-pill-aura"), "Expected rotating orbit styles to be removed");
-  assert.ok(!orbitalInstall.includes("orbital-dot"), "Expected endpoint orbit dots to be removed");
-  assert.ok(!globals.includes(".orbital-dot"), "Expected endpoint orbit dot styling to be removed");
-  assert.ok(!globals.includes("@keyframes orbital-roll"), "Expected roll-axis orbit animation to be removed");
-  assert.ok(!globals.includes("rotateX(66deg)"), "Expected tilted roll-axis rotation to be removed");
-  assert.ok(globals.includes("@keyframes orbital-color-pan"), "Expected monochrome pill sheen cycling");
-  assert.ok(
-    globals.includes("rgba(var(--signal-bright-rgb), 0.34) 0%"),
-    "Expected liquid glass nav to start with a bright monochrome edge",
-  );
-  assert.ok(
-    globals.includes("transparent 50%"),
-    "Expected liquid glass nav to stay transparent in the center",
-  );
-  assert.ok(
-    globals.includes("rgba(var(--signal-muted-rgb), 0.34) 100%"),
-    "Expected liquid glass nav to end with a muted monochrome edge",
-  );
-  assert.ok(globals.includes("-webkit-backdrop-filter: blur(34px)"), "Expected Safari liquid glass blur");
-  assert.ok(globals.includes("contrast(1.08)"), "Expected refractive liquid glass contrast");
-  assert.ok(globals.includes(".command-bar::before"), "Expected liquid glass refractive highlight");
-  assert.ok(globals.includes(".command-bar::after"), "Expected liquid glass specular edge");
-  assert.ok(globals.includes(".intro-header .command-bar"), "Expected topbar entry animation");
-  assert.ok(globals.includes("@keyframes intro-topbar"), "Expected topbar keyframes");
+  assert.ok(agentsInstall.includes("/logos/claude-code.png"), "Expected Claude Code logo in install button");
+  assert.ok(agentsInstall.includes("/logos/codex.svg"), "Expected Codex logo in install button");
+  assert.ok(!agentsInstall.includes("/logos/opencode.png"), "Expected OpenCode logo to be removed");
+  assert.ok(agentsInstall.includes("/logos/cursor.png"), "Expected Cursor logo in install button");
+  assert.ok(agentsInstall.includes("Install yieldOS"), "Expected install yieldOS label");
+  assert.ok(agentsInstall.includes("navigator.clipboard.writeText"), "Expected install button to copy command");
+  assert.ok(globals.includes(".agents-install-logo img"), "Expected install button logo styling");
+  assert.ok(globals.includes("brightness(0) invert(1)"), "Expected logos to be normalized to white");
   assert.ok(
     globals.includes("backdrop-filter: blur"),
-    "Expected glass topbar backdrop blur",
+    "Expected scrolled-nav backdrop blur",
   );
   assert.ok(globals.includes(".snap-deck"), "Expected snap deck wrapper");
   assert.ok(
-    globals.includes("scroll-snap-type: y proximity"),
-    "Expected softer scroll snap",
+    !globals.includes("scroll-snap-type"),
+    "Expected scroll snap to be removed for smoother scrolling",
   );
   assert.ok(
-    globals.includes("scroll-snap-align: start"),
-    "Expected section snap alignment",
-  );
-  assert.ok(
-    !globals.includes("scroll-snap-stop: always"),
-    "Expected scroll snap stops to be softened",
+    globals.includes("content-visibility: auto"),
+    "Expected sections to use content-visibility for off-screen pruning",
   );
   assert.ok(
     globals.includes(".scroll-progress"),
@@ -511,7 +486,6 @@ test("cinematic motion components and reduced motion styles are configured", () 
     !globals.includes(".gate-lane::before"),
     "Expected old center policy line to be removed",
   );
-  assert.ok(globals.includes(".scan-sweep"), "Expected scanner visual");
   assert.ok(globals.includes(".demo-cinema"), "Expected staged demo choreography");
   assert.ok(globals.includes(".decision-row"), "Expected verdict row choreography");
   assert.ok(globals.includes(".policy-path"), "Expected policy path styling");

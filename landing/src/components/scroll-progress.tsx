@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useEffect, useRef } from "react";
 
 const sections = [
   { label: "Hero", id: "hero" },
@@ -12,10 +12,40 @@ const sections = [
 ];
 
 export function ScrollProgress() {
-  const reduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll();
-  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const fillRef = useRef<HTMLSpanElement | null>(null);
+  const mobileFillRef = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    let ticking = false;
+
+    function update() {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      const progress = max > 0 ? Math.min(1, Math.max(0, doc.scrollTop / max)) : 0;
+      if (fillRef.current) {
+        fillRef.current.style.transform = `scaleY(${progress})`;
+      }
+      if (mobileFillRef.current) {
+        mobileFillRef.current.style.transform = `scaleX(${progress})`;
+      }
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    }
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   return (
     <>
@@ -24,12 +54,10 @@ export function ScrollProgress() {
         className="scroll-progress fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 2xl:block"
       >
         <div className="scroll-progress-track" aria-hidden="true">
-          <motion.span
+          <span
+            ref={fillRef}
             className="scroll-progress-fill"
-            style={{
-              scaleY: reduceMotion ? 1 : scaleY,
-              transformOrigin: "top",
-            }}
+            style={{ transformOrigin: "top", transform: "scaleY(0)" }}
           />
         </div>
         <ol className="scroll-progress-labels">
@@ -50,9 +78,10 @@ export function ScrollProgress() {
       </aside>
 
       <div className="scroll-progress-mobile fixed inset-x-0 bottom-0 z-40 h-px bg-black/10 2xl:hidden">
-        <motion.span
+        <span
+          ref={mobileFillRef}
           className="block h-px origin-left bg-[linear-gradient(90deg,var(--signal-bright),var(--signal-muted))]"
-          style={{ scaleX: reduceMotion ? 1 : scaleX }}
+          style={{ transform: "scaleX(0)" }}
         />
       </div>
     </>
