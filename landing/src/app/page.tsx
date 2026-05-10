@@ -67,7 +67,10 @@ export default function Home() {
         <HeroGridAccents />
         <div className="pitch-shell relative z-10 mx-auto w-full max-w-7xl px-4 py-7 sm:px-6">
           <div className="ml-0 mr-auto flex max-w-3xl flex-col items-start text-left">
-            <h1 className="hero-title text-left font-semibold leading-[0.95] tracking-[-0.025em] text-zinc-950">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-[11px]">
+              Security suite for your AI agent
+            </p>
+            <h1 className="hero-title mt-3 text-left font-semibold leading-[0.95] tracking-[-0.025em] text-zinc-950 sm:mt-4">
               {heroTitle}
             </h1>
             <MotionReveal className="self-stretch text-left" delay={0.05} immediate y={12}>
