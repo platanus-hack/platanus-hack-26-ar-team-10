@@ -21,6 +21,12 @@ This directory stores sanitized benchmark reports for yieldOS. Reports are commi
 - `assumption-based`: derived from measured counts plus explicit pricing or human-time assumptions.
 - `not measured`: not safe to claim.
 
+## Evidence Classes
+
+- Public proof: measured report from a clean checkout, pinned commit, deterministic command, and complete sanitized artifact.
+- Internal review: local-review report, dirty checkout report, assumption-based model, or report generated during claim exploration.
+- Not claimed: external provider billing savings, whole-repo vulnerability discovery, or universal cross-agent prevention unless a public-proof artifact exists.
+
 ## Public Reproducibility
 
 Public benchmark reports must include repo URL, pinned commit, sanitized output counts, and no local absolute paths. A report generated from a dirty benchmark runner should stay local unless it is explicitly marked as local-review evidence.
@@ -82,6 +88,8 @@ node scripts/code-audit-benchmark.mjs \
 
 node scripts/oracle-coverage-report.mjs \
   --out benchmarks/oracle-coverage-YYYY-MM-DD.json
+
+npm run evidence:verify -- benchmarks/*benchmark*.json benchmarks/oracle-coverage-*.json
 ```
 
 Use `--include-raw-logs` only for local debugging. Raw logs and raw-output hashes should not be committed.
@@ -145,3 +153,5 @@ The visual dashboard is a standalone HTML file generated from the local-review J
 ## Local Review Reports
 
 Reports with `local-review` in the filename are intended for hackathon and local inspection first. They are useful for expert review because the claims are bounded, sanitized, and reproducible from the included commands, but public marketing claims should be regenerated from a clean checkout and current provider pricing.
+
+`npm run evidence:verify -- benchmarks/*benchmark*.json benchmarks/oracle-coverage-*.json` classifies reports as `PUBLIC` or `INTERNAL` and exits non-zero when any report is not public proof. A rejected report can still guide product decisions, but it must not become public proof until the missing clean-run requirements are fixed.

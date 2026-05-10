@@ -65,7 +65,7 @@ Run the local adversarial loop:
 /yieldos:pentest --max-rounds 3 --converge 2 --dry-run
 ```
 
-Current benchmark evidence is summarized in [`benchmarks/README.md`](./benchmarks/README.md). The real-repo benchmark shows the tested workflow attacks were blocked before commit; it does not claim the target repositories are fully secure.
+Current benchmark evidence is summarized in [`benchmarks/README.md`](./benchmarks/README.md). The real-repo benchmark shows the tested workflow attacks were blocked before commit; it does not claim the target repositories are fully secure. Use `npm run evidence:verify -- <reports...>` to separate public-proof reports from internal review artifacts before making external claims.
 
 For supported adapters, data flows, and claim boundaries, see [`yieldOS/docs/enterprise-boundaries.md`](./yieldOS/docs/enterprise-boundaries.md).
 

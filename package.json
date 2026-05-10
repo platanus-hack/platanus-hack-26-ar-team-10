@@ -28,7 +28,8 @@
     "benchmark:cost": "node scripts/cost-benchmark.mjs",
     "benchmark:models": "node scripts/model-workflow-benchmark.mjs",
     "benchmark:scanners": "node scripts/scanner-comparison-benchmark.mjs",
-    "benchmark:visuals": "node scripts/benchmark-visual-dashboard.mjs"
+    "benchmark:visuals": "node scripts/benchmark-visual-dashboard.mjs",
+    "evidence:verify": "node scripts/evidence-verify.mjs"
   },
   "overrides": {
     "postcss": "8.5.14"
