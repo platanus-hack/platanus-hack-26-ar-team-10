@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-10T01:30:33.477Z",
+  "benchmark": {
+    "id": "optional-scanner-comparison",
+    "note": "Scanners are run only when installed locally. yieldOS value is workflow prevention before commit, not scanner replacement."
+  },
+  "scanners": [
+    {
+      "id": "semgrep",
+      "command": "semgrep",
+      "status": "not_installed"
+    },
+    {
+      "id": "gitleaks",
+      "command": "gitleaks",
+      "status": "ran",
+      "exit_code": 1,
+      "output": {
+        "stdout_bytes": 0,
+        "stderr_bytes": 114,
+        "stdout_lines": 0,
+        "stderr_lines": 3
+      }
+    },
+    {
+      "id": "codeql",
+      "command": "codeql",
+      "status": "not_installed"
+    },
+    {
+      "id": "snyk",
+      "command": "snyk",
+      "status": "not_installed"
+    }
+  ]
+}

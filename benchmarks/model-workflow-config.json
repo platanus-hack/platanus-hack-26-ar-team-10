@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "provider_budgets": {
+    "openai_usd": 200,
+    "anthropic_usd": 500
+  },
+  "case_order": "subject-major",
+  "repair_invalid_json": true,
+  "repair_max_output_tokens": 2600,
+  "models": [
+    {
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "max_output_tokens": 2200,
+      "request_timeout_ms": 150000,
+      "reasoning_effort": "medium"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.5-pro",
+      "max_output_tokens": 2600,
+      "request_timeout_ms": 210000,
+      "reasoning_effort": "medium"
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "max_output_tokens": 2200,
+      "request_timeout_ms": 150000
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-opus-4-7",
+      "max_output_tokens": 2600,
+      "request_timeout_ms": 210000
+    }
+  ],
+  "arms": [
+    {
+      "id": "raw-agent",
+      "yieldos_guidance": false
+    },
+    {
+      "id": "yieldos-guided-agent",
+      "yieldos_guidance": true
+    }
+  ],
+  "task_ids": [
+    "admin-users-route",
+    "webhook-importer",
+    "git-ref-log",
+    "sql-search-endpoint",
+    "file-preview-handler",
+    "login-redirect",
+    "token-debug-logger",
+    "archive-cleanup-job",
+    "public-profile-read"
+  ]
+}

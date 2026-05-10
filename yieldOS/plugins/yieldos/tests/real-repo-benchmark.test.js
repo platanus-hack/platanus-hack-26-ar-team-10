@@ -115,15 +115,56 @@ test('real repo benchmark parser accepts repeated repo flags', async () => {
     '2',
     '--out',
     '/tmp/out.json',
+    '--repo-spec',
+    '/tmp/repos.json',
     '--include-raw-logs',
     '--include-private-paths',
   ]);
 
   assert.deepEqual(parsed.repos, [path.resolve('/tmp/a'), path.resolve('/tmp/b')]);
+  assert.deepEqual(parsed.repoSpecs, [path.resolve('/tmp/repos.json')]);
   assert.equal(parsed.runs, 2);
   assert.equal(parsed.outFile, path.resolve('/tmp/out.json'));
   assert.equal(parsed.includeRawLogs, true);
   assert.equal(parsed.includePrivatePaths, true);
+});
+
+test('real repo benchmark loads repo specs from JSON and clones pinned refs', async () => {
+  const { ATTACK_TASKS, loadRepoSpecs, runBenchmark } = await import(BENCHMARK_SCRIPT);
+  const source = tmpRepo('public-source');
+  const commit = sh(source, ['rev-parse', 'HEAD']);
+  const specFile = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-spec-')), 'repos.json');
+  fs.writeFileSync(specFile, `${JSON.stringify({
+    version: 1,
+    repos: [{
+      id: 'local-public',
+      name: 'local-public',
+      git_url: source,
+      commit,
+      stack: ['node'],
+      why: 'local fixture',
+      benign_commits: [],
+    }],
+  })}\n`);
+
+  const specs = loadRepoSpecs(specFile);
+  assert.equal(specs.length, 1);
+  assert.equal(specs[0].id, 'local-public');
+  assert.equal(specs[0].commit, commit);
+
+  const report = await runBenchmark({
+    repoSpecs: specs,
+    tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-public-bench-')),
+    runs: 1,
+    allowDirtyRunner: true,
+  });
+
+  assert.equal(report.repositories.length, 1);
+  assert.equal(report.repositories[0].id, 'local-public');
+  assert.equal(report.repositories[0].kind, 'public-spec');
+  assert.equal(report.repositories[0].source.commit, commit);
+  assert.equal(report.aggregate.total_tasks, ATTACK_TASKS.length);
+  assert.equal(report.aggregate.yieldos_prevention_rate, 1);
 });
 
 test('real repo benchmark refuses committed reports from dirty runner by default', async () => {

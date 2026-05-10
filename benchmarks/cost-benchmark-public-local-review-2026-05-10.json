@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-10T03:05:16.197Z",
+  "measurement_type": "measured_rates_with_assumption_based_cost_model",
+  "cost_model_basis": "coverage_calibration_agent_assisted",
+  "measured": {
+    "total_risky_tasks": 9,
+    "deterministic_resolved": 7,
+    "deterministic_resolution_rate": 0.7778,
+    "agent_escalation_candidates": 2,
+    "agent_escalation_rate": 0.2222,
+    "safe_controls": 3,
+    "calibration_total_cases": 12,
+    "benign_commits": 27,
+    "false_positive_blocks": 0,
+    "false_positive_unknown": 0,
+    "false_positive_rate": 0,
+    "control_unsafe_commits": 16,
+    "control_commit_success_rate": 1
+  },
+  "assumptions": {
+    "version": 1,
+    "currency": "USD",
+    "pricing_source_note": "Refresh from provider pricing pages before publishing benchmark claims. New account-visible model IDs may appear before public pricing pages are updated, so the newest-model rows below are explicit benchmark assumptions.",
+    "pricing_sources": {
+      "openai": "https://platform.openai.com/docs/pricing/",
+      "anthropic": "https://platform.claude.com/docs/en/about-claude/pricing"
+    },
+    "model_availability_checked_at": "2026-05-10",
+    "provider_budgets": {
+      "openai_usd": 200,
+      "anthropic_usd": 500
+    },
+    "models": {
+      "openai:gpt-5.5": {
+        "provider": "openai",
+        "model": "gpt-5.5",
+        "input_usd_per_million": 2.5,
+        "cached_input_usd_per_million": 0.25,
+        "output_usd_per_million": 20,
+        "pricing_confidence": "conservative-assumption"
+      },
+      "openai:gpt-5.5-pro": {
+        "provider": "openai",
+        "model": "gpt-5.5-pro",
+        "input_usd_per_million": 30,
+        "cached_input_usd_per_million": 30,
+        "output_usd_per_million": 240,
+        "pricing_confidence": "conservative-assumption"
+      },
+      "anthropic:claude-sonnet-4-6": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "input_usd_per_million": 3,
+        "cache_write_5m_usd_per_million": 3.75,
+        "cache_read_usd_per_million": 0.3,
+        "output_usd_per_million": 15,
+        "pricing_confidence": "family-assumption"
+      },
+      "anthropic:claude-opus-4-7": {
+        "provider": "anthropic",
+        "model": "claude-opus-4-7",
+        "input_usd_per_million": 15,
+        "cache_write_5m_usd_per_million": 18.75,
+        "cache_read_usd_per_million": 1.5,
+        "output_usd_per_million": 75,
+        "pricing_confidence": "family-assumption"
+      }
+    },
+    "baseline_agent_review": {
+      "input_tokens": 150000,
+      "output_tokens": 10000,
+      "input_usd_per_million": 3,
+      "output_usd_per_million": 15
+    },
+    "escalated_agent_review": {
+      "input_tokens": 90000,
+      "output_tokens": 6000,
+      "input_usd_per_million": 3,
+      "output_usd_per_million": 15
+    },
+    "human_review": {
+      "senior_hourly_rate_usd": 150,
+      "minutes_per_escalation": 15,
+      "minutes_per_false_positive": 5
+    },
+    "incident_expected_cost": {
+      "escaped_issue_cost_usd": 0,
+      "note": "Default is zero to avoid overstating ROI. Teams may run scenario analysis with their own expected loss."
+    }
+  },
+  "costs": {
+    "without_yieldos_cost_usd": 5.4,
+    "with_yieldos_cost_usd": 0.72,
+    "delta_usd": 4.68,
+    "baseline_agent_review_per_task_usd": 0.6,
+    "escalated_agent_review_per_task_usd": 0.36,
+    "human_escalation_cost_usd": 0,
+    "false_positive_human_cost_usd": 0
+  },
+  "claim_safety": {
+    "token_savings_measured": false,
+    "provider_billing_measured": false,
+    "allowed_claim": "Measured calibration rates with assumption-based agent-assisted escalation cost. This models routing cost; it does not claim the agent repaired the deeper cases without a repair benchmark."
+  }
+}

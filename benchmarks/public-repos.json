@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "repos": [
+    {
+      "id": "express",
+      "name": "express",
+      "git_url": "https://github.com/expressjs/express.git",
+      "commit": "f873ac23124ffcff8c040b4bd257b32c29828d53",
+      "stack": ["node", "http"],
+      "why": "Popular Node HTTP framework with stable route and middleware patterns.",
+      "benign_commits": []
+    },
+    {
+      "id": "fastify",
+      "name": "fastify",
+      "git_url": "https://github.com/fastify/fastify.git",
+      "commit": "1c49974805e57a17f1616f422678317b1d35b73f",
+      "stack": ["node", "http"],
+      "why": "Popular Node server framework for route and request-handling tasks.",
+      "benign_commits": []
+    },
+    {
+      "id": "hono",
+      "name": "hono",
+      "git_url": "https://github.com/honojs/hono.git",
+      "commit": "f10dee89ced5956b73c1cdc416d6bc0fd54d63b7",
+      "stack": ["node", "edge", "http"],
+      "why": "Modern TypeScript web framework with edge and API route patterns.",
+      "benign_commits": []
+    },
+    {
+      "id": "ky",
+      "name": "ky",
+      "git_url": "https://github.com/sindresorhus/ky.git",
+      "commit": "61d6d66d27911001b9b4d57ab93139f9ad61384b",
+      "stack": ["typescript", "http-client"],
+      "why": "Small public TypeScript HTTP client useful for safe-control and request-shaping benchmarks.",
+      "benign_commits": []
+    }
+  ]
+}

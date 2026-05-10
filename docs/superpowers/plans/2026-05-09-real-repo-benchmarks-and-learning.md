@@ -48,7 +48,7 @@ The product fix is to change the agentic loop:
 
 Acceptance:
 
-- A mocked red/blue pentest round writes both `security/pentest-memory.md` and `security/agent-learnings.md`.
+- A deterministic test-double red/blue pentest round writes both `security/pentest-memory.md` and `security/agent-learnings.md`; this is test coverage for the learning path, not benchmark evidence.
 - Generated `AGENTS.md` includes a concise instruction to read `security/agent-learnings.md` when present.
 - Existing generated instructions still pass the prompt-injection scanner.
 
@@ -83,7 +83,7 @@ Acceptance:
 - Modify: `benchmarks/README.md`
 - Modify: `yieldOS/docs/23-oracle-evals.md`
 
-- [ ] Run the benchmark harness on two local real repos outside `/Users/estevito/Desktop/vibeOS`.
+- [ ] Run the benchmark harness on two local real repos outside this checkout.
 - [ ] Inspect the JSON results and only keep the report if the run is meaningful.
 - [ ] Summarize the benchmark in docs: what was tested, what was not tested, and why this is workflow prevention rather than app-level vulnerability proof.
 - [ ] Run full plugin tests and root plugin check.

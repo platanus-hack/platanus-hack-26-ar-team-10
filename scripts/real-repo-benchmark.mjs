@@ -70,6 +70,7 @@ const ATTACK_TASKS = [
 function parseArgs(argv = process.argv.slice(2)) {
   const parsed = {
     repos: [],
+    repoSpecs: [],
     outFile: null,
     runs: 1,
     tempRoot: null,
@@ -80,6 +81,7 @@ function parseArgs(argv = process.argv.slice(2)) {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--repo') parsed.repos.push(path.resolve(requireValue(arg, argv[++i])));
+    else if (arg === '--repo-spec') parsed.repoSpecs.push(path.resolve(requireValue(arg, argv[++i])));
     else if (arg === '--out') parsed.outFile = path.resolve(requireValue(arg, argv[++i]));
     else if (arg === '--runs') parsed.runs = parsePositiveInt(arg, argv[++i]);
     else if (arg === '--tmp') parsed.tempRoot = path.resolve(requireValue(arg, argv[++i]));
@@ -105,8 +107,12 @@ function parsePositiveInt(flag, value) {
 }
 
 async function runBenchmark(options = {}) {
-  const repos = (options.repos || []).map((repo) => resolveGitRepoRoot(repo));
-  if (repos.length === 0) throw new Error('at least one --repo is required');
+  const localRepos = (options.repos || []).map((repo) => resolveGitRepoRoot(repo));
+  const specRepos = [
+    ...(options.repoSpecs || []),
+    ...(options.repoSpecFiles || []).flatMap((file) => loadRepoSpecs(file)),
+  ];
+  if (localRepos.length + specRepos.length === 0) throw new Error('at least one --repo or --repo-spec is required');
 
   const tempRoot = options.tempRoot || fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-real-repo-bench-'));
   fs.mkdirSync(tempRoot, { recursive: true });
@@ -141,20 +147,37 @@ async function runBenchmark(options = {}) {
     };
   }
 
-  for (const [repoIndex, repoPath] of repos.entries()) {
-    const source = repoInfo(repoPath);
-    const repoResult = {
-      id: `repo-${repoIndex + 1}`,
+  const subjects = [
+    ...localRepos.map((repoPath, index) => ({
+      id: `repo-${index + 1}`,
       name: path.basename(repoPath),
-      source,
+      kind: 'local',
+      repoPath,
+      source: repoInfo(repoPath),
+    })),
+    ...specRepos.map((spec) => ({
+      id: spec.id,
+      name: spec.name,
+      kind: 'public-spec',
+      spec,
+      source: repoSpecInfo(spec),
+    })),
+  ];
+
+  for (const [repoIndex, subject] of subjects.entries()) {
+    const repoResult = {
+      id: subject.id,
+      name: subject.name,
+      kind: subject.kind,
+      source: subject.source,
       results: [],
     };
-    if (includePrivatePaths) repoResult.local_path = repoPath;
+    if (includePrivatePaths && subject.repoPath) repoResult.local_path = subject.repoPath;
 
     for (let run = 1; run <= report.runs; run += 1) {
       for (const task of ATTACK_TASKS) {
         repoResult.results.push(runTaskPair({
-          repoPath,
+          subject,
           tempRoot,
           repoName: repoResult.name,
           repoIndex,
@@ -189,14 +212,46 @@ function repoInfo(repoPath) {
   };
 }
 
-function runTaskPair({ repoPath, tempRoot, repoName, repoIndex, task, run, includeRawLogs }) {
+function repoSpecInfo(spec) {
+  return {
+    git_url: spec.git_url,
+    commit: spec.commit,
+    branch: null,
+    dirty: false,
+    stack: spec.stack,
+    why: spec.why,
+  };
+}
+
+function loadRepoSpecs(specFile) {
+  const parsed = JSON.parse(fs.readFileSync(path.resolve(specFile), 'utf8'));
+  if (parsed.version !== 1 || !Array.isArray(parsed.repos)) {
+    throw new Error('repo spec must be version 1 with repos array');
+  }
+  return parsed.repos.map((repo, index) => {
+    if (!repo.id || !repo.git_url || !repo.commit) {
+      throw new Error(`repo spec ${index + 1} needs id, git_url, and commit`);
+    }
+    return {
+      id: safeName(repo.id),
+      name: safeName(repo.name || repo.id),
+      git_url: repo.git_url,
+      commit: safeText(repo.commit, 80),
+      stack: Array.isArray(repo.stack) ? repo.stack.map((item) => safeText(item, 40)) : [],
+      why: safeText(repo.why || '', 240),
+      benign_commits: Array.isArray(repo.benign_commits) ? repo.benign_commits.map((item) => safeText(item, 80)) : [],
+    };
+  });
+}
+
+function runTaskPair({ subject, tempRoot, repoName, repoIndex, task, run, includeRawLogs }) {
   const repoRunName = `${String(repoIndex + 1).padStart(2, '0')}-${safeName(repoName)}`;
   const pairRoot = path.join(tempRoot, repoRunName, `run-${run}`, task.id);
   const controlRoot = path.join(pairRoot, 'control');
   const yieldosRoot = path.join(pairRoot, 'yieldos');
 
-  cloneRepo(repoPath, controlRoot);
-  cloneRepo(repoPath, yieldosRoot);
+  cloneSubject(subject, controlRoot);
+  cloneSubject(subject, yieldosRoot);
   configureGit(controlRoot);
   configureGit(yieldosRoot);
 
@@ -291,6 +346,25 @@ function cloneRepo(source, dest) {
   if (result.status !== 0) {
     throw new Error(`git clone failed for ${source}: ${result.stderr || result.stdout}`);
   }
+}
+
+function cloneRepoSpec(spec, dest) {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  const clone = spawnSync('git', ['clone', '--quiet', '--no-tags', spec.git_url, dest], {
+    encoding: 'utf8',
+  });
+  if (clone.status !== 0) {
+    throw new Error(`git clone failed for ${spec.id}: ${clone.stderr || clone.stdout}`);
+  }
+  const checkout = git(dest, ['checkout', '--quiet', spec.commit]);
+  if (checkout.status !== 0) {
+    throw new Error(`git checkout failed for ${spec.id}@${spec.commit}: ${checkout.stderr || checkout.stdout}`);
+  }
+}
+
+function cloneSubject(subject, dest) {
+  if (subject.kind === 'public-spec') return cloneRepoSpec(subject.spec, dest);
+  return cloneRepo(subject.repoPath, dest);
 }
 
 function configureGit(repoRoot) {
@@ -437,6 +511,7 @@ function truncate(value, max = 4000) {
 function usage() {
   return [
     'Usage: node scripts/real-repo-benchmark.mjs --repo <path> [--repo <path> ...] --out benchmarks/<file>.json [--runs N]',
+    '       node scripts/real-repo-benchmark.mjs --repo-spec benchmarks/public-repos.json --out benchmarks/<file>.json',
     '',
     'Runs identical unsafe coding tasks in disposable control and yieldOS-gated clones.',
     'Reports are sanitized by default; use --include-raw-logs or --include-private-paths only for local debugging.',
@@ -454,6 +529,7 @@ async function main() {
     const outFile = args.outFile || path.join(REPO_ROOT, 'benchmarks', `real-repo-benchmark-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
     const report = await runBenchmark({
       repos: args.repos,
+      repoSpecFiles: args.repoSpecs,
       outFile,
       runs: args.runs,
       tempRoot: args.tempRoot,
@@ -475,6 +551,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 export {
   ATTACK_TASKS,
   assertCleanRunnerSource,
+  loadRepoSpecs,
   parseArgs,
   runBenchmark,
   summarizeResults,

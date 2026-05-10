@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-10T02:46:24.742Z",
+  "benchmark": {
+    "id": "coverage-calibration",
+    "hook": "yieldOS/plugins/yieldos/scripts/pre-install-gate.js",
+    "note": "Measures immediate deterministic coverage against a balanced calibration set. Coverage-candidate cases are tracked as future oracle work, not as current product promises."
+  },
+  "tasks": [
+    {
+      "id": "admin-route-no-auth",
+      "track": "immediate-prevent",
+      "description": "Sensitive admin route without auth middleware."
+    },
+    {
+      "id": "sql-string-concat",
+      "track": "immediate-prevent",
+      "description": "Request-controlled SQL interpolation."
+    },
+    {
+      "id": "shell-ref-helper",
+      "track": "immediate-prevent",
+      "description": "Request-controlled shell command."
+    },
+    {
+      "id": "server-side-url-fetch",
+      "track": "immediate-prevent",
+      "description": "Request-controlled server-side fetch."
+    },
+    {
+      "id": "upload-path-join",
+      "track": "immediate-prevent",
+      "description": "Request-controlled filesystem path."
+    },
+    {
+      "id": "secret-console-log",
+      "track": "immediate-prevent",
+      "description": "Sensitive value written to logs."
+    },
+    {
+      "id": "query-redirect",
+      "track": "immediate-prevent",
+      "description": "User-controlled redirect target."
+    },
+    {
+      "id": "public-profile-read",
+      "track": "safe-control",
+      "description": "Benign public read-only helper."
+    },
+    {
+      "id": "parameterized-sql",
+      "track": "safe-control",
+      "description": "Parameterized query control."
+    },
+    {
+      "id": "mapped-redirect",
+      "track": "safe-control",
+      "description": "Server-side redirect map control."
+    },
+    {
+      "id": "mounted-admin-router",
+      "track": "coverage-candidate",
+      "description": "Admin router is mounted separately from the sensitive handler."
+    },
+    {
+      "id": "prisma-raw-unsafe",
+      "track": "coverage-candidate",
+      "description": "Prisma raw SQL helper interpolates request input."
+    }
+  ],
+  "results": [
+    {
+      "task_id": "admin-route-no-auth",
+      "track": "immediate-prevent",
+      "description": "Sensitive admin route without auth middleware.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "missing-authz",
+            "severity": "high",
+            "file": "yieldos-calibration-server.js",
+            "title": "Sensitive route without auth guard",
+            "status": "unresolved"
+          }
+        ],
+        "duration_ms": 94,
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 216,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "task_id": "sql-string-concat",
+      "track": "immediate-prevent",
+      "description": "Request-controlled SQL interpolation.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "sql-injection",
+            "severity": "high",
+            "file": "yieldos-calibration-db.js",
+            "title": "Interpolated SQL query",
+            "status": "unresolved"
+          }
+        ],
+        "duration_ms": 101,
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 200,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "task_id": "shell-ref-helper",
+      "track": "immediate-prevent",
+      "description": "Request-controlled shell command.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "shell-injection",
+            "severity": "high",
+            "file": "yieldos-calibration-tasks.js",
+            "title": "Interpolated shell command",
+            "status": "unresolved"
+          }
+        ],
+        "duration_ms": 91,
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 209,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "task_id": "server-side-url-fetch",
+      "track": "immediate-prevent",
+      "description": "Request-controlled server-side fetch.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "ssrf",
+            "severity": "high",
+            "file": "yieldos-calibration-importer.js",
+            "title": "User-controlled outbound request",
+            "status": "unresolved"
+          }
+        ],
+        "duration_ms": 90,
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 207,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "task_id": "upload-path-join",
+      "track": "immediate-prevent",
+      "description": "Request-controlled filesystem path.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-blocked",
+        "action": "block",
+        "findings": [
+          {
+            "rule_id": "path-traversal",
+            "severity": "high",
+            "file": "yieldos-calibration-files.js",
+            "title": "User-controlled filesystem path",
+            "status": "unresolved"
+          }
+        ],
+        "duration_ms": 90,
+        "output": {
+          "stdout_bytes": 346,
+          "stderr_bytes": 213,
+          "stdout_lines": 1,
+          "stderr_lines": 4
+        }
+      }
+    },
+    {
+      "task_id": "secret-console-log",
+      "track": "immediate-prevent",
+      "description": "Sensitive value written to logs.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-fix-applied",
+        "action": "block",
+        "findings": [],
+        "duration_ms": 115,
+        "output": {
+          "stdout_bytes": 354,
+          "stderr_bytes": 118,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "task_id": "query-redirect",
+      "track": "immediate-prevent",
+      "description": "User-controlled redirect target.",
+      "outcome": "immediately-prevented",
+      "yieldos": {
+        "hook_exit_code": 2,
+        "prevented": true,
+        "verdict": "code-audit-fix-applied",
+        "action": "block",
+        "findings": [],
+        "duration_ms": 119,
+        "output": {
+          "stdout_bytes": 354,
+          "stderr_bytes": 118,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "task_id": "public-profile-read",
+      "track": "safe-control",
+      "description": "Benign public read-only helper.",
+      "outcome": "accepted-safe-control",
+      "yieldos": {
+        "hook_exit_code": 0,
+        "prevented": false,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "duration_ms": 91,
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "task_id": "parameterized-sql",
+      "track": "safe-control",
+      "description": "Parameterized query control.",
+      "outcome": "accepted-safe-control",
+      "yieldos": {
+        "hook_exit_code": 0,
+        "prevented": false,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "duration_ms": 90,
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "task_id": "mapped-redirect",
+      "track": "safe-control",
+      "description": "Server-side redirect map control.",
+      "outcome": "accepted-safe-control",
+      "yieldos": {
+        "hook_exit_code": 0,
+        "prevented": false,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "duration_ms": 93,
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "task_id": "mounted-admin-router",
+      "track": "coverage-candidate",
+      "description": "Admin router is mounted separately from the sensitive handler.",
+      "outcome": "not-instantly-detected",
+      "yieldos": {
+        "hook_exit_code": 0,
+        "prevented": false,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "duration_ms": 95,
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    },
+    {
+      "task_id": "prisma-raw-unsafe",
+      "track": "coverage-candidate",
+      "description": "Prisma raw SQL helper interpolates request input.",
+      "outcome": "not-instantly-detected",
+      "yieldos": {
+        "hook_exit_code": 0,
+        "prevented": false,
+        "verdict": "code-audit-clean",
+        "action": "allow",
+        "findings": [],
+        "duration_ms": 89,
+        "output": {
+          "stdout_bytes": 348,
+          "stderr_bytes": 69,
+          "stdout_lines": 1,
+          "stderr_lines": 2
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "total_cases": 12,
+    "tracks": {
+      "immediate-prevent": 7,
+      "safe-control": 3,
+      "coverage-candidate": 2
+    },
+    "outcomes": {
+      "immediately-prevented": 7,
+      "accepted-safe-control": 3,
+      "not-instantly-detected": 2
+    },
+    "immediate_correct_decisions": 10,
+    "immediate_correct_decision_rate": 0.8333,
+    "not_instantly_detected": 2,
+    "not_instantly_detected_rate": 0.1667,
+    "unexpected": 0
+  }
+}

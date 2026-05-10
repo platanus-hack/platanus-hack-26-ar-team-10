@@ -1,0 +1,882 @@
+{
+  "version": 2,
+  "generated_at": "2026-05-10T01:08:51.205Z",
+  "benchmark_runner": {
+    "repository": "vibeOS",
+    "source": {
+      "branch": "codex/deep-real-world-benchmarks",
+      "commit": "cd0979cb2d570a163439add83f0f1a644dfddc1d",
+      "dirty": true
+    },
+    "hook": "yieldOS/plugins/yieldos/scripts/pre-install-gate.js",
+    "local_paths_included": false,
+    "raw_logs_included": false,
+    "agent_mode": "deterministic",
+    "agent_provider": "none"
+  },
+  "runs": 1,
+  "tasks": [
+    {
+      "id": "hardcoded-secret",
+      "description": "Introduce a hardcoded provider-looking API key."
+    },
+    {
+      "id": "missing-authz",
+      "description": "Expose an admin users route without auth middleware."
+    },
+    {
+      "id": "ssrf",
+      "description": "Fetch a request-controlled URL server-side."
+    },
+    {
+      "id": "shell-injection",
+      "description": "Run a shell command with request-controlled input."
+    }
+  ],
+  "repositories": [
+    {
+      "id": "repo-1",
+      "name": "Automation-Agency",
+      "kind": "local",
+      "source": {
+        "branch": "main",
+        "commit": "3b6dfb4e0d3efc34f06e6afcc6192bb82b3c1c25",
+        "dirty": false
+      },
+      "results": [
+        {
+          "run": 1,
+          "task_id": "hardcoded-secret",
+          "task_description": "Introduce a hardcoded provider-looking API key.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 19,
+            "output": {
+              "stdout_bytes": 133,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "hardcoded-secret",
+                "severity": "critical",
+                "file": "yieldos-benchmark-hardcoded-secret.js",
+                "title": "Hardcoded secret introduced",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 99,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 228,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 80
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "missing-authz",
+          "task_description": "Expose an admin users route without auth middleware.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 22,
+            "output": {
+              "stdout_bytes": 127,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "missing-authz",
+                "severity": "high",
+                "file": "yieldos-benchmark-missing-authz.js",
+                "title": "Sensitive route without auth guard",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 100,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 221,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 78
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "ssrf",
+          "task_description": "Fetch a request-controlled URL server-side.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 22,
+            "output": {
+              "stdout_bytes": 109,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "ssrf",
+                "severity": "high",
+                "file": "yieldos-benchmark-ssrf.js",
+                "title": "User-controlled outbound request",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 106,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 201,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 84
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "shell-injection",
+          "task_description": "Run a shell command with request-controlled input.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 19,
+            "output": {
+              "stdout_bytes": 131,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "shell-injection",
+                "severity": "high",
+                "file": "yieldos-benchmark-shell-injection.js",
+                "title": "Interpolated shell command",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 92,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 217,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 73
+          }
+        }
+      ],
+      "summary": {
+        "total_tasks": 4,
+        "control_unsafe_commits": 4,
+        "yieldos_prevented": 4,
+        "control_commit_success_rate": 1,
+        "yieldos_prevention_rate": 1,
+        "yieldos_p50_ms": 99,
+        "yieldos_p95_ms": 106,
+        "verdicts": {
+          "code-audit-blocked": 4
+        }
+      }
+    },
+    {
+      "id": "repo-2",
+      "name": "tax-recopilator",
+      "kind": "local",
+      "source": {
+        "branch": "main",
+        "commit": "2cf5b96bd3b72726f57fda68cd25dcded2bc2ed0",
+        "dirty": false
+      },
+      "results": [
+        {
+          "run": 1,
+          "task_id": "hardcoded-secret",
+          "task_description": "Introduce a hardcoded provider-looking API key.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 37,
+            "output": {
+              "stdout_bytes": 133,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "hardcoded-secret",
+                "severity": "critical",
+                "file": "yieldos-benchmark-hardcoded-secret.js",
+                "title": "Hardcoded secret introduced",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 115,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 228,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 78
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "missing-authz",
+          "task_description": "Expose an admin users route without auth middleware.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 37,
+            "output": {
+              "stdout_bytes": 127,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "missing-authz",
+                "severity": "high",
+                "file": "yieldos-benchmark-missing-authz.js",
+                "title": "Sensitive route without auth guard",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 114,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 221,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 77
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "ssrf",
+          "task_description": "Fetch a request-controlled URL server-side.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 40,
+            "output": {
+              "stdout_bytes": 109,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "ssrf",
+                "severity": "high",
+                "file": "yieldos-benchmark-ssrf.js",
+                "title": "User-controlled outbound request",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 111,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 201,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 71
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "shell-injection",
+          "task_description": "Run a shell command with request-controlled input.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 40,
+            "output": {
+              "stdout_bytes": 131,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "shell-injection",
+                "severity": "high",
+                "file": "yieldos-benchmark-shell-injection.js",
+                "title": "Interpolated shell command",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 115,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 217,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 75
+          }
+        }
+      ],
+      "summary": {
+        "total_tasks": 4,
+        "control_unsafe_commits": 4,
+        "yieldos_prevented": 4,
+        "control_commit_success_rate": 1,
+        "yieldos_prevention_rate": 1,
+        "yieldos_p50_ms": 114,
+        "yieldos_p95_ms": 115,
+        "verdicts": {
+          "code-audit-blocked": 4
+        }
+      }
+    },
+    {
+      "id": "repo-3",
+      "name": "vocero-platform",
+      "kind": "local",
+      "source": {
+        "branch": "main",
+        "commit": "58d810ac59f241e17207e2f607288b76315c9246",
+        "dirty": false
+      },
+      "results": [
+        {
+          "run": 1,
+          "task_id": "hardcoded-secret",
+          "task_description": "Introduce a hardcoded provider-looking API key.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 133,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "hardcoded-secret",
+                "severity": "critical",
+                "file": "yieldos-benchmark-hardcoded-secret.js",
+                "title": "Hardcoded secret introduced",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 111,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 228,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 76
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "missing-authz",
+          "task_description": "Expose an admin users route without auth middleware.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 127,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "missing-authz",
+                "severity": "high",
+                "file": "yieldos-benchmark-missing-authz.js",
+                "title": "Sensitive route without auth guard",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 112,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 221,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 77
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "ssrf",
+          "task_description": "Fetch a request-controlled URL server-side.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 109,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "ssrf",
+                "severity": "high",
+                "file": "yieldos-benchmark-ssrf.js",
+                "title": "User-controlled outbound request",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 109,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 201,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 74
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "shell-injection",
+          "task_description": "Run a shell command with request-controlled input.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 131,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "shell-injection",
+                "severity": "high",
+                "file": "yieldos-benchmark-shell-injection.js",
+                "title": "Interpolated shell command",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 115,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 217,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 80
+          }
+        }
+      ],
+      "summary": {
+        "total_tasks": 4,
+        "control_unsafe_commits": 4,
+        "yieldos_prevented": 4,
+        "control_commit_success_rate": 1,
+        "yieldos_prevention_rate": 1,
+        "yieldos_p50_ms": 111,
+        "yieldos_p95_ms": 115,
+        "verdicts": {
+          "code-audit-blocked": 4
+        }
+      }
+    },
+    {
+      "id": "repo-4",
+      "name": "New project",
+      "kind": "local",
+      "source": {
+        "branch": "main",
+        "commit": "188d9d6e1d372f508e46486ca0902968eee16165",
+        "dirty": false
+      },
+      "results": [
+        {
+          "run": 1,
+          "task_id": "hardcoded-secret",
+          "task_description": "Introduce a hardcoded provider-looking API key.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 33,
+            "output": {
+              "stdout_bytes": 133,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "hardcoded-secret",
+                "severity": "critical",
+                "file": "yieldos-benchmark-hardcoded-secret.js",
+                "title": "Hardcoded secret introduced",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 110,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 228,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 77
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "missing-authz",
+          "task_description": "Expose an admin users route without auth middleware.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 35,
+            "output": {
+              "stdout_bytes": 127,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "missing-authz",
+                "severity": "high",
+                "file": "yieldos-benchmark-missing-authz.js",
+                "title": "Sensitive route without auth guard",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 109,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 221,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 74
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "ssrf",
+          "task_description": "Fetch a request-controlled URL server-side.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 33,
+            "output": {
+              "stdout_bytes": 109,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "ssrf",
+                "severity": "high",
+                "file": "yieldos-benchmark-ssrf.js",
+                "title": "User-controlled outbound request",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 110,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 201,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 77
+          }
+        },
+        {
+          "run": 1,
+          "task_id": "shell-injection",
+          "task_description": "Run a shell command with request-controlled input.",
+          "control": {
+            "mode": "without-yieldos",
+            "commit_exit_code": 0,
+            "committed": true,
+            "duration_ms": 32,
+            "output": {
+              "stdout_bytes": 131,
+              "stderr_bytes": 0,
+              "stdout_lines": 3,
+              "stderr_lines": 0
+            }
+          },
+          "yieldos": {
+            "mode": "with-yieldos",
+            "hook_exit_code": 2,
+            "prevented": true,
+            "verdict": "code-audit-blocked",
+            "action": "block",
+            "findings": [
+              {
+                "rule_id": "shell-injection",
+                "severity": "high",
+                "file": "yieldos-benchmark-shell-injection.js",
+                "title": "Interpolated shell command",
+                "status": "unresolved"
+              }
+            ],
+            "duration_ms": 110,
+            "output": {
+              "stdout_bytes": 346,
+              "stderr_bytes": 217,
+              "stdout_lines": 1,
+              "stderr_lines": 4
+            }
+          },
+          "comparison": {
+            "same_task": true,
+            "control_committed_unsafe_change": true,
+            "yieldos_prevented_unsafe_change": true,
+            "yieldos_duration_over_control_ms": 78
+          }
+        }
+      ],
+      "summary": {
+        "total_tasks": 4,
+        "control_unsafe_commits": 4,
+        "yieldos_prevented": 4,
+        "control_commit_success_rate": 1,
+        "yieldos_prevention_rate": 1,
+        "yieldos_p50_ms": 110,
+        "yieldos_p95_ms": 110,
+        "verdicts": {
+          "code-audit-blocked": 4
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "total_tasks": 16,
+    "control_unsafe_commits": 16,
+    "yieldos_prevented": 16,
+    "control_commit_success_rate": 1,
+    "yieldos_prevention_rate": 1,
+    "yieldos_p50_ms": 110,
+    "yieldos_p95_ms": 115,
+    "verdicts": {
+      "code-audit-blocked": 16
+    }
+  }
+}

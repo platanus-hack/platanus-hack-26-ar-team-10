@@ -21,7 +21,13 @@
     "test:landing": "npm --prefix ./landing test --",
     "package:plugin": "node scripts/build-plugin-package.mjs",
     "policy:check": "node scripts/policy-check.mjs",
-    "benchmark:real-repos": "node scripts/real-repo-benchmark.mjs"
+    "benchmark:real-repos": "node scripts/real-repo-benchmark.mjs",
+    "benchmark:coverage-calibration": "node scripts/coverage-calibration-benchmark.mjs",
+    "benchmark:false-positives": "node scripts/false-positive-benchmark.mjs",
+    "benchmark:cost": "node scripts/cost-benchmark.mjs",
+    "benchmark:models": "node scripts/model-workflow-benchmark.mjs",
+    "benchmark:scanners": "node scripts/scanner-comparison-benchmark.mjs",
+    "benchmark:visuals": "node scripts/benchmark-visual-dashboard.mjs"
   },
   "overrides": {
     "postcss": "8.5.14"

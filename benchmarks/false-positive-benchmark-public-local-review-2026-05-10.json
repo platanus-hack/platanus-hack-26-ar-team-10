@@ -1,0 +1,541 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-10T01:06:59.263Z",
+  "benchmark": {
+    "id": "false-positive-public-commits",
+    "hook": "yieldOS/plugins/yieldos/scripts/pre-install-gate.js",
+    "raw_logs_included": false,
+    "agent_mode": "deterministic",
+    "agent_provider": "none",
+    "note": "Benign commits blocked by yieldOS are hard false positives; unknown is tracked separately as safety escalation."
+  },
+  "repositories": [
+    {
+      "id": "express",
+      "name": "express",
+      "source": {
+        "git_url": "https://github.com/expressjs/express.git",
+        "commit": "f873ac23124ffcff8c040b4bd257b32c29828d53",
+        "stack": [
+          "node",
+          "http"
+        ]
+      },
+      "results": [
+        {
+          "commit": "6340c1eaaedc0ddcae8be8df2cdb1d2e961cbf2f",
+          "changed_files": [
+            ".github/workflows/codeql.yml",
+            ".github/workflows/scorecard.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "8cc3afa8e35e1a62ccf48276d456278455eb784d",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            ".github/workflows/legacy.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "e7fd63a3878596154dd0693e92a8e5e41a45647c",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            ".github/workflows/legacy.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "8e022edc9185f540a3fcecaf5e56b850d919cdac",
+          "changed_files": [
+            "Readme.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "e5099198b292a565f8583d70caf12d7afed3607f",
+          "changed_files": [
+            "Readme.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "06e2367f91490f241e8932b56ffda042ec0debb5",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            ".github/workflows/legacy.yml",
+            ".github/workflows/scorecard.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "e3b962c558cc1c24fb69da285f42c3aa0c1c1da2",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            ".github/workflows/legacy.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "411061d94e7180343ebf1c86afd30dfb8746cbe7",
+          "changed_files": [
+            ".github/workflows/codeql.yml",
+            ".github/workflows/scorecard.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        }
+      ],
+      "sampled_benign_commits": true,
+      "summary": {
+        "total_commits": 8,
+        "allowed": 8,
+        "blocked": 0,
+        "unknown": 0,
+        "replay_failed": 0,
+        "false_positive_rate": 0,
+        "unknown_rate": 0
+      }
+    },
+    {
+      "id": "fastify",
+      "name": "fastify",
+      "source": {
+        "git_url": "https://github.com/fastify/fastify.git",
+        "commit": "1c49974805e57a17f1616f422678317b1d35b73f",
+        "stack": [
+          "node",
+          "http"
+        ]
+      },
+      "results": [
+        {
+          "commit": "291b1f89b4250f22d9edbe62a1cf1bfbd5f3f3d1",
+          "changed_files": [
+            ".github/workflows/links-check.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "7cbea084a459b74c6ca27f1df704fa7130db16a1",
+          "changed_files": [
+            ".github/workflows/citgm-package.yml",
+            ".github/workflows/lint-ecosystem-order.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "e5db7afd9e61e2b15bbbf4299358a4cc407e823e",
+          "changed_files": [
+            ".github/workflows/integration-alternative-runtimes.yml",
+            ".github/workflows/integration.yml",
+            ".github/workflows/package-manager-ci.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "efb599a7ac2b4e5ec148cf6a2f547b6dd3ea4eb7",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "dce0d47a44ecf6605a4e6b39d80f0bef17c2c2ce",
+          "changed_files": [
+            ".github/workflows/package-manager-ci.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "282ff731c233f2e84ea46c7c73d773ea2a7aea43",
+          "changed_files": [
+            "docs/Guides/Database.md",
+            "docs/Guides/Ecosystem.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "b06a196b694c0c7aed53976cd77456f1ad7d4c9f",
+          "changed_files": [
+            "docs/Guides/Ecosystem.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "909c5d5329536b0acc004da7649b3da8af9273b2",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        }
+      ],
+      "sampled_benign_commits": true,
+      "summary": {
+        "total_commits": 8,
+        "allowed": 8,
+        "blocked": 0,
+        "unknown": 0,
+        "replay_failed": 0,
+        "false_positive_rate": 0,
+        "unknown_rate": 0
+      }
+    },
+    {
+      "id": "hono",
+      "name": "hono",
+      "source": {
+        "git_url": "https://github.com/honojs/hono.git",
+        "commit": "f10dee89ced5956b73c1cdc416d6bc0fd54d63b7",
+        "stack": [
+          "node",
+          "edge",
+          "http"
+        ]
+      },
+      "results": [
+        {
+          "commit": "8078bbf7591ec133ac8a4f7cfc4f2666a50909a9",
+          "changed_files": [
+            "docs/CODE_OF_CONDUCT.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "d3abeb1f801aaa1b334285c73da5f5f022dbcadb",
+          "changed_files": [
+            "README.md",
+            "docs/CONTRIBUTING.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "81666ac6186ea98b96bde8ff9cfd91011c4d3af9",
+          "changed_files": [
+            ".github/actions/perf-measures/action.yml",
+            ".github/workflows/autofix.yml",
+            ".github/workflows/ci.yml",
+            ".github/workflows/cr.yml",
+            ".github/workflows/release.yml",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        }
+      ],
+      "sampled_benign_commits": true,
+      "summary": {
+        "total_commits": 3,
+        "allowed": 3,
+        "blocked": 0,
+        "unknown": 0,
+        "replay_failed": 0,
+        "false_positive_rate": 0,
+        "unknown_rate": 0
+      }
+    },
+    {
+      "id": "ky",
+      "name": "ky",
+      "source": {
+        "git_url": "https://github.com/sindresorhus/ky.git",
+        "commit": "61d6d66d27911001b9b4d57ab93139f9ad61384b",
+        "stack": [
+          "typescript",
+          "http-client"
+        ]
+      },
+      "results": [
+        {
+          "commit": "e0fcf780de2bd69af2528e4b7b87ccae6bb727b1",
+          "changed_files": [
+            "security/code-audit-state.json",
+            "test/retry.ts"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "d3750141ce7540fcb68137e3b73536dd0e9cec3d",
+          "changed_files": [
+            "readme.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "b324279a02150cb8e888d8150d26033997f45816",
+          "changed_files": [
+            "security/code-audit-state.json",
+            "test/main.ts"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "87aafbac8688f8dc55e3c0a0606b41ec5f5bc009",
+          "changed_files": [
+            "security/code-audit-state.json",
+            "test/retry.ts"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "2481afdbc2a6eefd468f2bf6c08c39a4ea5b3535",
+          "changed_files": [
+            "readme.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "86b15196b50cf9a9e7e7e17b7261cd671279c790",
+          "changed_files": [
+            "security/code-audit-state.json",
+            "test/browser.ts"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "c168a7ccd44d11bfc44390faca1e01cfc8895658",
+          "changed_files": [
+            "readme.md",
+            "security/code-audit-state.json"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        },
+        {
+          "commit": "6ed304d26a84177841bc5c6f858de0b806e2b4bd",
+          "changed_files": [
+            "security/code-audit-state.json",
+            "test/fetch.ts"
+          ],
+          "outcome": "allowed",
+          "verdict": "code-audit-clean",
+          "output": {
+            "stdout_bytes": 348,
+            "stderr_bytes": 69,
+            "stdout_lines": 1,
+            "stderr_lines": 2
+          }
+        }
+      ],
+      "sampled_benign_commits": true,
+      "summary": {
+        "total_commits": 8,
+        "allowed": 8,
+        "blocked": 0,
+        "unknown": 0,
+        "replay_failed": 0,
+        "false_positive_rate": 0,
+        "unknown_rate": 0
+      }
+    }
+  ],
+  "aggregate": {
+    "total_commits": 27,
+    "allowed": 27,
+    "blocked": 0,
+    "unknown": 0,
+    "replay_failed": 0,
+    "false_positive_rate": 0,
+    "unknown_rate": 0
+  }
+}
