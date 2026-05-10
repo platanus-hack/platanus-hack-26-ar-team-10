@@ -163,10 +163,32 @@ export default function Home() {
                 Agent vs oracle.
               </h2>
             </MotionReveal>
+
+            <MotionReveal delay={0.05}>
+              <p className="mt-5 text-[15px] leading-[1.65] text-zinc-600 sm:mt-6 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
+                Same security checks, two ways:{" "}
+                <strong className="font-semibold text-zinc-950">
+                  Claude Opus 4.7
+                </strong>{" "}
+                reviewing your changes vs the{" "}
+                <strong className="font-semibold text-zinc-950">
+                  yieldOS oracle
+                </strong>{" "}
+                running deterministic rules. Same task, very different bill.
+              </p>
+            </MotionReveal>
           </div>
 
-          <MotionReveal className="mt-8 sm:mt-12" delay={0.05} y={18}>
+          <MotionReveal className="mt-8 sm:mt-12" delay={0.1} y={18}>
             <OracleBenchmarks />
+          </MotionReveal>
+
+          <MotionReveal className="mt-6 sm:mt-8" delay={0.15}>
+            <p className="max-w-3xl text-xs leading-5 text-zinc-500 sm:text-[13px] sm:leading-6">
+              Time is wall-clock latency per check. Cost is the model spend
+              per risky review. The oracle never calls a model &mdash; that&rsquo;s
+              where every saved second and every saved cent comes from.
+            </p>
           </MotionReveal>
         </div>
       </section>
