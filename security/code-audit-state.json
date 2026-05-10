@@ -2,7 +2,7 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:cca6857ec0d88ec6ae86d0e02551515ae527ab69cff6237fcd2fe81e4d61d5a0",
+  "diff_hash": "sha256:879590503c7f34b109f346cc396cd9009c117a215c82af1187bf3e4bfa62f016",
   "range": "fc317971f77e6ffb52e6e75921a60f01699d417e..HEAD",
   "files": [
     ".claude-plugin/marketplace.json",
@@ -129,6 +129,7 @@
     "yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md",
     "yieldOS/plugins/yieldos/tests/agent-pack.test.js",
     "yieldOS/plugins/yieldos/tests/audit-events.test.js",
+    "yieldOS/plugins/yieldos/tests/code-audit.test.js",
     "yieldOS/plugins/yieldos/tests/credentials.test.js",
     "yieldOS/plugins/yieldos/tests/e2e.test.js",
     "yieldOS/plugins/yieldos/tests/logger.test.js",
