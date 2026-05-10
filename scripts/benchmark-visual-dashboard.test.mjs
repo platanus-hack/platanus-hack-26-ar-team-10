@@ -14,6 +14,7 @@ test('benchmark visual dashboard extracts presentation metrics', () => {
   assert.equal(data.cost.agent_escalations, 2);
   assert.equal(data.live.expanded.total_cases, 64);
   assert.equal(data.live.expanded.by_task['admin-users-route'].prevented, 15);
+  assert.match(data.claim.evidence_boundary, /local-review evidence/);
 });
 
 test('benchmark visual dashboard renders standalone html', () => {
@@ -25,6 +26,7 @@ test('benchmark visual dashboard renders standalone html', () => {
   assert.match(html, /"without_yieldos":5\.4/);
   assert.match(html, /"with_yieldos":0\.72/);
   assert.match(html, /agent-assisted/);
+  assert.match(html, /Run npm run evidence:verify/);
   assert.match(html, /2m 42s/);
   assert.doesNotMatch(html, /162,409 ms/);
   const removedHeadline = ['inval', 'id patch'].join('');

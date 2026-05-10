@@ -5,14 +5,15 @@ const path = require('node:path');
 
 const { pass, fail, unknown } = require('../result');
 const injectionScanner = require('../../injection-scanner');
+const policyFetcher = require('../../policy-fetcher');
 
-const POLICY_FILE = path.join(__dirname, '..', '..', '..', 'policy-cache', 'injection-patterns.json');
+const POLICY_ROOT = path.join(__dirname, '..', '..', '..', 'policy-cache');
 
 function run(projectRoot, options = {}) {
   const relativeFile = options.file || 'AGENTS.md';
   const subject = { type: 'instruction-file', ref: relativeFile };
   const file = safeProjectPath(projectRoot, relativeFile);
-  const policy = loadPatterns(options.policyPath || POLICY_FILE);
+  const policy = loadPatternsFromPolicyRoot(options.policyRoot || POLICY_ROOT);
   if (!policy.ok) {
     return unknown({
       id: 'instruction-policy',
@@ -61,19 +62,31 @@ function run(projectRoot, options = {}) {
   });
 }
 
+function loadPatternsFromPolicyRoot(policyRoot) {
+  const policy = policyFetcher.loadFromPolicyDirectory(policyRoot);
+  if (!policy) {
+    return { ok: false, error: 'policy bundle failed integrity verification' };
+  }
+  return validatePatterns(policy['injection-patterns.json']);
+}
+
 function loadPatterns(file) {
   try {
     const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-    if (!Array.isArray(data.patterns) || data.patterns.length === 0) {
-      return { ok: false, error: 'patterns list is empty' };
-    }
-    if (data.patterns.some((pattern) => typeof pattern.regex !== 'string')) {
-      return { ok: false, error: 'patterns must use regex keys' };
-    }
-    return { ok: true, patterns: data.patterns };
+    return validatePatterns(data);
   } catch (err) {
     return { ok: false, error: err.message };
   }
+}
+
+function validatePatterns(data) {
+  if (!data || !Array.isArray(data.patterns) || data.patterns.length === 0) {
+    return { ok: false, error: 'patterns list is empty' };
+  }
+  if (data.patterns.some((pattern) => typeof pattern.regex !== 'string')) {
+    return { ok: false, error: 'patterns must use regex keys' };
+  }
+  return { ok: true, patterns: data.patterns };
 }
 
 function safeProjectPath(projectRoot, relativeFile) {
@@ -85,4 +98,4 @@ function safeProjectPath(projectRoot, relativeFile) {
   return target;
 }
 
-module.exports = { run, loadPatterns };
+module.exports = { run, loadPatterns, loadPatternsFromPolicyRoot };

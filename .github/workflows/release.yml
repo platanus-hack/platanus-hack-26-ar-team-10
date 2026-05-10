@@ -11,9 +11,10 @@ permissions:
 jobs:
   github-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: "22"
       - name: Validate plugin release files
@@ -22,12 +23,20 @@ jobs:
         run: node scripts/policy-check.mjs
       - name: Run release helper tests
         run: node --test scripts/*.test.mjs
+      - name: Run repository secret smoke scan
+        run: node scripts/secret-scan-smoke.mjs
       - name: Run plugin tests
         working-directory: yieldOS/plugins/yieldos
         run: node --test tests/*.test.js
+      - name: Pack plugin artifact
+        run: tar -czf yieldos-plugin.tgz -C dist yieldos-plugin
+      - name: Generate release checksums
+        run: node scripts/generate-release-checksums.mjs install.sh yieldos-plugin.tgz
+      - name: Verify release checksums
+        run: shasum -a 256 -c checksums.txt
       - name: Extract release notes
         run: node scripts/release.mjs notes "$GITHUB_REF_NAME" > /tmp/yieldos-release-notes.md
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "yieldOS ${GITHUB_REF_NAME#yieldos--}" --notes-file /tmp/yieldos-release-notes.md
+        run: gh release create "$GITHUB_REF_NAME" install.sh yieldos-plugin.tgz checksums.txt --verify-tag --title "yieldOS ${GITHUB_REF_NAME#yieldos--}" --notes-file /tmp/yieldos-release-notes.md

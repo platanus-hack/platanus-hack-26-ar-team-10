@@ -38,7 +38,7 @@ export function DefenseLayers() {
       <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
         yieldOS architecture
       </p>
-      <div className="mt-4 space-y-3 sm:mt-5">
+      <div className="mt-3 space-y-3 sm:mt-4 sm:space-y-4">
         {layers.map((layer) => (
           <article
             key={layer.number}
@@ -57,8 +57,8 @@ export function DefenseLayers() {
                 opacity: 0.55,
               }}
             />
-            <div className="relative flex flex-col gap-2 px-5 py-4 sm:px-6 sm:py-5">
-              <div className="flex items-baseline gap-3">
+            <div className="relative flex flex-col gap-1.5 px-4 py-3.5 sm:gap-2 sm:px-5 sm:py-4 lg:px-6 lg:py-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span
                   className="font-mono text-[11px] uppercase tracking-[0.18em] sm:text-xs"
                   style={{ color: layer.textMuted }}
@@ -66,14 +66,14 @@ export function DefenseLayers() {
                   {layer.number}
                 </span>
                 <h3
-                  className="font-mono text-base font-bold uppercase tracking-[0.06em] sm:text-lg"
+                  className="font-mono text-[15px] font-bold uppercase tracking-[0.06em] sm:text-base lg:text-lg"
                   style={{ color: layer.text }}
                 >
                   {layer.title}
                 </h3>
               </div>
               <p
-                className="font-mono text-[11px] uppercase tracking-[0.14em] sm:text-xs"
+                className="break-words font-mono text-[10px] uppercase leading-[1.5] tracking-[0.14em] sm:text-[11px] lg:text-xs"
                 style={{ color: layer.textMuted }}
               >
                 {layer.tags.join(" · ")}

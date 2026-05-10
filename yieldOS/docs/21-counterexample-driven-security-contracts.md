@@ -1,6 +1,6 @@
 # Counterexample-Driven Security Contracts
 
-Counterexample-driven security contracts are the clearest product shape for yieldOS. The oracle-driven security harness is the machinery; the contract is what reviewers can inspect, run, and falsify.
+Counterexample-driven security contracts are the clearest product shape for yieldOS. The oracle-driven security harness is the machinery; the contract is what auditors can inspect, run, and falsify.
 
 For v0, the supported class is intentionally narrow:
 

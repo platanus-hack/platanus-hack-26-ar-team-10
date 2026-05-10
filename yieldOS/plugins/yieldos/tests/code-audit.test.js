@@ -1087,12 +1087,31 @@ test('redTeam ignores removed prose and string data that mention validation', ()
 
 test('redTeam ignores removed scanner regex literals that mention guard words', () => {
   const findings = codeAudit.redTeam({
-    files: ['scripts/code-audit/red-team.js'],
+    files: ['scripts/code-audit/red-team.js', 'yieldOS/plugins/yieldos/scripts/code-audit/red-team.js'],
     diff: [
       'diff --git a/scripts/code-audit/red-team.js b/scripts/code-audit/red-team.js',
       '+++ b/scripts/code-audit/red-team.js',
       '@@',
       '-  if (!/(req\\\\.user|requireAuth|authorize|isAdmin|requireRole|validate|schema\\\\.parse|z\\\\.object|permission|role)/i.test(item.code)) return null;',
+      'diff --git a/yieldOS/plugins/yieldos/scripts/code-audit/red-team.js b/yieldOS/plugins/yieldos/scripts/code-audit/red-team.js',
+      '+++ b/yieldOS/plugins/yieldos/scripts/code-audit/red-team.js',
+      '@@',
+      '-  return /(req\\\\.user|requireAuth|authorize|isAdmin|requireRole|schema\\\\.parse|z\\\\.object|permission|role)/i.test(code);',
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
+test('redTeam ignores removed credential authorization timestamp bookkeeping', () => {
+  const findings = codeAudit.redTeam({
+    files: ['yieldOS/plugins/yieldos/scripts/pre-install-gate.js'],
+    diff: [
+      'diff --git a/yieldOS/plugins/yieldos/scripts/pre-install-gate.js b/yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
+      '+++ b/yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
+      '@@',
+      '-  const authorizedAt = new Date(data.authorized_at).getTime();',
+      '-  return Number.isFinite(authorizedAt) && Number.isFinite(ttl) && Date.now() - authorizedAt < ttl;',
     ].join('\n'),
   });
 
@@ -1371,12 +1390,25 @@ test('pre-install hook applies fix on git commit and blocks original command', (
 
   assert.equal(r.code, 2);
   assert.equal(r.stderr.includes('[yieldOS:verdict] code-audit-fix-applied'), true);
+  assert.equal(r.stderr.includes('[yieldOS] SAVED security/code-audit-state.json'), true);
   assert.equal(content.includes('SECRET_TOKEN'), false);
   assert.equal(log.includes('code-audit-fix-applied'), true);
   assert.equal(state.diff_hash.startsWith('sha256:'), true);
   assert.equal(state.max_iterations, 3);
   assert.equal(state.verdict, 'code-audit-fix-applied');
   assert.equal(stagedFiles.includes('security/code-audit-state.json'), true);
+});
+
+test('pre-install hook shows generated oracle contract paths for blocking code review findings', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'server.js'), "const users = [];\napp.get('/admin/users', (req, res) => res.json(users));\n");
+  sh(root, ['add', 'server.js']);
+
+  const r = runHook(root, 'git commit -m "add admin route"');
+
+  assert.equal(r.code, 2);
+  assert.match(r.stderr, /\[yieldOS\] CONTRACT security\/oracles\/[^/]+\/contract\.json/);
+  assert.equal(r.stderr.includes('[yieldOS] SAVED security/code-audit-state.json'), true);
 });
 
 test('pre-install hook applies code audit to wrapped git commit command', () => {

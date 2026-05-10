@@ -60,3 +60,20 @@ test('plugin workflow avoids duplicated plugin tests and gates landing work', ()
     assert.match(namedStepBlock(source, stepName), /if:\s*\$\{\{\s*steps\.changes\.outputs\.landing == 'true'\s*\}\}/);
   }
 });
+
+test('release workflow publishes verified install artifacts', () => {
+  const source = workflow('release.yml');
+
+  assert.match(source, /tar -czf yieldos-plugin\.tgz -C dist yieldos-plugin/);
+  assert.match(source, /node scripts\/generate-release-checksums\.mjs install\.sh yieldos-plugin\.tgz/);
+  assert.match(source, /shasum -a 256 -c checksums\.txt/);
+  assert.match(source, /gh release create "\$GITHUB_REF_NAME" install\.sh yieldos-plugin\.tgz checksums\.txt/);
+});
+
+test('policy integrity files keep LF line endings on Windows checkouts', () => {
+  const attrs = fs.readFileSync(new URL('../.gitattributes', import.meta.url), 'utf8');
+
+  assert.match(attrs, /^\/policy\/\*\.json text eol=lf$/m);
+  assert.match(attrs, /^\/yieldOS\/plugins\/yieldos\/policy-cache\/\*\.json text eol=lf$/m);
+  assert.match(attrs, /^\/dist\/yieldos-plugin\/policy-cache\/\*\.json text eol=lf$/m);
+});

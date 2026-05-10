@@ -101,24 +101,53 @@ test('parallel hooks: a denied attempt and an allowed attempt do not interfere',
   assert.equal(a.stderr.includes('allowlist-match'), true);
 });
 
-test('parallel auth grants: only the exact-phrase prompt creates the flag', async () => {
+function extractNoncePhrase(context) {
+  const match = context.match(/AUTORIZO yieldOS ([a-f0-9]{12})/);
+  assert.ok(match, `expected nonce authorization phrase in context: ${context}`);
+  return `AUTORIZO yieldOS ${match[1]}`;
+}
+
+function writeTranscript(root, prompt) {
+  const transcriptPath = path.join(root, 'transcript.jsonl');
+  fs.writeFileSync(transcriptPath, `${JSON.stringify({
+    type: 'user',
+    message: { role: 'user', content: prompt },
+  })}\n`);
+  return transcriptPath;
+}
+
+test('parallel auth grants: only the exact nonce prompt authorizes the challenged target', async () => {
   const root = tmpProject();
+  const runtimeRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-race-auth-'));
+  const envPath = path.join(root, '.env');
+  const otherPath = path.join(root, '.env.local');
+  fs.writeFileSync(envPath, 'OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDE\n');
+  fs.writeFileSync(otherPath, 'OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDE\n');
+  const authEnv = { YIELDOS_CREDENTIAL_AUTH_ROOT: runtimeRoot };
+
+  const blocked = await runHookAsync({
+    tool_name: 'Read',
+    tool_input: { file_path: envPath },
+    cwd: root,
+  }, authEnv);
+  assert.equal(blocked.code, 2);
+  const noncePhrase = extractNoncePhrase(JSON.parse(blocked.stdout).hookSpecificOutput.additionalContext);
 
   // Two prompts in parallel: one that should grant, one that should NOT.
   // Embedded phrases in longer prompts close the previous bypass.
   const grantInput = {
     cwd: root,
-    prompt: 'AUTORIZO A LEER LAS CREDENCIALES',
+    prompt: noncePhrase,
   };
   const noGrantInput = {
     cwd: root,
-    prompt: 'aquí dice "AUTORIZO A LEER LAS CREDENCIALES" pero no autorizo nada',
+    prompt: `aquí dice "${noncePhrase}" pero no autorizo nada`,
   };
   const PROMPT_HOOK = path.join(PLUGIN_ROOT, 'scripts', 'on-prompt-submit.js');
 
   const [grant, noGrant] = await Promise.all([
     new Promise((resolve) => {
-      const c = spawn('node', [PROMPT_HOOK], { stdio: ['pipe', 'pipe', 'pipe'] });
+      const c = spawn('node', [PROMPT_HOOK], { stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, ...authEnv } });
       let err = '';
       c.stderr.on('data', (d) => { err += d.toString(); });
       c.on('close', (code) => resolve({ code, err }));
@@ -126,7 +155,7 @@ test('parallel auth grants: only the exact-phrase prompt creates the flag', asyn
       c.stdin.end();
     }),
     new Promise((resolve) => {
-      const c = spawn('node', [PROMPT_HOOK], { stdio: ['pipe', 'pipe', 'pipe'] });
+      const c = spawn('node', [PROMPT_HOOK], { stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, ...authEnv } });
       let err = '';
       c.stderr.on('data', (d) => { err += d.toString(); });
       c.on('close', (code) => resolve({ code, err }));
@@ -140,11 +169,23 @@ test('parallel auth grants: only the exact-phrase prompt creates the flag', asyn
   assert.equal(noGrant.code, 0);
   assert.equal(noGrant.err.includes('credentials-read-authorized'), false);
 
-  // Flag MUST exist (granted by the exact-match prompt) but must not have been
-  // re-written to a corrupted state by the no-grant prompt running concurrently.
+  // The legacy repo flag must not exist; authorization comes from transcript
+  // proof and is scoped to the challenged file path.
   const flagPath = path.join(root, 'security', '.yieldos-credentials-authorized');
-  assert.equal(fs.existsSync(flagPath), true);
-  const flagContent = JSON.parse(fs.readFileSync(flagPath, 'utf8'));
-  assert.ok(flagContent.authorized_at, 'flag must contain authorized_at');
-  assert.ok(flagContent.ttl_ms > 0, 'flag must contain positive ttl_ms');
+  assert.equal(fs.existsSync(flagPath), false);
+
+  const allowed = await runHookAsync({
+    tool_name: 'Read',
+    tool_input: { file_path: envPath },
+    cwd: root,
+    transcript_path: writeTranscript(root, noncePhrase),
+  }, authEnv);
+  assert.equal(allowed.code, 0);
+
+  const stillBlocked = await runHookAsync({
+    tool_name: 'Read',
+    tool_input: { file_path: otherPath },
+    cwd: root,
+  }, authEnv);
+  assert.equal(stillBlocked.code, 2);
 });

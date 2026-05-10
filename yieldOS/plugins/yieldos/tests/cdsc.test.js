@@ -366,6 +366,7 @@ test('yieldos-oracle run cdsc-proof executes through command adapter', async () 
 
   assert.equal(result.exitCode, 0, result.message);
   assert.equal(result.message.includes('cdsc-proof: pass'), true);
+  assert.equal(result.message.includes('[yieldOS] PROOF security/oracles/demo/proof-manifest.json'), true);
 });
 
 test('yieldos-oracle runtime oracles require explicit approval', async () => {
@@ -396,4 +397,23 @@ test('oracle demo render preserves structured unknown when proof manifest is abs
 
   assert.equal(message.includes('UNKNOWN proof incomplete'), true);
   assert.equal(message.includes('cdsc-proof-runtime-error'), true);
+});
+
+test('oracle demo render prints contract and proof artifact paths', () => {
+  const root = tmpProject();
+  const artifactRoot = path.join(root, 'security/oracles/missing-auth-demo');
+  fs.mkdirSync(artifactRoot, { recursive: true });
+  fs.writeFileSync(path.join(artifactRoot, 'contract.json'), '{}\n');
+  fs.writeFileSync(path.join(artifactRoot, 'proof-manifest.json'), JSON.stringify({
+    baseline: { observed: { status: 200 } },
+    fixed: { observed: { status: 401 } },
+  }));
+
+  const message = demoCommand.renderDemo(root, {
+    status: 'pass',
+    summary: 'CDSC proof passed.',
+  });
+
+  assert.equal(message.includes('[yieldOS] CONTRACT security/oracles/missing-auth-demo/contract.json'), true);
+  assert.equal(message.includes('[yieldOS] PROOF security/oracles/missing-auth-demo/proof-manifest.json'), true);
 });

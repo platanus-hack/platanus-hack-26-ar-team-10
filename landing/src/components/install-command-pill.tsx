@@ -33,7 +33,7 @@ export function InstallCommandPill({ command }: InstallCommandPillProps) {
   const resetTimerRef = useRef<number | null>(null);
 
   const compactCommand = command.replace(
-    "https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main",
+    "https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0",
     "...",
   );
 
@@ -68,7 +68,7 @@ export function InstallCommandPill({ command }: InstallCommandPillProps) {
       </span>
       <span className="truncate font-mono text-[13px] tracking-tight text-white/90 sm:text-[14px]">
         <span className="hidden sm:inline">{compactCommand}</span>
-        <span className="sm:hidden">curl ... | sh</span>
+        <span className="sm:hidden">verified install</span>
       </span>
       <span
         aria-live="polite"

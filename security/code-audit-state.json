@@ -2,13 +2,18 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:99c71e6aa69f49d486a80ea9996edb641ce00147dcb85686165c526162c4c679",
-  "range": "1497a38c7aea8925c98051518e52caeeb8bf7f71..HEAD",
+  "diff_hash": "sha256:4fc8eff99483ccc0931c3dba09630aebfa068b93f1435f2fb4fa0e88a698b4a1",
+  "range": "4b659cb9cf4a394bb028c738a813743dc806c2dd..HEAD",
   "files": [
     ".github/workflows/plugin.yml",
+    ".github/workflows/release.yml",
+    ".github/workflows/security.yml",
     ".github/workflows/yieldos-full-matrix.yml",
     ".github/workflows/yieldos-tests.yml",
-    "scripts/workflow-policy.test.mjs"
+    "landing/package-lock.json",
+    "landing/package.json",
+    "package-lock.json",
+    "package.json"
   ],
   "verdict": "code-audit-clean",
   "action": "allow",
@@ -23,7 +28,7 @@
   "findings": [],
   "resolved_findings": [],
   "verification": {
-    "static_rescan": "passed",
+    "static_rescan": "not-run",
     "checks": []
   },
   "oracle_artifacts": []

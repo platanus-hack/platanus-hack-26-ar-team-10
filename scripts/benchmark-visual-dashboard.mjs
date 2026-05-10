@@ -32,6 +32,7 @@ function buildDashboardData(files = REPORTS) {
       headline: 'yieldOS turns risky agent output into an executable commit boundary',
       strongest: 'Across public and private real-repo deterministic runs, every tested unsafe control commit landed without yieldOS and every matching yieldOS-gated commit was stopped before commit.',
       caveat: 'Live model workflow results are narrower: admin-route auth prevention is strongly measured; SSRF and SQL live-model prevention should remain coverage targets until their oracles are hardened.',
+      evidence_boundary: 'This dashboard is local-review evidence for product calibration. Run npm run evidence:verify before using any report as public proof.',
     },
     deterministic: {
       public: normalizeRealRepo(publicReal),
@@ -207,6 +208,7 @@ function renderDashboardHtml(data) {
         </div>
         <div>
           <div class="callout warning"><strong>Honest limit:</strong> the calibration set keeps a small slice of deeper cases that should become future oracles or review escalations.</div>
+          <p class="footer-note">${escapeHtml(data.claim.evidence_boundary)}</p>
           <p class="footer-note">This makes the benchmark more credible: yieldOS has a measured safety boundary today and an explicit way to measure expansion tomorrow.</p>
         </div>
       </div>

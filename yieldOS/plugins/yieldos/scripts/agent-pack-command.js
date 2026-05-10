@@ -14,6 +14,7 @@ const {
 } = require('./agent-pack-playbooks');
 const { parseManifest } = require('./agent-pack-yaml');
 const { knownOracleIds } = require('./oracles/registry');
+const policyFetcher = require('./policy-fetcher');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const VALID_ACTIONS = new Set(['preview', 'write', 'verify']);
@@ -129,21 +130,32 @@ function compilePack(projectRoot, packPath, options = {}) {
 }
 
 function loadPolicy(projectRoot, options = {}) {
+  const bundle = loadVerifiedPolicyBundle(projectRoot, options);
   return {
-    skills: readPolicyFile(projectRoot, options.policyRoot, 'skills.json'),
-    mcps: readPolicyFile(projectRoot, options.policyRoot, 'mcps.json'),
+    skills: bundle['skills.json'],
+    mcps: bundle['mcps.json'],
   };
 }
 
-function readPolicyFile(projectRoot, policyRoot, filename) {
+function loadVerifiedPolicyBundle(projectRoot, options = {}) {
+  if (options.policyRoot) {
+    const explicit = policyFetcher.loadFromPolicyDirectory(path.resolve(options.policyRoot));
+    if (!explicit) throw new Error('explicit policy root failed integrity verification');
+    return explicit;
+  }
+
   const candidates = [
-    policyRoot && path.join(policyRoot, filename),
-    path.join(projectRoot, 'policy', filename),
-    path.join(PLUGIN_ROOT, 'policy-cache', filename),
-  ].filter(Boolean);
-  const found = candidates.find((candidate) => fs.existsSync(candidate));
-  if (!found) throw new Error(`policy file not found: ${filename}`);
-  return JSON.parse(fs.readFileSync(found, 'utf8'));
+    path.join(projectRoot, 'policy'),
+    path.join(PLUGIN_ROOT, 'policy-cache'),
+  ];
+
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) continue;
+    const policy = policyFetcher.loadFromPolicyDirectory(candidate);
+    if (policy) return policy;
+  }
+
+  throw new Error('verified policy bundle not found');
 }
 
 function validatePack(pack, policy) {

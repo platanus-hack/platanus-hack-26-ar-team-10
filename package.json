@@ -1,5 +1,5 @@
 {
-  "name": "platanus-hack-26-ar-team-10-root",
+  "name": "yieldos-root",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -7,8 +7,8 @@
   },
   "devDependencies": {
     "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "scripts": {
     "dev": "npm --prefix ./landing run dev --",
@@ -19,6 +19,7 @@
     "test:root": "node --test scripts/*.test.mjs",
     "test:plugin": "cd yieldOS/plugins/yieldos && node --test tests/*.test.js",
     "test:landing": "npm --prefix ./landing test --",
+    "release:checksums": "node scripts/generate-release-checksums.mjs",
     "package:plugin": "node scripts/build-plugin-package.mjs",
     "policy:check": "node scripts/policy-check.mjs",
     "benchmark:real-repos": "node scripts/real-repo-benchmark.mjs",
@@ -27,7 +28,8 @@
     "benchmark:cost": "node scripts/cost-benchmark.mjs",
     "benchmark:models": "node scripts/model-workflow-benchmark.mjs",
     "benchmark:scanners": "node scripts/scanner-comparison-benchmark.mjs",
-    "benchmark:visuals": "node scripts/benchmark-visual-dashboard.mjs"
+    "benchmark:visuals": "node scripts/benchmark-visual-dashboard.mjs",
+    "evidence:verify": "node scripts/evidence-verify.mjs"
   },
   "overrides": {
     "postcss": "8.5.14"

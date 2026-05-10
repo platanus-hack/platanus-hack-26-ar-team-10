@@ -6,12 +6,11 @@ const path = require('node:path');
 
 const policyFetcher = require('./policy-fetcher');
 const credentialsScanner = require('./credentials-scanner');
+const credentialAuth = require('./credential-auth');
 const terminalArt = require('./terminal-art');
 const envHelper = require('./env-helper');
 const logger = require('./logger');
 const pentestEventReader = require('./code-audit/pentest-loop/event-reader');
-
-const AUTH_TTL_MS = 30 * 60 * 1000;
 
 function readStdinSync() {
   try { return fs.readFileSync(0, 'utf8'); }
@@ -26,20 +25,6 @@ function parseInput(raw) {
 
 function projectCwd(input) {
   return input.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
-}
-
-function authFlagPath(projectRoot) {
-  return path.join(projectRoot, 'security', '.yieldos-credentials-authorized');
-}
-
-function writeAuthFlag(projectRoot) {
-  const filePath = authFlagPath(projectRoot);
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, `${JSON.stringify({
-    authorized_at: new Date().toISOString(),
-    ttl_ms: AUTH_TTL_MS,
-  }, null, 2)}\n`);
-  return filePath;
 }
 
 function writeJsonAndExit(payload, exitCode) {
@@ -101,8 +86,8 @@ function buildCredentialsWarning(findings, prompt, projectRoot) {
     ...guide.split('\n').map((line) => `+ ${line}`),
     '+',
     '+ Cuando la credencial ya este en .env, pedi que se lea desde archivo.',
-    '+ Para autorizar una lectura local por 30 minutos, la frase exacta es:',
-    '+   AUTORIZO A LEER LAS CREDENCIALES',
+    '+ Para autorizar una lectura local, primero pedí leer el archivo.',
+    '+ yieldOS va a mostrar una frase con nonce para esa ruta exacta.',
     '```',
   ].join('\n');
 
@@ -162,15 +147,18 @@ async function main() {
     }
   } catch (_) { /* ignore */ }
 
-  if (credentialsScanner.authorizationPhraseDetected(prompt)) {
+  const authorization = credentialAuth.authorizePendingCredentialRead({
+    projectRoot,
+    response: prompt,
+  });
+  if (authorization.ok) {
     try {
-      const filePath = writeAuthFlag(projectRoot);
       logger.appendEntry(projectRoot, 'Credentials Read Authorization Granted', {
-        File: filePath,
-        'Valid for': '30 minutes',
-        Reason: 'user typed the exact authorization phrase',
+        Target: authorization.target_display || '(credential path)',
+        'Valid for': 'the matching Read retry while transcript proof is current',
+        Reason: 'user typed the exact nonce-bound authorization phrase',
       });
-      process.stderr.write(`${terminalArt.statusLine('[yieldOS] Autorización para leer credenciales registrada (válida 30 min)', 'success')}\n`);
+      process.stderr.write(`${terminalArt.statusLine('[yieldOS] Respuesta de autorización de credenciales recibida; reintentá el Read bloqueado', 'success')}\n`);
       process.stderr.write('[yieldOS:verdict] credentials-read-authorized\n');
     } catch (error) {
       process.stderr.write(`[yieldOS] no se pudo registrar la autorización: ${error.message}\n`);

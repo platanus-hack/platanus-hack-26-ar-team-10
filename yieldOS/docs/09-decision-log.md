@@ -281,7 +281,7 @@ Alternative considered: list it as a warning but allow. Rejected because users (
 
 ## D31 — Marketplace-based plugin install
 
-**Decision**: yieldOS is installed via Claude Code's official plugin CLI (`claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10; claude plugins install yieldos@yieldos`).
+**Decision**: yieldOS is installed via Claude Code's official plugin CLI (`claude plugins marketplace add yieldos/yieldos; claude plugins install yieldos@yieldos`).
 
 **Rationale**: tracks with how Claude Code expects plugins to be installed. Direct file copying to `~/.claude/plugins/yieldos/` works for testing but bypasses the official registration; the CLI flow registers the plugin properly in `installed_plugins.json`.
 
@@ -291,7 +291,7 @@ Alternative considered: list it as a warning but allow. Rejected because users (
 
 **Decision**: the public repository exposes `.claude-plugin/marketplace.json` at the repo root and points Claude Code to `yieldOS/plugins/yieldos/`. The nested `yieldOS/.claude-plugin/marketplace.json` remains valid for local marketplace testing from the `yieldOS/` directory.
 
-**Rationale**: Claude Code validates and installs GitHub marketplaces from the repository root. Keeping the root marketplace valid makes `claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10` work the same way public plugin repositories like Guard do.
+**Rationale**: Claude Code validates and installs GitHub marketplaces from the repository root. Keeping the root marketplace valid makes `claude plugins marketplace add yieldos/yieldos` work the same way public plugin repositories like Guard do.
 
 ---
 

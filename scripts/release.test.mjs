@@ -21,13 +21,13 @@ function makeFixture() {
 
   writeJson(path.join(root, '.claude-plugin/marketplace.json'), {
     name: 'yieldos',
-    owner: { name: 'platanus-hack-26-ar-team-10' },
+    owner: { name: 'yieldos' },
     plugins: [{ name: 'yieldos', version: '0.2.7', source: './yieldOS/plugins/yieldos' }],
   });
 
   writeJson(path.join(root, 'yieldOS/.claude-plugin/marketplace.json'), {
     name: 'yieldos',
-    owner: { name: 'platanus-hack-26-ar-team-10' },
+    owner: { name: 'yieldos' },
     plugins: [{ name: 'yieldos', version: '0.2.7', source: './plugins/yieldos' }],
   });
 

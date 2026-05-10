@@ -85,14 +85,14 @@ function validateMarketplace(relativePath, expectedSource, expectedVersion, sour
   const marketplace = readJson(relativePath);
   assertNoUnknownMarketplaceKeys(marketplace, relativePath);
   assert(marketplace.name === 'yieldos', `${relativePath} must be named yieldos`);
-  assert(marketplace.owner?.name === 'platanus-hack-26-ar-team-10', `${relativePath} has wrong owner`);
+  assert(marketplace.owner?.name === 'yieldos', `${relativePath} has wrong owner`);
   assert(Array.isArray(marketplace.plugins), `${relativePath} must declare plugins`);
 
   const entry = marketplace.plugins.find((plugin) => plugin.name === 'yieldos');
   assert(entry, `${relativePath} must declare the yieldos plugin`);
   assert(entry.version === expectedVersion, `${relativePath} must point at yieldos ${expectedVersion}`);
   assert(entry.source === expectedSource, `${relativePath} has wrong source: ${entry.source}`);
-  assert(entry.author?.name === 'platanus-hack-26-ar-team-10', `${relativePath} has wrong author`);
+  assert(entry.author?.name === 'yieldOS', `${relativePath} has wrong author`);
   assert(entry.category === 'security', `${relativePath} should classify yieldos as security`);
   assertFile(path.join(sourceBase, expectedSource, '.claude-plugin/plugin.json'));
 }
@@ -100,7 +100,7 @@ function validateMarketplace(relativePath, expectedSource, expectedVersion, sour
 const plugin = readJson('yieldOS/plugins/yieldos/.claude-plugin/plugin.json');
 assert(plugin.name === 'yieldos', 'plugin manifest must be named yieldos');
 assertSemver(plugin.version, 'plugin manifest version');
-assert(plugin.author?.name === 'platanus-hack-26-ar-team-10', 'plugin manifest has wrong author');
+assert(plugin.author?.name === 'yieldOS', 'plugin manifest has wrong author');
 
 validateMarketplace('.claude-plugin/marketplace.json', './dist/yieldos-plugin', plugin.version);
 validateMarketplace('yieldOS/.claude-plugin/marketplace.json', './plugins/yieldos', plugin.version, 'yieldOS');
@@ -111,9 +111,11 @@ for (const relativePath of [
   'scripts/release.mjs',
   'scripts/release.test.mjs',
   'scripts/versioning.mjs',
+  'scripts/generate-policy-manifest.mjs',
   '.github/workflows/plugin.yml',
   '.github/workflows/release.yml',
   'policy/README.md',
+  'policy/manifest.json',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
   'yieldOS/plugins/yieldos/commands/audit.md',
   'yieldOS/plugins/yieldos/commands/init.md',
@@ -134,11 +136,14 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/agent-pack-command.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-playbooks.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-yaml.js',
+  'yieldOS/plugins/yieldos/scripts/audit-event-checkpoint.js',
+  'yieldOS/plugins/yieldos/scripts/audit-events.js',
   'yieldOS/plugins/yieldos/scripts/oracle-command.js',
   'yieldOS/plugins/yieldos/scripts/oracles/demo-command.js',
   'yieldOS/plugins/yieldos/scripts/init-command.js',
   'yieldOS/plugins/yieldos/scripts/init-profiles.js',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
+  'yieldOS/plugins/yieldos/scripts/policy-manifest.js',
   'yieldOS/plugins/yieldos/scripts/post-install-audit.js',
   'yieldOS/plugins/yieldos/scripts/on-session-start.js',
   'yieldOS/plugins/yieldos/scripts/on-prompt-submit.js',
@@ -202,7 +207,11 @@ try {
     'commands/oracle.md',
     'hooks/hooks.json',
     'policy-cache/allowlist.json',
+    'policy-cache/manifest.json',
+    'scripts/policy-manifest.js',
     'scripts/pre-install-gate.js',
+    'scripts/audit-event-checkpoint.js',
+    'scripts/audit-events.js',
     'scripts/oracle-command.js',
     'skills/dependency-gate/SKILL.md',
   ]) {

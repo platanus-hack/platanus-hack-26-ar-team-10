@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-MARKETPLACE_SOURCE="${YIELDOS_MARKETPLACE_SOURCE:-platanus-hack/platanus-hack-26-ar-team-10}"
+MARKETPLACE_SOURCE="${YIELDOS_MARKETPLACE_SOURCE:-yieldos/yieldos}"
 PLUGIN_ID="${YIELDOS_PLUGIN_ID:-yieldos@yieldos}"
 SCOPE="${YIELDOS_INSTALL_SCOPE:-user}"
 DRY_RUN=0
@@ -16,16 +16,20 @@ Usage:
 
 Options:
   --scope <user|project|local>  Install scope passed to Claude Code (default: user)
-  --source <repo|url|path>      Marketplace source (default: platanus-hack/platanus-hack-26-ar-team-10)
+  --source <repo|url|path>      Marketplace source (default: yieldos/yieldos)
   --plugin <plugin@marketplace> Plugin id to install (default: yieldos@yieldos)
   --force                      Refresh the marketplace before installing
   --dry-run                    Print commands without running them
   -h, --help                   Show this help
 
 Examples:
-  curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+  curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh
+  curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt
+  shasum -a 256 -c checksums.txt --ignore-missing
+  sh install.sh --dry-run
+  sh install.sh
   sh install.sh --scope project
-  sh install.sh --source /path/to/platanus-hack-26-ar-team-10 --dry-run
+  sh install.sh --source /path/to/yieldos --dry-run
 EOF
 }
 
@@ -104,7 +108,16 @@ case "$NODE_MAJOR" in
 esac
 [ "$NODE_MAJOR" -ge 18 ] || die "Node.js 18+ is required. Current major version: $NODE_MAJOR"
 
-printf 'yieldOS installer\n'
+if [ "$DRY_RUN" = "1" ]; then
+  printf 'yieldOS installer dry run\n'
+  printf '  source: pinned release or explicit marketplace source\n'
+  printf '  checksum: verify before execution with the documented checksums.txt flow\n'
+  printf '  target: Claude Code plugin marketplace\n'
+  printf '  network: marketplace add/install only\n'
+  printf '  writes: Claude Code plugin files and yieldOS runtime cache\n'
+else
+  printf 'yieldOS installer\n'
+fi
 printf '  source: %s\n' "$MARKETPLACE_SOURCE"
 printf '  plugin: %s\n' "$PLUGIN_ID"
 printf '  scope: %s\n' "$SCOPE"

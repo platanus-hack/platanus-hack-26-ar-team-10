@@ -157,14 +157,14 @@ const AUTH_DATA_TEMPLATES = [
       s('cwe', 'CWE-20 Improper Input Validation', 'https://cwe.mitre.org/data/definitions/20.html'),
     ],
     signals: ['LLM output controls recommendation/approval/diagnosis/security decision', 'no citation/grounding/verification/human-review boundary'],
-    evidence: ['decision type', 'grounding source', 'validation or reviewer gate'],
+    evidence: ['decision type', 'grounding source', 'validation or review gate'],
     pass: ['critical claim is grounded, cited, bounded, and independently verified before action'],
     fail: ['fabricated or unsupported claim can trigger critical decision or user-visible advice as fact'],
     unknown: ['decision criticality is unclear', 'truth fixture or authoritative source is unavailable'],
     negativeControls: ['creative drafting with no decision side effect', 'answer clearly labeled unverified and blocked from action'],
     fixtures: ['hallucinated package recommendation', 'unsupported legal/medical claim', 'grounded citation control'],
     metrics: ['unsupported_claim_block_rate', 'grounding_required_rate'],
-    fixPatterns: ['require citations from trusted sources', 'separate advice from execution', 'route high-impact decisions to reviewer'],
+    fixPatterns: ['require citations from trusted sources', 'separate advice from execution', 'route high-impact decisions to human review'],
   }),
 ];
 

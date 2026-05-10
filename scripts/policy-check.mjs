@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const require = createRequire(import.meta.url);
+const policyManifest = require('../yieldOS/plugins/yieldos/scripts/policy-manifest');
 
 const POLICY_FILES = [
   'allowlist.json',
@@ -51,6 +54,7 @@ function validatePolicyRoot(repoRoot = REPO_ROOT) {
       errors.push(`policy-cache/${file} differs from policy/${file}`);
     }
   }
+  validatePolicyManifest(repoRoot, errors);
 
   validateEntryList('allowlist.json', policies['allowlist.json'], errors, { prefixes: ['npm:', 'python:', 'cargo:', 'go:'] });
   validateEntryList('denylist.json', policies['denylist.json'], errors, { prefixes: ['npm:', 'python:', 'cargo:', 'go:'] });
@@ -67,6 +71,48 @@ function validatePolicyRoot(repoRoot = REPO_ROOT) {
   validateMcps(policies['mcps.json'], errors);
 
   return errors;
+}
+
+function validatePolicyManifest(repoRoot, errors) {
+  const defaultsPath = path.join(repoRoot, 'yieldOS/plugins/yieldos/config/defaults.json');
+  const defaults = readJson(defaultsPath, errors);
+  const manifestFile = defaults?.policy?.manifest_file || policyManifest.MANIFEST_FILE;
+  const expectedHash = defaults?.policy?.manifest_sha256;
+
+  if (manifestFile !== policyManifest.MANIFEST_FILE) {
+    errors.push('defaults policy.manifest_file must be manifest.json');
+  }
+  if (!/^sha256:[a-f0-9]{64}$/i.test(String(expectedHash || ''))) {
+    errors.push('defaults policy.manifest_sha256 must be sha256:<64 hex>');
+  }
+  if (defaults?.policy?.integrity !== 'pinned-manifest-sha256') {
+    errors.push('defaults policy.integrity must be pinned-manifest-sha256');
+  }
+
+  const policyDir = path.join(repoRoot, 'policy');
+  const cacheDir = path.join(repoRoot, 'yieldOS/plugins/yieldos/policy-cache');
+  const policyVerification = policyManifest.verifyPolicyBundle(policyDir, {
+    files: POLICY_FILES,
+    expectedManifestSha256: expectedHash,
+    manifestFile,
+    baseLabel: 'policy',
+  });
+  errors.push(...policyVerification.errors);
+
+  const cacheVerification = policyManifest.verifyPolicyBundle(cacheDir, {
+    files: POLICY_FILES,
+    expectedManifestSha256: expectedHash,
+    manifestFile,
+    baseLabel: 'policy-cache',
+  });
+  errors.push(...cacheVerification.errors);
+
+  if (policyVerification.manifestSha256 && expectedHash && policyVerification.manifestSha256 !== expectedHash) {
+    errors.push('defaults policy.manifest_sha256 does not match policy/manifest.json');
+  }
+  if (policyVerification.manifest && cacheVerification.manifest && canonical(policyVerification.manifest) !== canonical(cacheVerification.manifest)) {
+    errors.push('policy-cache/manifest.json differs from policy/manifest.json');
+  }
 }
 
 function validateEntryList(file, policy, errors, { prefixes }) {
@@ -353,10 +399,11 @@ function validateVersion(policy, errors) {
   if (typeof policy.version !== 'string' || policy.version.length === 0) {
     errors.push('version.json version must be a string');
   }
-  for (const field of ['updated_at', 'hash']) {
-    if (policy[field] !== undefined && typeof policy[field] !== 'string') {
-      errors.push(`version.json ${field} must be a string`);
-    }
+  if (policy.updated_at !== undefined && typeof policy.updated_at !== 'string') {
+    errors.push('version.json updated_at must be a string');
+  }
+  if (typeof policy.hash !== 'string' || !/^sha256:[a-f0-9]{64}$/i.test(policy.hash)) {
+    errors.push('version.json hash must be sha256:<64 hex>');
   }
 }
 

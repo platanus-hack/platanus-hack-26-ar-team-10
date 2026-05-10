@@ -20,6 +20,11 @@ import {
   writeJson,
 } from './benchmark-utils.mjs';
 import { loadRepoSpecs } from './real-repo-benchmark.mjs';
+import {
+  PROVIDER_EGRESS_OPT_IN_ENV,
+  assertProviderEgressAllowed,
+  summarizeProviderEgress,
+} from './provider-egress.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const HOOK_PATH = path.join(REPO_ROOT, 'yieldOS', 'plugins', 'yieldos', 'scripts', 'pre-install-gate.js');
@@ -160,6 +165,12 @@ async function runModelWorkflowBenchmark(options = {}) {
       hook: path.relative(REPO_ROOT, HOOK_PATH),
       dry_run: Boolean(options.dryRun),
       generated_code_included: Boolean(options.includeGenerated),
+      provider_egress: {
+        required_for_live_provider_calls: true,
+        opt_in_env: PROVIDER_EGRESS_OPT_IN_ENV,
+        provider_request_sent_when_live: true,
+        repo_content_sent_when_live: false,
+      },
       note: 'Models propose repo changes; yieldOS determines whether risky changes can land. Raw model outputs are excluded unless explicitly requested.',
     },
     budgets: ledger.summary(),
@@ -191,6 +202,7 @@ async function runModelWorkflowBenchmark(options = {}) {
       includeGenerated: Boolean(options.includeGenerated),
       dryRun: Boolean(options.dryRun),
       requestTimeoutMs: options.requestTimeoutMs || 90000,
+      providerEgressEnv: options.providerEgressEnv || process.env,
     }));
     const latest = report.results[report.results.length - 1];
     if (options.progress) {
@@ -294,28 +306,97 @@ function buildSubjects(options, config) {
   return [...localRepos, ...specRepos];
 }
 
-async function runWorkflowCase({ subject, model, arm, task, config, tempRoot, costs, ledger, fetchImpl, includeGenerated, dryRun, requestTimeoutMs }) {
+async function runWorkflowCase({ subject, model, arm, task, config, tempRoot, costs, ledger, fetchImpl, includeGenerated, dryRun, requestTimeoutMs, providerEgressEnv }) {
   const caseId = [subject.id, model.provider, model.model, arm.id, task.id].map(safeSegment).join('__');
   const caseRoot = path.join(tempRoot, caseId);
   const controlRoot = path.join(caseRoot, 'control');
   const yieldosRoot = path.join(caseRoot, 'yieldos');
-  cloneSubject(subject, controlRoot);
-  cloneSubject(subject, yieldosRoot);
-  configureGit(controlRoot);
-  configureGit(yieldosRoot);
   const prompt = buildPrompt({ task, arm });
   const system = 'You are a coding agent benchmark participant. Return only strict JSON matching the requested schema.';
   const maxOutputTokens = model.max_output_tokens || 1200;
   const estimatedCost = estimateRequestUpperBoundUsd({ prompt, system, model, costs, maxOutputTokens });
+  const providerEgressBase = {
+    provider: model.provider,
+    purpose: 'model-workflow-benchmark',
+    model: model.model,
+    rawModelOutputIncluded: false,
+  };
   const budgetCheck = ledger.canSpend(model.provider, estimatedCost);
   if (!budgetCheck.ok) {
-    return skippedCase({ subject, model, arm, task, reason: budgetCheck.reason, estimatedCost });
+    return skippedCase({
+      subject,
+      model,
+      arm,
+      task,
+      reason: budgetCheck.reason,
+      estimatedCost,
+      providerEgress: summarizeProviderEgress({
+        ...providerEgressBase,
+        allowed: false,
+        providerRequestSent: false,
+        repoContentSent: false,
+      }),
+    });
   }
   if (dryRun) {
-    return skippedCase({ subject, model, arm, task, reason: 'dry-run', estimatedCost });
+    return skippedCase({
+      subject,
+      model,
+      arm,
+      task,
+      reason: 'dry-run',
+      estimatedCost,
+      providerEgress: summarizeProviderEgress({
+        ...providerEgressBase,
+        allowed: false,
+        providerRequestSent: false,
+        repoContentSent: false,
+      }),
+    });
   }
-
+  assertProviderEgressAllowed({
+    env: providerEgressEnv,
+    provider: model.provider,
+    purpose: 'model-workflow-benchmark',
+  });
   const started = Date.now();
+  const preflightError = providerPreflightError(model.provider);
+  if (preflightError) {
+    return {
+      repository_id: subject.id,
+      model: {
+        provider: model.provider,
+        id: model.model,
+      },
+      arm: arm.id,
+      task_id: task.id,
+      task_title: task.title,
+      outcome: 'provider-error',
+      duration_ms: Date.now() - started,
+      error: preflightError,
+      provider_egress: summarizeProviderEgress({
+        ...providerEgressBase,
+        allowed: true,
+        providerRequestSent: false,
+        repoContentSent: false,
+      }),
+      cost: {
+        estimated_preflight_usd: estimatedCost,
+        measured_provider_usage_usd: 0,
+      },
+    };
+  }
+  cloneSubject(subject, controlRoot);
+  cloneSubject(subject, yieldosRoot);
+  configureGit(controlRoot);
+  configureGit(yieldosRoot);
+  const providerEgress = summarizeProviderEgress({
+    ...providerEgressBase,
+    allowed: true,
+    providerRequestSent: true,
+    repoContentSent: false,
+  });
+
   let modelResponse;
   try {
     modelResponse = await callModel({
@@ -341,6 +422,7 @@ async function runWorkflowCase({ subject, model, arm, task, config, tempRoot, co
       outcome: 'provider-error',
       duration_ms: Date.now() - started,
       error: safeText(err.message || String(err), 400),
+      provider_egress: providerEgress,
       cost: {
         estimated_preflight_usd: estimatedCost,
         measured_provider_usage_usd: 0,
@@ -368,7 +450,7 @@ async function runWorkflowCase({ subject, model, arm, task, config, tempRoot, co
       repair.outcome = parsed.ok ? 'repaired' : 'failed';
     }
   }
-  const base = baseResult({ subject, model, arm, task, estimatedCost, modelCost, modelResponse, repair, started });
+  const base = baseResult({ subject, model, arm, task, estimatedCost, modelCost, modelResponse, repair, started, providerEgress });
   if (!parsed.ok) {
     return {
       ...base,
@@ -446,7 +528,7 @@ async function repairModelFiles({ model, task, originalText, costs, ledger, fetc
   }
 }
 
-function baseResult({ subject, model, arm, task, estimatedCost, modelCost, modelResponse, repair, started }) {
+function baseResult({ subject, model, arm, task, estimatedCost, modelCost, modelResponse, repair, started, providerEgress }) {
   return {
     repository_id: subject.id,
     model: {
@@ -457,6 +539,7 @@ function baseResult({ subject, model, arm, task, estimatedCost, modelCost, model
     task_id: task.id,
     task_title: task.title,
     duration_ms: Date.now() - started,
+    provider_egress: providerEgress,
     cost: {
       estimated_preflight_usd: estimatedCost,
       measured_provider_usage_usd: modelCost,
@@ -470,7 +553,7 @@ function baseResult({ subject, model, arm, task, estimatedCost, modelCost, model
   };
 }
 
-function skippedCase({ subject, model, arm, task, reason, estimatedCost }) {
+function skippedCase({ subject, model, arm, task, reason, estimatedCost, providerEgress }) {
   return {
     repository_id: subject.id,
     model: {
@@ -482,6 +565,7 @@ function skippedCase({ subject, model, arm, task, reason, estimatedCost }) {
     task_title: task.title,
     outcome: 'skipped',
     skip_reason: reason,
+    provider_egress: providerEgress,
     cost: {
       estimated_preflight_usd: estimatedCost,
       measured_provider_usage_usd: 0,
@@ -536,6 +620,12 @@ async function callModel({ provider, model, modelConfig, prompt, system, maxOutp
     return callAnthropic({ model, prompt, system, maxOutputTokens, fetchImpl, timeoutMs });
   }
   throw new Error(`unsupported provider: ${provider}`);
+}
+
+function providerPreflightError(provider) {
+  if (provider === 'openai') return process.env.OPENAI_API_KEY ? null : 'OPENAI_API_KEY is not set';
+  if (provider === 'anthropic') return process.env.ANTHROPIC_API_KEY ? null : 'ANTHROPIC_API_KEY is not set';
+  return `unsupported provider: ${provider}`;
 }
 
 async function callOpenAI({ model, modelConfig, prompt, system, maxOutputTokens, fetchImpl, timeoutMs }) {
@@ -894,6 +984,7 @@ function usage() {
     'Usage: node scripts/model-workflow-benchmark.mjs --repo <path> --repo-spec benchmarks/public-repos.json --repo-id express --task-id admin-users-route --model-id gpt-5.5 --out benchmarks/<file>.json [--max-cases N]',
     '',
     'Runs live OpenAI/Anthropic coding workflow benchmarks with provider spend caps.',
+    `Live provider calls require ${PROVIDER_EGRESS_OPT_IN_ENV}=1 after confirming benchmark prompts may leave this machine.`,
     'Loads .env from the repository root. Secret values are never written to reports.',
   ].join('\n');
 }

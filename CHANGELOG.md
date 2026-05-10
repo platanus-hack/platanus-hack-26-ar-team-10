@@ -1,5 +1,16 @@
 # Changelog
 
+## yieldOS v0.13.0 - 2026-05-10
+
+- Publish accumulated team-agent-pack, code-audit, oracle, and enterprise productization work since the last public GitHub Release.
+- Add enterprise controls for install trust, policy integrity, credential authorization, tamper-evident audit events, provider egress, evidence classification, governance, and runtime module boundaries.
+- Harden code-audit and oracle coverage for docs/example secrets, raw error responses, request body buffering, and additional security contract mappings.
+- Surface saved audit state, generated oracle contracts, and proof manifests directly in CLI output.
+
+## yieldOS v0.12.0 - 2026-05-10
+
+- Add enterprise-grade productization controls for install trust, policy integrity, credential authorization, audit events, provider egress, evidence classification, governance, and runtime module boundaries.
+
 ## yieldOS v0.11.1 - 2026-05-10
 
 - Harden code-audit coverage for docs/example secrets, raw error responses, and unbounded request body buffering.

@@ -27,6 +27,19 @@ Rules:
 - `entries` should be reviewable without reading chat history.
 - `rules.default_unlisted` must be explicit when unlisted items are security-relevant.
 
+## Policy Integrity
+
+`manifest.json` is generated, not hand-authored. It records the raw-byte SHA-256 for every runtime policy file listed in `config/defaults.json`. The installed plugin pins the manifest hash in `policy.manifest_sha256` and rejects online, runtime-cache, or shipped-cache bundles that drift from that manifest.
+
+Policy changes must run:
+
+```bash
+node scripts/generate-policy-manifest.mjs
+node scripts/policy-check.mjs
+```
+
+The generator updates `policy/version.json.hash`, syncs `yieldOS/plugins/yieldos/policy-cache/`, writes both manifest copies, and updates the plugin default manifest pin.
+
 ## Package Allowlist
 
 Current file: `allowlist.json`

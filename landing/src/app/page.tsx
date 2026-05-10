@@ -1,59 +1,19 @@
-import { AgentPackSection } from "@/components/agent-pack-section";
 import { AgentsInstallButton } from "@/components/agents-install-button";
-import { CopyCommandButton } from "@/components/copy-command-button";
 import { DefenseLayers } from "@/components/defense-layers";
+import { ExternalDefenseTerminal } from "@/components/external-defense-terminal";
 import { HeroGridAccents } from "@/components/hero-grid-accents";
 import { InstallCommandPill } from "@/components/install-command-pill";
 import { MotionReveal } from "@/components/motion-reveal";
-import { OracleDemoFlow } from "@/components/oracle-demo-flow";
+import { OracleBenchmarks } from "@/components/oracle-benchmarks";
 import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ViewReadmeButton } from "@/components/view-readme-button";
 
 const installCommand =
-  "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh";
-const readmeUrl =
-  "https://github.com/platanus-hack/platanus-hack-26-ar-team-10#readme";
+  "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh && curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt && shasum -a 256 -c checksums.txt --ignore-missing && sh install.sh";
+const repoUrl =
+  "https://github.com/yieldos/yieldos";
+const readmeUrl = `${repoUrl}#readme`;
 const heroTitle = "Unlock safe coding for technical and non-technical talent";
-
-const gatedVectors = [
-  { title: "Packages", detail: "9 managers." },
-  { title: "Skills", detail: "Approved instructions." },
-  { title: "MCPs", detail: "Scoped tools." },
-  { title: "Instructions", detail: "AGENTS.md / CLAUDE.md." },
-  { title: "Vendoring", detail: "Block clone." },
-  { title: "Binaries", detail: "Block curl | sh." },
-  { title: "Manifests", detail: "Pass data." },
-];
-
-const policySteps = [
-  { step: "01", title: "Native", copy: "Prefer platform APIs." },
-  { step: "02", title: "Allow", copy: "Curated versions pass." },
-  { step: "03", title: "Deny", copy: "Known bad stops." },
-  { step: "04", title: "Exotic", copy: "Binaries and vendoring block." },
-  { step: "05", title: "Analyze", copy: "Rewrite tiny. Block risky." },
-];
-
-const auditItems = [
-  {
-    label: "Append-only log",
-    value: "security/dependency-events.md",
-  },
-  {
-    label: "Self-defense",
-    value: "agent cannot edit protected yieldOS files",
-  },
-  {
-    label: "Fresh policy",
-    value: "online, runtime cache, shipped fallback",
-  },
-];
-
-const proofStats = [
-  { value: "0", label: "CI model calls in verifier" },
-  { value: "3", label: "oracle result states" },
-  { value: "2", label: "CDSC proof sides" },
-  { value: "7", label: "gated vectors" },
-];
 
 export default function Home() {
   return (
@@ -67,12 +27,15 @@ export default function Home() {
         <HeroGridAccents />
         <div className="pitch-shell relative z-10 mx-auto w-full max-w-7xl px-4 py-7 sm:px-6">
           <div className="ml-0 mr-auto flex max-w-3xl flex-col items-start text-left">
-            <h1 className="hero-title text-left font-semibold leading-[0.95] tracking-[-0.025em] text-zinc-950">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-[11px]">
+              Security suite for your AI agent
+            </p>
+            <h1 className="hero-title mt-3 text-left font-semibold leading-[0.95] tracking-[-0.025em] text-zinc-950 sm:mt-4">
               {heroTitle}
             </h1>
             <MotionReveal className="self-stretch text-left" delay={0.05} immediate y={12}>
               <p className="mt-5 w-full max-w-[58ch] text-left text-base leading-7 text-zinc-600 sm:mt-6 sm:text-lg sm:leading-8">
-                yieldOS sits between your AI coding agent and your project. It automatically blocks malicious packages, prompt injections, and unsafe code changes before they reach your repo — with deterministic checks, not the AI&rsquo;s opinion.
+                yieldOS sits between your AI coding agent and your project. It blocks policy-covered risky actions before sensitive steps, verifies selected fixes with scoped oracle contracts, and escalates uncovered cases instead of trusting the AI&rsquo;s opinion.
               </p>
             </MotionReveal>
             <MotionReveal
@@ -100,20 +63,20 @@ export default function Home() {
         id="defenses"
         className="pitch-section theme-surface-light border-y border-zinc-200/80"
       >
-        <div className="pitch-shell mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 sm:py-20">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16">
-            <div className="max-w-xl">
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="grid grid-cols-1 gap-8 sm:gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16 xl:gap-20">
+            <div className="w-full max-w-xl">
               <MotionReveal>
                 <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
                   How yieldOS protects you
                 </p>
-                <h2 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-tight text-zinc-950 sm:text-5xl lg:text-6xl">
+                <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-zinc-950 sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
                   Two layers of defense, one job: keep your project safe.
                 </h2>
               </MotionReveal>
 
               <MotionReveal delay={0.05}>
-                <div className="mt-7 space-y-5 text-base leading-7 text-zinc-600 sm:mt-9 sm:space-y-6 sm:text-lg sm:leading-8">
+                <div className="mt-6 space-y-4 text-[15px] leading-[1.65] text-zinc-600 sm:mt-8 sm:space-y-5 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
                   <p>
                     yieldOS works on two fronts at once: what comes IN to your
                     project, and what goes OUT every commit.
@@ -146,204 +109,127 @@ export default function Home() {
       </section>
 
       <section
-        id="demo-flow"
-        className="pitch-section bg-[#0e0e10] text-white"
+        id="external-attacks"
+        className="pitch-section bg-[#0a0a0c] text-white"
       >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[0.64fr_1.36fr] lg:items-end lg:gap-10">
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="max-w-2xl">
             <MotionReveal>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Contract proof demo
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400 sm:text-[11px]">
+                External defense
               </p>
-              <h2 className="mt-3 max-w-lg text-3xl font-semibold leading-tight text-balance sm:mt-5 sm:text-5xl">
-                Counterexample killed. Fix proven.
+              <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
+                Live in your editor.
               </h2>
+            </MotionReveal>
+
+            <MotionReveal delay={0.05}>
+              <p className="mt-5 text-[15px] leading-[1.65] text-zinc-400 sm:mt-6 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
+                Every risky action your AI agent tries gets intercepted before
+                it touches your repo. Here&rsquo;s what you actually see.
+              </p>
             </MotionReveal>
           </div>
 
-          <div className="mt-6">
-            <OracleDemoFlow />
-          </div>
+          <MotionReveal className="mt-8 sm:mt-12" delay={0.1} y={18}>
+            <ExternalDefenseTerminal />
+          </MotionReveal>
         </div>
       </section>
 
       <section
-        id="gated-vectors"
-        className="pitch-section theme-surface-light border-y border-zinc-200/80"
-      >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.74fr_1.26fr] lg:items-center lg:gap-12">
-            <MotionReveal>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                What yieldOS gates
-              </p>
-              <h2 className="mt-4 max-w-xl text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-                Seven gated vectors.
-              </h2>
-            </MotionReveal>
-            <div className="vector-grid grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {gatedVectors.map((vector, index) => (
-                <MotionReveal key={vector.title} delay={index * 0.04} y={14}>
-                  <article
-                    className={`surface-scan-card vector-card min-h-28 rounded-lg border border-zinc-200 bg-white p-4 ${
-                      index === 0 || index === 3 ? "is-dominant" : ""
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-base font-medium text-zinc-950">
-                        {vector.title}
-                      </h3>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-zinc-600">
-                      {vector.detail}
-                    </p>
-                  </article>
-                </MotionReveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="policy-flow"
+        id="benchmarks"
         className="pitch-section theme-surface-smoke border-b border-zinc-200/80"
       >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:gap-12">
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="max-w-2xl">
             <MotionReveal>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Five-check policy flow
+                Internal defense · benchmarks
               </p>
-              <h2 className="mt-4 max-w-lg text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-                Five checks. No prompts.
+              <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-zinc-950 sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
+                Agent vs oracle.
               </h2>
             </MotionReveal>
-            <div className="policy-path review-path relative rounded-lg border border-zinc-200/80 bg-white/80">
-              {policySteps.map((item, index) => (
-                <MotionReveal key={item.step} delay={index * 0.05} y={18}>
-                  <article className="relative grid gap-3 border-b border-zinc-200 p-4 last:border-b-0 sm:grid-cols-4 sm:p-5">
-                    <p className="review-step font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
-                      {item.step}
-                    </p>
-                    <div className="sm:col-span-3">
-                      <h3 className="text-base font-medium sm:text-lg">
-                        {item.title}
-                      </h3>
-                      <p className="mt-1 text-sm leading-6 text-zinc-600">
-                        {item.copy}
-                      </p>
-                    </div>
-                  </article>
-                </MotionReveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <AgentPackSection />
-
-      <section
-        id="audit-trail"
-        className="pitch-section theme-surface-light"
-      >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.76fr_1.24fr] lg:items-center lg:gap-12">
-            <MotionReveal>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Audit + self-defense
+            <MotionReveal delay={0.05}>
+              <p className="mt-5 text-[15px] leading-[1.65] text-zinc-600 sm:mt-6 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
+                Same security checks, two routing paths:{" "}
+                <strong className="font-semibold text-zinc-950">
+                  Claude Opus 4.7
+                </strong>{" "}
+                review candidates vs the{" "}
+                <strong className="font-semibold text-zinc-950">
+                  Oracle
+                </strong>{" "}
+                running deterministic rules. The current numbers are local-review
+                evidence, not provider billing proof.
               </p>
-              <h2 className="mt-4 max-w-lg text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-                Logs. Cache. Self-defense.
-              </h2>
             </MotionReveal>
-            <div className="incident-ledger divide-y divide-zinc-200/80 rounded-lg border border-zinc-200/80 bg-white/85">
-              {auditItems.map((item, index) => (
-                <MotionReveal key={item.label} delay={index * 0.06} y={18}>
-                  <article className="log-row grid gap-3 p-4 sm:grid-cols-[150px_1fr] sm:p-5">
-                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-400">
-                      {item.label}
-                    </p>
-                    <p className="text-sm leading-6 text-zinc-700 sm:text-base">
-                      {item.value}
-                    </p>
-                  </article>
-                </MotionReveal>
-              ))}
-            </div>
           </div>
-        </div>
-      </section>
 
-      <section
-        id="proof"
-        className="pitch-section theme-surface-smoke border-y border-zinc-200/80"
-      >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.68fr_1.32fr] lg:items-center lg:gap-12">
-            <MotionReveal>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Prototype contract
-              </p>
-              <h2 className="mt-4 max-w-lg text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-                Baseline fail. Fixed pass.
-              </h2>
-            </MotionReveal>
-            <div className="proof-grid grid grid-cols-2 gap-3">
-              {proofStats.map((stat, index) => (
-                <MotionReveal key={stat.label} delay={index * 0.05} y={16}>
-                  <article className="metric-tile proof-card rounded-lg border border-zinc-200/80 bg-white/80 p-4 sm:p-6">
-                    <p className="font-mono text-3xl font-semibold leading-none tracking-tight text-zinc-950 sm:text-5xl">
-                      {stat.value}
-                    </p>
-                    <p className="mt-3 text-sm leading-5 text-zinc-500">
-                      {stat.label}
-                    </p>
-                  </article>
-                </MotionReveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+          <MotionReveal className="mt-8 sm:mt-12" delay={0.1} y={18}>
+            <OracleBenchmarks />
+          </MotionReveal>
 
-      <section
-        id="final-cta"
-        className="pitch-section theme-surface-light"
-      >
-        <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
-          <div className="audit-stamp relative overflow-hidden rounded-lg border border-zinc-200 bg-[#0e0e10] px-5 py-14 text-center text-white sm:px-8">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-              No unproven fixes.
+          <MotionReveal className="mt-6 sm:mt-8" delay={0.15}>
+            <p className="max-w-3xl text-xs leading-5 text-zinc-500 sm:text-[13px] sm:leading-6">
+              Time is wall-clock latency per check. Cost is an assumption-based
+              routing estimate from the local-review reports. The oracle path
+              does not call a model for deterministic checks.
             </p>
-            <h2 className="mx-auto mt-5 max-w-2xl text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-              Give agents a contract boundary.
-            </h2>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <CopyCommandButton
-                command={installCommand}
-                label="Install yieldOS"
-                variant="light"
-              />
-              <a
-                href="/oracle-demo"
-                className="inline-flex h-11 items-center justify-center rounded-md border border-white/15 bg-white/[0.06] px-4 text-sm font-medium text-white transition hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10] active:translate-y-px"
-              >
-                View contract demo
-              </a>
-            </div>
-          </div>
+          </MotionReveal>
         </div>
       </section>
 
-      <footer className="theme-surface-light border-t border-zinc-200/80 py-5">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 font-mono text-xs text-zinc-500 sm:flex-row sm:px-8">
-          <p>yieldOS</p>
-          <p>Oracle-driven security harness</p>
+      <footer className="theme-surface-light border-t border-zinc-200/80">
+        <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-[1fr_auto] sm:items-end sm:gap-10">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-[11px]">
+                Security suite for your AI agent
+              </p>
+              <p className="mt-3 text-3xl font-semibold tracking-[-0.02em] text-zinc-950 sm:text-4xl">
+                yieldOS
+              </p>
+              <p className="mt-3 max-w-md text-sm leading-6 text-zinc-600 sm:text-base sm:leading-7">
+                Deterministic checks before risky changes touch your repo. The
+                model can propose. The oracle decides.
+              </p>
+            </div>
+            <nav
+              aria-label="Footer"
+              className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 sm:text-xs"
+            >
+              <a
+                href={repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-zinc-950"
+              >
+                GitHub
+              </a>
+              <a
+                href={readmeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-zinc-950"
+              >
+                README
+              </a>
+              <a
+                href="#hero"
+                className="transition-colors hover:text-zinc-950"
+              >
+                Top
+              </a>
+              <span aria-label="License">MIT</span>
+            </nav>
+          </div>
+          <div className="mt-10 flex flex-col gap-2 border-t border-zinc-200/80 pt-6 font-mono text-[11px] text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
+            <p>© 2026 yieldOS · Oracle-driven security harness</p>
+            <p>Local-first security contracts for coding agents</p>
+          </div>
         </div>
       </footer>
     </main>
