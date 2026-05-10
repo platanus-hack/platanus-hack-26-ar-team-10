@@ -10,7 +10,7 @@
     {
       "name": "yieldos",
       "description": "Security gate for Claude Code. Intercepts dependency installs, skills, MCPs, instruction edits, source-code audits, generated agent instructions, adversarial pentest loops, dashboard streams, and policy-validated team agent packs.",
-      "version": "0.12.0",
+      "version": "0.13.0",
       "author": {
         "name": "yieldOS"
       },
