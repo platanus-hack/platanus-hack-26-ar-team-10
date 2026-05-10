@@ -22,6 +22,8 @@ function missingAuthz(item) {
 }
 
 const AUTH_GUARD_RE = /\b(?:requireAuth|authorize|authMiddleware|isAdmin|requireRole|ensureAuth)\b/;
+const REMOVED_GUARD_RE = /\b(?:req\.user|requireAuth|authorize|authMiddleware|ensureAuth|isAdmin|requireRole|schema\.parse|z\.object|permission|role)\b/i;
+const VALIDATION_CALL_RE = /\bvalidate[A-Za-z0-9_]*\s*\(/;
 
 function hasRouteAuthGuard(line) {
   const args = routeCallArgs(line);
@@ -100,8 +102,7 @@ function splitTopLevelArgs(input) {
 function removedValidation(item, input) {
   if (item.sign !== '-') return null;
   const code = codeShape(item.code);
-  const hasGuardToken = /(req\.user|requireAuth|authorize|isAdmin|requireRole|schema\.parse|z\.object|permission|role)/i.test(code)
-    || /\bvalidate[A-Za-z0-9_]*\s*\(/.test(code);
+  const hasGuardToken = REMOVED_GUARD_RE.test(code) || VALIDATION_CALL_RE.test(code);
   if (!hasGuardToken) return null;
   if (hasAddedGuardReplacement(item, input)) return null;
   if (!/(?:\bif\s*\(|\breturn\b|=>|[;{}()])/.test(code)) return null;
@@ -118,8 +119,7 @@ function hasAddedGuardReplacement(item, input) {
   return parseChangedLines(input?.diff || '').some((candidate) => {
     if (candidate.file !== item.file || candidate.sign !== '+') return false;
     const code = codeShape(candidate.code);
-    return /(req\.user|requireAuth|authorize|isAdmin|requireRole|schema\.parse|z\.object|permission|role)/i.test(code)
-      || /\bvalidate[A-Za-z0-9_]*\s*\(/.test(code);
+    return REMOVED_GUARD_RE.test(code) || VALIDATION_CALL_RE.test(code);
   });
 }
 

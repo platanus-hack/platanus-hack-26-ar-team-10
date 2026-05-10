@@ -436,12 +436,31 @@ test('redTeam ignores removed prose and string data that mention validation', ()
 
 test('redTeam ignores removed scanner regex literals that mention guard words', () => {
   const findings = codeAudit.redTeam({
-    files: ['scripts/code-audit/red-team.js'],
+    files: ['scripts/code-audit/red-team.js', 'yieldOS/plugins/yieldos/scripts/code-audit/red-team.js'],
     diff: [
       'diff --git a/scripts/code-audit/red-team.js b/scripts/code-audit/red-team.js',
       '+++ b/scripts/code-audit/red-team.js',
       '@@',
       '-  if (!/(req\\\\.user|requireAuth|authorize|isAdmin|requireRole|validate|schema\\\\.parse|z\\\\.object|permission|role)/i.test(item.code)) return null;',
+      'diff --git a/yieldOS/plugins/yieldos/scripts/code-audit/red-team.js b/yieldOS/plugins/yieldos/scripts/code-audit/red-team.js',
+      '+++ b/yieldOS/plugins/yieldos/scripts/code-audit/red-team.js',
+      '@@',
+      '-  return /(req\\\\.user|requireAuth|authorize|isAdmin|requireRole|schema\\\\.parse|z\\\\.object|permission|role)/i.test(code);',
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
+test('redTeam ignores removed credential authorization timestamp bookkeeping', () => {
+  const findings = codeAudit.redTeam({
+    files: ['yieldOS/plugins/yieldos/scripts/pre-install-gate.js'],
+    diff: [
+      'diff --git a/yieldOS/plugins/yieldos/scripts/pre-install-gate.js b/yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
+      '+++ b/yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
+      '@@',
+      '-  const authorizedAt = new Date(data.authorized_at).getTime();',
+      '-  return Number.isFinite(authorizedAt) && Number.isFinite(ttl) && Date.now() - authorizedAt < ttl;',
     ].join('\n'),
   });
 

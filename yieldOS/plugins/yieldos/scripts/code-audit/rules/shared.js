@@ -47,7 +47,7 @@ function stripQuotedStrings(code) {
 }
 
 function stripRegexLiterals(code) {
-  return code.replace(/(^|[=(:,\[{!&|?;]\s*)\/(?:\\.|[^/\\\n])+\/[dgimsuy]*/g, '$1//');
+  return code.replace(/(^|[=(:,\[{!&|?;]\s*|\breturn\s+)\/(?:\\.|[^/\\\n])+\/[dgimsuy]*/g, '$1//');
 }
 
 module.exports = {
