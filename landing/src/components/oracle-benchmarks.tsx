@@ -6,6 +6,7 @@ type Row = {
 
 type Card = {
   title: string;
+  caption: string;
   fill: string;
   stroke: string;
   text: string;
@@ -19,6 +20,7 @@ type Card = {
 const cards: Card[] = [
   {
     title: "Oracle",
+    caption: "Deterministic · runs only when needed",
     fill: "rgba(34, 167, 110, 0.1)",
     stroke: "rgba(22, 140, 88, 0.5)",
     text: "rgb(22, 140, 88)",
@@ -33,6 +35,7 @@ const cards: Card[] = [
   },
   {
     title: "Claude Opus 4.7",
+    caption: "Non-deterministic · runs every check",
     fill: "rgba(220, 38, 38, 0.08)",
     stroke: "rgba(220, 38, 38, 0.45)",
     text: "rgb(185, 28, 28)",
@@ -75,8 +78,14 @@ export function OracleBenchmarks() {
             >
               {card.title}
             </h3>
+            <p
+              className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] sm:text-[11px]"
+              style={{ color: card.textMuted }}
+            >
+              {card.caption}
+            </p>
 
-            <div className="mt-7 space-y-6 sm:mt-9 sm:space-y-7">
+            <div className="mt-6 space-y-6 sm:mt-8 sm:space-y-7">
               {card.rows.map((row) => (
                 <div key={row.metric}>
                   <div className="flex items-baseline justify-between gap-3">
