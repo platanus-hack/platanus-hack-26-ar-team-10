@@ -69,7 +69,7 @@ export function HeroGridAccents() {
   return (
     <div
       aria-hidden
-      className="hidden md:block"
+      className="hidden xl:block"
       style={{
         position: "absolute",
         right: 0,
