@@ -100,20 +100,20 @@ export default function Home() {
         id="defenses"
         className="pitch-section theme-surface-light border-y border-zinc-200/80"
       >
-        <div className="pitch-shell mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 sm:py-20">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16">
-            <div className="max-w-xl">
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="grid grid-cols-1 gap-8 sm:gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16 xl:gap-20">
+            <div className="w-full max-w-xl">
               <MotionReveal>
                 <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
                   How yieldOS protects you
                 </p>
-                <h2 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-tight text-zinc-950 sm:text-5xl lg:text-6xl">
+                <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-zinc-950 sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
                   Two layers of defense, one job: keep your project safe.
                 </h2>
               </MotionReveal>
 
               <MotionReveal delay={0.05}>
-                <div className="mt-7 space-y-5 text-base leading-7 text-zinc-600 sm:mt-9 sm:space-y-6 sm:text-lg sm:leading-8">
+                <div className="mt-6 space-y-4 text-[15px] leading-[1.65] text-zinc-600 sm:mt-8 sm:space-y-5 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
                   <p>
                     yieldOS works on two fronts at once: what comes IN to your
                     project, and what goes OUT every commit.
