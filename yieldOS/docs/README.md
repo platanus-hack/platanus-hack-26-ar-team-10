@@ -21,10 +21,10 @@ This directory captures every design decision behind yieldOS, why it exists, and
 15. [Oracle-driven harness](19-oracle-driven-harness.md) — *technical harness behind security-contract execution and pass/fail/unknown semantics*
 16. [Oracle evidence artifacts](20-oracle-evidence-artifacts.md) — *hashable generated evidence and CI verification boundaries*
 17. [Counterexample-driven security contracts](21-counterexample-driven-security-contracts.md) — *the reviewer-facing contract/counterexample/proof-of-fix model*
-18. [Oracle demo script](22-oracle-demo-script.md) — *visible demo flow for judges and non-technical viewers*
+18. [Oracle demo script](22-oracle-demo-script.md) — *visible demo flow for non-technical viewers*
 19. [Oracle evals](23-oracle-evals.md) — *cost, flake, and deterministic-resolution metrics*
-20. [Hackathon pitch](24-hackathon-pitch.md) — *current story, hard objections, and demo framing*
-21. [Oracle contract catalog](25-oracle-contract-catalog.md) — *research-backed oracle cases for validation and benchmarks*
+20. [Oracle contract catalog](25-oracle-contract-catalog.md) — *research-backed oracle cases for validation and benchmarks*
+21. [Enterprise boundaries](enterprise-boundaries.md) — *current enforcement levels, data flows, and claim rules*
 
 ## Planning docs (not yet implemented)
 

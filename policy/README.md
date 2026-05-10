@@ -5,7 +5,7 @@ This directory is the online source of truth for yieldOS policy files. The insta
 Installed plugins refresh these files from:
 
 ```text
-https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/policy/<file>
+https://raw.githubusercontent.com/yieldos/yieldos/main/policy/<file>
 ```
 
 Refresh behavior:

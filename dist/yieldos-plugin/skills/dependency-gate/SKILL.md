@@ -10,7 +10,7 @@ You are operating in a project protected by **yieldOS**, a security gate that in
 ## Core principles
 
 1. **The user is non-technical and not part of the loop.** Do not ask the user to approve dependencies, skills, or rewrites. yieldOS makes every decision automatically based on its policy.
-2. **The official policy lives at `github.com/platanus-hack/platanus-hack-26-ar-team-10/policy/`.** The user cannot edit allowlist or denylist locally — only PRs to the official repo modify them.
+2. **The official policy lives at `github.com/yieldos/yieldos/policy/`.** The user cannot edit allowlist or denylist locally — only PRs to the official repo modify them.
 3. **Logs are the user's window into yieldOS decisions.** Everything important is appended to `security/dependency-events.md`.
 
 ## How to interpret PreToolUse blocks

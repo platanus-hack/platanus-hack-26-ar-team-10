@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const githubUrl = "https://github.com/platanus-hack/platanus-hack-26-ar-team-10";
+const githubUrl = "https://github.com/yieldos/yieldos";
 
 export function ScrollAwareHeader() {
   const [scrolled, setScrolled] = useState(false);

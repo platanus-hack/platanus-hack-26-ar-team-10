@@ -1,10 +1,10 @@
 {
   "name": "yieldos",
   "metadata": {
-    "description": "Local marketplace for yieldOS, a Claude Code security gate."
+    "description": "Local marketplace for yieldOS, a Claude Code agent-action security gate."
   },
   "owner": {
-    "name": "platanus-hack-26-ar-team-10"
+    "name": "yieldos"
   },
   "plugins": [
     {
@@ -12,7 +12,7 @@
       "description": "Security gate for Claude Code. Intercepts dependency installs, skills, MCPs, instruction edits, source-code audits, generated agent instructions, adversarial pentest loops, dashboard streams, and policy-validated team agent packs.",
       "version": "0.11.1",
       "author": {
-        "name": "platanus-hack-26-ar-team-10"
+        "name": "yieldOS"
       },
       "source": "./plugins/yieldos",
       "category": "security"

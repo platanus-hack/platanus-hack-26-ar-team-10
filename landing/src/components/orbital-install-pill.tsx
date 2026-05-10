@@ -33,7 +33,7 @@ export function OrbitalInstallPill({ command }: OrbitalInstallPillProps) {
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<number | null>(null);
   const compactCommand = command.replace(
-    "https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main",
+    "https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1",
     "...",
   );
 
@@ -68,7 +68,7 @@ export function OrbitalInstallPill({ command }: OrbitalInstallPillProps) {
         </span>
         <span className="orbital-pill-command">
           <span className="hidden sm:inline">{compactCommand}</span>
-          <span className="sm:hidden">curl ... | sh</span>
+          <span className="sm:hidden">verified install</span>
         </span>
         <span className="orbital-pill-copy" aria-live="polite">
           {copied ? "copied" : "copy"}

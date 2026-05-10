@@ -2,8 +2,6 @@
 
 <img src="./project-logo.png" alt="yieldOS logo" width="200" />
 
-Track: AI Security
-
 **Executable security contracts for AI coding agents.**
 
 AI coding agents can install dependencies, add tools, edit instruction files, read secrets, and commit code faster than a human reviewer can inspect every step. yieldOS is an oracle-driven security harness that turns risky agent actions into security contracts, counterexamples, and proof-of-fix evidence. The model can propose. The oracle decides.
@@ -12,19 +10,23 @@ AI coding agents can install dependencies, add tools, edit instruction files, re
 
 - Claude Code plugin hooks for `SessionStart`, `UserPromptSubmit`, `PreToolUse`, and `PostToolUse`.
 - Pre-action gating for package installs, skill installs, direct MCP additions, manifest dependency edits, vendored code, remote shell installers, instruction-file edits, protected yieldOS evidence, and credential-file reads.
-- Credential protection: reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar paths require the exact local phrase `AUTORIZO A LEER LAS CREDENCIALES`.
+- Credential protection: reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar paths require explicit local authorization.
 - Commit/push source-code audit with red-team findings, deterministic blue-team fixes when safe, and commit-bound `security/code-audit-state.json`.
 - Counterexample-driven security contracts: define the invariant, replay the unsafe baseline, replay the fixed runtime, and store scoped proof artifacts.
 - Oracle runner with scoped `pass`, `fail`, and `unknown` results. Oracles execute contracts; for sensitive actions, `unknown` blocks by default.
 - Team agent packs that validate approved skills, MCPs, playbooks, profiles, oracles, generated files, and pack locks.
 - `/yieldos:audit`, `/yieldos:init`, `/yieldos:pack`, `/yieldos:oracle`, `/yieldos:pentest`, and `/yieldos:update` plugin commands.
 
-## Demo For Reviewers
+## Install And Verify
 
-Install from the public marketplace:
+Enterprise install flow verifies release files before execution:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/checksums.txt
+shasum -a 256 -c checksums.txt --ignore-missing
+sh install.sh --dry-run
+sh install.sh
 ```
 
 The public install uses the clean package at `dist/yieldos-plugin`. It ships hooks, commands, policy cache, dashboard runtime, skills, and oracle contracts. It does not ship tests, mocks, or intentionally vulnerable demo fixtures.
@@ -35,7 +37,7 @@ Inspect shipped oracle contracts:
 /yieldos:oracle contracts
 ```
 
-For reviewer demos from a cloned repository, run the visible security-contract proof:
+For local product demos from a cloned repository, run the visible security-contract proof:
 
 ```text
 yieldOS/plugins/yieldos/bin/yieldos-oracle-demo missing-auth
@@ -64,6 +66,8 @@ Run the local adversarial loop:
 
 Current benchmark evidence is summarized in [`benchmarks/README.md`](./benchmarks/README.md). The real-repo benchmark shows the tested workflow attacks were blocked before commit; it does not claim the target repositories are fully secure.
 
+For supported adapters, data flows, and claim boundaries, see [`yieldOS/docs/enterprise-boundaries.md`](./yieldOS/docs/enterprise-boundaries.md).
+
 ## Repository Map
 
 | Path | Purpose |
@@ -71,7 +75,7 @@ Current benchmark evidence is summarized in [`benchmarks/README.md`](./benchmark
 | [`install.sh`](./install.sh) | Claude Code plugin installer. |
 | [`policy/`](./policy) | Runtime policy source of truth: allowlist, denylist, skills, MCPs, categories, native equivalents, settings, and injection patterns. |
 | [`yieldOS/plugins/yieldos/`](./yieldOS/plugins/yieldos) | The actual Claude Code plugin: hooks, commands, scripts, dashboard, shipped policy cache, and tests. |
-| [`dist/yieldos-plugin/`](./dist/yieldos-plugin) | Clean installable plugin package used by the public marketplace manifest. |
+| [`dist/yieldos-plugin/`](./dist/yieldos-plugin) | Clean installable plugin package used by the marketplace manifest. |
 | [`yieldOS/docs/`](./yieldOS/docs) | Product and architecture docs. The docs index separates shipped surfaces from forward-looking plans. |
 | [`examples/oracle-demo/`](./examples/oracle-demo) | Runnable missing-auth baseline/fixed demo fixture, kept outside the production plugin package. |
 | [`yieldOS/packs/`](./yieldOS/packs) | Dogfood team agent pack manifest. |

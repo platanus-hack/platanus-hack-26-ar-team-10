@@ -35,4 +35,4 @@ dev, and build commands into `landing/`:
 npm --prefix ./landing run build
 ```
 
-The app is intentionally isolated in this directory so the hackathon repository can keep the main project files at the root.
+The app is intentionally isolated in this directory so product copy, visual tests, and deployment settings stay separate from the plugin runtime.

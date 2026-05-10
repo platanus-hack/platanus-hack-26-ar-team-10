@@ -23,14 +23,18 @@ yieldOS makes trust decisions **before** risky work is accepted, against policy 
 ## Quickstart
 
 ```bash
-# 1. Install from the public marketplace
-curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh
+# 1. Download and verify the pinned release installer
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/checksums.txt
+shasum -a 256 -c checksums.txt --ignore-missing
+sh install.sh --dry-run
+sh install.sh
 ```
 
 Manual install:
 
 ```bash
-claude plugins marketplace add platanus-hack/platanus-hack-26-ar-team-10
+claude plugins marketplace add yieldos/yieldos
 claude plugins install yieldos@yieldos
 
 # Optional: run the test suite
@@ -60,6 +64,8 @@ claude plugins update yieldos@yieldos
 ```
 
 After updating, run `/reload-plugins` or restart Claude Code so hooks switch from the old cache path to the new version.
+
+Supported adapters, data flows, and claim boundaries are documented in [docs/enterprise-boundaries.md](docs/enterprise-boundaries.md).
 
 Maintainers should release through the version helper from the repository root:
 
@@ -523,8 +529,8 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/21-counterexample-driven-security-contracts.md](docs/21-counterexample-driven-security-contracts.md) | Baseline-fail plus fixed-pass security contracts. |
 | [docs/22-oracle-demo-script.md](docs/22-oracle-demo-script.md) | Missing-auth proof demo flow. |
 | [docs/23-oracle-evals.md](docs/23-oracle-evals.md) | Oracle evaluation and benchmark framing. |
-| [docs/24-hackathon-pitch.md](docs/24-hackathon-pitch.md) | Hackathon story, objections, and demo framing. |
 | [docs/25-oracle-contract-catalog.md](docs/25-oracle-contract-catalog.md) | Oracle contract catalog for validation and benchmarks. |
+| [docs/enterprise-boundaries.md](docs/enterprise-boundaries.md) | Current enforcement levels, data flows, and claim rules. |
 
 ---
 
