@@ -25,17 +25,17 @@ export default function OracleDemoPage() {
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-              Oracle proof demo
+              Contract proof demo
             </p>
             <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-              The model can propose. The oracle decides.
+              Contract. Counterexample. Proof of fix.
             </h1>
           </div>
           <div className="max-w-2xl">
             <p className="text-sm leading-6 text-zinc-600 sm:text-base sm:leading-7">
               A vulnerable admin route is accepted only after a deterministic
-              counterexample proves the baseline failed and the fixed runtime
-              passes the same replay.
+              counterexample proves the baseline violated the contract and the
+              fixed runtime passes the same replay.
             </p>
             <p className="mt-4 rounded-md border border-zinc-300 bg-white px-4 py-3 font-mono text-xs leading-5 text-zinc-700">
               This proves this route and replay, not the whole repo.

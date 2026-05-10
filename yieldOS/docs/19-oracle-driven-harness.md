@@ -1,8 +1,8 @@
-# Oracle-Driven Harness
+# Oracle-Driven Security Harness
 
-yieldOS now treats risky agent actions as acceptance decisions, not model opinions.
+yieldOS treats risky agent actions as acceptance decisions, not model opinions. The public unit of value is the security contract: what must be true, what counterexample tries to break it, and what evidence proves the fix. The technical architecture behind that is an oracle-driven security harness.
 
-An oracle is a small executable or mechanically verifiable check that returns one of three scoped results:
+An oracle is the executable or mechanically verifiable check that runs a contract and returns one of three scoped results:
 
 - `pass`: this exact subject passed this exact check.
 - `fail`: this exact subject violated this exact check.
@@ -12,9 +12,9 @@ For sensitive actions, `unknown` blocks by default. This is the core safety rule
 
 The model can propose a patch, explanation, or finding. The oracle decides whether the repo accepts the result.
 
-## Contract
+## Security Contract
 
-Each oracle result includes:
+Each contract-backed oracle result includes:
 
 - subject: the exact diff, pack, file, dependency, route, or replay checked.
 - scope: what was checked and what was not checked.
@@ -22,6 +22,8 @@ Each oracle result includes:
 - evidence: bounded, redacted facts.
 - metrics: runtime, timeout, and evidence size.
 - hashes: tamper-evident hashes for subject, evidence, and the result.
+
+For counterexample-driven contracts, the evidence should show both sides: the vulnerable baseline violates the contract, and the fixed runtime passes the same replay. That is why the contract story is sharper than a scanner finding: it is falsifiable and repeatable.
 
 ## Enforcement Boundary
 

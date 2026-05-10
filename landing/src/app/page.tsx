@@ -8,7 +8,7 @@ import { ScrollProgress } from "@/components/scroll-progress";
 
 const installCommand =
   "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh";
-const heroTitle = "Oracle-driven security harness for AI coding agents";
+const heroTitle = "Executable security contracts for AI coding agents";
 
 const gatedVectors = [
   { title: "Packages", detail: "9 managers." },
@@ -67,7 +67,7 @@ export default function Home() {
             </h1>
             <MotionReveal delay={3.05} immediate y={12}>
               <p className="mx-auto mt-5 w-full max-w-[34ch] text-sm leading-6 text-zinc-400 sm:mt-7 sm:max-w-2xl sm:text-lg sm:leading-7">
-                yieldOS wraps protected Claude Code repos and CI-verified workflows with executable oracles. The model can propose. The oracle decides.
+                yieldOS turns risky agent changes into contracts, counterexamples, and proof-of-fix evidence. Under the hood, it is an oracle-driven security harness: the model can propose, but the oracle decides.
               </p>
             </MotionReveal>
             <MotionReveal
@@ -90,10 +90,10 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[0.64fr_1.36fr] lg:items-end lg:gap-10">
             <MotionReveal>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Oracle proof demo
+                Contract proof demo
               </p>
               <h2 className="mt-3 max-w-lg text-3xl font-semibold leading-tight text-balance sm:mt-5 sm:text-5xl">
-                Baseline fail. Fixed pass.
+                Counterexample killed. Fix proven.
               </h2>
             </MotionReveal>
           </div>
@@ -224,7 +224,7 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.68fr_1.32fr] lg:items-center lg:gap-12">
             <MotionReveal>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-                Prototype proof
+                Prototype contract
               </p>
               <h2 className="mt-4 max-w-lg text-4xl font-semibold leading-tight text-balance sm:text-6xl">
                 Baseline fail. Fixed pass.
@@ -255,10 +255,10 @@ export default function Home() {
         <div className="pitch-shell mx-auto max-w-7xl px-5 py-7 sm:px-8">
           <div className="audit-stamp relative overflow-hidden rounded-lg border border-zinc-200 bg-[#0e0e10] px-5 py-14 text-center text-white sm:px-8">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
-              No silent installs.
+              No unproven fixes.
             </p>
             <h2 className="mx-auto mt-5 max-w-2xl text-4xl font-semibold leading-tight text-balance sm:text-6xl">
-              Give agents an evidence boundary.
+              Give agents a contract boundary.
             </h2>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <CopyCommandButton
@@ -270,7 +270,7 @@ export default function Home() {
                 href="/oracle-demo"
                 className="inline-flex h-11 items-center justify-center rounded-md border border-white/15 bg-white/[0.06] px-4 text-sm font-medium text-white transition hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e10] active:translate-y-px"
               >
-                View oracle demo
+                View contract demo
               </a>
             </div>
           </div>

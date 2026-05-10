@@ -27,21 +27,22 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
 
   [
     "yieldOS",
-    "Oracle-driven security harness for AI coding agents",
+    "Executable security contracts for AI coding agents",
+    "contracts, counterexamples, and proof-of-fix evidence",
     "Oracle-driven",
     "security harness",
-    "yieldOS wraps protected Claude Code repos and CI-verified workflows with executable oracles.",
-    "The model can propose. The oracle decides.",
+    "oracle-driven security harness",
+    "the model can propose, but the oracle decides",
     "Install yieldOS",
-    "View oracle demo",
+    "View contract demo",
     "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh",
     "curl ... | sh",
     "OrbitalInstallPill",
     "Copy yieldOS install command",
     "AGENTS.md",
     "curl | sh",
-    "Oracle proof demo",
-    "Baseline fail. Fixed pass.",
+    "Contract proof demo",
+    "Counterexample killed. Fix proven.",
     "CONTRACT created",
     "REPLAY baseline got 200",
     "REPLAY fixed got 401",
@@ -57,6 +58,8 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Proof",
     "FAIL missing-authz",
     "PASS scoped acceptance",
+    "No unproven fixes.",
+    "Give agents a contract boundary.",
   ].forEach((text) => {
     assert.ok(source.includes(text), `Expected landing source to include: ${text}`);
   });
@@ -295,9 +298,9 @@ test("oracle demo page explains baseline fail plus fixed pass proof", () => {
   const source = `${page}\n${flow}`;
 
   [
-    "Oracle proof demo",
-    "The model can propose. The oracle decides.",
-    "baseline failed and the fixed runtime",
+    "Contract proof demo",
+    "Contract. Counterexample. Proof of fix.",
+    "baseline violated the contract and the",
     "FAIL missing-authz",
     "CONTRACT created",
     "REPLAY baseline got 200",
@@ -533,9 +536,9 @@ test("layout metadata and offline-safe font theme are configured for yieldOS", (
   const layout = read("src/app/layout.tsx");
   const globals = read("src/app/globals.css");
 
-  assert.ok(layout.includes("yieldOS - oracle-driven security harness"));
+  assert.ok(layout.includes("yieldOS - executable security contracts"));
   assert.ok(
-    layout.includes("yieldOS wraps AI coding agents with scoped pass, fail, and unknown oracles for risky repo actions."),
+    layout.includes("yieldOS turns risky AI coding-agent changes into executable security contracts, counterexamples, and oracle-verified proof."),
   );
   assert.ok(!layout.includes("next/font/google"));
   assert.ok(globals.includes("ui-sans-serif"));

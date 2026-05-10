@@ -1,8 +1,8 @@
 # yieldOS
 
-**Oracle-driven security harness for AI coding agents.**
+**Executable security contracts for AI coding agents.**
 
-yieldOS is a Claude Code plugin and CI-verifiable harness that intercepts risky agent actions, then accepts or rejects sensitive changes through scoped oracles. It decides automatically — without asking the model to be the final authority — whether evidence is `pass`, `fail`, or `unknown`. It also exposes `/yieldos:audit` for on-demand source-code review, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, `/yieldos:oracle` for oracle discovery, `yieldos-oracle run ...` for scoped checks, `/yieldos:oracle-demo` for a visible counterexample proof, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
+yieldOS is a Claude Code plugin and CI-verifiable, oracle-driven security harness that intercepts risky agent actions, then accepts or rejects sensitive changes through scoped security contracts. A contract states what must be true, a counterexample tries to break it, and an oracle decides whether the evidence is `pass`, `fail`, or `unknown`. It also exposes `/yieldos:audit` for on-demand source-code review, `/yieldos:init` for preview-first agent instruction generation, `/yieldos:pack` for policy-validated team agent packs, `/yieldos:oracle` for oracle discovery, `yieldos-oracle run ...` for scoped checks, `/yieldos:oracle-demo` for a visible counterexample proof, and `/yieldos:pentest` for an explicit red-team / blue-team review loop.
 
 The model can propose. The oracle decides.
 
@@ -110,7 +110,7 @@ Run the missing-auth proof demo:
 /yieldos:oracle-demo missing-auth
 ```
 
-Oracles normalize existing checks into scoped `pass`, `fail`, and `unknown` evidence. For sensitive actions, `unknown` blocks by default. The first counterexample-driven security contract proves one class: an unauthenticated request to a sensitive route must return `401` or `403`, with baseline-fail plus fixed-pass evidence.
+Security contracts normalize existing checks into scoped `pass`, `fail`, and `unknown` evidence. Oracles execute those contracts. For sensitive actions, `unknown` blocks by default. The first counterexample-driven security contract proves one class: an unauthenticated request to a sensitive route must return `401` or `403`, with baseline-fail plus fixed-pass evidence.
 
 Detail: [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md).
 
@@ -518,7 +518,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/15-pentest-loop.md](docs/15-pentest-loop.md) | Red-team / blue-team loop with persistent local lessons. |
 | [docs/16-agent-rules-and-playbooks.md](docs/16-agent-rules-and-playbooks.md) | Planning and research for reviewed playbooks. |
 | [docs/17-team-agent-packs.md](docs/17-team-agent-packs.md) | Policy-validated team agent packs. |
-| [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md) | Oracle-driven pass/fail/unknown acceptance model. |
+| [docs/19-oracle-driven-harness.md](docs/19-oracle-driven-harness.md) | Oracle-driven security harness and pass/fail/unknown acceptance model. |
 | [docs/20-oracle-evidence-artifacts.md](docs/20-oracle-evidence-artifacts.md) | Hashable generated evidence boundaries. |
 | [docs/21-counterexample-driven-security-contracts.md](docs/21-counterexample-driven-security-contracts.md) | Baseline-fail plus fixed-pass security contracts. |
 | [docs/22-oracle-demo-script.md](docs/22-oracle-demo-script.md) | Missing-auth proof demo flow. |

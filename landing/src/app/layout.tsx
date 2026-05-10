@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "yieldOS - oracle-driven security harness",
+  title: "yieldOS - executable security contracts",
   description:
-    "yieldOS wraps AI coding agents with scoped pass, fail, and unknown oracles for risky repo actions.",
+    "yieldOS turns risky AI coding-agent changes into executable security contracts, counterexamples, and oracle-verified proof.",
 };
 
 export default function RootLayout({
