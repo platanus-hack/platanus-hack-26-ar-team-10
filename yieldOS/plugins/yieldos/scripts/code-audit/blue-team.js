@@ -3,10 +3,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { redactDocsExampleSecrets } = require('./doc-secrets');
 const { restageFiles } = require('./git');
 
 function blueTeam(projectRoot, findings) {
-  const fixable = findings.filter((f) => f.fixStrategy === 'remove-line' || f.fixStrategy === 'replace-redirect-root');
+  const fixable = findings.filter((f) => f.fixStrategy === 'remove-line' || f.fixStrategy === 'replace-redirect-root' || f.fixStrategy === 'redact-doc-secret');
 
   for (const finding of fixable) {
     const file = finding.file;
@@ -56,6 +57,18 @@ function applyLineFix(content, finding) {
       if (line.trim() !== target) return line;
       replaced = true;
       return line.replace(/res\.redirect\s*\([^)]*\)/, "res.redirect('/')");
+    }).join('\n');
+  }
+
+  if (finding.fixStrategy === 'redact-doc-secret') {
+    let replaced = false;
+    return lines.map((line) => {
+      if (replaced) return line;
+      if (line.trim() !== target) return line;
+      const redacted = redactDocsExampleSecrets(line);
+      if (redacted === line) return line;
+      replaced = true;
+      return redacted;
     }).join('\n');
   }
 

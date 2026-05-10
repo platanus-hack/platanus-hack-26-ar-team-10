@@ -199,6 +199,9 @@ test('oracle contract catalog covers current red-team rules and researched stand
     'llm-data-model-poisoning',
     'llm-misinformation-critical-decision',
     'persistent-memory-prompt-injection',
+    'mcp-quota-exhaustion',
+    'tenant-scope-invariant',
+    'transactional-replace-invariant',
   ].forEach((id) => assert.equal(ids.has(id), true, `missing oracle contract for ${id}`));
 
   ['owasp-top-10-2021', 'owasp-api-top-10-2023', 'owasp-llm-top-10-2025', 'cwe'].forEach((family) => {
@@ -212,12 +215,19 @@ test('oracle contract catalog includes expanded benchmark-hardening mappings', (
   const resource = oracleTemplates.getTemplate('unrestricted-resource-consumption');
   const upload = oracleTemplates.getTemplate('dangerous-file-upload');
   const memory = oracleTemplates.getTemplate('persistent-memory-prompt-injection');
+  const mcpQuota = oracleTemplates.getTemplate('mcp-quota-exhaustion');
+  const tenantScope = oracleTemplates.getTemplate('tenant-scope-invariant');
+  const transactionalReplace = oracleTemplates.getTemplate('transactional-replace-invariant');
 
   assert.equal(idor.standards.some((standard) => standard.id.includes('CWE-639')), true);
   assert.equal(resource.standards.some((standard) => standard.id.includes('CWE-770')), true);
   assert.equal(upload.standards.some((standard) => standard.id.includes('CWE-434')), true);
   assert.equal(memory.standards.some((standard) => standard.id.includes('LLM08')), true);
   assert.equal(memory.kind, 'agent-permission');
+  assert.equal(mcpQuota.kind, 'mcp-contract');
+  assert.equal(mcpQuota.benchmark.fixtures.includes('MCP tool loop without per-tenant quota'), true);
+  assert.equal(tenantScope.benchmark.fixtures.includes('empty tenant id request'), true);
+  assert.equal(transactionalReplace.benchmark.fixtures.includes('delete-before-insert failure'), true);
 });
 
 test('oracle contracts are benchmarkable acceptance contracts, not prose only', () => {

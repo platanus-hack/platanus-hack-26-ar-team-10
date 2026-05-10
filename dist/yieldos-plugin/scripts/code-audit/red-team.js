@@ -1,6 +1,9 @@
 'use strict';
 
+const { findDocsExampleSecret, isDocsExampleFile } = require('./doc-secrets');
+
 const FINDERS = [
+  docsExampleSecret,
   sensitiveLogging,
   hardcodedSecret,
   missingAuthz,
@@ -10,6 +13,8 @@ const FINDERS = [
   unsafeFileMutation,
   ssrf,
   openRedirect,
+  unsafeErrorResponse,
+  unboundedBodyRead,
   removedValidation,
   dangerousInstructionEdit,
 ];
@@ -18,9 +23,13 @@ function redTeam(input) {
   const lines = parseChangedLines(input.diff || '');
   const findings = [];
   for (const item of lines) {
-    if (isAuditExemptFile(item.file)) continue;
+    if (isAuditExemptFile(item.file)) {
+      const finding = docsExampleSecret(item);
+      if (finding && hasExploitEvidence(finding)) findings.push(finding);
+      continue;
+    }
     for (const finder of FINDERS) {
-      const finding = finder(item, input);
+      const finding = finder(item, input, lines);
       if (finding && hasExploitEvidence(finding)) findings.push(finding);
     }
   }
@@ -63,6 +72,19 @@ function makeFinding(item, ruleId, severity, title, details) {
     line: item.code.trim(),
     ...details,
   };
+}
+
+function docsExampleSecret(item) {
+  if (item.sign !== '+') return null;
+  if (!isDocsExampleFile(item.file)) return null;
+  if (!findDocsExampleSecret(item.code)) return null;
+  return makeFinding(item, 'docs-example-secret', 'high', 'Secret-like value in docs example', {
+    attackerControlledInput: 'A real-looking credential is added to tracked documentation or example configuration.',
+    vulnerableSink: 'Repository documentation or example configuration files.',
+    exploitPath: 'A repository reader can copy the credential-looking value from docs or an agent can reuse it in future examples.',
+    impact: 'Credential disclosure risk and unsafe secret-handling patterns copied into downstream work.',
+    fixStrategy: 'redact-doc-secret',
+  });
 }
 
 function sensitiveLogging(item) {
@@ -264,6 +286,53 @@ function openRedirect(item) {
     impact: 'Phishing, token leakage through redirect flows, or login abuse.',
     fixStrategy: 'replace-redirect-root',
   });
+}
+
+function unsafeErrorResponse(item) {
+  if (item.sign !== '+') return null;
+  const code = codeShape(item.code);
+  const writesClientResponse = /\b(?:res|response)\s*\.\s*(?:status\s*\(\s*5\d\d\s*\)\s*\.\s*)?(?:json|send|end)\s*\(/.test(code);
+  if (!writesClientResponse) return null;
+  if (!/\b(?:err|error|e)\s*\.\s*(?:message|stack)\b/.test(code)) return null;
+  return makeFinding(item, 'security-misconfiguration', 'medium', 'Raw error details returned to client', {
+    attackerControlledInput: 'Unexpected request paths can trigger server exceptions.',
+    vulnerableSink: 'HTTP error response body.',
+    exploitPath: 'A failing request receives raw exception details that may expose internals, schema, dependency messages, or future secret-bearing errors.',
+    impact: 'Information disclosure and easier attack discovery.',
+    fixStrategy: 'manual',
+  });
+}
+
+function unboundedBodyRead(item, input, lines) {
+  if (item.sign !== '+') return null;
+  if (!/\b(?:req|request)\s*\.\s*on\s*\(\s*['"]data['"]/.test(item.code)) return null;
+  const code = codeShape(item.code);
+  if (!/(?:\+=|\.push\s*\(|Buffer\.concat\s*\()/.test(code)) return null;
+  if (hasBodyLimit(item.code) || hasNearbyBodyLimit(item, lines)) return null;
+  return makeFinding(item, 'unrestricted-resource-consumption', 'medium', 'Unbounded request body buffering', {
+    attackerControlledInput: 'An HTTP client controls the request body size.',
+    vulnerableSink: 'In-memory request body accumulation.',
+    exploitPath: 'A large or streaming request can keep appending chunks without a byte cap before parsing or rejection.',
+    impact: 'Memory exhaustion, request worker starvation, or token/cost amplification in downstream handlers.',
+    fixStrategy: 'manual',
+  });
+}
+
+function hasNearbyBodyLimit(item, lines) {
+  const changedLines = Array.isArray(lines) ? lines : [];
+  const itemIndex = changedLines.indexOf(item);
+  return changedLines.some((candidate, candidateIndex) => {
+    if (itemIndex !== -1 && Math.abs(candidateIndex - itemIndex) > 2) return false;
+    return candidate.file === item.file
+      && candidate.sign === '+'
+      && hasBodyLimit(candidate.code);
+  });
+}
+
+function hasBodyLimit(code) {
+  const line = String(code || '');
+  if (!/\b(?:MAX_BODY|MAX_BYTES|BODY_LIMIT|content-length|contentLength|byteLength|bytesRead|body\.length|chunks\.length|limit)\b/i.test(line)) return false;
+  return /(?:>|>=|destroy|413|too large|abort|return|throw)/i.test(line);
 }
 
 function removedValidation(item, input) {
