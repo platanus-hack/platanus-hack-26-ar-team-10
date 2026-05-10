@@ -44,7 +44,7 @@ The separate oracle coverage report may label a contract as `benchmarked` when t
 
 ## Covered Families
 
-The current catalog has 35 contracts:
+The current catalog has 38 contracts:
 
 - Web/API authorization: `missing-authz`, `idor-bola`, `removed-security-guard`, `broken-authentication`.
 - API object properties and data exposure: `mass-assignment-bopla`, `excessive-data-exposure`.
@@ -52,7 +52,8 @@ The current catalog has 35 contracts:
 - File/network abuse: `path-traversal`, `unsafe-file-mutation`, `dangerous-file-upload`, `ssrf`, `open-redirect`, `csrf-missing-token`.
 - Secrets and configuration: `sensitive-logging`, `hardcoded-secret`, `weak-crypto-random`, `security-misconfiguration`.
 - Supply chain and integrity: `vulnerable-outdated-component`, `software-integrity-postinstall`, `unsafe-consumption-of-apis`, `insecure-deserialization`.
-- Resource/cost/business controls: `unrestricted-resource-consumption`, `business-flow-abuse`.
+- Resource/cost/business controls: `unrestricted-resource-consumption`, `mcp-quota-exhaustion`, `business-flow-abuse`.
+- Tenant/data integrity invariants: `tenant-scope-invariant`, `transactional-replace-invariant`.
 - Agentic/LLM risks: `dangerous-instruction-edit`, `prompt-injection`, `persistent-memory-prompt-injection`, `excessive-agency`, `system-prompt-leakage`, `rag-vector-poisoning`, `llm-output-to-sensitive-sink`, `llm-data-model-poisoning`, `llm-misinformation-critical-decision`.
 
 ## Research Sources

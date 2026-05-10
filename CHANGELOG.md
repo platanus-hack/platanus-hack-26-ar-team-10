@@ -1,5 +1,10 @@
 # Changelog
 
+## yieldOS v0.11.1 - 2026-05-10
+
+- Harden code-audit coverage for docs/example secrets, raw error responses, and unbounded request body buffering.
+- Add contract-only oracle mappings for MCP quota, tenant scope, and transactional replace invariants.
+
 ## yieldOS v0.11.0 - 2026-05-09
 
 - Add policy-validated team agent packs for approved skills, MCPs, profiles, and playbooks.
