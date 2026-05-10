@@ -19,6 +19,25 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
+      - name: Detect changed areas
+        id: changes
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only "origin/${{ github.base_ref }}"...HEAD > /tmp/changed-files
+          else
+            before="${{ github.event.before }}"
+            if [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ]; then
+              git diff --name-only "$before" "$GITHUB_SHA" > /tmp/changed-files
+            else
+              git diff-tree --no-commit-id --name-only -r HEAD > /tmp/changed-files
+            fi
+          fi
+          if grep -Eq '^(landing/|\.github/workflows/plugin\.yml)$' /tmp/changed-files; then
+            echo "landing=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "landing=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Validate marketplace and plugin structure
         run: node scripts/plugin-check.mjs
       - name: Validate policy structure
@@ -35,22 +54,23 @@ jobs:
           sh -n yieldOS/plugins/yieldos/bin/yieldos-pack
           sh -n yieldOS/plugins/yieldos/bin/yieldos-pentest
           sh -n yieldOS/plugins/yieldos/bin/yieldos-update
-      - name: Run plugin tests
-        working-directory: yieldOS/plugins/yieldos
-        run: node --test tests/*.test.js
       - name: Verify committed code-audit oracle state
         if: github.event_name == 'pull_request'
         run: node yieldOS/plugins/yieldos/scripts/code-audit/ci-verify.js --mode pr --base "origin/${{ github.base_ref }}"
       - name: Install landing dependencies
+        if: ${{ steps.changes.outputs.landing == 'true' }}
         working-directory: landing
         run: npm ci
       - name: Run landing tests
+        if: ${{ steps.changes.outputs.landing == 'true' }}
         working-directory: landing
         run: npm test
       - name: Lint landing
+        if: ${{ steps.changes.outputs.landing == 'true' }}
         working-directory: landing
         run: npm run lint
       - name: Build landing
+        if: ${{ steps.changes.outputs.landing == 'true' }}
         working-directory: landing
         run: npm run build
       - name: Check benchmark runner syntax

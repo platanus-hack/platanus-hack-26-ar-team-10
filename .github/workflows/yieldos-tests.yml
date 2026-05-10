@@ -5,16 +5,45 @@ on:
     paths:
       - 'yieldOS/plugins/yieldos/**'
       - 'policy/**'
+      - '.github/workflows/plugin.yml'
       - '.github/workflows/yieldos-tests.yml'
   push:
     branches: [main]
     paths:
       - 'yieldOS/plugins/yieldos/**'
       - 'policy/**'
+  schedule:
+    - cron: '17 8 * * 1'
+  workflow_dispatch:
 
 jobs:
-  unit-tests:
-    name: unit tests - ${{ matrix.os }} - node ${{ matrix.node }}
+  unit-tests-pr:
+    name: unit tests - PR - ${{ matrix.os }} - node ${{ matrix.node }}
+    if: ${{ github.event_name == 'pull_request' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: '22'
+          - os: windows-latest
+            node: '22'
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run yieldOS test suite
+        working-directory: yieldOS/plugins/yieldos
+        run: node --test tests/*.test.js
+
+  unit-tests-full:
+    name: unit tests - full - ${{ matrix.os }} - node ${{ matrix.node }}
+    if: ${{ github.event_name != 'pull_request' }}
     strategy:
       fail-fast: false
       matrix:
