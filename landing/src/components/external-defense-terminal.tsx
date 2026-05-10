@@ -9,7 +9,7 @@ export function ExternalDefenseTerminal() {
         <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
         <span className="h-3 w-3 rounded-full bg-[#28c840]" />
         <span className="ml-3 truncate font-mono text-[11px] text-zinc-400">
-          mauro@local — ~/Desktop/tensorflow-demo
+          mauro@local — ~/code/checkout-api
         </span>
       </div>
 
@@ -41,7 +41,7 @@ export function ExternalDefenseTerminal() {
                 API Usage Billing
               </p>
               <p className="text-zinc-500">· Mauro&rsquo;s Individual Org</p>
-              <p className="text-zinc-500">~/Desktop/tensorflow-demo</p>
+              <p className="text-zinc-500">~/code/checkout-api</p>
             </div>
 
             <div className="border-zinc-800 sm:border-l sm:pl-4">
