@@ -59,7 +59,7 @@ node scripts/cost-benchmark.mjs \
   --assumptions benchmarks/cost-assumptions.json \
   --out benchmarks/cost-benchmark-YYYY-MM-DD.json
 
-node scripts/model-workflow-benchmark.mjs \
+YIELDOS_ALLOW_PROVIDER_EGRESS=1 node scripts/model-workflow-benchmark.mjs \
   --repo /absolute/path/to/local/repo \
   --repo-spec benchmarks/public-repos.json \
   --repo-id express \
@@ -86,7 +86,9 @@ node scripts/oracle-coverage-report.mjs \
 
 Use `--include-raw-logs` only for local debugging. Raw logs and raw-output hashes should not be committed.
 Real-repo reports also require a clean benchmark-runner checkout by default; `--allow-dirty-runner` is only for local debugging output that should not be committed.
-Model workflow reports load `.env` from the repository root for `OPENAI_API_KEY` and `ANTHROPIC_API_KEY`, enforce provider budget caps before each request, and exclude raw model output by default. Use `--repo-id`, `--model-id`, and `--task-id` to run reproducible slices of the full matrix; use `--checkpoint-every 1` for long provider runs so partial local-review evidence is written after each case.
+Model workflow reports load `.env` from the repository root for `OPENAI_API_KEY` and `ANTHROPIC_API_KEY`, enforce provider budget caps before each request, and exclude raw model output by default. Live provider calls are blocked unless `YIELDOS_ALLOW_PROVIDER_EGRESS=1` is set after confirming benchmark prompts may leave the machine. `--dry-run` and provider-budget skips stay offline, do not clone public repo specs, and do not require the egress opt-in. Reports include a `provider_egress` summary for each case so local-review evidence distinguishes dry-runs, budget skips, missing-credential failures, provider requests, and whether checked-out repository content was included. The current model workflow sends benchmark task prompts, not repository source files, so live cases record `provider_request_sent: true` and `repo_content_sent: false`. Use `--repo-id`, `--model-id`, and `--task-id` to run reproducible slices of the full matrix; use `--checkpoint-every 1` for long provider runs so partial local-review evidence is written after each case.
+
+There is no `scripts/peer-repo-repair/` provider-repair runtime in this checkout. Any future repair workflow that sends repository context to OpenAI, Anthropic, or another provider should use the same explicit egress gate and report summary before it is advertised as supported benchmark coverage.
 
 The default model workflow config currently targets account-visible frontier models (`gpt-5.5`, `gpt-5.5-pro`, `claude-sonnet-4-6`, `claude-opus-4-7`) with explicit pricing assumptions in `cost-assumptions.json`. Treat those dollar figures as local benchmark estimates until provider pricing pages are refreshed and cited for publication.
 

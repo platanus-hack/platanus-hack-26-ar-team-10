@@ -12,14 +12,14 @@ yieldOS is an agent-action security firewall. The current hard-enforced adapter 
 | Code audit commit/push gate | Enforced for configured git actions | Blocks covered unsafe diffs before commit or push | Whole-repo SAST or complete taint analysis |
 | Oracle contracts | Scoped proof | Verifies selected behaviors through executable contracts | Proof that the entire application is secure |
 | Other agent packs | Advisory unless adapter says enforced | Provides policy guidance and instructions | Hard blocking across unsupported agents |
-| Provider-backed repair workflows | Optional | Can send redacted context when explicitly configured | Offline-only operation when provider mode is enabled |
+| Provider-backed model workflows | Explicit egress opt-in | Can send scoped provider prompts only when `YIELDOS_ALLOW_PROVIDER_EGRESS=1` is set and reports record the provider/model/purpose boundary | Offline-only operation, measured billing savings, or support for provider-repair scripts that do not exist in this checkout |
 
 ## Data Flows
 
 - Local hook decisions stay on the machine.
 - Policy fetch reads public policy JSON and falls back to the shipped policy cache.
 - Credential read authorization does not trust writable cache grants. The cache may hold challenge hints, but allow decisions require transcript proof that the latest user prompt exactly matched the target-bound nonce; `Bash` is blocked when recursive project credential sentinels are present because shell access cannot be path-scoped by the hook.
-- Provider repair workflows use model/provider credentials only when the user configures those workflows.
+- Provider-backed model workflows use model/provider credentials only when the user configures those workflows and sets `YIELDOS_ALLOW_PROVIDER_EGRESS=1`. Dry-runs and provider-budget skips do not clone public repo specs, call providers, or send repository context. Missing-credential failures are reported without claiming provider requests or repository content were sent. The current live model workflow benchmark sends task prompts, not checked-out source files, and reports that distinction as `provider_request_sent: true` with `repo_content_sent: false`. The current checkout does not include a `scripts/peer-repo-repair/` runtime.
 - Audit events are written locally unless the user configures export.
 
 ## Claim Rules
