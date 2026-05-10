@@ -2,14 +2,11 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:8b3a92555962c76a560a8d97958a82622b0c255277f7196658ae5e2ef058eec8",
-  "range": "a50bb47e3f2fa5d9337e2678ca67c0d84a1b39f5..HEAD",
+  "diff_hash": "sha256:8d947953a2e9a3f6b2c094aff2ee6581bb8c4521dabe5453898759650fd01236",
+  "range": "25855b91b51764931bc3275eb641c9597755af5a..HEAD",
   "files": [
-    "landing/next.config.ts",
-    "landing/src/app/benchmarks/page.tsx",
-    "landing/src/app/page.tsx",
-    "landing/src/lib/benchmark-dashboard-data.ts",
-    "landing/tests/landing-content.test.mjs"
+    "README.es.md",
+    "README.md"
   ],
   "verdict": "code-audit-clean",
   "action": "allow",
