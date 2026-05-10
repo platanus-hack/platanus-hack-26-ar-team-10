@@ -1,5 +1,13 @@
 # Changelog
 
+## yieldOS v0.14.0 - 2026-05-10
+
+- Add native Git hook enforcement for Codex, shells, and other non-Claude hosts.
+- Relax credential sentinel blocking so unrelated Bash works while explicit credential-path commands still block.
+- Harden pre-push handling for Git hook remote arguments and first pushes from branches without upstreams.
+- Add the landing benchmarks dashboard, Spanish README, and updated public install guidance.
+- Expand deterministic code-audit coverage for real-world security checks.
+
 ## yieldOS v0.13.0 - 2026-05-10
 
 - Publish accumulated team-agent-pack, code-audit, oracle, and enterprise productization work since the last public GitHub Release.
