@@ -3,6 +3,7 @@
 
 const path = require('node:path');
 
+const ui = require('./ui');
 const { listOracles, getOracle } = require('./oracles/registry');
 const { listTemplates } = require('./oracles/templates');
 
@@ -61,7 +62,7 @@ async function runOracleCommand(projectRoot, argv = process.argv.slice(2), optio
   const exitCode = result.status === 'pass' && !result.blocking ? 0 : result.status === 'fail' ? 1 : 2;
   return {
     exitCode,
-    message: parsed.options.json ? `${JSON.stringify(result, null, 2)}\n` : renderResult(result),
+    message: parsed.options.json ? `${JSON.stringify(result, null, 2)}\n` : renderResult(result, { color: options.color }),
     result,
   };
 }
@@ -118,12 +119,13 @@ function renderContracts(contracts, options = {}) {
   ].join('\n');
 }
 
-function renderResult(result) {
+function renderResult(result, options = {}) {
   return [
     `yieldOS oracle ${result.id}: ${result.status}`,
     `blocking: ${result.blocking ? 'yes' : 'no'}`,
     result.blocking_reason ? `reason: ${result.blocking_reason}` : '',
     `summary: ${result.summary}`,
+    ...ui.formatArtifactLines(ui.artifactItemsFromOracleResult(result), { color: options.color }),
     `result_hash: ${result.hashes?.result || ''}`,
   ].filter(Boolean).join('\n');
 }
@@ -148,7 +150,9 @@ function usage() {
 }
 
 async function main() {
-  const result = await runOracleCommand(process.cwd());
+  const result = await runOracleCommand(process.cwd(), process.argv.slice(2), {
+    color: ui.shouldColor(process.stderr),
+  });
   const stream = result.exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${result.message.trimEnd()}\n`);
   process.exit(result.exitCode);

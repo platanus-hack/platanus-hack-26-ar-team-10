@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const ui = require('../ui');
 const proof = require('./cdsc/proof');
 const { hashObject } = require('./result');
 
@@ -51,7 +52,7 @@ async function runDemo(argv = process.argv.slice(2), options = {}) {
   if (parsed.open) openDemoRoute(options.demoUrl || 'http://localhost:3018/oracle-demo');
   return {
     exitCode: result.status === 'pass' ? 0 : result.status === 'fail' ? 1 : 2,
-    message: renderDemo(root, result),
+    message: renderDemo(root, result, { color: options.color }),
     result,
     projectRoot: root,
   };
@@ -94,7 +95,7 @@ function prepareDemoProject(root) {
   fs.writeFileSync(path.join(root, 'yieldos.oracle-runtime.json'), `${JSON.stringify(runtime, null, 2)}\n`);
 }
 
-function renderDemo(root, result) {
+function renderDemo(root, result, options = {}) {
   const proofPath = path.join(root, 'security/oracles/missing-auth-demo/proof-manifest.json');
   if (!fs.existsSync(proofPath)) {
     return [
@@ -110,6 +111,10 @@ function renderDemo(root, result) {
   const manifest = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
   const baselineStatus = manifest.baseline.observed?.status || 'unknown';
   const fixedStatus = manifest.fixed.observed?.status || 'unknown';
+  const artifactLines = ui.formatArtifactLines([
+    { label: 'contract', path: 'security/oracles/missing-auth-demo/contract.json' },
+    { label: 'proof', path: 'security/oracles/missing-auth-demo/proof-manifest.json' },
+  ], { color: options.color });
   return [
     'yieldOS oracle proof demo: missing-auth',
     '',
@@ -120,6 +125,7 @@ function renderDemo(root, result) {
     card('REPLAY fixed got 401', `Observed ${fixedStatus} on fixed runtime.`),
     card('PASS scoped acceptance', result.status === 'pass' ? 'Baseline failed and fixed replay passed.' : `Proof status: ${result.status}.`),
     '',
+    ...artifactLines,
     `Artifacts: ${path.join(root, 'security/oracles/missing-auth-demo')}`,
     'Scope: this route and replay only, not the whole repo.',
   ].join('\n');
@@ -143,7 +149,9 @@ function usage() {
 }
 
 async function main() {
-  const result = await runDemo();
+  const result = await runDemo(process.argv.slice(2), {
+    color: ui.shouldColor(process.stderr),
+  });
   const stream = result.exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${result.message.trimEnd()}\n`);
   process.exit(result.exitCode);

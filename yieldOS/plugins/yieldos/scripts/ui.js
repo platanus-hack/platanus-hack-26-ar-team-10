@@ -46,6 +46,14 @@ function formatAuditFindings(audit, options = {}) {
   return lines;
 }
 
+function formatArtifactLines(items = [], options = {}) {
+  const color = Boolean(options.color);
+  return normalizeArtifactItems(items).map((item) => {
+    const label = item.label.toUpperCase();
+    return `[yieldOS] ${paint(label, artifactColor(label), color)} ${item.path}`;
+  });
+}
+
 function writeDecision(decision, stream = process.stderr) {
   const color = shouldColor(stream);
   if (decision.message) stream.write(`${formatDecision(decision, { color })}\n`);
@@ -61,6 +69,9 @@ function writeAudit(audit, stream = process.stderr) {
   const color = shouldColor(stream);
   if (audit.message) stream.write(`${formatDecision(audit, { color })}\n`);
   for (const line of formatAuditFindings(audit, { color })) {
+    stream.write(`${line}\n`);
+  }
+  for (const line of formatArtifactLines(artifactItemsFromAudit(audit), { color })) {
     stream.write(`${line}\n`);
   }
   stream.write(`${formatVerdict(audit.verdict)}\n`);
@@ -84,12 +95,71 @@ function paint(text, colorName, enabled) {
   return `${COLORS[colorName] || ''}${text}${COLORS.reset}`;
 }
 
+function artifactItemsFromAudit(audit = {}) {
+  return normalizeArtifactItems([
+    ...(audit.savedFiles || []).map((item) => (typeof item === 'string' ? { label: 'saved', path: item } : item)),
+    ...(audit.oracleContracts || []).map((item) => ({ label: 'contract', path: item.path })),
+    ...(audit.oracleArtifacts || []).map((item) => ({
+      label: artifactLabelForType(item.type),
+      path: item.path,
+    })),
+    ...(audit.oracle_artifacts || []).map((item) => ({
+      label: artifactLabelForType(item.type),
+      path: item.path,
+    })),
+  ]);
+}
+
+function artifactItemsFromOracleResult(result = {}) {
+  const artifacts = [];
+  for (const evidence of result.evidence || []) {
+    if (evidence?.type === 'artifacts' && Array.isArray(evidence.value)) {
+      artifacts.push(...evidence.value.map((item) => ({
+        label: artifactLabelForType(item.type),
+        path: item.path,
+      })));
+    }
+  }
+  return normalizeArtifactItems(artifacts);
+}
+
+function normalizeArtifactItems(items = []) {
+  const seen = new Set();
+  const normalized = [];
+  for (const item of items || []) {
+    const label = String(item?.label || '').trim();
+    const pathValue = String(item?.path || '').trim();
+    if (!label || !pathValue) continue;
+    if (label === 'artifact') continue;
+    const key = `${label.toUpperCase()}\0${pathValue}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    normalized.push({ label, path: pathValue });
+  }
+  return normalized;
+}
+
+function artifactLabelForType(type) {
+  if (type === 'contract') return 'contract';
+  if (type === 'proofManifest' || type === 'proof-manifest') return 'proof';
+  return 'artifact';
+}
+
+function artifactColor(label) {
+  if (label === 'SAVED' || label === 'PROOF') return 'green';
+  if (label === 'CONTRACT') return 'cyan';
+  return 'dim';
+}
+
 module.exports = {
+  artifactItemsFromAudit,
+  artifactItemsFromOracleResult,
   shouldColor,
   formatDecision,
   formatVerdict,
   formatRewriteTarget,
   formatAuditFindings,
+  formatArtifactLines,
   writeDecision,
   writeMessage,
   writeAudit,

@@ -738,12 +738,25 @@ test('pre-install hook applies fix on git commit and blocks original command', (
 
   assert.equal(r.code, 2);
   assert.equal(r.stderr.includes('[yieldOS:verdict] code-audit-fix-applied'), true);
+  assert.equal(r.stderr.includes('[yieldOS] SAVED security/code-audit-state.json'), true);
   assert.equal(content.includes('SECRET_TOKEN'), false);
   assert.equal(log.includes('code-audit-fix-applied'), true);
   assert.equal(state.diff_hash.startsWith('sha256:'), true);
   assert.equal(state.max_iterations, 3);
   assert.equal(state.verdict, 'code-audit-fix-applied');
   assert.equal(stagedFiles.includes('security/code-audit-state.json'), true);
+});
+
+test('pre-install hook shows generated oracle contract paths for blocking code review findings', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'server.js'), "const users = [];\napp.get('/admin/users', (req, res) => res.json(users));\n");
+  sh(root, ['add', 'server.js']);
+
+  const r = runHook(root, 'git commit -m "add admin route"');
+
+  assert.equal(r.code, 2);
+  assert.match(r.stderr, /\[yieldOS\] CONTRACT security\/oracles\/[^/]+\/contract\.json/);
+  assert.equal(r.stderr.includes('[yieldOS] SAVED security/code-audit-state.json'), true);
 });
 
 test('pre-install hook applies code audit to wrapped git commit command', () => {
