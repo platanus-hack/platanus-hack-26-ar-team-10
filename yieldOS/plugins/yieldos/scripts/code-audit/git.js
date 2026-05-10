@@ -29,9 +29,41 @@ function collectStagedDiff(projectRoot) {
 }
 
 function collectPushDiff(projectRoot) {
-  const upstream = git(projectRoot, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
+  const upstream = resolvePushUpstream(projectRoot);
   const base = git(projectRoot, ['merge-base', 'HEAD', upstream]);
   return collectRangeDiff(projectRoot, `${base}..HEAD`, 'push', upstream);
+}
+
+function resolvePushUpstream(projectRoot) {
+  try {
+    return git(projectRoot, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
+  } catch (_) {
+    return defaultPushBase(projectRoot);
+  }
+}
+
+function defaultPushBase(projectRoot) {
+  if (process.env.CODE_AUDIT_BASE_REF) return process.env.CODE_AUDIT_BASE_REF;
+  try {
+    const remoteHead = git(projectRoot, ['symbolic-ref', '--quiet', '--short', 'refs/remotes/origin/HEAD']);
+    if (remoteHead) return remoteHead;
+  } catch (_) {
+    // Some first-push repos have origin/main but no origin/HEAD symbolic ref.
+  }
+
+  const branches = remoteBranches(projectRoot);
+  if (branches.includes('origin/main')) return 'origin/main';
+  if (branches.includes('origin/master')) return 'origin/master';
+  return branches[0] || 'origin/main';
+}
+
+function remoteBranches(projectRoot) {
+  try {
+    const out = git(projectRoot, ['for-each-ref', '--format=%(refname:short)', 'refs/remotes/origin']);
+    return out ? out.split(/\r?\n/).filter(Boolean).filter((branch) => branch !== 'origin/HEAD') : [];
+  } catch (_) {
+    return [];
+  }
 }
 
 function collectBaseDiff(projectRoot, baseRef, mode = 'pr') {
@@ -80,6 +112,7 @@ module.exports = {
   git,
   collectStagedDiff,
   collectPushDiff,
+  resolvePushUpstream,
   collectBaseDiff,
   collectRangeDiff,
   restageFiles,

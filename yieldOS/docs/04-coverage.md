@@ -118,7 +118,7 @@ Detector: `Read` against credential-looking paths:
 - `.ssh/`, `.aws/`, `.kube/`, `.gcloud/`, `.docker/`
 - private-key filenames such as `id_rsa`
 
-**Routing**: structured `Read` calls are blocked unless the latest user prompt in the Claude transcript exactly matches the nonce phrase generated for that credential path. `Bash` is blocked when recursive project credential sentinels are present because shell commands have unrestricted filesystem access and cannot be made target-bound by the hook.
+**Routing**: structured `Read` calls are blocked unless the latest user prompt in the Claude transcript exactly matches the nonce phrase generated for that credential path. `Bash` commands that reference credential-looking paths are blocked by default. Whole-project sentinel blocking remains available as strict mode with `YIELDOS_STRICT_CREDENTIAL_SENTINEL=1`.
 
 ## 9. Git commit and push audit
 

@@ -14,6 +14,19 @@ Category A rewrites do not participate in code-audit decisions.
 For `git commit`, it audits the staged diff. For `git push`, it audits commits
 ahead of the configured upstream branch.
 
+For Codex, plain shells, or any host that does not run Claude Code plugin
+hooks, install native Git hooks in the repo:
+
+```bash
+yieldos-git-hooks install
+```
+
+The installed `.git/hooks/pre-commit` and `.git/hooks/pre-push` call the same
+code-audit gate. That makes ordinary `git commit` and `git push` commands hit
+yieldOS even when the agent UI does not show Claude's hook message. The usual
+Git escape hatch, `--no-verify`, can still bypass local hooks; pair with CI
+verification for team enforcement.
+
 ## Red Team / Blue Team Loop
 
 The commit path is a bounded loop, not a one-shot scan. It runs up to three fix

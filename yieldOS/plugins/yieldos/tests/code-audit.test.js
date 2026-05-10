@@ -100,6 +100,26 @@ test('collectPushDiff returns commits ahead of upstream', () => {
   assert.equal(auditInput.diff.includes('+res.redirect(req.query.next);'), true);
 });
 
+test('collectPushDiff falls back to origin main for first branch push', () => {
+  const remote = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-code-audit-remote-'));
+  sh(remote, ['init', '--bare']);
+
+  const root = tmpRepo();
+  sh(root, ['remote', 'add', 'origin', remote]);
+  sh(root, ['push', 'origin', 'main']);
+  sh(root, ['switch', '-c', 'feature/no-upstream']);
+
+  fs.writeFileSync(path.join(root, 'server.js'), 'res.redirect(req.query.next);\n');
+  sh(root, ['add', 'server.js']);
+  sh(root, ['commit', '-m', 'add redirect']);
+
+  const auditInput = codeAudit.collectPushDiff(root);
+
+  assert.equal(auditInput.upstream, 'origin/main');
+  assert.deepEqual(auditInput.files, ['server.js']);
+  assert.equal(auditInput.diff.includes('+res.redirect(req.query.next);'), true);
+});
+
 test('collectPushDiff ignores committed generated audit files for hash and files', () => {
   const remote = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-code-audit-remote-'));
   sh(remote, ['init', '--bare']);

@@ -190,8 +190,11 @@ PreToolUse hook
   │       yes → allow structured Read, log credentials-read-authorized
   │       no  → block, create a nonce challenge hint in the runtime cache
   │
-  ├─► Bash with credential sentinels present?
+  ├─► Bash references credential-looking path?
   │       yes → block; Bash cannot be target-bound safely
+  │
+  ├─► strict sentinel mode enabled and project credential sentinels present?
+  │       yes → block all Bash until strict mode is disabled
   │
   └─► exit 2 unless user has explicitly authorized the read
 ```

@@ -94,6 +94,20 @@ blue-team fix per pass, re-scans after each patch, and stops after a hard limit.
 It logs the result to `security/code-audit-events.md` and writes
 machine-verifiable state to `security/code-audit-state.json`.
 
+Claude Code receives this through plugin `PreToolUse` hooks. Codex and plain
+shell workflows can use the same gate by installing native Git hooks in the
+repo:
+
+```bash
+yieldos-git-hooks install
+```
+
+If the plugin bin directory is not on `PATH`, run the installed script directly:
+
+```bash
+yieldOS/plugins/yieldos/bin/yieldos-git-hooks install
+```
+
 For deeper review, teams can opt into native local-agent mode with
 `YIELDOS_CODE_AUDIT_MODE=agent-review` or `agent-fix`. That uses the user's
 already-authenticated Claude Code or Codex CLI to propose findings or patches,

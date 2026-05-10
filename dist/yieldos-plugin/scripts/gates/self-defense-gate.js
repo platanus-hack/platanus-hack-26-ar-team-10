@@ -40,7 +40,7 @@ async function handleSelfDefense(input, projectRoot, options = {}) {
       process.stderr.write('[yieldOS:verdict] credentials-read-blocked\n');
       emitDecision('credentials-read-blocked', 'yieldOS bloqueó Bash porque el comando referencia credenciales; usá el flujo Read con nonce', 2);
     }
-    if (credentialsScanner.projectHasCredentialSentinel(projectRoot)) {
+    if (strictCredentialSentinelEnabled(process.env) && credentialsScanner.projectHasCredentialSentinel(projectRoot)) {
       logger.appendEntry(projectRoot, 'Credentials Bash Blocked (credential sentinel present)', {
         Command: cmd,
         Reason: 'Bash has unrestricted filesystem access; use the Read tool credential authorization flow instead',
@@ -66,6 +66,11 @@ async function handleSelfDefense(input, projectRoot, options = {}) {
       emitDecision('self-defense-block', 'yieldOS bloqueó modificación de evidencia protegida', 2);
     }
   }
+}
+
+function strictCredentialSentinelEnabled(env = process.env) {
+  const value = String(env.YIELDOS_STRICT_CREDENTIAL_SENTINEL || '').trim().toLowerCase();
+  return value === '1' || value === 'true';
 }
 
 function isProtectedBashMutation(command, projectRoot = process.cwd()) {
@@ -100,6 +105,7 @@ function escapeRegExp(value) {
 
 module.exports = {
   handleSelfDefense,
+  strictCredentialSentinelEnabled,
   isProtectedBashMutation,
   referencesProtectedSecurityPath,
 };

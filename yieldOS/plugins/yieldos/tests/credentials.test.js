@@ -397,6 +397,43 @@ test('PreToolUse blocks Bash reads of .env without credentials authorization', (
   assert.equal(result.stderr.includes('[yieldOS:verdict] credentials-read-blocked'), true);
 });
 
+test('PreToolUse allows unrelated Bash when credential sentinels are present', () => {
+  const root = tmpProject();
+  const runtimeRoot = tmpRuntimeRoot();
+  fs.writeFileSync(path.join(root, '.env'), 'OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDE\n');
+
+  const result = runHook(PRE_TOOL_HOOK, {
+    cwd: root,
+    tool_name: 'Bash',
+    tool_input: { command: 'git status --short' },
+  }, {
+    env: { YIELDOS_CREDENTIAL_AUTH_ROOT: runtimeRoot },
+  });
+
+  assert.equal(result.code, 0);
+  assert.equal(result.stderr.includes('[yieldOS:verdict] credentials-read-blocked'), false);
+});
+
+test('PreToolUse strict credential sentinel mode blocks unrelated Bash', () => {
+  const root = tmpProject();
+  const runtimeRoot = tmpRuntimeRoot();
+  fs.writeFileSync(path.join(root, '.env'), 'OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDE\n');
+
+  const result = runHook(PRE_TOOL_HOOK, {
+    cwd: root,
+    tool_name: 'Bash',
+    tool_input: { command: 'git status --short' },
+  }, {
+    env: {
+      YIELDOS_CREDENTIAL_AUTH_ROOT: runtimeRoot,
+      YIELDOS_STRICT_CREDENTIAL_SENTINEL: '1',
+    },
+  });
+
+  assert.equal(result.code, 2);
+  assert.equal(result.stderr.includes('[yieldOS:verdict] credentials-read-blocked'), true);
+});
+
 test('PreToolUse blocks Bash reads of any credential-looking root file recognized by Read', () => {
   const root = tmpProject();
   const runtimeRoot = tmpRuntimeRoot();
