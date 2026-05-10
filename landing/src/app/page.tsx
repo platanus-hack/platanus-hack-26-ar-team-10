@@ -5,6 +5,7 @@ import { DefenseLayers } from "@/components/defense-layers";
 import { HeroGridAccents } from "@/components/hero-grid-accents";
 import { InstallCommandPill } from "@/components/install-command-pill";
 import { MotionReveal } from "@/components/motion-reveal";
+import { OracleBenchmarks } from "@/components/oracle-benchmarks";
 import { OracleDemoFlow } from "@/components/oracle-demo-flow";
 import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ViewReadmeButton } from "@/components/view-readme-button";
@@ -145,6 +146,34 @@ export default function Home() {
               <DefenseLayers />
             </MotionReveal>
           </div>
+        </div>
+      </section>
+
+      <section
+        id="benchmarks"
+        className="pitch-section theme-surface-smoke border-b border-zinc-200/80"
+      >
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="max-w-3xl">
+            <MotionReveal>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
+                Benchmarks
+              </p>
+              <h2 className="mt-3 text-balance text-3xl font-semibold leading-[1.08] tracking-tight text-zinc-950 sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-6xl">
+                The oracle is cheaper, faster, and deterministic.
+              </h2>
+              <p className="mt-5 max-w-2xl text-[15px] leading-[1.65] text-zinc-600 sm:mt-6 sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
+                Letting the AI agent review its own commits costs money and time,
+                and gives a different answer every run. The oracle is
+                deterministic, near-instant, and free per check. Numbers from real
+                runs in this repo.
+              </p>
+            </MotionReveal>
+          </div>
+
+          <MotionReveal className="mt-10 sm:mt-14" delay={0.05} y={18}>
+            <OracleBenchmarks />
+          </MotionReveal>
         </div>
       </section>
 
