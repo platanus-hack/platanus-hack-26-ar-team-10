@@ -115,35 +115,24 @@ export default function Home() {
               <MotionReveal delay={0.05}>
                 <div className="mt-7 space-y-5 text-base leading-7 text-zinc-600 sm:mt-9 sm:space-y-6 sm:text-lg sm:leading-8">
                   <p>
-                    yieldOS works on two fronts at the same time. Together they cover
-                    everything that can put your code at risk &mdash; the packages
-                    you install, the AI agents working on your repo, the MCPs and
-                    skills they activate, and the very commits you&rsquo;re about to
-                    push.
+                    yieldOS works on two fronts at once: what comes IN to your
+                    project, and what goes OUT every commit.
                   </p>
                   <p>
                     <strong className="font-semibold text-zinc-950">
                       External defense.
                     </strong>{" "}
-                    This is the Claude Code plugin running live in your editor. Every
-                    time an AI agent tries to install a package, run a shell command,
-                    edit a sensitive file, add an MCP, or activate a new skill,
-                    yieldOS intercepts the action and decides &mdash; block, allow,
-                    or rewrite &mdash; before it ever touches your repo. Malicious
-                    dependencies, prompt injections, and dangerous commands stop at
-                    the door.
+                    The Claude Code plugin runs live in your editor and
+                    intercepts every package, command, file edit, MCP, or skill
+                    the agent tries &mdash; before it touches your repo.
                   </p>
                   <p>
                     <strong className="font-semibold text-zinc-950">
                       Internal defense.
                     </strong>{" "}
-                    Before each commit, the oracle reviews the code you&rsquo;re
-                    about to ship. It runs the same predictable security checks
-                    every time &mdash; missing authentication, leaked secrets,
-                    unsafe edits to your project&rsquo;s instructions &mdash; and if
-                    something fails, the commit is held with proof of what&rsquo;s
-                    wrong. The AI can propose code. The oracle has the final word
-                    on whether it&rsquo;s safe.
+                    Before each commit, the oracle scans your code for missing
+                    auth, leaked secrets, and unsafe edits. If a check fails, the
+                    commit is blocked with proof.
                   </p>
                 </div>
               </MotionReveal>

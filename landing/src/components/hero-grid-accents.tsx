@@ -30,6 +30,9 @@ type Cluster = {
 // Cada paso = 3 cols a la derecha (col más bajo) + 3 rows hacia arriba.
 // Los 12 delays están separados ≥4 s entre sí para que NUNCA haya dos
 // celdas en alerta al mismo tiempo (la alerta dura ~2.4 s).
+// Staircase amplio en pantallas anchas (cols 9 → 6 → 3 desde abajo hacia
+// arriba). En viewports más chicos el wrapper responsive recorta los
+// clusters más a la izquierda en vez de moverlos.
 const CLUSTERS: Cluster[] = [
   {
     col: 9,
