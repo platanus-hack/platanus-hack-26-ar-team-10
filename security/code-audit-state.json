@@ -2,10 +2,11 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:879590503c7f34b109f346cc396cd9009c117a215c82af1187bf3e4bfa62f016",
+  "diff_hash": "sha256:0733b7a1c2a919e5ae19480344f663484802c3a3a08bf7f418adc665040e9b25",
   "range": "fc317971f77e6ffb52e6e75921a60f01699d417e..HEAD",
   "files": [
     ".claude-plugin/marketplace.json",
+    ".gitattributes",
     ".github/CODEOWNERS",
     ".github/dependabot.yml",
     ".github/workflows/plugin.yml",
