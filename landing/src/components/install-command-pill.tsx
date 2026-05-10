@@ -33,7 +33,7 @@ export function InstallCommandPill({ command }: InstallCommandPillProps) {
   const resetTimerRef = useRef<number | null>(null);
 
   const compactCommand = command.replace(
-    "https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1",
+    "https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0",
     "...",
   );
 

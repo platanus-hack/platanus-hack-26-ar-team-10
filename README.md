@@ -23,8 +23,8 @@ AI coding agents can install dependencies, add tools, edit instruction files, re
 Enterprise install flow verifies release files before execution:
 
 ```bash
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/checksums.txt
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt
 shasum -a 256 -c checksums.txt --ignore-missing
 sh install.sh --dry-run
 sh install.sh

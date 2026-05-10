@@ -11,16 +11,26 @@ function read(path) {
 
 test("home page pivots to the yieldOS source-of-truth story", () => {
   const page = read("src/app/page.tsx");
+  const oracleDemoPage = read("src/app/oracle-demo/page.tsx");
   const agentPackSection = read("src/components/agent-pack-section.tsx");
   const oracleFlow = read("src/components/oracle-demo-flow.tsx");
+  const oracleBenchmarks = read("src/components/oracle-benchmarks.tsx");
+  const defenseLayers = read("src/components/defense-layers.tsx");
+  const externalDefenseTerminal = read("src/components/external-defense-terminal.tsx");
   const agentsInstall = read("src/components/agents-install-button.tsx");
+  const viewReadme = read("src/components/view-readme-button.tsx");
   const scrollAwareHeader = read("src/components/scroll-aware-header.tsx");
   const scrollProgress = read("src/components/scroll-progress.tsx");
   const source = [
     page,
+    oracleDemoPage,
     agentPackSection,
     oracleFlow,
+    oracleBenchmarks,
+    defenseLayers,
+    externalDefenseTerminal,
     agentsInstall,
+    viewReadme,
     scrollAwareHeader,
     scrollProgress,
   ].join("\n");
@@ -34,56 +44,34 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Oracle-driven security harness",
     "blocks policy-covered risky actions before sensitive steps",
     "Install yieldOS",
-    "View contract demo",
-    "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh",
+    "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh",
     "AgentsInstallButton",
-    "copy install command",
+    "View README.md",
+    "External defense",
+    "Internal defense",
+    "yieldOS architecture",
+    "yieldOS · Validated · allowlist",
+    "yieldOS · Blocked · credential exposed in prompt",
+    "yieldOS · Blocked · denylist match",
+    "local-review",
+    "not provider billing proof",
+    "assumption-based",
+    "Local-first security contracts for coding agents",
     "AGENTS.md",
-    "curl | sh",
     "Contract proof demo",
-    "Counterexample killed. Fix proven.",
+    "Contract. Counterexample. Proof of fix.",
     "CONTRACT created",
     "REPLAY baseline got 200",
     "REPLAY fixed got 401",
-    "security/dependency-events.md",
     "ScrollProgress",
     "ScrollAwareHeader",
-    "Hero",
-    "Demo",
-    "Coverage",
-    "Policy",
-    "Packs",
-    "Audit",
-    "Proof",
     "FAIL missing-authz",
     "PASS scoped acceptance",
-    "No unproven fixes.",
-    "Give agents a contract boundary.",
   ].forEach((text) => {
     assert.ok(source.includes(text), `Expected landing source to include: ${text}`);
   });
 
   [
-    "Packages",
-    "Skills",
-    "MCPs",
-    "Instructions",
-    "Vendoring",
-    "Binaries",
-    "Manifests",
-    "Five-check policy flow",
-    "Native",
-    "Allow",
-    "Deny",
-    "Exotic",
-    "Analyze",
-    "0",
-    "CI model calls in verifier",
-    "3",
-    "oracle result states",
-    "2",
-    "CDSC proof sides",
-    "7",
     "Team agent packs",
     "Package company rules once.",
     "Choose approved skills, MCPs, safety profiles, playbooks, and",
@@ -102,29 +90,28 @@ test("home page pivots to the yieldOS source-of-truth story", () => {
     "Copilot",
     "Windsurf",
     "enforced via hooks",
-    "guidance",
+    "guidance-only rules",
   ].forEach((text) => {
     assert.ok(source.includes(text), `Expected yieldOS proof/capability copy: ${text}`);
   });
 
   [
     "hero",
-    "demo-flow",
-    "gated-vectors",
-    "policy-flow",
+    "defenses",
+    "external-attacks",
+    "benchmarks",
     "agent-packs",
-    "audit-trail",
-    "proof",
-    "final-cta",
   ].forEach((id) => {
     assert.ok(source.includes(`id="${id}"`), `Expected section id: ${id}`);
   });
 
-  const demoIndex = page.indexOf('id="demo-flow"');
-  const coverageIndex = page.indexOf('id="gated-vectors"');
-  const policyIndex = page.indexOf('id="policy-flow"');
-  assert.ok(demoIndex < coverageIndex, "Expected demo to appear after hero");
-  assert.ok(coverageIndex < policyIndex, "Expected coverage before policy flow");
+  const heroIndex = page.indexOf('id="hero"');
+  const defensesIndex = page.indexOf('id="defenses"');
+  const externalIndex = page.indexOf('id="external-attacks"');
+  const benchmarksIndex = page.indexOf('id="benchmarks"');
+  assert.ok(heroIndex < defensesIndex, "Expected defenses to appear after hero");
+  assert.ok(defensesIndex < externalIndex, "Expected external defense after defense overview");
+  assert.ok(externalIndex < benchmarksIndex, "Expected benchmarks after external defense");
 
   [
     "npx anon scan",

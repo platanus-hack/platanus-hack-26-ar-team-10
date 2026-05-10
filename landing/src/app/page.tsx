@@ -9,7 +9,7 @@ import { ScrollAwareHeader } from "@/components/scroll-aware-header";
 import { ViewReadmeButton } from "@/components/view-readme-button";
 
 const installCommand =
-  "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh && curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/checksums.txt && shasum -a 256 -c checksums.txt --ignore-missing && sh install.sh";
+  "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh && curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt && shasum -a 256 -c checksums.txt --ignore-missing && sh install.sh";
 const repoUrl =
   "https://github.com/yieldos/yieldos";
 const readmeUrl = `${repoUrl}#readme`;
