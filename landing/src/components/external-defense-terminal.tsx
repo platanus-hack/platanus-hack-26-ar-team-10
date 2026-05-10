@@ -16,7 +16,7 @@ export function ExternalDefenseTerminal() {
       {/* Terminal content */}
       <div className="p-3 font-mono text-[11px] leading-5 text-zinc-300 sm:p-4 sm:text-[12px] sm:leading-6">
         {/* Welcome frame (orange notch border) */}
-        <div className="relative overflow-hidden rounded-lg border border-orange-500/45 px-3 pb-3 pt-4 sm:px-4 sm:pb-4 sm:pt-5">
+        <div className="relative mt-2 rounded-lg border border-orange-500/45 px-3 pb-3 pt-4 sm:px-4 sm:pb-4 sm:pt-5">
           <div className="absolute left-3 top-0 -translate-y-1/2 bg-[#0a0a0c] px-2 text-[10px] uppercase tracking-[0.18em] text-orange-400">
             Claude Code v2.1.111
           </div>
