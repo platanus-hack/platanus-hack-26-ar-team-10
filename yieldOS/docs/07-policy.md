@@ -1,6 +1,6 @@
 # Policy management
 
-All policy lives at `github.com/yieldos/yieldos/policy/`. Installed plugins fetch the raw JSON files from that directory and fall back to the shipped `policy-cache/` snapshot when offline. Policy is **not** editable locally.
+Reviewed policy lives at `github.com/yieldos/yieldos/policy/`. Installed plugins can fetch candidate bundles from that directory, but they only activate a bundle when `manifest.json` matches the manifest hash pinned in the installed plugin and every policy file matches the manifest. Policy is **not** editable locally.
 
 ## Policy files
 
@@ -15,7 +15,8 @@ policy/
 ├── injection-patterns.json     ← regex patterns for prompt-injection scanning
 ├── build-scripts-allowed.json  ← packages whose preinstall/postinstall is approved
 ├── required-settings.json      ← `.npmrc` / `pnpm-workspace.yaml` settings to enforce
-└── version.json                ← cache invalidation marker
+├── version.json                ← policy version + decision-set hash
+└── manifest.json               ← release-pinned file hashes
 ```
 
 ## Why centrally curated
@@ -26,7 +27,7 @@ Three reasons:
 
 2. **Curation is a shared trust artifact.** When 100 users use the same policy, they benefit from the work of every PR reviewer. When they each maintain their own, nobody benefits.
 
-3. **Updates flow naturally.** A new supply-chain attack disclosed today can be added to denylist via PR; every yieldOS user picks it up on their next session.
+3. **Updates flow through release trust.** A new supply-chain attack disclosed today can be added to denylist via PR, then shipped with a regenerated manifest and plugin pin. Installed clients reject mutable `main` drift until the release pin changes.
 
 ## Package policy shape
 
@@ -52,24 +53,24 @@ Denylist entries require:
 
 Runtime precedence is intentionally fail-closed: denylist wins before native-equivalent suggestions and allowlist matches. A package cannot be both allowlisted and denylisted without `scripts/policy-check.mjs` failing.
 
-## Three-layer cache
+## Manifest-pinned cache
 
 ```
                    ┌──────────────────────┐
-                   │  Online (origin)     │  github.com/.../policy/
-                   │  Source of truth     │
+                   │  Online candidate    │  github.com/.../policy/
+                   │  manifest + files    │
                    └──────────┬───────────┘
-                              │ HTTPS fetch
+                              │ HTTPS fetch + sha256 verification
                               ↓
                    ┌──────────────────────┐
                    │  Runtime cache       │  ~/.claude/plugins/yieldos/.runtime-cache/
-                   │  TTL 5 min           │  Per-user, persisted across sessions
+                   │  TTL 5 min           │  Last verified online bundle
                    └──────────┬───────────┘
                               │
-                              ↓ fallback
+                              ↓ fallback if online fails or is untrusted
                    ┌──────────────────────┐
                    │  Shipped cache       │  plugin/policy-cache/
-                   │  Updated on release  │  Always present, offline-safe
+                   │  Release-pinned      │  Always present, offline-safe
                    └──────────────────────┘
 ```
 
@@ -80,13 +81,15 @@ getPolicy({ forceRefresh })
   │
   ├─ if (!forceRefresh && runtime cache fresh) → return runtime
   │
-  ├─ try fetch from origin (each file)
-  │     ├─ all files succeed → write runtime cache, return online
-  │     └─ any file fails → fall through
+  ├─ try fetch manifest + files from origin
+  │     ├─ manifest sha256 matches plugin pin
+  │     ├─ every file sha256 matches manifest
+  │     ├─ all JSON parses → atomically activate runtime cache, return online
+  │     └─ any failure → discard candidate and fall through
   │
-  ├─ try runtime cache → return runtime-cache-degraded
+  ├─ try verified runtime cache → return runtime-cache-degraded
   │
-  └─ try shipped cache → return shipped-cache-degraded
+  └─ try verified shipped cache → return shipped-cache-degraded
        └─ if missing too → unavailable (block on critical paths)
 ```
 
@@ -98,7 +101,7 @@ getPolicy({ forceRefresh })
 | `UserPromptSubmit` | refresh if TTL expired |
 | `PreToolUse` per call | refresh if TTL expired (cache check) |
 
-5-minute TTL means the runtime cache typically holds for the duration of a session, with at most one refresh per 5 min on long sessions.
+5-minute TTL means the runtime cache typically holds for the duration of a session, with at most one candidate refresh per 5 min on long sessions. The TTL does not bypass manifest verification.
 
 ## How to propose a policy change
 
@@ -107,8 +110,10 @@ The user does not edit policy locally. To add a package to the allowlist or deny
 1. Open a PR to `github.com/yieldos/yieldos`.
 2. Edit the relevant `policy/*.json` file.
 3. Justify in the PR description (e.g., "this package is widely used and we have audited the postinstall script and verified the maintainer").
-4. Maintainer reviews and merges.
-5. Next `SessionStart` after merge picks it up automatically (within 5 min).
+4. Maintainer reviews and runs `node scripts/generate-policy-manifest.mjs`.
+5. Maintainer runs `node scripts/policy-check.mjs`.
+6. The plugin release ships the updated `policy-cache/manifest.json` and pinned `policy.manifest_sha256`.
+7. Installed clients accept the new online bundle only after their plugin pin matches it.
 
 ## What changes are valid in a PR
 
@@ -204,7 +209,7 @@ This avoids spamming `api.osv.dev` when checking the same package repeatedly dur
 }
 ```
 
-The hash is the canonical hash of all other policy files combined. yieldOS uses it to decide whether the runtime cache is current. (Today: simpler TTL-based; the hash check is for v2.)
+The hash is the SHA-256 digest of the decision-bearing policy files, excluding `version.json` and `manifest.json`. `manifest.json` is the runtime integrity authority: it records each policy file's raw-byte SHA-256 and the installed plugin pins the manifest hash in `config/defaults.json`.
 
 ## Failure modes
 
@@ -214,6 +219,9 @@ The hash is the canonical hash of all other policy files combined. yieldOS uses 
 | Online unreachable, runtime missing, shipped present | Use shipped, log degraded mode |
 | All unreachable | Block on critical paths, log unavailable |
 | Online returns malformed JSON | Treat as unreachable, fall back |
-| Online returns 404 on one file | Use cached version of that file |
+| Online returns 404 on one file | Discard the entire online candidate and fall back |
+| Online manifest hash differs from plugin pin | Discard the online candidate and fall back |
+| Runtime cache hash differs from manifest | Ignore runtime cache and fall back to shipped |
+| Shipped cache hash differs from manifest | Treat policy as unavailable |
 
-The system is **fail-closed** for critical paths (denylist must always be enforced) and **fail-open** for non-critical paths (a missing native-equivalents file just means we skip native suggestions).
+The system is **fail-closed** for critical paths: an unverified policy bundle is not used for dependency, skill, MCP, credential, or instruction decisions.

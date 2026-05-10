@@ -333,24 +333,26 @@ Detectors cover npm, pnpm, yarn, bun, pip, poetry, uv, cargo, go, skills, vendor
 
 ---
 
-## Policy — three-layer cache, online-first
+## Policy — manifest-pinned cache
 
 ```
                   ┌──────────────────────────┐
-                  │   Online (origin)        │
-                  │ github.com/.../policy/   │   ← source of truth
+                  │   Online candidate       │
+                  │ github.com/.../policy/   │
+                  │ manifest must match pin  │
                   └─────────────┬────────────┘
-                                │ fetch (each session)
+                                │ verify sha256 manifest + files
                                 ↓
                   ┌──────────────────────────┐
                   │   Runtime cache          │   ~/.claude/plugins/yieldos/
                   │   TTL 5 min              │   .runtime-cache/
+                  │   manifest-verified      │
                   └─────────────┬────────────┘
-                                │ fallback if origin unreachable
+                                │ fallback if origin unavailable or untrusted
                                 ↓
                   ┌──────────────────────────┐
                   │   Shipped cache          │   plugin/policy-cache/
-                  │   updated on release     │   always present
+                  │   release-pinned         │   always present
                   └──────────────────────────┘
 ```
 
@@ -358,6 +360,8 @@ Refresh triggers:
 - `SessionStart` — force refresh (ignore TTL).
 - `UserPromptSubmit` — refresh if stale.
 - `PreToolUse` — refresh if TTL expired.
+
+Online refresh is accepted only when `policy/manifest.json` matches the manifest hash pinned in the installed plugin and every policy file matches the manifest. Otherwise yieldOS falls back to the last verified runtime cache or the shipped release cache.
 
 → Detail: [docs/07-policy.md](docs/07-policy.md).
 
@@ -377,7 +381,7 @@ plugins/yieldos/
 │   ├── on-session-start.js     ← SessionStart entry
 │   ├── on-prompt-submit.js     ← UserPromptSubmit entry
 │   ├── decide.js               ← 5-check flow
-│   ├── policy-fetcher.js       ← three-layer cache
+│   ├── policy-fetcher.js       ← manifest-pinned policy cache
 │   ├── policy-lookup.js        ← lists/categories lookups
 │   ├── logger.js               ← append-only, secret-redacted
 │   ├── self-defense.js         ← protected-path detection
@@ -418,7 +422,7 @@ You do not need to:
 - Edit allowlist or denylist.
 - Run any commands manually.
 
-If you want to add a package that yieldOS blocked, the path is: open a PR that updates the reviewed root [`policy/`](../policy) files and keeps the plugin `policy-cache/` synchronized.
+If you want to add a package that yieldOS blocked, the path is: open a PR that updates the reviewed root [`policy/`](../policy) files, run `node scripts/generate-policy-manifest.mjs`, and ship the updated manifest pin with the plugin release.
 
 ---
 
@@ -513,7 +517,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 | [docs/04-coverage.md](docs/04-coverage.md) | Every vector yieldOS gates: packages, skills, MCPs, instruction files, vendoring, binaries. |
 | [docs/05-decision-flow.md](docs/05-decision-flow.md) | The full 5-check pipeline plus pre/post-hook details. |
 | [docs/06-architecture.md](docs/06-architecture.md) | Plugin layout, module dependency graph, runtime sequences, three caches. |
-| [docs/07-policy.md](docs/07-policy.md) | Policy fetching, the three-layer cache, refresh triggers, PR flow. |
+| [docs/07-policy.md](docs/07-policy.md) | Policy fetching, manifest-pinned cache, refresh triggers, PR flow. |
 | [docs/08-tradeoffs.md](docs/08-tradeoffs.md) | What we gave up on purpose and why. |
 | [docs/09-decision-log.md](docs/09-decision-log.md) | Every meaningful decision in order, with rationale. |
 | [docs/10-code-audit.md](docs/10-code-audit.md) | Commit/push source-code security audit loop. |

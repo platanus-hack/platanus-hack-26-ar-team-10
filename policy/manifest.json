@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "policy_version": "0.5.0",
+  "generated_at": "2026-05-09T09:20:00.000Z",
+  "authority": {
+    "repo": "yieldos/yieldos",
+    "ref": "main",
+    "path": "policy",
+    "integrity": "pinned-manifest-sha256"
+  },
+  "files": [
+    {
+      "path": "allowlist.json",
+      "sha256": "sha256:dfde8d802408d4ea55c8240d237226e85dd63368f2772963797971a391220611",
+      "bytes": 128442
+    },
+    {
+      "path": "denylist.json",
+      "sha256": "sha256:5d0d5a4e3baffab608aa6f75a69daf0fa7e3fabc4047187cec620d28ac69653e",
+      "bytes": 4963
+    },
+    {
+      "path": "categories.json",
+      "sha256": "sha256:75da382d6186a29cb247d8bd2065b2cdadce7a4fc2d5674cbf5e155d30a16f4a",
+      "bytes": 4679
+    },
+    {
+      "path": "native-equivalents.json",
+      "sha256": "sha256:6101bd43243a5b1d38c3483a9d5e19297ee940dece64afdd0698f43d3c0bfd63",
+      "bytes": 1852
+    },
+    {
+      "path": "skills.json",
+      "sha256": "sha256:2304143919ee117f5cdab63d60e0e8ab7dfa833266a0be35e91bd8a57987e3d4",
+      "bytes": 1986
+    },
+    {
+      "path": "mcps.json",
+      "sha256": "sha256:2beefd47dd0936554fd20f136445b57037d2c325ca6fd926034672bf64e43290",
+      "bytes": 2494
+    },
+    {
+      "path": "injection-patterns.json",
+      "sha256": "sha256:751856ac71e2916854d81b35db5d883c6b450618c82c0168da933b2eba276927",
+      "bytes": 1478
+    },
+    {
+      "path": "build-scripts-allowed.json",
+      "sha256": "sha256:70adefb42f1d61616306efefece55a263617006b0240d3ef2a20da68e0f76396",
+      "bytes": 797
+    },
+    {
+      "path": "required-settings.json",
+      "sha256": "sha256:3efc3fb027b86d9d469b230afb5662cffae38d0622db17735889a2a1c5d9b678",
+      "bytes": 967
+    },
+    {
+      "path": "version.json",
+      "sha256": "sha256:a2a58871cb2715fe4e94ef4fdce9facce3681d2779aa84a33638dc091b94788f",
+      "bytes": 154
+    }
+  ],
+  "bundle_sha256": "sha256:5a7c8026a92f1e3799a5853bb53100456bd0adec90271a704684003da33fc403"
+}

@@ -28,6 +28,11 @@ function writePack(root, content) {
   return target;
 }
 
+function writeJson(filePath, value) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
 function sha256(content) {
   return `sha256:${crypto.createHash('sha256').update(content).digest('hex')}`;
 }
@@ -96,6 +101,38 @@ skills:
   allow:
     - key: skill:not-approved
 `);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('skill:not-approved is not approved'), true);
+});
+
+test('runPack ignores unverified project-local policy files', () => {
+  const root = tmpProject();
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: unverified-local-policy
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+skills:
+  allow:
+    - key: skill:not-approved
+`);
+  writeJson(path.join(root, 'policy', 'skills.json'), {
+    version: 'tampered',
+    entries: [{
+      key: 'skill:not-approved',
+      category: 'third-party',
+      vendor: 'attacker',
+      purpose: 'bypass fixture',
+    }],
+    rules: { default_unlisted: 'block' },
+  });
 
   const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
 
