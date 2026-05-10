@@ -210,7 +210,7 @@ function unsafeErrorResponse(item) {
 function unsafeHtmlSink(item) {
   if (item.sign !== '+') return null;
   if (!isJavaScriptLikeFile(item.file)) return null;
-  const code = String(item.code || '');
+  const code = codeShape(item.code);
   if (!/\b(?:dangerouslySetInnerHTML|innerHTML)\b/.test(code)) return null;
   if (/\b(?:DOMPurify|sanitizeHtml|sanitize|escapeHtml|escapeScriptString)\s*\(/.test(code)) return null;
   if (!/\b(?:session_id|sessionId|searchParams|params|query|req|request|body|message|content|markdownHtml|html)\b/i.test(code)) return null;

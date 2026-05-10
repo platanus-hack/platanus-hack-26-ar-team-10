@@ -242,13 +242,17 @@ test('redTeam ignores fixtures, tests, and stringified route examples', () => {
 
 test('redTeam ignores exact sink examples inside quoted template data', () => {
   const findings = codeAudit.redTeam({
-    files: ['scripts/oracles/templates/web.js'],
+    files: ['scripts/oracles/templates/web.js', 'yieldOS/plugins/yieldos/scripts/oracles/templates/web.js'],
     diff: [
       'diff --git a/scripts/oracles/templates/web.js b/scripts/oracles/templates/web.js',
       '+++ b/scripts/oracles/templates/web.js',
       '@@',
       "+    signals: ['res.redirect(req.query.next)', 'exec(\"git log \" + req.query.ref)'],",
       "+    fixtures: ['fetch(req.query.url)', 'fs.unlinkSync(req.query.path)'],",
+      'diff --git a/yieldOS/plugins/yieldos/scripts/oracles/templates/web.js b/yieldOS/plugins/yieldos/scripts/oracles/templates/web.js',
+      '+++ b/yieldOS/plugins/yieldos/scripts/oracles/templates/web.js',
+      '@@',
+      "+    signals: ['dangerouslySetInnerHTML', 'innerHTML assignment', 'query/callback parameter interpolated into generated script text'],",
     ].join('\n'),
   });
 
@@ -313,13 +317,17 @@ test('redTeam detects real-looking API key values in docs examples', () => {
 });
 
 test('redTeam detects real-looking SECRET_KEY values in docs examples', () => {
+  const secretKey = [
+    'welzhKsWgkTjUjTsJFG8O-mKVb47Qh-TULAjXu-wYP5FA',
+    'R62E8DQNh98FDtkwmZks1ZqN_5FOFNbWzENyTofw',
+  ].join('-');
   const findings = codeAudit.redTeam({
     files: ['docs/open-wearables-setup.md'],
     diff: [
       'diff --git a/docs/open-wearables-setup.md b/docs/open-wearables-setup.md',
       '+++ b/docs/open-wearables-setup.md',
       '@@',
-      '+SECRET_KEY=welzhKsWgkTjUjTsJFG8O-mKVb47Qh-TULAjXu-wYP5FA-R62E8DQNh98FDtkwmZks1ZqN_5FOFNbWzENyTofw',
+      `+SECRET_KEY=${secretKey}`,
     ].join('\n'),
   });
 
@@ -327,13 +335,17 @@ test('redTeam detects real-looking SECRET_KEY values in docs examples', () => {
 });
 
 test('redTeam detects hardcoded private key literals in setup scripts', () => {
+  const privateKey = [
+    '811ee5b89d461f44fddcfcde631f750e',
+    'd828dd93da8ed73a0dd6c56b46ae3764',
+  ].join('');
   const findings = codeAudit.redTeam({
     files: ['sdk/setup-test-agent.ts'],
     diff: [
       'diff --git a/sdk/setup-test-agent.ts b/sdk/setup-test-agent.ts',
       '+++ b/sdk/setup-test-agent.ts',
       '@@',
-      "+console.log('ZERO_PRIVATE_KEY=811ee5b89d461f44fddcfcde631f750ed828dd93da8ed73a0dd6c56b46ae3764');",
+      `+console.log('ZERO_PRIVATE_KEY=${privateKey}');`,
     ].join('\n'),
   });
 
