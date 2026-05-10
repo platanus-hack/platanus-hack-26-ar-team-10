@@ -1,0 +1,22 @@
+{
+  "name": "yieldos",
+  "version": "0.11.0",
+  "description": "Oracle-driven security harness for Claude Code. Intercepts risky agent actions, verifies scoped pass/fail/unknown evidence, audits code, runs counterexample replays, and packages policy-validated team rules.",
+  "author": {
+    "name": "platanus-hack-26-ar-team-10"
+  },
+  "homepage": "https://github.com/platanus-hack/platanus-hack-26-ar-team-10",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "supply-chain",
+    "dependency-management",
+    "claude-code",
+    "agent-instructions",
+    "oracles",
+    "security-harness",
+    "red-team",
+    "dashboard",
+    "agent-packs"
+  ]
+}

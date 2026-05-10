@@ -1,258 +1,2998 @@
 {
-  "version": "0.2.0",
-  "updated_at": "2026-05-09T03:00:00Z",
+  "version": "0.3.0",
+  "updated_at": "2026-05-10T00:00:00Z",
   "entries": [
-    { "key": "npm:react@18.3.1", "category": "framework" },
-    { "key": "npm:react-dom@18.3.1", "category": "framework" },
-    { "key": "npm:vue@3.4.21", "category": "framework" },
-    { "key": "npm:express@4.19.2", "category": "framework" },
-    { "key": "npm:fastify@4.26.2", "category": "framework" },
-    { "key": "npm:next@14.2.3", "category": "framework" },
-    { "key": "npm:nuxt@3.11.2", "category": "framework" },
-    { "key": "npm:remix@2.9.2", "category": "framework" },
-    { "key": "npm:astro@4.7.0", "category": "framework" },
-    { "key": "npm:svelte@4.2.15", "category": "framework" },
-    { "key": "npm:solid-js@1.8.17", "category": "framework" },
-    { "key": "npm:gatsby@5.13.0", "category": "framework" },
-    { "key": "npm:hono@4.3.0", "category": "framework" },
-    { "key": "npm:koa@2.15.3", "category": "framework" },
-    { "key": "npm:zod@3.23.8", "category": "schema-validator" },
-    { "key": "npm:zod", "category": "schema-validator" },
-    { "key": "npm:typescript@5.4.5", "category": "compiler" },
-    { "key": "npm:typescript", "category": "compiler" },
-    { "key": "npm:vite@5.2.10", "category": "build-tool" },
-    { "key": "npm:vite", "category": "build-tool" },
-    { "key": "npm:webpack", "category": "build-tool" },
-    { "key": "npm:rollup", "category": "build-tool" },
-    { "key": "npm:esbuild", "category": "build-tool" },
-    { "key": "npm:swc", "category": "build-tool" },
-    { "key": "npm:parcel", "category": "build-tool" },
-    { "key": "npm:eslint@8.57.0", "category": "linter" },
-    { "key": "npm:eslint", "category": "linter" },
-    { "key": "npm:prettier@3.2.5", "category": "formatter" },
-    { "key": "npm:prettier", "category": "formatter" },
-    { "key": "npm:biome", "category": "linter" },
-    { "key": "npm:@biomejs/biome", "category": "linter" },
-    { "key": "npm:vitest@1.6.0", "category": "test-runner" },
-    { "key": "npm:vitest", "category": "test-runner" },
-    { "key": "npm:jest", "category": "test-runner" },
-    { "key": "npm:mocha", "category": "test-runner" },
-    { "key": "npm:playwright", "category": "test-runner" },
-    { "key": "npm:cypress", "category": "test-runner" },
-    { "key": "npm:axios@1.7.2", "category": "http-client" },
-    { "key": "npm:axios", "category": "http-client" },
-    { "key": "npm:got", "category": "http-client" },
-    { "key": "npm:ky", "category": "http-client" },
-    { "key": "npm:undici", "category": "http-client" },
-    { "key": "npm:dotenv@16.4.5", "category": "config" },
-    { "key": "npm:dotenv", "category": "config" },
-    { "key": "npm:bcrypt@5.1.1", "category": "crypto" },
-    { "key": "npm:bcrypt", "category": "crypto" },
-    { "key": "npm:bcryptjs", "category": "crypto" },
-    { "key": "npm:argon2", "category": "crypto" },
-    { "key": "npm:jsonwebtoken@9.0.2", "category": "jwt" },
-    { "key": "npm:jsonwebtoken", "category": "jwt" },
-    { "key": "npm:jose", "category": "jwt" },
-    { "key": "npm:passport", "category": "auth" },
-    { "key": "npm:next-auth", "category": "auth" },
-    { "key": "npm:lucia", "category": "auth" },
-    { "key": "npm:pg@8.11.5", "category": "db-driver" },
-    { "key": "npm:pg", "category": "db-driver" },
-    { "key": "npm:mysql2", "category": "db-driver" },
-    { "key": "npm:redis", "category": "db-driver" },
-    { "key": "npm:ioredis", "category": "db-driver" },
-    { "key": "npm:mongodb", "category": "db-driver" },
-    { "key": "npm:sqlite3", "category": "db-driver" },
-    { "key": "npm:better-sqlite3", "category": "db-driver" },
-    { "key": "npm:knex", "category": "db-driver" },
-    { "key": "npm:kysely", "category": "db-driver" },
-    { "key": "npm:prisma@5.13.0", "category": "orm" },
-    { "key": "npm:prisma", "category": "orm" },
-    { "key": "npm:@prisma/client@5.13.0", "category": "orm" },
-    { "key": "npm:@prisma/client", "category": "orm" },
-    { "key": "npm:drizzle-orm", "category": "orm" },
-    { "key": "npm:typeorm", "category": "orm" },
-    { "key": "npm:sequelize", "category": "orm" },
-    { "key": "npm:mongoose", "category": "orm" },
-    { "key": "npm:tailwindcss", "category": "ui" },
-    { "key": "npm:@mui/material", "category": "ui" },
-    { "key": "npm:@mui/icons-material", "category": "ui" },
-    { "key": "npm:@chakra-ui/react", "category": "ui" },
-    { "key": "npm:@radix-ui/react-dialog", "category": "ui" },
-    { "key": "npm:@radix-ui/react-dropdown-menu", "category": "ui" },
-    { "key": "npm:@radix-ui/react-popover", "category": "ui" },
-    { "key": "npm:@radix-ui/react-tooltip", "category": "ui" },
-    { "key": "npm:@headlessui/react", "category": "ui" },
-    { "key": "npm:antd", "category": "ui" },
-    { "key": "npm:lucide-react", "category": "ui" },
-    { "key": "npm:react-icons", "category": "ui" },
-    { "key": "npm:@heroicons/react", "category": "ui" },
-    { "key": "npm:lingui", "category": "i18n" },
-    { "key": "npm:i18next", "category": "i18n" },
-    { "key": "npm:react-i18next", "category": "i18n" },
-    { "key": "npm:@aws-sdk/client-s3", "category": "cloud-sdk" },
-    { "key": "npm:@aws-sdk/client-secretsmanager", "category": "cloud-sdk" },
-    { "key": "npm:@aws-sdk/client-dynamodb", "category": "cloud-sdk" },
-    { "key": "npm:@aws-sdk/client-lambda", "category": "cloud-sdk" },
-    { "key": "npm:@aws-sdk/client-sqs", "category": "cloud-sdk" },
-    { "key": "npm:@google-cloud/firestore", "category": "cloud-sdk" },
-    { "key": "npm:@google-cloud/storage", "category": "cloud-sdk" },
-    { "key": "npm:@google-cloud/translate", "category": "cloud-sdk" },
-    { "key": "npm:@google-cloud/pubsub", "category": "cloud-sdk" },
-    { "key": "npm:@firebase/app", "category": "cloud-sdk" },
-    { "key": "npm:firebase", "category": "cloud-sdk" },
-    { "key": "npm:firebase-admin", "category": "cloud-sdk" },
-    { "key": "npm:@clerk/clerk-sdk-node", "category": "auth-sdk" },
-    { "key": "npm:@auth0/auth0-react", "category": "auth-sdk" },
-    { "key": "npm:stripe", "category": "payment-sdk" },
-    { "key": "npm:@stripe/stripe-js", "category": "payment-sdk" },
-    { "key": "npm:@stripe/react-stripe-js", "category": "payment-sdk" },
-    { "key": "npm:twilio", "category": "messaging-sdk" },
-    { "key": "npm:@twilio/sdk", "category": "messaging-sdk" },
-    { "key": "npm:discord.js", "category": "platform-sdk" },
-    { "key": "npm:discord-api-types", "category": "platform-sdk" },
-    { "key": "npm:@solana/web3.js", "category": "blockchain-sdk" },
-    { "key": "npm:@coinbase/wallet-sdk", "category": "blockchain-sdk" },
-    { "key": "npm:ethers", "category": "blockchain-sdk" },
-    { "key": "npm:web3", "category": "blockchain-sdk" },
-    { "key": "npm:openai", "category": "ai-sdk" },
-    { "key": "npm:@anthropic-ai/sdk", "category": "ai-sdk" },
-    { "key": "npm:@google-cloud/aiplatform", "category": "ai-sdk" },
-    { "key": "npm:langchain", "category": "ai-sdk" },
-    { "key": "npm:@langchain/core", "category": "ai-sdk" },
-    { "key": "npm:@langchain/openai", "category": "ai-sdk" },
-    { "key": "npm:@types/node", "category": "types" },
-    { "key": "npm:@types/react", "category": "types" },
-    { "key": "npm:@types/react-dom", "category": "types" },
-    { "key": "npm:@types/express", "category": "types" },
-    { "key": "npm:@types/lodash", "category": "types" },
-    { "key": "npm:tslib", "category": "types" },
-    { "key": "npm:type-fest", "category": "types" },
-    { "key": "npm:csstype", "category": "types" },
-    { "key": "npm:create-next-app", "category": "scaffolder" },
-    { "key": "npm:create-react-app", "category": "scaffolder" },
-    { "key": "npm:create-vite", "category": "scaffolder" },
-    { "key": "npm:react-scripts", "category": "scaffolder" },
-    { "key": "npm:http-proxy", "category": "http" },
-    { "key": "npm:http-proxy-middleware", "category": "http" },
-    { "key": "npm:http-proxy-agent", "category": "http" },
-    { "key": "npm:https-proxy-agent", "category": "http" },
-    { "key": "npm:public-suffix-list", "category": "data" },
-    { "key": "npm:react", "category": "framework-trusted" },
-    { "key": "npm:react-dom", "category": "framework-trusted" },
-    { "key": "npm:vue", "category": "framework-trusted" },
-    { "key": "npm:express", "category": "framework-trusted" },
-    { "key": "npm:fastify", "category": "framework-trusted" },
-    { "key": "npm:next", "category": "framework-trusted" },
-    { "key": "npm:nuxt", "category": "framework-trusted" },
-    { "key": "npm:remix", "category": "framework-trusted" },
-    { "key": "npm:astro", "category": "framework-trusted" },
-    { "key": "npm:svelte", "category": "framework-trusted" },
-    { "key": "npm:gatsby", "category": "framework-trusted" },
-    { "key": "npm:hono", "category": "framework-trusted" },
-    { "key": "npm:koa", "category": "framework-trusted" },
-    { "key": "npm:solid-js", "category": "framework-trusted" },
-    { "key": "npm:sharp", "category": "image-trusted" },
-    { "key": "npm:sqlite3", "category": "db-driver-trusted" },
-    { "key": "npm:better-sqlite3", "category": "db-driver-trusted" },
-    { "key": "npm:canvas", "category": "image-trusted" },
-    { "key": "npm:node-sass", "category": "build-tool-trusted" },
-    { "key": "npm:@swc/core", "category": "build-tool-trusted" },
-    { "key": "npm:@ember/array", "category": "framework" },
-    { "key": "npm:@rxjs/operators", "category": "reactive" },
-    { "key": "python:requests==2.31.0", "category": "http-client" },
-    { "key": "python:requests", "category": "http-client" },
-    { "key": "python:httpx", "category": "http-client" },
-    { "key": "python:httpcore", "category": "http-client" },
-    { "key": "python:aiohttp", "category": "http-client" },
-    { "key": "python:urllib3", "category": "http-client" },
-    { "key": "python:fastapi==0.110.0", "category": "framework" },
-    { "key": "python:fastapi", "category": "framework" },
-    { "key": "python:django", "category": "framework" },
-    { "key": "python:flask", "category": "framework" },
-    { "key": "python:starlette", "category": "framework" },
-    { "key": "python:uvicorn", "category": "server" },
-    { "key": "python:gunicorn", "category": "server" },
-    { "key": "python:pydantic==2.7.1", "category": "schema-validator" },
-    { "key": "python:pydantic", "category": "schema-validator" },
-    { "key": "python:pydantic-core", "category": "schema-validator" },
-    { "key": "python:sqlalchemy==2.0.29", "category": "orm" },
-    { "key": "python:sqlalchemy", "category": "orm" },
-    { "key": "python:alembic", "category": "orm" },
-    { "key": "python:bcrypt==4.1.2", "category": "crypto" },
-    { "key": "python:bcrypt", "category": "crypto" },
-    { "key": "python:cryptography", "category": "crypto" },
-    { "key": "python:argon2-cffi", "category": "crypto" },
-    { "key": "python:passlib", "category": "crypto" },
-    { "key": "python:pyjwt==2.8.0", "category": "jwt" },
-    { "key": "python:pyjwt", "category": "jwt" },
-    { "key": "python:python-jose", "category": "jwt" },
-    { "key": "python:authlib", "category": "auth" },
-    { "key": "python:oauthlib", "category": "auth" },
-    { "key": "python:requests-oauthlib", "category": "auth" },
-    { "key": "python:openai", "category": "ai-sdk" },
-    { "key": "python:anthropic", "category": "ai-sdk" },
-    { "key": "python:langchain", "category": "ai-sdk" },
-    { "key": "python:langchain-core", "category": "ai-sdk" },
-    { "key": "python:langchain-openai", "category": "ai-sdk" },
-    { "key": "python:langchain-community", "category": "ai-sdk" },
-    { "key": "python:huggingface-hub", "category": "ai-sdk" },
-    { "key": "python:transformers", "category": "ml" },
-    { "key": "python:torch", "category": "ml" },
-    { "key": "python:tensorflow", "category": "ml" },
-    { "key": "python:scikit-learn", "category": "ml" },
-    { "key": "python:numpy", "category": "data" },
-    { "key": "python:pandas", "category": "data" },
-    { "key": "python:scipy", "category": "data" },
-    { "key": "python:matplotlib", "category": "data" },
-    { "key": "python:pytest", "category": "test-runner" },
-    { "key": "python:pytest-asyncio", "category": "test-runner" },
-    { "key": "python:pytest-mock", "category": "test-runner" },
-    { "key": "python:pytest-cov", "category": "test-runner" },
-    { "key": "python:unittest-mock", "category": "test-runner" },
-    { "key": "python:hypothesis", "category": "test-runner" },
-    { "key": "python:httpretty", "category": "test-mock" },
-    { "key": "python:responses", "category": "test-mock" },
-    { "key": "python:vcrpy", "category": "test-mock" },
-    { "key": "python:requests-mock", "category": "test-mock" },
-    { "key": "python:moto", "category": "test-mock" },
-    { "key": "python:stripe-mock", "category": "test-mock" },
-    { "key": "python:pytest-httpx", "category": "test-mock" },
-    { "key": "python:redis", "category": "db-driver" },
-    { "key": "python:psycopg2", "category": "db-driver" },
-    { "key": "python:psycopg2-binary", "category": "db-driver" },
-    { "key": "python:asyncpg", "category": "db-driver" },
-    { "key": "python:asyncpg-pool", "category": "db-driver" },
-    { "key": "python:pymongo", "category": "db-driver" },
-    { "key": "python:motor", "category": "db-driver" },
-    { "key": "python:elasticsearch", "category": "db-driver" },
-    { "key": "python:boto3", "category": "cloud-sdk" },
-    { "key": "python:botocore", "category": "cloud-sdk" },
-    { "key": "python:google-cloud-storage", "category": "cloud-sdk" },
-    { "key": "python:google-cloud-bigquery", "category": "cloud-sdk" },
-    { "key": "python:google-auth", "category": "cloud-sdk" },
-    { "key": "python:azure-storage-blob", "category": "cloud-sdk" },
-    { "key": "python:azure-identity", "category": "cloud-sdk" },
-    { "key": "python:stripe", "category": "payment-sdk" },
-    { "key": "python:twilio", "category": "messaging-sdk" },
-    { "key": "python:beautifulsoup4", "category": "parser" },
-    { "key": "python:lxml", "category": "parser" },
-    { "key": "python:html5lib", "category": "parser" },
-    { "key": "python:pyyaml", "category": "parser" },
-    { "key": "python:tomli", "category": "parser" },
-    { "key": "python:tomlkit", "category": "parser" },
-    { "key": "python:pillow", "category": "image" },
-    { "key": "python:opencv-python", "category": "image" },
-    { "key": "python:rapidjson", "category": "parser" },
-    { "key": "python:ujson", "category": "parser" },
-    { "key": "python:orjson", "category": "parser" },
-    { "key": "python:speech-recognition", "category": "audio" },
-    { "key": "python:click", "category": "cli" },
-    { "key": "python:typer", "category": "cli" },
-    { "key": "python:rich", "category": "cli" },
-    { "key": "python:tqdm", "category": "cli" },
-    { "key": "python:python-dotenv", "category": "config" },
-    { "key": "python:loguru", "category": "logging" },
-    { "key": "python:structlog", "category": "logging" }
-  ]
+    {
+      "key": "npm:react@18.3.1",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react/v/18.3.1"
+      ]
+    },
+    {
+      "key": "npm:react-dom@18.3.1",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react-dom/v/18.3.1"
+      ]
+    },
+    {
+      "key": "npm:vue@3.4.21",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/vue/v/3.4.21"
+      ]
+    },
+    {
+      "key": "npm:express@4.19.2",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/express/v/4.19.2"
+      ]
+    },
+    {
+      "key": "npm:fastify@4.26.2",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/fastify/v/4.26.2"
+      ]
+    },
+    {
+      "key": "npm:next@14.2.3",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/next/v/14.2.3"
+      ]
+    },
+    {
+      "key": "npm:nuxt@3.11.2",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/nuxt/v/3.11.2"
+      ]
+    },
+    {
+      "key": "npm:remix@2.9.2",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/remix/v/2.9.2"
+      ]
+    },
+    {
+      "key": "npm:astro@4.7.0",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/astro/v/4.7.0"
+      ]
+    },
+    {
+      "key": "npm:svelte@4.2.15",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/svelte/v/4.2.15"
+      ]
+    },
+    {
+      "key": "npm:solid-js@1.8.17",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/solid-js/v/1.8.17"
+      ]
+    },
+    {
+      "key": "npm:gatsby@5.13.0",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/gatsby/v/5.13.0"
+      ]
+    },
+    {
+      "key": "npm:hono@4.3.0",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/hono/v/4.3.0"
+      ]
+    },
+    {
+      "key": "npm:koa@2.15.3",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/koa/v/2.15.3"
+      ]
+    },
+    {
+      "key": "npm:zod@3.23.8",
+      "category": "schema-validator",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned schema validator dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/zod/v/3.23.8"
+      ]
+    },
+    {
+      "key": "npm:zod",
+      "category": "schema-validator",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only schema validator dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/zod"
+      ]
+    },
+    {
+      "key": "npm:typescript@5.4.5",
+      "category": "compiler",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned compiler dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/typescript/v/5.4.5"
+      ]
+    },
+    {
+      "key": "npm:typescript",
+      "category": "compiler",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only compiler dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/typescript"
+      ]
+    },
+    {
+      "key": "npm:vite@5.2.10",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned build tool dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/vite/v/5.2.10"
+      ]
+    },
+    {
+      "key": "npm:vite",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/vite"
+      ]
+    },
+    {
+      "key": "npm:webpack",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/webpack"
+      ]
+    },
+    {
+      "key": "npm:rollup",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/rollup"
+      ]
+    },
+    {
+      "key": "npm:esbuild",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/esbuild"
+      ]
+    },
+    {
+      "key": "npm:swc",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/swc"
+      ]
+    },
+    {
+      "key": "npm:parcel",
+      "category": "build-tool",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/parcel"
+      ]
+    },
+    {
+      "key": "npm:eslint@8.57.0",
+      "category": "linter",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned linter dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/eslint/v/8.57.0"
+      ]
+    },
+    {
+      "key": "npm:eslint",
+      "category": "linter",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only linter dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/eslint"
+      ]
+    },
+    {
+      "key": "npm:prettier@3.2.5",
+      "category": "formatter",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned formatter dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/prettier/v/3.2.5"
+      ]
+    },
+    {
+      "key": "npm:prettier",
+      "category": "formatter",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only formatter dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/prettier"
+      ]
+    },
+    {
+      "key": "npm:biome",
+      "category": "linter",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only linter dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/biome"
+      ]
+    },
+    {
+      "key": "npm:@biomejs/biome",
+      "category": "linter",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only linter dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@biomejs/biome"
+      ]
+    },
+    {
+      "key": "npm:vitest@1.6.0",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned test runner dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/vitest/v/1.6.0"
+      ]
+    },
+    {
+      "key": "npm:vitest",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/vitest"
+      ]
+    },
+    {
+      "key": "npm:jest",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/jest"
+      ]
+    },
+    {
+      "key": "npm:mocha",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/mocha"
+      ]
+    },
+    {
+      "key": "npm:playwright",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/playwright"
+      ]
+    },
+    {
+      "key": "npm:cypress",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/cypress"
+      ]
+    },
+    {
+      "key": "npm:axios@1.7.2",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned http client dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/axios/v/1.7.2"
+      ]
+    },
+    {
+      "key": "npm:axios",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/axios"
+      ]
+    },
+    {
+      "key": "npm:got",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/got"
+      ]
+    },
+    {
+      "key": "npm:ky",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/ky"
+      ]
+    },
+    {
+      "key": "npm:undici",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/undici"
+      ]
+    },
+    {
+      "key": "npm:dotenv@16.4.5",
+      "category": "config",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned config dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/dotenv/v/16.4.5"
+      ]
+    },
+    {
+      "key": "npm:dotenv",
+      "category": "config",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only config dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/dotenv"
+      ]
+    },
+    {
+      "key": "npm:bcrypt@5.1.1",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned crypto dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/bcrypt/v/5.1.1"
+      ]
+    },
+    {
+      "key": "npm:bcrypt",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/bcrypt"
+      ]
+    },
+    {
+      "key": "npm:bcryptjs",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/bcryptjs"
+      ]
+    },
+    {
+      "key": "npm:argon2",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/argon2"
+      ]
+    },
+    {
+      "key": "npm:jsonwebtoken@9.0.2",
+      "category": "jwt",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned jwt dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/jsonwebtoken/v/9.0.2"
+      ]
+    },
+    {
+      "key": "npm:jsonwebtoken",
+      "category": "jwt",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only jwt dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/jsonwebtoken"
+      ]
+    },
+    {
+      "key": "npm:jose",
+      "category": "jwt",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only jwt dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/jose"
+      ]
+    },
+    {
+      "key": "npm:passport",
+      "category": "auth",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/passport"
+      ]
+    },
+    {
+      "key": "npm:next-auth",
+      "category": "auth",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/next-auth"
+      ]
+    },
+    {
+      "key": "npm:lucia",
+      "category": "auth",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/lucia"
+      ]
+    },
+    {
+      "key": "npm:pg@8.11.5",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned db driver dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/pg/v/8.11.5"
+      ]
+    },
+    {
+      "key": "npm:pg",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/pg"
+      ]
+    },
+    {
+      "key": "npm:mysql2",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/mysql2"
+      ]
+    },
+    {
+      "key": "npm:redis",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/redis"
+      ]
+    },
+    {
+      "key": "npm:ioredis",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/ioredis"
+      ]
+    },
+    {
+      "key": "npm:mongodb",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/mongodb"
+      ]
+    },
+    {
+      "key": "npm:sqlite3",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/sqlite3"
+      ]
+    },
+    {
+      "key": "npm:better-sqlite3",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/better-sqlite3"
+      ]
+    },
+    {
+      "key": "npm:knex",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/knex"
+      ]
+    },
+    {
+      "key": "npm:kysely",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/kysely"
+      ]
+    },
+    {
+      "key": "npm:prisma@5.13.0",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned orm dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/prisma/v/5.13.0"
+      ]
+    },
+    {
+      "key": "npm:prisma",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/prisma"
+      ]
+    },
+    {
+      "key": "npm:@prisma/client@5.13.0",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned orm dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@prisma/client/v/5.13.0"
+      ]
+    },
+    {
+      "key": "npm:@prisma/client",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@prisma/client"
+      ]
+    },
+    {
+      "key": "npm:drizzle-orm",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/drizzle-orm"
+      ]
+    },
+    {
+      "key": "npm:typeorm",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/typeorm"
+      ]
+    },
+    {
+      "key": "npm:sequelize",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/sequelize"
+      ]
+    },
+    {
+      "key": "npm:mongoose",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/mongoose"
+      ]
+    },
+    {
+      "key": "npm:tailwindcss",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/tailwindcss"
+      ]
+    },
+    {
+      "key": "npm:@mui/material",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@mui/material"
+      ]
+    },
+    {
+      "key": "npm:@mui/icons-material",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@mui/icons-material"
+      ]
+    },
+    {
+      "key": "npm:@chakra-ui/react",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@chakra-ui/react"
+      ]
+    },
+    {
+      "key": "npm:@radix-ui/react-dialog",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@radix-ui/react-dialog"
+      ]
+    },
+    {
+      "key": "npm:@radix-ui/react-dropdown-menu",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@radix-ui/react-dropdown-menu"
+      ]
+    },
+    {
+      "key": "npm:@radix-ui/react-popover",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@radix-ui/react-popover"
+      ]
+    },
+    {
+      "key": "npm:@radix-ui/react-tooltip",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@radix-ui/react-tooltip"
+      ]
+    },
+    {
+      "key": "npm:@headlessui/react",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@headlessui/react"
+      ]
+    },
+    {
+      "key": "npm:antd",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/antd"
+      ]
+    },
+    {
+      "key": "npm:lucide-react",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/lucide-react"
+      ]
+    },
+    {
+      "key": "npm:react-icons",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react-icons"
+      ]
+    },
+    {
+      "key": "npm:@heroicons/react",
+      "category": "ui",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ui dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@heroicons/react"
+      ]
+    },
+    {
+      "key": "npm:lingui",
+      "category": "i18n",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only i18n dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/lingui"
+      ]
+    },
+    {
+      "key": "npm:i18next",
+      "category": "i18n",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only i18n dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/i18next"
+      ]
+    },
+    {
+      "key": "npm:react-i18next",
+      "category": "i18n",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only i18n dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react-i18next"
+      ]
+    },
+    {
+      "key": "npm:@aws-sdk/client-s3",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@aws-sdk/client-s3"
+      ]
+    },
+    {
+      "key": "npm:@aws-sdk/client-secretsmanager",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@aws-sdk/client-secretsmanager"
+      ]
+    },
+    {
+      "key": "npm:@aws-sdk/client-dynamodb",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@aws-sdk/client-dynamodb"
+      ]
+    },
+    {
+      "key": "npm:@aws-sdk/client-lambda",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@aws-sdk/client-lambda"
+      ]
+    },
+    {
+      "key": "npm:@aws-sdk/client-sqs",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@aws-sdk/client-sqs"
+      ]
+    },
+    {
+      "key": "npm:@google-cloud/firestore",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@google-cloud/firestore"
+      ]
+    },
+    {
+      "key": "npm:@google-cloud/storage",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@google-cloud/storage"
+      ]
+    },
+    {
+      "key": "npm:@google-cloud/translate",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@google-cloud/translate"
+      ]
+    },
+    {
+      "key": "npm:@google-cloud/pubsub",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@google-cloud/pubsub"
+      ]
+    },
+    {
+      "key": "npm:@firebase/app",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@firebase/app"
+      ]
+    },
+    {
+      "key": "npm:firebase",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/firebase"
+      ]
+    },
+    {
+      "key": "npm:firebase-admin",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/firebase-admin"
+      ]
+    },
+    {
+      "key": "npm:@clerk/clerk-sdk-node",
+      "category": "auth-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@clerk/clerk-sdk-node"
+      ]
+    },
+    {
+      "key": "npm:@auth0/auth0-react",
+      "category": "auth-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@auth0/auth0-react"
+      ]
+    },
+    {
+      "key": "npm:stripe",
+      "category": "payment-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only payment sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/stripe"
+      ]
+    },
+    {
+      "key": "npm:@stripe/stripe-js",
+      "category": "payment-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only payment sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@stripe/stripe-js"
+      ]
+    },
+    {
+      "key": "npm:@stripe/react-stripe-js",
+      "category": "payment-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only payment sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@stripe/react-stripe-js"
+      ]
+    },
+    {
+      "key": "npm:twilio",
+      "category": "messaging-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only messaging sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/twilio"
+      ]
+    },
+    {
+      "key": "npm:@twilio/sdk",
+      "category": "messaging-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only messaging sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@twilio/sdk"
+      ]
+    },
+    {
+      "key": "npm:discord.js",
+      "category": "platform-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only platform sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/discord.js"
+      ]
+    },
+    {
+      "key": "npm:discord-api-types",
+      "category": "platform-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only platform sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/discord-api-types"
+      ]
+    },
+    {
+      "key": "npm:@solana/web3.js",
+      "category": "blockchain-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only blockchain sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@solana/web3.js"
+      ]
+    },
+    {
+      "key": "npm:@coinbase/wallet-sdk",
+      "category": "blockchain-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only blockchain sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@coinbase/wallet-sdk"
+      ]
+    },
+    {
+      "key": "npm:ethers",
+      "category": "blockchain-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only blockchain sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/ethers"
+      ]
+    },
+    {
+      "key": "npm:web3",
+      "category": "blockchain-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only blockchain sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/web3"
+      ]
+    },
+    {
+      "key": "npm:openai",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/openai"
+      ]
+    },
+    {
+      "key": "npm:@anthropic-ai/sdk",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@anthropic-ai/sdk"
+      ]
+    },
+    {
+      "key": "npm:@google-cloud/aiplatform",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@google-cloud/aiplatform"
+      ]
+    },
+    {
+      "key": "npm:langchain",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/langchain"
+      ]
+    },
+    {
+      "key": "npm:@langchain/core",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@langchain/core"
+      ]
+    },
+    {
+      "key": "npm:@langchain/openai",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@langchain/openai"
+      ]
+    },
+    {
+      "key": "npm:@types/node",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@types/node"
+      ]
+    },
+    {
+      "key": "npm:@types/react",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@types/react"
+      ]
+    },
+    {
+      "key": "npm:@types/react-dom",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@types/react-dom"
+      ]
+    },
+    {
+      "key": "npm:@types/express",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@types/express"
+      ]
+    },
+    {
+      "key": "npm:@types/lodash",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@types/lodash"
+      ]
+    },
+    {
+      "key": "npm:tslib",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/tslib"
+      ]
+    },
+    {
+      "key": "npm:type-fest",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/type-fest"
+      ]
+    },
+    {
+      "key": "npm:csstype",
+      "category": "types",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only types dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/csstype"
+      ]
+    },
+    {
+      "key": "npm:create-next-app",
+      "category": "scaffolder",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only scaffolder dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/create-next-app"
+      ]
+    },
+    {
+      "key": "npm:create-react-app",
+      "category": "scaffolder",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only scaffolder dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/create-react-app"
+      ]
+    },
+    {
+      "key": "npm:create-vite",
+      "category": "scaffolder",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only scaffolder dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/create-vite"
+      ]
+    },
+    {
+      "key": "npm:react-scripts",
+      "category": "scaffolder",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only scaffolder dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react-scripts"
+      ]
+    },
+    {
+      "key": "npm:http-proxy",
+      "category": "http",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/http-proxy"
+      ]
+    },
+    {
+      "key": "npm:http-proxy-middleware",
+      "category": "http",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/http-proxy-middleware"
+      ]
+    },
+    {
+      "key": "npm:http-proxy-agent",
+      "category": "http",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/http-proxy-agent"
+      ]
+    },
+    {
+      "key": "npm:https-proxy-agent",
+      "category": "http",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/https-proxy-agent"
+      ]
+    },
+    {
+      "key": "npm:public-suffix-list",
+      "category": "data",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only data dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/public-suffix-list"
+      ]
+    },
+    {
+      "key": "npm:react",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react"
+      ]
+    },
+    {
+      "key": "npm:react-dom",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/react-dom"
+      ]
+    },
+    {
+      "key": "npm:vue",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/vue"
+      ]
+    },
+    {
+      "key": "npm:express",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/express"
+      ]
+    },
+    {
+      "key": "npm:fastify",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/fastify"
+      ]
+    },
+    {
+      "key": "npm:next",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/next"
+      ]
+    },
+    {
+      "key": "npm:nuxt",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/nuxt"
+      ]
+    },
+    {
+      "key": "npm:remix",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/remix"
+      ]
+    },
+    {
+      "key": "npm:astro",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/astro"
+      ]
+    },
+    {
+      "key": "npm:svelte",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/svelte"
+      ]
+    },
+    {
+      "key": "npm:gatsby",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/gatsby"
+      ]
+    },
+    {
+      "key": "npm:hono",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/hono"
+      ]
+    },
+    {
+      "key": "npm:koa",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/koa"
+      ]
+    },
+    {
+      "key": "npm:solid-js",
+      "category": "framework-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/solid-js"
+      ]
+    },
+    {
+      "key": "npm:sharp",
+      "category": "image-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only image trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/sharp"
+      ]
+    },
+    {
+      "key": "npm:sqlite3",
+      "category": "db-driver-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/sqlite3"
+      ]
+    },
+    {
+      "key": "npm:better-sqlite3",
+      "category": "db-driver-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/better-sqlite3"
+      ]
+    },
+    {
+      "key": "npm:canvas",
+      "category": "image-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only image trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/canvas"
+      ]
+    },
+    {
+      "key": "npm:node-sass",
+      "category": "build-tool-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/node-sass"
+      ]
+    },
+    {
+      "key": "npm:@swc/core",
+      "category": "build-tool-trusted",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only build tool trusted dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@swc/core"
+      ]
+    },
+    {
+      "key": "npm:@ember/array",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@ember/array"
+      ]
+    },
+    {
+      "key": "npm:@rxjs/operators",
+      "category": "reactive",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only reactive dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://www.npmjs.com/package/@rxjs/operators"
+      ]
+    },
+    {
+      "key": "python:requests==2.31.0",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned http client dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://pypi.org/project/requests/2.31.0/"
+      ]
+    },
+    {
+      "key": "python:requests",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/requests/"
+      ]
+    },
+    {
+      "key": "python:httpx",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/httpx/"
+      ]
+    },
+    {
+      "key": "python:httpcore",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/httpcore/"
+      ]
+    },
+    {
+      "key": "python:aiohttp",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/aiohttp/"
+      ]
+    },
+    {
+      "key": "python:urllib3",
+      "category": "http-client",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only http client dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/urllib3/"
+      ]
+    },
+    {
+      "key": "python:fastapi==0.110.0",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned framework dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://pypi.org/project/fastapi/0.110.0/"
+      ]
+    },
+    {
+      "key": "python:fastapi",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/fastapi/"
+      ]
+    },
+    {
+      "key": "python:django",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/django/"
+      ]
+    },
+    {
+      "key": "python:flask",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/flask/"
+      ]
+    },
+    {
+      "key": "python:starlette",
+      "category": "framework",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only framework dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/starlette/"
+      ]
+    },
+    {
+      "key": "python:uvicorn",
+      "category": "server",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only server dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/uvicorn/"
+      ]
+    },
+    {
+      "key": "python:gunicorn",
+      "category": "server",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only server dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/gunicorn/"
+      ]
+    },
+    {
+      "key": "python:pydantic==2.7.1",
+      "category": "schema-validator",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned schema validator dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://pypi.org/project/pydantic/2.7.1/"
+      ]
+    },
+    {
+      "key": "python:pydantic",
+      "category": "schema-validator",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only schema validator dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pydantic/"
+      ]
+    },
+    {
+      "key": "python:pydantic-core",
+      "category": "schema-validator",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only schema validator dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pydantic-core/"
+      ]
+    },
+    {
+      "key": "python:sqlalchemy==2.0.29",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned orm dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://pypi.org/project/sqlalchemy/2.0.29/"
+      ]
+    },
+    {
+      "key": "python:sqlalchemy",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/sqlalchemy/"
+      ]
+    },
+    {
+      "key": "python:alembic",
+      "category": "orm",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only orm dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/alembic/"
+      ]
+    },
+    {
+      "key": "python:bcrypt==4.1.2",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned crypto dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://pypi.org/project/bcrypt/4.1.2/"
+      ]
+    },
+    {
+      "key": "python:bcrypt",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/bcrypt/"
+      ]
+    },
+    {
+      "key": "python:cryptography",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/cryptography/"
+      ]
+    },
+    {
+      "key": "python:argon2-cffi",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/argon2-cffi/"
+      ]
+    },
+    {
+      "key": "python:passlib",
+      "category": "crypto",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only crypto dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/passlib/"
+      ]
+    },
+    {
+      "key": "python:pyjwt==2.8.0",
+      "category": "jwt",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "rationale": "Pinned jwt dependency approved for the baseline dependency gate; denylist precedence, native-equivalent rules, and analyzer checks still apply.",
+      "source_urls": [
+        "https://pypi.org/project/pyjwt/2.8.0/"
+      ]
+    },
+    {
+      "key": "python:pyjwt",
+      "category": "jwt",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only jwt dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pyjwt/"
+      ]
+    },
+    {
+      "key": "python:python-jose",
+      "category": "jwt",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only jwt dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/python-jose/"
+      ]
+    },
+    {
+      "key": "python:authlib",
+      "category": "auth",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/authlib/"
+      ]
+    },
+    {
+      "key": "python:oauthlib",
+      "category": "auth",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/oauthlib/"
+      ]
+    },
+    {
+      "key": "python:requests-oauthlib",
+      "category": "auth",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only auth dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/requests-oauthlib/"
+      ]
+    },
+    {
+      "key": "python:openai",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/openai/"
+      ]
+    },
+    {
+      "key": "python:anthropic",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/anthropic/"
+      ]
+    },
+    {
+      "key": "python:langchain",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/langchain/"
+      ]
+    },
+    {
+      "key": "python:langchain-core",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/langchain-core/"
+      ]
+    },
+    {
+      "key": "python:langchain-openai",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/langchain-openai/"
+      ]
+    },
+    {
+      "key": "python:langchain-community",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/langchain-community/"
+      ]
+    },
+    {
+      "key": "python:huggingface-hub",
+      "category": "ai-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ai sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/huggingface-hub/"
+      ]
+    },
+    {
+      "key": "python:transformers",
+      "category": "ml",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ml dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/transformers/"
+      ]
+    },
+    {
+      "key": "python:torch",
+      "category": "ml",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ml dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/torch/"
+      ]
+    },
+    {
+      "key": "python:tensorflow",
+      "category": "ml",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ml dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/tensorflow/"
+      ]
+    },
+    {
+      "key": "python:scikit-learn",
+      "category": "ml",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only ml dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/scikit-learn/"
+      ]
+    },
+    {
+      "key": "python:numpy",
+      "category": "data",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only data dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/numpy/"
+      ]
+    },
+    {
+      "key": "python:pandas",
+      "category": "data",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only data dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pandas/"
+      ]
+    },
+    {
+      "key": "python:scipy",
+      "category": "data",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only data dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/scipy/"
+      ]
+    },
+    {
+      "key": "python:matplotlib",
+      "category": "data",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only data dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/matplotlib/"
+      ]
+    },
+    {
+      "key": "python:pytest",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pytest/"
+      ]
+    },
+    {
+      "key": "python:pytest-asyncio",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pytest-asyncio/"
+      ]
+    },
+    {
+      "key": "python:pytest-mock",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pytest-mock/"
+      ]
+    },
+    {
+      "key": "python:pytest-cov",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pytest-cov/"
+      ]
+    },
+    {
+      "key": "python:unittest-mock",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/unittest-mock/"
+      ]
+    },
+    {
+      "key": "python:hypothesis",
+      "category": "test-runner",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test runner dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/hypothesis/"
+      ]
+    },
+    {
+      "key": "python:httpretty",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/httpretty/"
+      ]
+    },
+    {
+      "key": "python:responses",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/responses/"
+      ]
+    },
+    {
+      "key": "python:vcrpy",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/vcrpy/"
+      ]
+    },
+    {
+      "key": "python:requests-mock",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/requests-mock/"
+      ]
+    },
+    {
+      "key": "python:moto",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/moto/"
+      ]
+    },
+    {
+      "key": "python:stripe-mock",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/stripe-mock/"
+      ]
+    },
+    {
+      "key": "python:pytest-httpx",
+      "category": "test-mock",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only test mock dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pytest-httpx/"
+      ]
+    },
+    {
+      "key": "python:redis",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/redis/"
+      ]
+    },
+    {
+      "key": "python:psycopg2",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/psycopg2/"
+      ]
+    },
+    {
+      "key": "python:psycopg2-binary",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/psycopg2-binary/"
+      ]
+    },
+    {
+      "key": "python:asyncpg",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/asyncpg/"
+      ]
+    },
+    {
+      "key": "python:asyncpg-pool",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/asyncpg-pool/"
+      ]
+    },
+    {
+      "key": "python:pymongo",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pymongo/"
+      ]
+    },
+    {
+      "key": "python:motor",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/motor/"
+      ]
+    },
+    {
+      "key": "python:elasticsearch",
+      "category": "db-driver",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only db driver dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/elasticsearch/"
+      ]
+    },
+    {
+      "key": "python:boto3",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/boto3/"
+      ]
+    },
+    {
+      "key": "python:botocore",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/botocore/"
+      ]
+    },
+    {
+      "key": "python:google-cloud-storage",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/google-cloud-storage/"
+      ]
+    },
+    {
+      "key": "python:google-cloud-bigquery",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/google-cloud-bigquery/"
+      ]
+    },
+    {
+      "key": "python:google-auth",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/google-auth/"
+      ]
+    },
+    {
+      "key": "python:azure-storage-blob",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/azure-storage-blob/"
+      ]
+    },
+    {
+      "key": "python:azure-identity",
+      "category": "cloud-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cloud sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/azure-identity/"
+      ]
+    },
+    {
+      "key": "python:stripe",
+      "category": "payment-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only payment sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/stripe/"
+      ]
+    },
+    {
+      "key": "python:twilio",
+      "category": "messaging-sdk",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only messaging sdk dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/twilio/"
+      ]
+    },
+    {
+      "key": "python:beautifulsoup4",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/beautifulsoup4/"
+      ]
+    },
+    {
+      "key": "python:lxml",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/lxml/"
+      ]
+    },
+    {
+      "key": "python:html5lib",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/html5lib/"
+      ]
+    },
+    {
+      "key": "python:pyyaml",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pyyaml/"
+      ]
+    },
+    {
+      "key": "python:tomli",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/tomli/"
+      ]
+    },
+    {
+      "key": "python:tomlkit",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/tomlkit/"
+      ]
+    },
+    {
+      "key": "python:pillow",
+      "category": "image",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only image dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/pillow/"
+      ]
+    },
+    {
+      "key": "python:opencv-python",
+      "category": "image",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only image dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/opencv-python/"
+      ]
+    },
+    {
+      "key": "python:rapidjson",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/rapidjson/"
+      ]
+    },
+    {
+      "key": "python:ujson",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/ujson/"
+      ]
+    },
+    {
+      "key": "python:orjson",
+      "category": "parser",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only parser dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/orjson/"
+      ]
+    },
+    {
+      "key": "python:speech-recognition",
+      "category": "audio",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only audio dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/speech-recognition/"
+      ]
+    },
+    {
+      "key": "python:click",
+      "category": "cli",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cli dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/click/"
+      ]
+    },
+    {
+      "key": "python:typer",
+      "category": "cli",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cli dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/typer/"
+      ]
+    },
+    {
+      "key": "python:rich",
+      "category": "cli",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cli dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/rich/"
+      ]
+    },
+    {
+      "key": "python:tqdm",
+      "category": "cli",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only cli dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/tqdm/"
+      ]
+    },
+    {
+      "key": "python:python-dotenv",
+      "category": "config",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only config dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/python-dotenv/"
+      ]
+    },
+    {
+      "key": "python:loguru",
+      "category": "logging",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only logging dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/loguru/"
+      ]
+    },
+    {
+      "key": "python:structlog",
+      "category": "logging",
+      "decision": "allow",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "allow_any_version": true,
+      "rationale": "Name-only logging dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks, denylist precedence, native-equivalent rules, and analyzer checks.",
+      "source_urls": [
+        "https://pypi.org/project/structlog/"
+      ]
+    }
+  ],
+  "description": "Reviewed baseline package allowlist. Denylist precedence still wins at runtime."
 }

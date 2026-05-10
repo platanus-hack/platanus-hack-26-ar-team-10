@@ -10,6 +10,7 @@ const { execFileSync, spawnSync } = require('node:child_process');
 const codeAudit = require('../scripts/code-audit');
 const auditState = require('../scripts/code-audit/state');
 const auditVerify = require('../scripts/code-audit/verify');
+const gitHelpers = require('../scripts/code-audit/git');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const HOOK_PATH = path.join(PLUGIN_ROOT, 'scripts', 'pre-install-gate.js');
@@ -67,6 +68,18 @@ test('collectStagedDiff ignores generated audit files for hash and files', () =>
   assert.deepEqual(auditInput.files, ['app.js']);
   assert.equal(auditInput.diff.includes('code-audit-state.json'), false);
   assert.equal(auditInput.diffHash.startsWith('sha256:'), true);
+});
+
+test('git helper can read diffs larger than the Node exec default buffer', () => {
+  const root = tmpRepo();
+  const large = `${'a'.repeat(2 * 1024 * 1024)}\n`;
+  fs.writeFileSync(path.join(root, 'large.txt'), large);
+  sh(root, ['add', 'large.txt']);
+  sh(root, ['commit', '-m', 'add large file']);
+
+  const content = gitHelpers.git(root, ['show', 'HEAD:large.txt']);
+
+  assert.equal(content.length > 1024 * 1024, true);
 });
 
 test('collectPushDiff returns commits ahead of upstream', () => {
@@ -324,6 +337,42 @@ test('redTeam detects removed auth or validation guard', () => {
   });
 
   assert.equal(findings.some((f) => f.ruleId === 'removed-security-guard'), true);
+});
+
+test('redTeam ignores generated dist plugin package content', () => {
+  const findings = codeAudit.redTeam({
+    files: [
+      'dist/yieldos-plugin/policy-cache/version.json',
+      'dist/yieldos-plugin/scripts/classifiers/skills.js',
+    ],
+    diff: [
+      'diff --git a/dist/yieldos-plugin/policy-cache/version.json b/dist/yieldos-plugin/policy-cache/version.json',
+      '+++ b/dist/yieldos-plugin/policy-cache/version.json',
+      '@@',
+      '+  "hash": "skills-mcps-populated-2026-05-09"',
+      'diff --git a/dist/yieldos-plugin/scripts/classifiers/skills.js b/dist/yieldos-plugin/scripts/classifiers/skills.js',
+      '+++ b/dist/yieldos-plugin/scripts/classifiers/skills.js',
+      '@@',
+      "+  source: 'skills-marketplace',",
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
+test('redTeam ignores same-file security guard replacement', () => {
+  const findings = codeAudit.redTeam({
+    files: ['scripts/plugin-check.mjs'],
+    diff: [
+      'diff --git a/scripts/plugin-check.mjs b/scripts/plugin-check.mjs',
+      '+++ b/scripts/plugin-check.mjs',
+      '@@',
+      "-validateMarketplace('.claude-plugin/marketplace.json', './yieldOS/plugins/yieldos', plugin.version);",
+      "+validateMarketplace('.claude-plugin/marketplace.json', './dist/yieldos-plugin', plugin.version);",
+    ].join('\n'),
+  });
+
+  assert.deepEqual(findings, []);
 });
 
 test('redTeam detects V1 vulnerability classes with exploit evidence', () => {

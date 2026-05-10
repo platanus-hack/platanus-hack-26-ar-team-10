@@ -1,0 +1,44 @@
+{
+  "policy": {
+    "repo": "platanus-hack/platanus-hack-26-ar-team-10",
+    "branch": "main",
+    "path": "policy",
+    "files": [
+      "allowlist.json",
+      "denylist.json",
+      "categories.json",
+      "native-equivalents.json",
+      "skills.json",
+      "mcps.json",
+      "injection-patterns.json",
+      "build-scripts-allowed.json",
+      "required-settings.json",
+      "version.json"
+    ],
+    "raw_url_template": "https://raw.githubusercontent.com/{repo}/{branch}/{path}/{file}"
+  },
+  "cache": {
+    "runtime_dir": "~/.claude/plugins/yieldos/.runtime-cache",
+    "ttl_seconds": 300
+  },
+  "audit": {
+    "transitive_min_age_days": 10,
+    "osv_api": "https://api.osv.dev/v1/query",
+    "osv_cache_ttl_seconds": 3600
+  },
+  "log": {
+    "path": "security/dependency-events.md"
+  },
+  "rewrite": {
+    "marker_index": "security/yieldos-rewrites.json",
+    "rewrites_root": "src/lib/yieldos"
+  },
+  "thresholds": {
+    "category_a_max_loc": 200,
+    "category_a_max_files": 30,
+    "category_a_max_unpacked_kb": 50,
+    "category_a_max_direct_deps": 1
+  },
+  "managers_v1": ["npm", "pnpm", "pip"],
+  "managers_v2": ["yarn", "bun", "poetry", "uv", "cargo", "go"]
+}

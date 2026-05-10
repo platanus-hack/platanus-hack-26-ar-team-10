@@ -16,7 +16,8 @@ const { hashObject } = require('../scripts/oracles/result');
 const demoCommand = require('../scripts/oracles/demo-command');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
-const FIXTURE_ROOT = path.join(PLUGIN_ROOT, 'fixtures', 'oracle-demo');
+const REPO_ROOT = path.resolve(PLUGIN_ROOT, '..', '..', '..');
+const FIXTURE_ROOT = path.join(REPO_ROOT, 'examples', 'oracle-demo', 'fixture');
 
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-cdsc-'));
@@ -97,7 +98,7 @@ test('missing-auth contract grounds only current deterministic findings', () => 
 });
 
 test('cdsc replay maps vulnerable baseline to fail and fixed runtime to pass', async () => {
-  const root = PLUGIN_ROOT;
+  const root = REPO_ROOT;
   const contract = {
     version: '0.1',
     id: 'express-admin-route-requires-auth',

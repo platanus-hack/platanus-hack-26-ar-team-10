@@ -55,6 +55,9 @@ function validatePolicyRoot(repoRoot = REPO_ROOT) {
   validateEntryList('allowlist.json', policies['allowlist.json'], errors, { prefixes: ['npm:', 'python:', 'cargo:', 'go:'] });
   validateEntryList('denylist.json', policies['denylist.json'], errors, { prefixes: ['npm:', 'python:', 'cargo:', 'go:'] });
   validateEntryList('build-scripts-allowed.json', policies['build-scripts-allowed.json'], errors, { prefixes: ['npm:', 'python:', 'cargo:', 'go:'] });
+  validateAllowlist(policies['allowlist.json'], errors);
+  validateDenylist(policies['denylist.json'], errors);
+  validatePolicyConflicts(policies, errors);
   validateCategories(policies['categories.json'], errors);
   validateNativeEquivalents(policies['native-equivalents.json'], errors);
   validateInjectionPatterns(policies['injection-patterns.json'], errors);
@@ -81,6 +84,137 @@ function validateEntryList(file, policy, errors, { prefixes }) {
       errors.push(`${file} entries[${index}].key has unsupported prefix: ${entry.key}`);
     }
   }
+}
+
+function validateAllowlist(policy, errors) {
+  if (!policy || !Array.isArray(policy.entries)) return;
+  for (const [index, entry] of policy.entries.entries()) {
+    if (!entry || typeof entry.key !== 'string') continue;
+    if (entry.decision !== 'allow') {
+      errors.push(`allowlist.json entries[${index}].decision must be allow`);
+    }
+    if (!entry.category) errors.push(`allowlist.json entries[${index}].category is required`);
+    if (!entry.reviewed_by) errors.push(`allowlist.json entries[${index}].reviewed_by is required`);
+    if (!isDateString(entry.reviewed_at)) errors.push(`allowlist.json entries[${index}].reviewed_at must be YYYY-MM-DD`);
+    if (!entry.rationale) errors.push(`allowlist.json entries[${index}].rationale is required`);
+    if (isNameOnlyPackageKey(entry.key) && entry.allow_any_version !== true) {
+      errors.push(`allowlist.json entries[${index}] name-only entry requires allow_any_version: true`);
+    }
+    if (!isNameOnlyPackageKey(entry.key) && entry.allow_any_version === true) {
+      errors.push(`allowlist.json entries[${index}] pinned entry must not set allow_any_version: true`);
+    }
+    if (entry.allow_any_version === true && !entry.rationale) {
+      errors.push(`allowlist.json entries[${index}] allow_any_version requires rationale`);
+    }
+    validateStringArray('allowlist.json', index, entry, 'source_urls', errors, { optional: true });
+  }
+}
+
+function validateDenylist(policy, errors) {
+  if (!policy || !Array.isArray(policy.entries)) return;
+  const severities = new Set(['critical', 'high', 'medium', 'low']);
+  for (const [index, entry] of policy.entries.entries()) {
+    if (!entry || typeof entry.key !== 'string') continue;
+    if (entry.decision !== 'deny') {
+      errors.push(`denylist.json entries[${index}].decision must be deny`);
+    }
+    if (!entry.reason) errors.push(`denylist.json entries[${index}].reason is required`);
+    if (!severities.has(entry.severity)) {
+      errors.push(`denylist.json entries[${index}].severity must be critical, high, medium, or low`);
+    }
+    if (!entry.reviewed_by) errors.push(`denylist.json entries[${index}].reviewed_by is required`);
+    if (!isDateString(entry.reviewed_at)) errors.push(`denylist.json entries[${index}].reviewed_at must be YYYY-MM-DD`);
+    validateStringArray('denylist.json', index, entry, 'source_urls', errors, { optional: false });
+  }
+}
+
+function validatePolicyConflicts(policies, errors) {
+  const allowEntries = policies['allowlist.json']?.entries || [];
+  const denyEntries = policies['denylist.json']?.entries || [];
+  const allowExact = new Map();
+  const denyExact = new Map();
+  const allowNames = new Map();
+  const denyNames = new Map();
+
+  collectPackageKeys(allowEntries, allowExact, allowNames);
+  collectPackageKeys(denyEntries, denyExact, denyNames);
+
+  for (const key of allowExact.keys()) {
+    if (denyExact.has(key)) {
+      errors.push(`allowlist.json and denylist.json both contain ${key}`);
+    }
+  }
+  for (const [key, name] of allowExact.entries()) {
+    if (denyNames.has(name)) {
+      errors.push(`allowlist.json ${key} conflicts with denylist name entry ${name}`);
+    }
+  }
+  for (const [key, name] of denyExact.entries()) {
+    if (allowNames.has(name)) {
+      errors.push(`denylist.json ${key} conflicts with allowlist name entry ${name}`);
+    }
+  }
+}
+
+function collectPackageKeys(entries, exact, names) {
+  for (const entry of entries) {
+    if (!entry || typeof entry.key !== 'string') continue;
+    const key = normalizePackageKey(entry.key);
+    if (!key) continue;
+    const name = packageNameKey(key);
+    exact.set(key, name);
+    if (isNameOnlyPackageKey(key)) names.set(name, key);
+  }
+}
+
+function isNameOnlyPackageKey(key) {
+  const parsed = parsePackageKey(key);
+  return parsed ? parsed.version === null : false;
+}
+
+function packageNameKey(key) {
+  const parsed = parsePackageKey(key);
+  return parsed ? `${parsed.ecosystem}:${parsed.name}` : key;
+}
+
+function normalizePackageKey(key) {
+  const parsed = parsePackageKey(key);
+  if (!parsed) return null;
+  return parsed.version === null
+    ? `${parsed.ecosystem}:${parsed.name}`
+    : `${parsed.ecosystem}:${parsed.name}${parsed.delimiter}${parsed.version}`;
+}
+
+function parsePackageKey(key) {
+  const match = String(key).match(/^([a-z]+):(.+)$/);
+  if (!match) return null;
+  const ecosystem = match[1];
+  const body = match[2];
+  if (ecosystem === 'python') {
+    const index = body.indexOf('==');
+    return index === -1
+      ? { ecosystem, name: body, delimiter: '==', version: null }
+      : { ecosystem, name: body.slice(0, index), delimiter: '==', version: body.slice(index + 2) };
+  }
+  const index = body.lastIndexOf('@');
+  return index <= 0
+    ? { ecosystem, name: body, delimiter: '@', version: null }
+    : { ecosystem, name: body.slice(0, index), delimiter: '@', version: body.slice(index + 1) };
+}
+
+function validateStringArray(file, index, entry, field, errors, { optional }) {
+  if (entry[field] === undefined && optional) return;
+  if (!Array.isArray(entry[field]) || entry[field].some((value) => typeof value !== 'string' || value.length === 0)) {
+    errors.push(`${file} entries[${index}].${field} must be an array of strings`);
+    return;
+  }
+  if (!optional && entry[field].length === 0) {
+    errors.push(`${file} entries[${index}].${field} must include at least one entry`);
+  }
+}
+
+function isDateString(value) {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
 function validateSkills(policy, errors) {

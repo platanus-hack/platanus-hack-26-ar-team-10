@@ -1,0 +1,122 @@
+#!/usr/bin/env sh
+set -eu
+
+MARKETPLACE_NAME="${YIELDOS_MARKETPLACE_NAME:-yieldos}"
+MARKETPLACE_SOURCE="${YIELDOS_MARKETPLACE_SOURCE:-platanus-hack/platanus-hack-26-ar-team-10}"
+PLUGIN_ID="${YIELDOS_PLUGIN_ID:-yieldos@yieldos}"
+SCOPE="${YIELDOS_UPDATE_SCOPE:-user}"
+DRY_RUN=0
+
+usage() {
+  cat <<'EOF'
+Update yieldOS from its Claude Code marketplace.
+
+Usage:
+  yieldos-update [options]
+
+Options:
+  --scope <user|project|local|managed>  Claude Code installation scope (default: user)
+  --marketplace <name>                  Marketplace name (default: yieldos)
+  --source <repo|url|path>              Source to add if marketplace is missing
+  --plugin <plugin@marketplace>         Plugin id to update (default: yieldos@yieldos)
+  --dry-run                             Print commands without running them
+  -h, --help                            Show this help
+
+After a successful update, run /reload-plugins or restart Claude Code.
+EOF
+}
+
+die() {
+  printf 'yieldOS update: %s\n' "$*" >&2
+  exit 1
+}
+
+has() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+print_cmd() {
+  printf '+'
+  for arg in "$@"; do
+    printf ' %s' "$arg"
+  done
+  printf '\n'
+}
+
+run() {
+  if [ "$DRY_RUN" = "1" ]; then
+    print_cmd "$@"
+  else
+    "$@"
+  fi
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --scope)
+      [ "$#" -ge 2 ] || die "--scope needs a value"
+      SCOPE="$2"
+      shift 2
+      ;;
+    --marketplace)
+      [ "$#" -ge 2 ] || die "--marketplace needs a value"
+      MARKETPLACE_NAME="$2"
+      shift 2
+      ;;
+    --source)
+      [ "$#" -ge 2 ] || die "--source needs a value"
+      MARKETPLACE_SOURCE="$2"
+      shift 2
+      ;;
+    --plugin)
+      [ "$#" -ge 2 ] || die "--plugin needs a value"
+      PLUGIN_ID="$2"
+      shift 2
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "unknown option: $1"
+      ;;
+  esac
+done
+
+case "$SCOPE" in
+  user|project|local|managed) ;;
+  *) die "--scope must be one of: user, project, local, managed" ;;
+esac
+
+has claude || die "Claude Code CLI is required."
+claude plugins update --help >/dev/null 2>&1 || die "This Claude Code CLI does not expose plugin update. Update Claude Code first."
+
+printf 'yieldOS update\n'
+printf '  marketplace: %s\n' "$MARKETPLACE_NAME"
+printf '  plugin: %s\n' "$PLUGIN_ID"
+printf '  scope: %s\n' "$SCOPE"
+[ "$DRY_RUN" = "1" ] && printf '  mode: dry-run\n'
+printf '\n'
+
+if ! run claude plugins marketplace update "$MARKETPLACE_NAME"; then
+  if [ "$SCOPE" = "managed" ]; then
+    die "managed marketplaces are read-only; ask the administrator to update yieldOS"
+  fi
+  printf 'yieldOS update: marketplace refresh failed, trying to add source %s\n' "$MARKETPLACE_SOURCE" >&2
+  run claude plugins marketplace add --scope "$SCOPE" "$MARKETPLACE_SOURCE"
+  run claude plugins marketplace update "$MARKETPLACE_NAME"
+fi
+
+run claude plugins update --scope "$SCOPE" "$PLUGIN_ID"
+
+printf '\n'
+if [ "$DRY_RUN" = "1" ]; then
+  printf 'Dry run complete. No changes were made.\n'
+else
+  printf 'yieldOS update finished. Run /reload-plugins or restart Claude Code to use the updated hooks in this session.\n'
+  printf 'Verify with: claude plugins list\n'
+fi

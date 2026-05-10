@@ -91,6 +91,34 @@ test('denylisted by name (any version) blocks', async () => {
   assert.equal(d.verdict, VERDICT.BLOCK_DENYLIST);
 });
 
+test('denylist wins when a package also matches allowlist', async () => {
+  const candidate = { manager: 'npm', name: 'dual-use', version: '1.0.0', command: 'npm install dual-use@1.0.0' };
+  const localPolicy = {
+    ...policy,
+    'allowlist.json': { entries: [{ key: 'npm:dual-use@1.0.0', category: 'test-fixture' }] },
+    'denylist.json': { entries: [{ key: 'npm:dual-use@1.0.0', reason: 'test conflict must fail closed' }] },
+  };
+
+  const d = await decide(candidate, localPolicy, opts);
+
+  assert.equal(d.verdict, VERDICT.BLOCK_DENYLIST);
+  assert.equal(d.action, 'block');
+  assert.equal(d.meta.denyEntry.reason, 'test conflict must fail closed');
+});
+
+test('denylist wins before native replacement suggestion', async () => {
+  const candidate = { manager: 'npm', name: 'uuid', version: '9.0.0', command: 'npm install uuid' };
+  const localPolicy = {
+    ...policy,
+    'denylist.json': { entries: [{ key: 'npm:uuid', reason: 'test native conflict must fail closed' }] },
+  };
+
+  const d = await decide(candidate, localPolicy, opts);
+
+  assert.equal(d.verdict, VERDICT.BLOCK_DENYLIST);
+  assert.equal(d.action, 'block');
+});
+
 test('Category D package blocks', async () => {
   const candidate = { manager: 'npm', name: 'bcrypt', version: '5.1.1', command: 'npm install bcrypt' };
   const d = await decide(candidate, policy, opts);

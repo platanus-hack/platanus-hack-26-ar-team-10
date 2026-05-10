@@ -14,11 +14,18 @@ yieldos-oracle contracts --json
 
 The CLI also keeps `yieldos-oracle templates` as a compatibility alias; the public concept is an oracle contract.
 
+The text output includes contract status:
+
+```text
+- missing-authz (active-demo, cdsc-http, high) - Sensitive route without authorization guard [...]
+```
+
 ## What An Oracle Contract Means
 
 Each contract defines:
 
 - standards mapping: OWASP Web/API/LLM, OWASP Cheat Sheets, and CWE where applicable.
+- product status: `active-adapter`, `active-demo`, or `contract-only`.
 - detection signals: code or policy shapes worth turning into deterministic checks.
 - required evidence: source line, attacker-controlled input, sensitive sink, exploit path, and impact.
 - acceptance criteria: what makes a scoped oracle `pass`, `fail`, or `unknown`.
@@ -26,6 +33,14 @@ Each contract defines:
 - benchmark fixtures and metrics: the test data and measurements needed before claiming coverage.
 
 This is deliberately stricter than a scanner rule. A scanner can report a suspicion; a yieldOS oracle must produce scoped evidence or return `unknown`.
+
+Status should be read literally:
+
+- `active-adapter`: a runnable adapter exists for that contract family.
+- `active-demo`: a runnable demo/proof path exists for at least one fixture.
+- `contract-only`: the reviewed contract definition ships, but it is not yet a runnable product claim.
+
+The separate oracle coverage report may label a contract as `benchmarked` when there is committed benchmark evidence. That is an evidence status, not a replacement for the product status in the template.
 
 ## Covered Families
 
@@ -72,4 +87,4 @@ The catalog is not a claim that every contract has a complete runnable oracle to
 - `cdsc-replay`
 - `cdsc-proof`
 
-Contracts that are not yet runnable should still be used for benchmark design. A benchmark should clearly label each case as `benchmarked`, `active-adapter`, `active-demo`, or `contract-only`.
+Contracts that are not yet runnable should still be used for benchmark design. A benchmark should clearly label coverage separately from product status so users can tell shipped adapters from contract backlog.

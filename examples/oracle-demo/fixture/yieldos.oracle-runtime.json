@@ -1,7 +1,7 @@
 {
   "version": "0.1",
   "baseline": {
-    "cwd": "fixtures/oracle-demo",
+    "cwd": "examples/oracle-demo/fixture",
     "command": "${NODE}",
     "args": ["vulnerable-server.js"],
     "source_file": "vulnerable-server.js",
@@ -12,7 +12,7 @@
     "env_allowlist": ["NODE_ENV", "PORT"]
   },
   "fixed": {
-    "cwd": "fixtures/oracle-demo",
+    "cwd": "examples/oracle-demo/fixture",
     "command": "${NODE}",
     "args": ["server-source.js"],
     "source_file": "server-source.js",

@@ -1,17 +1,136 @@
 {
-  "version": "0.1.0",
-  "updated_at": "2026-05-09T00:00:00Z",
+  "version": "0.2.0",
+  "updated_at": "2026-05-10T00:00:00Z",
   "entries": [
-    { "key": "npm:event-stream@3.3.6", "reason": "supply-chain attack 2018 (bitcoin wallet exfiltration via flatmap-stream)" },
-    { "key": "npm:flatmap-stream", "reason": "supply-chain attack vector for event-stream 2018" },
-    { "key": "npm:colors", "reason": "self-sabotage attack 2022; corrupted output infinite loop" },
-    { "key": "npm:faker", "reason": "self-sabotage attack 2022; package was destroyed by maintainer" },
-    { "key": "npm:node-ipc", "reason": "protestware 2022; deletes files in specific geo regions" },
-    { "key": "npm:ua-parser-js@0.7.29", "reason": "supply-chain attack October 2021" },
-    { "key": "npm:ua-parser-js@0.8.0", "reason": "supply-chain attack October 2021" },
-    { "key": "npm:ua-parser-js@1.0.0", "reason": "supply-chain attack October 2021" },
-    { "key": "npm:rc@1.2.9", "reason": "supply-chain attack" },
-    { "key": "npm:coa", "reason": "supply-chain attack November 2021" },
-    { "key": "npm:crossenv", "reason": "typosquatting cross-env" }
-  ]
+    {
+      "key": "npm:event-stream@3.3.6",
+      "decision": "deny",
+      "reason": "supply-chain attack 2018 (bitcoin wallet exfiltration via flatmap-stream)",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://osv.dev/vulnerability/GHSA-mh6f-8j2x-4483",
+        "https://devblogs.microsoft.com/devops/blocking-malicious-versions-of-event-stream-and-flatmap-stream-packages/"
+      ]
+    },
+    {
+      "key": "npm:flatmap-stream",
+      "decision": "deny",
+      "reason": "supply-chain attack vector for event-stream 2018",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://osv.dev/vulnerability/GHSA-mh6f-8j2x-4483",
+        "https://devblogs.microsoft.com/devops/blocking-malicious-versions-of-event-stream-and-flatmap-stream-packages/"
+      ]
+    },
+    {
+      "key": "npm:colors",
+      "decision": "deny",
+      "reason": "self-sabotage attack 2022; corrupted output infinite loop",
+      "severity": "high",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://snyk.io/blog/open-source-npm-packages-colors-faker/"
+      ]
+    },
+    {
+      "key": "npm:faker",
+      "decision": "deny",
+      "reason": "self-sabotage attack 2022; package was destroyed by maintainer",
+      "severity": "high",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://snyk.io/blog/open-source-npm-packages-colors-faker/"
+      ]
+    },
+    {
+      "key": "npm:node-ipc",
+      "decision": "deny",
+      "reason": "protestware 2022; deletes files in specific geo regions",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://security.snyk.io/vuln/SNYK-JS-NODEIPC-2426370",
+        "https://snyk.io/blog/peacenotwar-malicious-npm-node-ipc-package-vulnerability/"
+      ]
+    },
+    {
+      "key": "npm:ua-parser-js@0.7.29",
+      "decision": "deny",
+      "reason": "supply-chain attack October 2021",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://advisories.gitlab.com/pkg/npm/ua-parser-js/CVE-2021-4229/",
+        "https://www.rapid7.com/blog/post/2021/10/25/npm-library-ua-parser-js-hijacked-what-you-need-to-know/"
+      ]
+    },
+    {
+      "key": "npm:ua-parser-js@0.8.0",
+      "decision": "deny",
+      "reason": "supply-chain attack October 2021",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://advisories.gitlab.com/pkg/npm/ua-parser-js/CVE-2021-4229/",
+        "https://www.rapid7.com/blog/post/2021/10/25/npm-library-ua-parser-js-hijacked-what-you-need-to-know/"
+      ]
+    },
+    {
+      "key": "npm:ua-parser-js@1.0.0",
+      "decision": "deny",
+      "reason": "supply-chain attack October 2021",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://advisories.gitlab.com/pkg/npm/ua-parser-js/CVE-2021-4229/",
+        "https://www.rapid7.com/blog/post/2021/10/25/npm-library-ua-parser-js-hijacked-what-you-need-to-know/"
+      ]
+    },
+    {
+      "key": "npm:rc@1.2.9",
+      "decision": "deny",
+      "reason": "supply-chain attack",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://cert.europa.eu/publications/security-advisories/2021-062/",
+        "https://www.sonatype.com/blog/npm-hijackers-at-it-again-popular-coa-and-rc-open-source-libraries-taken-over-to-spread-malware"
+      ]
+    },
+    {
+      "key": "npm:coa",
+      "decision": "deny",
+      "reason": "supply-chain attack November 2021",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://cert.europa.eu/publications/security-advisories/2021-062/",
+        "https://www.sonatype.com/blog/npm-hijackers-at-it-again-popular-coa-and-rc-open-source-libraries-taken-over-to-spread-malware"
+      ]
+    },
+    {
+      "key": "npm:crossenv",
+      "decision": "deny",
+      "reason": "typosquatting cross-env",
+      "severity": "critical",
+      "reviewed_by": "yieldos-maintainers",
+      "reviewed_at": "2026-05-10",
+      "source_urls": [
+        "https://blog.npmjs.org/post/163723642530/crossenv-malware-on-the-npm-registry"
+      ]
+    }
+  ],
+  "description": "Known malicious, sabotaged, protestware, or typosquatted packages blocked before allowlist and native-equivalent logic."
 }

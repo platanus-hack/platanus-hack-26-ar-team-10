@@ -18,6 +18,8 @@ test('oracle coverage report labels benchmarked, active, and contract-only cases
   assert.equal(byId.get('hardcoded-secret').status, 'benchmarked');
   assert.equal(byId.get('sensitive-logging').status, 'benchmarked');
   assert.equal(byId.get('dangerous-instruction-edit').status, 'benchmarked');
+  assert.equal(byId.get('dangerous-instruction-edit').contract_status, 'active-adapter');
+  assert.equal(byId.get('missing-authz').contract_status, 'active-demo');
   assert.equal(byId.get('prompt-injection').status, 'active-adapter');
   assert.equal(byId.get('idor-bola').status, 'contract-only');
   assert.equal(byId.get('persistent-memory-prompt-injection').status, 'contract-only');

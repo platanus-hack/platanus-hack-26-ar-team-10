@@ -1,0 +1,44 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-05-09T00:00:00Z",
+  "managers": {
+    "pnpm": {
+      "config_file": ".npmrc",
+      "settings": {
+        "minimum-release-age": "10",
+        "block-exotic-subdeps": "true",
+        "strict-dep-builds": "true",
+        "trust-policy": "no-downgrade",
+        "ignore-scripts": "true"
+      },
+      "settings_alt_files": ["pnpm-workspace.yaml"]
+    },
+    "npm": {
+      "config_file": ".npmrc",
+      "settings": {
+        "ignore-scripts": "true",
+        "engine-strict": "true",
+        "save-exact": "true"
+      }
+    },
+    "yarn": {
+      "config_file": ".yarnrc.yml",
+      "settings": {
+        "enableScripts": "false"
+      }
+    },
+    "bun": {
+      "config_file": "bunfig.toml",
+      "settings": {
+        "ignoreScripts": "true"
+      }
+    },
+    "pip": {
+      "config_file": "pip.conf",
+      "settings": {
+        "no-build-isolation": "false",
+        "require-hashes": "true"
+      }
+    }
+  }
+}

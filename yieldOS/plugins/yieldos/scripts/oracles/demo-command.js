@@ -10,7 +10,9 @@ const proof = require('./cdsc/proof');
 const { hashObject } = require('./result');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..', '..');
-const FIXTURE_ROOT = path.join(PLUGIN_ROOT, 'fixtures', 'oracle-demo');
+const REPO_ROOT = path.resolve(PLUGIN_ROOT, '..', '..', '..');
+const FIXTURE_ROOT = process.env.YIELDOS_ORACLE_DEMO_FIXTURE_ROOT ||
+  path.join(REPO_ROOT, 'examples', 'oracle-demo', 'fixture');
 
 function parseArgs(argv = []) {
   const args = [...argv];
@@ -37,7 +39,11 @@ async function runDemo(argv = process.argv.slice(2), options = {}) {
   }
 
   const root = options.projectRoot || fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-oracle-demo-'));
-  prepareDemoProject(root);
+  try {
+    prepareDemoProject(root);
+  } catch (err) {
+    return { exitCode: 2, message: `yieldOS oracle demo error: ${err.message}` };
+  }
   const result = await proof.run(root, {
     contract: 'security/oracles/missing-auth-demo/contract.json',
     runtime: 'yieldos.oracle-runtime.json',
@@ -52,6 +58,9 @@ async function runDemo(argv = process.argv.slice(2), options = {}) {
 }
 
 function prepareDemoProject(root) {
+  if (!fs.existsSync(FIXTURE_ROOT)) {
+    throw new Error('yieldOS oracle demo fixtures are not included in this plugin package. Use the repository examples/oracle-demo fixture or set YIELDOS_ORACLE_DEMO_FIXTURE_ROOT.');
+  }
   fs.mkdirSync(path.join(root, 'security/oracles/missing-auth-demo'), { recursive: true });
   fs.cpSync(FIXTURE_ROOT, path.join(root, 'fixture'), { recursive: true });
   const sourceText = fs.readFileSync(path.join(root, 'fixture', 'vulnerable-source.js'), 'utf8');

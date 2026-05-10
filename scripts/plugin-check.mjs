@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+
+import { buildPluginPackage } from './build-plugin-package.mjs';
 
 const repoRoot = process.cwd();
 
@@ -31,6 +34,31 @@ function assertExecutable(relativePath) {
 
 function assertSemver(value, label) {
   assert(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value), `${label} must be semver x.y.z`);
+}
+
+function assertTreesEqual(leftDir, rightDir) {
+  const leftFiles = listFiles(leftDir);
+  const rightFiles = listFiles(rightDir);
+  assert(JSON.stringify(leftFiles) === JSON.stringify(rightFiles), 'dist/yieldos-plugin file list differs from generated package');
+  for (const relativePath of leftFiles) {
+    const left = fs.readFileSync(path.join(leftDir, relativePath));
+    const right = fs.readFileSync(path.join(rightDir, relativePath));
+    assert(left.equals(right), `dist/yieldos-plugin differs from generated package at ${relativePath}`);
+  }
+}
+
+function listFiles(root) {
+  const files = [];
+  walk(root, (file) => files.push(path.relative(root, file).split(path.sep).join('/')));
+  return files.sort();
+}
+
+function walk(dir, visitor) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) walk(file, visitor);
+    else if (entry.isFile()) visitor(file);
+  }
 }
 
 function assertNoUnknownMarketplaceKeys(marketplace, relativePath) {
@@ -74,7 +102,7 @@ assert(plugin.name === 'yieldos', 'plugin manifest must be named yieldos');
 assertSemver(plugin.version, 'plugin manifest version');
 assert(plugin.author?.name === 'platanus-hack-26-ar-team-10', 'plugin manifest has wrong author');
 
-validateMarketplace('.claude-plugin/marketplace.json', './yieldOS/plugins/yieldos', plugin.version);
+validateMarketplace('.claude-plugin/marketplace.json', './dist/yieldos-plugin', plugin.version);
 validateMarketplace('yieldOS/.claude-plugin/marketplace.json', './plugins/yieldos', plugin.version, 'yieldOS');
 
 for (const relativePath of [
@@ -133,11 +161,12 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/security/.gitignore',
   'yieldOS/plugins/yieldos/scripts/classifiers/manifests.js',
   'yieldOS/plugins/yieldos/skills/dependency-gate/SKILL.md',
-  'yieldOS/plugins/yieldos/fixtures/oracle-demo/vulnerable-server.js',
-  'yieldOS/plugins/yieldos/fixtures/oracle-demo/vulnerable-source.js',
-  'yieldOS/plugins/yieldos/fixtures/oracle-demo/fixed-server.js',
-  'yieldOS/plugins/yieldos/fixtures/oracle-demo/server-source.js',
-  'yieldOS/plugins/yieldos/fixtures/oracle-demo/yieldos.oracle-runtime.json',
+  'examples/oracle-demo/README.md',
+  'examples/oracle-demo/fixture/vulnerable-server.js',
+  'examples/oracle-demo/fixture/vulnerable-source.js',
+  'examples/oracle-demo/fixture/fixed-server.js',
+  'examples/oracle-demo/fixture/server-source.js',
+  'examples/oracle-demo/fixture/yieldos.oracle-runtime.json',
   'yieldOS/packs/yieldos-internal-security/yield.agent-pack.yaml',
   'landing/package.json',
   'landing/src/app/agent-packs/page.tsx',
@@ -161,5 +190,36 @@ assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-oracle-demo');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-pack');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-pentest');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-update');
+
+const packageTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-plugin-package-'));
+const packageOutDir = path.join(packageTempRoot, 'yieldos-plugin');
+try {
+  buildPluginPackage({ repoRoot, outDir: packageOutDir });
+  assertTreesEqual(packageOutDir, path.join(repoRoot, 'dist/yieldos-plugin'));
+  for (const relativePath of [
+    '.claude-plugin/plugin.json',
+    'commands/audit.md',
+    'commands/oracle.md',
+    'hooks/hooks.json',
+    'policy-cache/allowlist.json',
+    'scripts/pre-install-gate.js',
+    'scripts/oracle-command.js',
+    'skills/dependency-gate/SKILL.md',
+  ]) {
+    assert(fs.existsSync(path.join(packageOutDir, relativePath)), `package missing runtime file: ${relativePath}`);
+  }
+  for (const relativePath of [
+    'tests',
+    'fixtures',
+    'bin/yieldos-oracle-demo',
+    'commands/oracle-demo.md',
+    'scripts/oracles/demo-command.js',
+    'scripts/oracles/bench.js',
+  ]) {
+    assert(!fs.existsSync(path.join(packageOutDir, relativePath)), `package must not include dev-only path: ${relativePath}`);
+  }
+} finally {
+  fs.rmSync(packageTempRoot, { recursive: true, force: true });
+}
 
 console.log('plugin structure OK');

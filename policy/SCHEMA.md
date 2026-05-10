@@ -1,9 +1,9 @@
 # yieldOS Policy Schema
 
-Status: human-readable contract
-Last updated: 2026-05-09
+Status: validated policy contract
+Last updated: 2026-05-10
 
-This file documents the current shape of `/policy` and the fields yieldOS should require before adding more third-party skills, MCPs, rules, or playbooks. It is not a JSON Schema validator yet.
+This file documents the current shape of `/policy` and the fields yieldOS requires before adding more third-party packages, skills, MCPs, rules, or playbooks. `scripts/policy-check.mjs` is the executable validator.
 
 ## Common Shape
 
@@ -26,6 +26,72 @@ Rules:
 - `description` explains what is being governed, not product marketing.
 - `entries` should be reviewable without reading chat history.
 - `rules.default_unlisted` must be explicit when unlisted items are security-relevant.
+
+## Package Allowlist
+
+Current file: `allowlist.json`
+
+Allowlist entries approve a package under a documented scope. They are not absolute approvals: denylist, native-equivalent rules, registry existence checks, and analyzers still run with denylist precedence.
+
+Pinned entry:
+
+```json
+{
+  "key": "npm:react@18.3.1",
+  "category": "framework",
+  "decision": "allow",
+  "reviewed_by": "yieldos-maintainers",
+  "reviewed_at": "2026-05-10",
+  "rationale": "Pinned framework dependency approved for the baseline dependency gate.",
+  "source_urls": ["https://www.npmjs.com/package/react/v/18.3.1"]
+}
+```
+
+Name-only entry:
+
+```json
+{
+  "key": "npm:typescript",
+  "category": "compiler",
+  "decision": "allow",
+  "allow_any_version": true,
+  "reviewed_by": "yieldos-maintainers",
+  "reviewed_at": "2026-05-10",
+  "rationale": "Name-only compiler dependency approved for the baseline dependency gate; concrete versions still go through registry existence checks and analyzers."
+}
+```
+
+Rules:
+
+- `decision` must be `allow`.
+- Name-only entries require `allow_any_version: true` and a rationale.
+- Pinned entries must not set `allow_any_version: true`.
+- Allowlist entries must not conflict with denylist entries.
+
+## Package Denylist
+
+Current file: `denylist.json`
+
+Denylist entries block known malicious, sabotaged, protestware, typosquatted, or otherwise unsafe packages. Denylist wins before native-equivalent and allowlist logic.
+
+```json
+{
+  "key": "npm:event-stream@3.3.6",
+  "decision": "deny",
+  "reason": "supply-chain attack 2018",
+  "severity": "critical",
+  "reviewed_by": "yieldos-maintainers",
+  "reviewed_at": "2026-05-10",
+  "source_urls": ["https://osv.dev/vulnerability/GHSA-mh6f-8j2x-4483"]
+}
+```
+
+Rules:
+
+- `decision` must be `deny`.
+- `reason`, `severity`, `reviewed_by`, `reviewed_at`, and `source_urls` are required.
+- `severity` must be `critical`, `high`, `medium`, or `low`.
+- Denylist entries must not conflict with allowlist entries.
 
 ## Skills
 
