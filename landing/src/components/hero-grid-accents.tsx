@@ -31,20 +31,20 @@ type Cluster = {
 // Los 12 delays están separados ≥4 s entre sí para que NUNCA haya dos
 // celdas en alerta al mismo tiempo (la alerta dura ~2.4 s).
 // Staircase compacto que entra en cualquier viewport ≥ 1280 px sin clipping.
-// Cols 4 → 2 → 0 (de abajo hacia arriba), step de 2 cols + 3 rows.
+// Cols 5 → 3 → 1 (de abajo hacia arriba), step de 2 cols + 3 rows.
 const CLUSTERS: Cluster[] = [
   {
-    col: 4,
+    col: 5,
     row: 1,
     delays: [0, 16, 32, 8],
   },
   {
-    col: 2,
+    col: 3,
     row: 4,
     delays: [28, 4, 20, 36],
   },
   {
-    col: 0,
+    col: 1,
     row: 7,
     delays: [12, 40, 24, 44],
   },
