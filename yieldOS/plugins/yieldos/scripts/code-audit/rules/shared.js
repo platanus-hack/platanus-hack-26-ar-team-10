@@ -42,6 +42,25 @@ function codeShape(code) {
   return stripRegexLiterals(stripQuotedStrings(String(code || '')));
 }
 
+function addedTextForFile(input, file) {
+  return parseChangedLines(input?.diff || '')
+    .filter((candidate) => candidate.file === file && candidate.sign === '+')
+    .map((candidate) => candidate.code)
+    .join('\n');
+}
+
+function isJavaScriptLikeFile(file) {
+  return /\.(?:[cm]?[jt]sx?)$/i.test(String(file || ''));
+}
+
+function isPythonFile(file) {
+  return /\.py$/i.test(String(file || ''));
+}
+
+function isRuntimeCodeFile(file) {
+  return /\.(?:py|[cm]?[jt]sx?)$/i.test(String(file || ''));
+}
+
 function stripQuotedStrings(code) {
   return code.replace(/(['"])(?:\\.|(?!\1)[\s\S])*\1/g, '$1$1');
 }
@@ -51,8 +70,12 @@ function stripRegexLiterals(code) {
 }
 
 module.exports = {
+  addedTextForFile,
   codeShape,
   hasExploitEvidence,
+  isJavaScriptLikeFile,
+  isPythonFile,
+  isRuntimeCodeFile,
   makeFinding,
   parseAddedLines,
   parseChangedLines,

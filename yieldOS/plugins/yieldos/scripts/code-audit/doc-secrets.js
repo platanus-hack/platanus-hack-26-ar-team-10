@@ -1,7 +1,7 @@
 'use strict';
 
 const AUTH_HEADER_RE = /(\bAuthorization\s*:\s*(?:Bearer|Token)\s+)([A-Za-z0-9._~+/=-]{16,})/gi;
-const SECRET_ASSIGNMENT_RE = /(\b[A-Za-z0-9_-]*(?:api[_-]?key|secret|token|password|passwd|authorization)\b\s*[:=]\s*['"]?)([A-Za-z0-9._~+/=-]{16,})/gi;
+const SECRET_ASSIGNMENT_RE = /(\b[A-Za-z0-9_-]*(?:api[_-]?key|secret[_-]?key|secret|token|password|passwd|authorization)\b\s*[:=]\s*['"]?)([A-Za-z0-9._~+/=-]{16,})/gi;
 const PROVIDER_TOKEN_RE = /\b(?:sk-(?:proj-)?|ghp_|xox[abprs]-)[A-Za-z0-9_-]{16,}\b/g;
 
 function isDocsExampleFile(file) {
