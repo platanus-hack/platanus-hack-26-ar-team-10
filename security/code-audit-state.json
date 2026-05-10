@@ -2,7 +2,7 @@
   "version": 1,
   "mode": "pr",
   "diff_source": "merge-base",
-  "diff_hash": "sha256:0733b7a1c2a919e5ae19480344f663484802c3a3a08bf7f418adc665040e9b25",
+  "diff_hash": "sha256:279f217dcf22f99ad534fe57354fda69af28741fb35ff920480fbbf9334a38cf",
   "range": "fc317971f77e6ffb52e6e75921a60f01699d417e..HEAD",
   "files": [
     ".claude-plugin/marketplace.json",
