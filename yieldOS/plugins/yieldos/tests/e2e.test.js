@@ -14,13 +14,38 @@ function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-e2e-'));
 }
 
-function runHook(input) {
+function runHook(input, options = {}) {
   const r = spawnSync('node', [HOOK_PATH], {
     input: JSON.stringify(input),
     encoding: 'utf8',
+    env: { ...process.env, ...(options.env || {}) },
     timeout: 10000,
   });
   return { code: r.status, stderr: r.stderr || '', stdout: r.stdout || '' };
+}
+
+function policyLoadTraceEnv() {
+  const root = tmpProject();
+  const marker = path.join(root, 'policy-loaded');
+  const preload = path.join(root, 'trace-policy-load.js');
+  fs.writeFileSync(preload, [
+    "'use strict';",
+    "const fs = require('node:fs');",
+    "const Module = require('node:module');",
+    `const marker = ${JSON.stringify(marker)};`,
+    'const originalLoad = Module._load;',
+    'Module._load = function patchedLoad(request, parent, isMain) {',
+    "  if (request === './policy-fetcher' || /[\\\\/]policy-fetcher(?:\\.js)?$/.test(String(request))) {",
+    "    fs.writeFileSync(marker, 'loaded');",
+    '  }',
+    '  return originalLoad.apply(this, arguments);',
+    '};',
+    '',
+  ].join('\n'));
+  return {
+    marker,
+    env: { NODE_OPTIONS: `${process.env.NODE_OPTIONS || ''} --require=${preload}`.trim() },
+  };
 }
 
 function hookContext(result) {
@@ -37,6 +62,47 @@ test('non-install command passes through with exit 0', () => {
     cwd: root,
   });
   assert.equal(r.code, 0);
+});
+
+test('non-install Bash does not load policy', () => {
+  const root = tmpProject();
+  const trace = policyLoadTraceEnv();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'ls -la' },
+    cwd: root,
+  }, { env: trace.env });
+
+  assert.equal(r.code, 0);
+  assert.equal(fs.existsSync(trace.marker), false);
+});
+
+test('normal Read does not load policy', () => {
+  const root = tmpProject();
+  const readme = path.join(root, 'README.md');
+  fs.writeFileSync(readme, '# hello\n');
+  const trace = policyLoadTraceEnv();
+  const r = runHook({
+    tool_name: 'Read',
+    tool_input: { file_path: readme },
+    cwd: root,
+  }, { env: trace.env });
+
+  assert.equal(r.code, 0);
+  assert.equal(fs.existsSync(trace.marker), false);
+});
+
+test('dependency install loads policy', () => {
+  const root = tmpProject();
+  const trace = policyLoadTraceEnv();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'npm install event-stream@3.3.6' },
+    cwd: root,
+  }, { env: trace.env });
+
+  assert.equal(r.code, 2);
+  assert.equal(fs.existsSync(trace.marker), true);
 });
 
 test('npm install of denylisted package blocks (exit 2)', () => {
