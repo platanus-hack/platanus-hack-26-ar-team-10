@@ -11,6 +11,7 @@ permissions:
 jobs:
   github-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -22,6 +23,8 @@ jobs:
         run: node scripts/policy-check.mjs
       - name: Run release helper tests
         run: node --test scripts/*.test.mjs
+      - name: Run repository secret smoke scan
+        run: node scripts/secret-scan-smoke.mjs
       - name: Run plugin tests
         working-directory: yieldOS/plugins/yieldos
         run: node --test tests/*.test.js

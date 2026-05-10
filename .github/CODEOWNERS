@@ -1,0 +1,9 @@
+# Sensitive runtime enforcement, policy, and release paths require maintainer review.
+
+/yieldOS/plugins/yieldos/scripts/ @NachoEstevo @sbuffose @frxnnk @MauroProto
+/yieldOS/plugins/yieldos/hooks.json @NachoEstevo @sbuffose @frxnnk @MauroProto
+/policy/ @NachoEstevo @sbuffose @frxnnk @MauroProto
+/install.sh @NachoEstevo @sbuffose @frxnnk @MauroProto
+/.github/workflows/ @NachoEstevo @sbuffose @frxnnk @MauroProto
+/.github/CODEOWNERS @NachoEstevo @sbuffose @frxnnk @MauroProto
+/dist/yieldos-plugin/ @NachoEstevo @sbuffose @frxnnk @MauroProto
