@@ -103,4 +103,5 @@ Verificación con checksums antes de ejecutar — y `sh install.sh --dry-run` pe
 
 ---
 
+**Landing:** [landing-yield.vercel.app](https://landing-yield.vercel.app/)
 **Repo:** [github.com/platanus-hack/platanus-hack-26-ar-team-10](https://github.com/platanus-hack/platanus-hack-26-ar-team-10)

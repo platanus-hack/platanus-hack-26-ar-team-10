@@ -2,9 +2,21 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "yieldOS - executable security contracts",
+  metadataBase: new URL("https://landing-yield.vercel.app/"),
+  title: "yieldOS — security suite for your AI agent",
   description:
     "yieldOS turns risky AI coding-agent changes into executable security contracts, counterexamples, and oracle-verified proof.",
+  openGraph: {
+    title: "yieldOS — security suite for your AI agent",
+    description:
+      "Deterministic checks before risky changes touch your repo. The model can propose. The oracle decides.",
+    url: "https://landing-yield.vercel.app/",
+    siteName: "yieldOS",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://landing-yield.vercel.app/",
+  },
 };
 
 export default function RootLayout({

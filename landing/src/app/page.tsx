@@ -14,6 +14,7 @@ const installCommand =
 const repoUrl =
   "https://github.com/yieldos/yieldos";
 const readmeUrl = `${repoUrl}#readme`;
+const landingUrl = "https://landing-yield.vercel.app/";
 const heroTitle = "Unlock safe coding for technical and non-technical talent";
 
 export default function Home() {
@@ -237,7 +238,14 @@ export default function Home() {
           </div>
           <div className="mt-10 flex flex-col gap-2 border-t border-zinc-200/80 pt-6 font-mono text-[11px] text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
             <p>© 2026 yieldOS · Oracle-driven security harness</p>
-            <p>Local-first security contracts for coding agents</p>
+            <p>
+              <a
+                href={landingUrl}
+                className="transition-colors hover:text-zinc-950"
+              >
+                landing-yield.vercel.app
+              </a>
+            </p>
           </div>
         </div>
       </footer>
