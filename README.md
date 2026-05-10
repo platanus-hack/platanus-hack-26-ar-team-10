@@ -12,7 +12,7 @@
 
 AI coding agents can install dependencies, add tools, edit instruction files, read secrets, and commit code faster than manual review can inspect every step. yieldOS is an oracle-driven security harness that turns risky agent actions into security contracts, counterexamples, and proof-of-fix evidence. **The model can propose. The oracle decides.**
 
-> Built at **Platanus Hack 26 — Buenos Aires** by team-10, AI Security track. Landing: [platanus-hack-26-ar-team-10.vercel.app](https://platanus-hack-26-ar-team-10.vercel.app). Léelo en [español](./README.es.md).
+> Built at **Platanus Hack 26 — Buenos Aires** by team-10, AI Security track. Landing: [landing-yield.vercel.app](https://landing-yield.vercel.app/). Léelo en [español](./README.es.md).
 
 ---
 

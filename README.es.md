@@ -12,7 +12,7 @@
 
 Los agentes de IA pueden instalar dependencias, agregar herramientas, editar archivos de instrucciones, leer secretos y commitear código más rápido de lo que cualquier revisión manual puede inspeccionar paso a paso. yieldOS es un harness de seguridad guiado por oráculos que convierte acciones riesgosas del agente en contratos de seguridad, contraejemplos y evidencia de fix. **El modelo puede proponer. El oráculo decide.**
 
-> Construido en **Platanus Hack 26 — Buenos Aires** por team-10, track AI Security. Landing: [platanus-hack-26-ar-team-10.vercel.app](https://platanus-hack-26-ar-team-10.vercel.app). Read it in [English](./README.md).
+> Construido en **Platanus Hack 26 — Buenos Aires** por team-10, track AI Security. Landing: [landing-yield.vercel.app](https://landing-yield.vercel.app/). Read it in [English](./README.md).
 
 ---
 
@@ -75,14 +75,13 @@ yieldOS toma esas decisiones **antes** de que el trabajo riesgoso sea aceptado, 
 
 ## Quickstart
 
-Una vez que tengas Claude Code instalado y acceso a una terminal:
+Una vez que tengas Claude Code instalado y acceso a una terminal, instalá yieldOS con un solo curl:
 
 ```bash
-git clone https://github.com/platanus-hack/platanus-hack-26-ar-team-10.git
-cd platanus-hack-26-ar-team-10
-sh install.sh --dry-run
-sh install.sh
+curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh -s -- --source platanus-hack/platanus-hack-26-ar-team-10
 ```
+
+El flag `--source platanus-hack/platanus-hack-26-ar-team-10` le dice al instalador dónde vive el marketplace durante el hackathon (la org `yieldos/yieldos` va a publicar el mismo plugin cuando esté lista).
 
 Después del install, reiniciá Claude Code (o corré `/reload-plugins`) y yieldOS gateará automáticamente las llamadas a `Bash`, `Write`, `Edit` y `Read`.
 
@@ -137,8 +136,8 @@ Flujo de instalación enterprise con verificación de archivos antes de ejecutar
 curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.13.0/install.sh
 curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.13.0/checksums.txt
 shasum -a 256 -c checksums.txt --ignore-missing
-sh install.sh --dry-run
-sh install.sh
+sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10 --dry-run
+sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10
 ```
 
 El install público usa el paquete limpio en [`dist/yieldos-plugin/`](./dist/yieldos-plugin). Trae hooks, comandos, cache de policy, runtime del dashboard, skills y contratos de oráculo. **No** trae tests, mocks ni fixtures intencionalmente vulnerables.
