@@ -54,11 +54,11 @@ The checked-in `benchmarks/code-audit-benchmark-2026-05-09.json` covers 15 fixtu
 - 4 allowed,
 - 15/15 expected outcomes matched.
 
-The checked-in `benchmarks/oracle-coverage-2026-05-09.json` records 35 templates:
+The checked-in `benchmarks/oracle-coverage-2026-05-09.json` records 38 templates:
 
 - 11 benchmarked,
 - 3 active-adapter,
-- 21 contract-only.
+- 24 contract-only.
 
 Contract-only means the oracle contract exists, but yieldOS should not claim runnable proof for it yet.
 

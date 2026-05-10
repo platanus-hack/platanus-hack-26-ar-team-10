@@ -1,17 +1,20 @@
 {
   "version": 1,
-  "generated_at": "2026-05-09T22:43:04.146Z",
+  "generated_at": "2026-05-10T05:33:25.600Z",
   "summary": {
-    "total_contracts": 35,
+    "total_contracts": 38,
     "by_status": {
       "benchmarked": 11,
-      "contract-only": 21,
+      "contract-only": 24,
       "active-adapter": 3
     },
     "by_kind": {
       "cdsc-http": 4,
       "static-diff": 20,
       "dependency-policy": 2,
+      "mcp-contract": 1,
+      "tenant-contract": 1,
+      "data-integrity-contract": 1,
       "instruction-policy": 2,
       "agent-permission": 7
     }
@@ -61,6 +64,7 @@
       "severity": "high",
       "kind": "cdsc-http",
       "status": "benchmarked",
+      "contract_status": "active-demo",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
@@ -74,6 +78,7 @@
       "severity": "high",
       "kind": "cdsc-http",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "owasp-api-top-10-2023:API1 Broken Object Level Authorization",
@@ -88,6 +93,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
@@ -101,6 +107,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A03 Injection",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -114,6 +121,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A03 Injection",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -127,6 +135,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A03 Injection",
         "owasp-cheat-sheet:OS Command Injection Defense",
@@ -140,6 +149,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "cwe:CWE-22 Path Traversal"
@@ -152,6 +162,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "cwe:CWE-73 External Control of File Name or Path"
@@ -164,6 +175,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A05 Security Misconfiguration",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -177,6 +189,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A10 SSRF",
         "owasp-api-top-10-2023:API7 SSRF",
@@ -191,6 +204,7 @@
       "severity": "medium",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "cwe:CWE-601 Open Redirect"
@@ -203,6 +217,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A03 Injection",
         "cwe:CWE-79 Cross-site Scripting"
@@ -215,6 +230,7 @@
       "severity": "medium",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A01 Broken Access Control",
         "owasp-cheat-sheet:CSRF Prevention",
@@ -228,6 +244,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A09 Security Logging and Monitoring Failures",
         "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
@@ -241,6 +258,7 @@
       "severity": "critical",
       "kind": "static-diff",
       "status": "benchmarked",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A02 Cryptographic Failures",
         "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
@@ -254,6 +272,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A02 Cryptographic Failures",
         "owasp-api-top-10-2023:API2 Broken Authentication",
@@ -267,6 +286,7 @@
       "severity": "medium",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A05 Security Misconfiguration",
         "owasp-api-top-10-2023:API8 Security Misconfiguration",
@@ -280,6 +300,7 @@
       "severity": "high",
       "kind": "dependency-policy",
       "status": "active-adapter",
+      "contract_status": "active-adapter",
       "standards": [
         "owasp-top-10-2021:A06 Vulnerable and Outdated Components",
         "owasp-api-top-10-2023:API9 Improper Inventory Management",
@@ -293,6 +314,7 @@
       "severity": "high",
       "kind": "dependency-policy",
       "status": "active-adapter",
+      "contract_status": "active-adapter",
       "standards": [
         "owasp-top-10-2021:A08 Software and Data Integrity Failures",
         "owasp-llm-top-10-2025:LLM03 Supply Chain",
@@ -306,6 +328,7 @@
       "severity": "medium",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API4 Unrestricted Resource Consumption",
         "owasp-llm-top-10-2025:LLM10 Unbounded Consumption",
@@ -315,11 +338,56 @@
       "benchmark_case": false
     },
     {
+      "id": "mcp-quota-exhaustion",
+      "title": "MCP tool loop lacks tenant quota or execution budget",
+      "severity": "medium",
+      "kind": "mcp-contract",
+      "status": "contract-only",
+      "contract_status": "contract-only",
+      "standards": [
+        "owasp-api-top-10-2023:API4 Unrestricted Resource Consumption",
+        "owasp-llm-top-10-2025:LLM10 Unbounded Consumption",
+        "cwe:CWE-770 Allocation of Resources Without Limits or Throttling"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "tenant-scope-invariant",
+      "title": "Tenant scope can be empty, fallback, or caller-controlled",
+      "severity": "high",
+      "kind": "tenant-contract",
+      "status": "contract-only",
+      "contract_status": "contract-only",
+      "standards": [
+        "owasp-api-top-10-2023:API1 Broken Object Level Authorization",
+        "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
+        "cwe:CWE-639 Authorization Bypass Through User-Controlled Key",
+        "cwe:CWE-863 Incorrect Authorization"
+      ],
+      "benchmark_case": false
+    },
+    {
+      "id": "transactional-replace-invariant",
+      "title": "Replace operation is not atomic",
+      "severity": "medium",
+      "kind": "data-integrity-contract",
+      "status": "contract-only",
+      "contract_status": "contract-only",
+      "standards": [
+        "owasp-api-top-10-2023:API6 Unrestricted Access to Sensitive Business Flows",
+        "owasp-top-10-2021:A04 Insecure Design",
+        "cwe:CWE-362 Race Condition",
+        "cwe:CWE-667 Improper Locking"
+      ],
+      "benchmark_case": false
+    },
+    {
       "id": "unsafe-consumption-of-apis",
       "title": "Unsafe trust of third-party API response",
       "severity": "medium",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API10 Unsafe Consumption of APIs",
         "owasp-top-10-2021:A08 Software and Data Integrity Failures",
@@ -333,6 +401,7 @@
       "severity": "critical",
       "kind": "instruction-policy",
       "status": "benchmarked",
+      "contract_status": "active-adapter",
       "standards": [
         "owasp-llm-top-10-2025:LLM01 Prompt Injection",
         "owasp-llm-top-10-2025:LLM06 Excessive Agency",
@@ -346,6 +415,7 @@
       "severity": "high",
       "kind": "instruction-policy",
       "status": "active-adapter",
+      "contract_status": "active-adapter",
       "standards": [
         "owasp-llm-top-10-2025:LLM01 Prompt Injection",
         "owasp-llm-top-10-2025:LLM05 Improper Output Handling",
@@ -359,6 +429,7 @@
       "severity": "high",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM01 Prompt Injection",
         "owasp-llm-top-10-2025:LLM08 Vector and Embedding Weaknesses",
@@ -372,6 +443,7 @@
       "severity": "high",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM06 Excessive Agency",
         "owasp-api-top-10-2023:API5 Broken Function Level Authorization",
@@ -385,6 +457,7 @@
       "severity": "medium",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM07 System Prompt Leakage",
         "owasp-llm-top-10-2025:LLM02 Sensitive Information Disclosure",
@@ -398,6 +471,7 @@
       "severity": "high",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM08 Vector and Embedding Weaknesses",
         "owasp-llm-top-10-2025:LLM01 Prompt Injection",
@@ -411,6 +485,7 @@
       "severity": "critical",
       "kind": "cdsc-http",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A07 Identification and Authentication Failures",
         "owasp-api-top-10-2023:API2 Broken Authentication",
@@ -424,6 +499,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API3 Broken Object Property Level Authorization",
         "owasp-top-10-2021:A01 Broken Access Control",
@@ -437,6 +513,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API3 Broken Object Property Level Authorization",
         "owasp-top-10-2021:A01 Broken Access Control",
@@ -450,6 +527,7 @@
       "severity": "medium",
       "kind": "cdsc-http",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-api-top-10-2023:API6 Unrestricted Access to Sensitive Business Flows",
         "owasp-top-10-2021:A04 Insecure Design",
@@ -463,6 +541,7 @@
       "severity": "high",
       "kind": "static-diff",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-top-10-2021:A08 Software and Data Integrity Failures",
         "cwe:CWE-502 Deserialization of Untrusted Data"
@@ -475,6 +554,7 @@
       "severity": "high",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM05 Improper Output Handling",
         "owasp-top-10-2021:A03 Injection",
@@ -488,6 +568,7 @@
       "severity": "high",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM04 Data and Model Poisoning",
         "owasp-llm-top-10-2025:LLM03 Supply Chain",
@@ -501,6 +582,7 @@
       "severity": "medium",
       "kind": "agent-permission",
       "status": "contract-only",
+      "contract_status": "contract-only",
       "standards": [
         "owasp-llm-top-10-2025:LLM09 Misinformation",
         "owasp-top-10-2021:A04 Insecure Design",
