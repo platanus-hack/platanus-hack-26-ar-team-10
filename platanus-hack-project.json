@@ -1,0 +1,6 @@
+{
+  "project-name": "yieldOS",
+  "project-oneliner-spanish": "Un security suite con oráculos para agentes de IA: el modelo propone, la evidencia decide.",
+  "project-description-spanish": "yieldOS es un plugin de Claude Code que protege tu proyecto cuando trabajás con agentes de IA. Funciona en dos capas en simultáneo: una defensa externa que intercepta en vivo cada paquete, comando, MCP o skill que el agente intenta ejecutar antes de que toque tu repo, y una defensa interna donde un oráculo de checks deterministas (auth faltante, secretos filtrados, ediciones inseguras) valida cada commit con evidencia hashable. Los oráculos devuelven pass, fail o unknown, y para acciones sensibles unknown bloquea por defecto. El modelo puede proponer; el oráculo decide.",
+  "deploy-url": ""
+}
