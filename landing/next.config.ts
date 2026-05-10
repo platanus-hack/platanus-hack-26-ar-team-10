@@ -8,7 +8,7 @@ const repoRoot = resolve(landingDir, "..");
 const nextConfig: NextConfig = {
   outputFileTracingRoot: repoRoot,
   turbopack: {
-    root: landingDir,
+    root: repoRoot,
   },
 };
 

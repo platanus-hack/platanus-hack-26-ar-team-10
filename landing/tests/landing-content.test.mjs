@@ -214,6 +214,37 @@ test("copy-to-clipboard behavior is isolated in a client component", () => {
   assert.ok(!component.includes("showArrow"), "Expected arrow toggle experiment to be removed");
 });
 
+test("benchmarks page exposes the presentation dashboard", () => {
+  const homePage = read("src/app/page.tsx");
+  const page = read("src/app/benchmarks/page.tsx");
+  const data = read("src/lib/benchmark-dashboard-data.ts");
+  const source = `${homePage}\n${page}\n${data}`;
+
+  [
+    'href="/benchmarks"',
+    "Full dashboard",
+    "yieldOS benchmark dashboard",
+    "Strong guardrail, honest limits",
+    "Prevention without broad false positives",
+    "Expanded frontier slice: outcomes by task",
+    "More expensive models still need a boundary",
+    "Review cost route",
+    "False-positive replay",
+    "local-review evidence",
+    "Run npm run evidence:verify",
+    "real-repo-benchmark-public-local-review-2026-05-10.json",
+    "coverage-calibration-benchmark-local-review-2026-05-10.json",
+    "model-workflow-benchmark-expanded-local-review-2026-05-10.json",
+  ].forEach((text) => {
+    assert.ok(source.includes(text), `Expected benchmark dashboard source to include: ${text}`);
+  });
+
+  assert.ok(
+    !page.includes("dangerouslySetInnerHTML"),
+    "Expected the landing route to render the dashboard as React, not embed generated HTML",
+  );
+});
+
 test("agent packs page provides a downloadable pack builder", () => {
   const page = read("src/app/agent-packs/page.tsx");
   const builder = read("src/components/agent-pack-builder.tsx");
