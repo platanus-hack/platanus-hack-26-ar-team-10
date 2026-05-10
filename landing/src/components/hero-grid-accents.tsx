@@ -56,9 +56,30 @@ export function HeroGridAccents() {
   const W = SVG_COLS * GRID;
   const H = SVG_ROWS * GRID;
 
+  // El wrapper se posiciona absoluto al bottom-right del hero, con un width
+  // responsive que GARANTIZA que el cluster nunca cruza al área del título:
+  //   - max 2016 px (todo el SVG)
+  //   - max viewport - 50rem (deja 800 px para título + padding cuando el
+  //     viewport es chico/medio)
+  //   - max 50vw - 10rem (deja la mitad del viewport - 160 px para que en
+  //     pantallas anchas con el título centrado tampoco se choque)
+  // overflow: hidden recorta el SVG si se pasa.
   return (
-    <svg
+    <div
       aria-hidden
+      className="hidden md:block"
+      style={{
+        position: "absolute",
+        right: 0,
+        bottom: 0,
+        width: `min(${W}px, calc(100vw - 50rem), calc(50vw - 10rem))`,
+        height: "100%",
+        overflow: "hidden",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+    <svg
       width={W}
       height={H}
       viewBox={`0 0 ${W} ${H}`}
@@ -66,10 +87,7 @@ export function HeroGridAccents() {
         position: "absolute",
         right: 0,
         bottom: 0,
-        zIndex: 0,
-        pointerEvents: "none",
       }}
-      className="hidden min-[1700px]:block"
     >
       {CLUSTERS.map((cluster, ci) => {
         // Top-left corner del 2x2 en SVG coords:
@@ -168,5 +186,6 @@ export function HeroGridAccents() {
         );
       })}
     </svg>
+    </div>
   );
 }

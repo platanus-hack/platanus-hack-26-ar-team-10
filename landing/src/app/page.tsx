@@ -1,6 +1,7 @@
 import { AgentPackSection } from "@/components/agent-pack-section";
 import { AgentsInstallButton } from "@/components/agents-install-button";
 import { CopyCommandButton } from "@/components/copy-command-button";
+import { DefenseLayers } from "@/components/defense-layers";
 import { HeroGridAccents } from "@/components/hero-grid-accents";
 import { InstallCommandPill } from "@/components/install-command-pill";
 import { MotionReveal } from "@/components/motion-reveal";
@@ -90,6 +91,66 @@ export default function Home() {
               y={10}
             >
               <InstallCommandPill command={installCommand} />
+            </MotionReveal>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="defenses"
+        className="pitch-section theme-surface-light border-y border-zinc-200/80"
+      >
+        <div className="pitch-shell mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 sm:py-20">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16">
+            <div className="max-w-xl">
+              <MotionReveal>
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[11px]">
+                  How yieldOS protects you
+                </p>
+                <h2 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-tight text-zinc-950 sm:text-5xl lg:text-6xl">
+                  Two layers of defense, one job: keep your project safe.
+                </h2>
+              </MotionReveal>
+
+              <MotionReveal delay={0.05}>
+                <div className="mt-7 space-y-5 text-base leading-7 text-zinc-600 sm:mt-9 sm:space-y-6 sm:text-lg sm:leading-8">
+                  <p>
+                    yieldOS works on two fronts at the same time. Together they cover
+                    everything that can put your code at risk &mdash; the packages
+                    you install, the AI agents working on your repo, the MCPs and
+                    skills they activate, and the very commits you&rsquo;re about to
+                    push.
+                  </p>
+                  <p>
+                    <strong className="font-semibold text-zinc-950">
+                      External defense.
+                    </strong>{" "}
+                    This is the Claude Code plugin running live in your editor. Every
+                    time an AI agent tries to install a package, run a shell command,
+                    edit a sensitive file, add an MCP, or activate a new skill,
+                    yieldOS intercepts the action and decides &mdash; block, allow,
+                    or rewrite &mdash; before it ever touches your repo. Malicious
+                    dependencies, prompt injections, and dangerous commands stop at
+                    the door.
+                  </p>
+                  <p>
+                    <strong className="font-semibold text-zinc-950">
+                      Internal defense.
+                    </strong>{" "}
+                    Before each commit, the oracle reviews the code you&rsquo;re
+                    about to ship. It runs the same predictable security checks
+                    every time &mdash; missing authentication, leaked secrets,
+                    unsafe edits to your project&rsquo;s instructions &mdash; and if
+                    something fails, the commit is held with proof of what&rsquo;s
+                    wrong. The AI can propose code. The oracle has the final word
+                    on whether it&rsquo;s safe.
+                  </p>
+                </div>
+              </MotionReveal>
+            </div>
+
+            <MotionReveal delay={0.1} y={20}>
+              <DefenseLayers />
             </MotionReveal>
           </div>
         </div>
