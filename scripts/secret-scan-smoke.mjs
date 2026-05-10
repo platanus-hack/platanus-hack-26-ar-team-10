@@ -15,6 +15,10 @@ const SECRET_PATTERNS = [
     id: 'secret-assignment',
     regex: /\b[A-Z0-9_]*(?:SECRET|TOKEN|PASSWORD|PASSWD|API_KEY|ACCESS_KEY|PRIVATE_KEY)[A-Z0-9_]*\s*[:=]\s*['"][A-Za-z0-9._~+/=-]{24,}['"]/gi,
   },
+  {
+    id: 'secret-assignment',
+    regex: /\b[A-Z0-9_]*(?:SECRET|TOKEN|PASSWORD|PASSWD|API_KEY|ACCESS_KEY|PRIVATE_KEY)[A-Z0-9_]*\s*=\s*[A-Za-z0-9_+/=-]{24,}\b/gi,
+  },
 ];
 
 const APPROVED_FIXTURE_PATHS = [

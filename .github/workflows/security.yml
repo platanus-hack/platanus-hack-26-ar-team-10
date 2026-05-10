@@ -11,12 +11,14 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   codeql:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
       - uses: github/codeql-action/init@7fd177fa680c9881b53cdab4d346d32574c9f7f4

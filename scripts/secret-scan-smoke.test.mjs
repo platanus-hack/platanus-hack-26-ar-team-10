@@ -56,6 +56,16 @@ test('secret smoke scan flags long secret-like assignments outside fixtures', ()
   assert.equal(findings[0].rule_id, 'secret-assignment');
 });
 
+test('secret smoke scan flags unquoted env-style secret assignments', () => {
+  const value = `${'abcdef1234567890'}abcdef1234567890`;
+  const findings = findSecretSmokeFindings([{
+    path: 'server/.env.example',
+    text: `DATABASE_SECRET=${value}\n`,
+  }]);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].rule_id, 'secret-assignment');
+});
+
 test('secret smoke scan ignores non-secret token metrics', () => {
   const findings = findSecretSmokeFindings([{
     path: 'yieldOS/plugins/yieldos/scripts/oracles/bench.js',
