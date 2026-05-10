@@ -1,7 +1,9 @@
 type ChartRow = {
   label: string;
   value: string;
-  percent: number; // 0–100, controls bar width
+  percent: number; // 0–100, controla el ancho de la barra
+  barColor: string;
+  swatchColor: string;
 };
 
 type Chart = {
@@ -11,10 +13,13 @@ type Chart = {
   text: string;
   textMuted: string;
   dot: string;
-  barAccent: string;
-  barMuted: string;
+  trackColor: string;
   rows: ChartRow[];
 };
+
+// Color del agente (rojo, indicador de "costoso/lento")
+const AGENT_BAR = "rgba(220, 38, 38, 0.9)";
+const AGENT_SWATCH = "rgba(220, 38, 38, 1)";
 
 const charts: Chart[] = [
   {
@@ -24,11 +29,22 @@ const charts: Chart[] = [
     text: "rgb(58, 92, 196)",
     textMuted: "rgba(58, 92, 196, 0.7)",
     dot: "rgba(58, 92, 196, 0.28)",
-    barAccent: "rgba(58, 92, 196, 0.85)",
-    barMuted: "rgba(58, 92, 196, 0.25)",
+    trackColor: "rgba(58, 92, 196, 0.18)",
     rows: [
-      { label: "Agent self-review", value: "≈ 12 s", percent: 100 },
-      { label: "yieldOS oracle", value: "150 ms", percent: 1.25 },
+      {
+        label: "Claude Opus 4.7 (agent self-review)",
+        value: "≈ 12 s",
+        percent: 100,
+        barColor: AGENT_BAR,
+        swatchColor: AGENT_SWATCH,
+      },
+      {
+        label: "yieldOS oracle",
+        value: "150 ms",
+        percent: 1.25,
+        barColor: "rgba(58, 92, 196, 0.9)",
+        swatchColor: "rgb(58, 92, 196)",
+      },
     ],
   },
   {
@@ -38,11 +54,22 @@ const charts: Chart[] = [
     text: "rgb(22, 140, 88)",
     textMuted: "rgba(22, 140, 88, 0.7)",
     dot: "rgba(22, 140, 88, 0.28)",
-    barAccent: "rgba(22, 140, 88, 0.85)",
-    barMuted: "rgba(22, 140, 88, 0.25)",
+    trackColor: "rgba(22, 140, 88, 0.18)",
     rows: [
-      { label: "Agent self-review", value: "$0.60", percent: 100 },
-      { label: "yieldOS oracle", value: "$0", percent: 0 },
+      {
+        label: "Claude Opus 4.7 (agent self-review)",
+        value: "$0.60",
+        percent: 100,
+        barColor: AGENT_BAR,
+        swatchColor: AGENT_SWATCH,
+      },
+      {
+        label: "yieldOS oracle",
+        value: "$0",
+        percent: 0,
+        barColor: "rgba(22, 140, 88, 0.9)",
+        swatchColor: "rgb(22, 140, 88)",
+      },
     ],
   },
 ];
@@ -76,35 +103,43 @@ export function OracleBenchmarks() {
               {chart.title}
             </h3>
 
-            <div className="mt-6 space-y-5 sm:mt-8 sm:space-y-6">
-              {chart.rows.map((row, idx) => (
+            <div className="mt-7 space-y-6 sm:mt-9 sm:space-y-7">
+              {chart.rows.map((row) => (
                 <div key={row.label}>
-                  <div className="flex items-baseline justify-between gap-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <span
+                        aria-hidden
+                        className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ background: row.swatchColor }}
+                      />
+                      <span
+                        className="truncate font-mono text-[11px] font-semibold uppercase tracking-[0.12em] sm:text-xs"
+                        style={{ color: chart.text }}
+                      >
+                        {row.label}
+                      </span>
+                    </div>
                     <span
-                      className="font-mono text-[11px] uppercase tracking-[0.14em] sm:text-xs"
-                      style={{ color: chart.textMuted }}
-                    >
-                      {row.label}
-                    </span>
-                    <span
-                      className="font-mono text-xl font-semibold tracking-tight sm:text-2xl"
+                      className="shrink-0 font-mono text-xl font-semibold tracking-tight sm:text-2xl"
                       style={{ color: chart.text }}
                     >
                       {row.value}
                     </span>
                   </div>
                   <div
-                    className="mt-2 h-2.5 w-full overflow-hidden rounded-full sm:mt-3 sm:h-3"
-                    style={{ background: chart.barMuted }}
+                    className="mt-2.5 h-2.5 w-full overflow-hidden rounded-full sm:mt-3 sm:h-3"
+                    style={{ background: chart.trackColor }}
                   >
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${Math.max(row.percent, 0.5)}%`,
-                        background: idx === 0 ? chart.barAccent : chart.text,
-                        opacity: row.percent === 0 ? 0 : 1,
-                      }}
-                    />
+                    {row.percent > 0 ? (
+                      <div
+                        className="h-full rounded-full transition-[width] duration-700"
+                        style={{
+                          width: `${Math.max(row.percent, 1)}%`,
+                          background: row.barColor,
+                        }}
+                      />
+                    ) : null}
                   </div>
                 </div>
               ))}
