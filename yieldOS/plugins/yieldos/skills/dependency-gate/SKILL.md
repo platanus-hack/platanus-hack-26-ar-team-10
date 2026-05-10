@@ -24,7 +24,7 @@ When yieldOS blocks a `Bash` / `Write` / `Edit` action, it returns a structured 
 - `large-lib-analysis` — large package; yieldOS will run manifest/script/OSV/static analysis. Wait for the analyzer verdict. Do not retry the install.
 - `verification-failed` — analysis flagged the package. Inform the user and do not retry.
 - `verification-passed` — package is safe; retry the install once.
-- `credentials-read-blocked` — the agent tried to read `.env`, `.ssh`, `.aws`, `.kube`, or another credentials path without the user's exact authorization phrase. Surface the colored warning returned in `hookSpecificOutput.additionalContext` and do not retry the read.
+- `credentials-read-blocked` — the agent tried to read `.env`, `.ssh`, `.aws`, `.kube`, or another credentials path without a target-bound user authorization. Surface the colored warning returned in `hookSpecificOutput.additionalContext` and do not retry the read.
 - `prompt-credentials-detected` — the user prompt contained credential-looking material. The hook injects a critical directive and pre-rendered alert/guide blocks. Surface them verbatim, never repeat the credential value, and never use it in tools.
 - `code-audit-fix-applied` — yieldOS applied a source-code security fix to the staged diff. Review the staged changes and rerun `git commit`; do not blindly force the original command.
 - `code-audit-blocked` — source-code audit found unresolved blocking risk. Fix the code before retrying commit or push.
@@ -37,13 +37,13 @@ Never ask the user to paste secrets into chat. If a prompt contains credentials,
 
 For `prompt-credentials-detected`, do not echo, quote, paraphrase, encode, summarize, or use any part of the credential value. Only variable names are allowed. Do not put the credential into any `Bash`, `Edit`, or `Write` tool call. Tell the user to move the value into `.env` from the shell using the guide.
 
-If the agent needs to read credentials from a local file, the user must reply with exactly:
+If the agent needs to read credentials from a local file, first attempt the read and let yieldOS block it. The block message contains a nonce phrase shaped like:
 
 ```text
-AUTORIZO A LEER LAS CREDENCIALES
+AUTORIZO yieldOS <nonce>
 ```
 
-The phrase must be the whole prompt. When accepted, yieldOS writes a local authorization flag under `security/` that expires after 30 minutes. Do not retry a blocked credentials read until the user has sent that exact phrase.
+The nonce phrase must be the whole user prompt. yieldOS authorizes only the matching `Read` retry when the Claude transcript proves that latest user prompt exactly matches the target-bound nonce. Do not use `Bash` to read credentials; retry the blocked `Read` after the user has sent the exact nonce phrase.
 
 ## Rewrite flow (Category A only)
 

@@ -1,6 +1,24 @@
 'use strict';
 
-const AUTHORIZATION_PHRASE = 'AUTORIZO A LEER LAS CREDENCIALES';
+const fs = require('node:fs');
+const path = require('node:path');
+
+const SENTINEL_SCAN_LIMIT = 20000;
+const SKIP_SENTINEL_DIRS = new Set([
+  '.git',
+  '.next',
+  '.pytest_cache',
+  '.turbo',
+  '.venv',
+  '__pycache__',
+  'build',
+  'coverage',
+  'dist',
+  'node_modules',
+  'target',
+  'vendor',
+  'venv',
+]);
 
 const SECRET_PATTERNS = [
   { id: 'openai-project-key', regex: /\bsk-proj-[A-Za-z0-9_-]{30,}\b/g, redact: '[REDACTED:openai-project-key]' },
@@ -50,13 +68,6 @@ function scan(text) {
   return { findings, redacted };
 }
 
-function authorizationPhraseDetected(text) {
-  // Exact match only: an embedded phrase from a README/tool output must not
-  // silently authorize credentials access.
-  if (typeof text !== 'string') return false;
-  return text.trim() === AUTHORIZATION_PHRASE;
-}
-
 function isCredentialsPath(filePath) {
   if (typeof filePath !== 'string' || filePath.length === 0) return false;
   const normalized = filePath.replace(/\\/g, '/');
@@ -71,10 +82,77 @@ function isCredentialsPath(filePath) {
   return false;
 }
 
+function tokenLooksPathLike(token) {
+  return /^(?:~\/|\.{1,2}\/|\/)/.test(token) || token.includes('/');
+}
+
+function shellPathTokens(command) {
+  const tokens = [];
+  const matches = String(command || '').matchAll(/[^\s"'`<>|;&(){}]+/g);
+  for (const match of matches) {
+    const token = match[0]
+      .replace(/\\([./~-])/g, '$1')
+      .replace(/^[=:,]+|[,:]+$/g, '');
+    if (token) tokens.push(token);
+  }
+  return tokens;
+}
+
+function resolveShellPathToken(token, projectRoot) {
+  if (token.startsWith('~/')) {
+    return path.join(require('node:os').homedir(), token.slice(2));
+  }
+  return path.isAbsolute(token)
+    ? token
+    : path.resolve(projectRoot || process.cwd(), token);
+}
+
+function commandReferencesCredentialPath(command, projectRoot) {
+  for (const token of shellPathTokens(command)) {
+    if (isCredentialsPath(token)) return true;
+    if (!tokenLooksPathLike(token)) continue;
+
+    try {
+      const realTarget = fs.realpathSync.native(resolveShellPathToken(token, projectRoot));
+      if (isCredentialsPath(realTarget)) return true;
+    } catch (_) {
+      // Missing or generated paths are still covered by the literal token check.
+    }
+  }
+  return false;
+}
+
+function projectHasCredentialSentinel(projectRoot) {
+  if (typeof projectRoot !== 'string' || projectRoot.length === 0) return false;
+  const stack = [path.resolve(projectRoot)];
+  let scanned = 0;
+
+  try {
+    while (stack.length > 0) {
+      const dir = stack.pop();
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        scanned += 1;
+        if (scanned > SENTINEL_SCAN_LIMIT) return true;
+
+        const fullPath = path.join(dir, entry.name);
+        if (isCredentialsPath(fullPath)) return true;
+        if (entry.isDirectory() && !SKIP_SENTINEL_DIRS.has(entry.name)) {
+          stack.push(fullPath);
+        }
+      }
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+}
+
 module.exports = {
-  AUTHORIZATION_PHRASE,
+  SENTINEL_SCAN_LIMIT,
   SECRET_PATTERNS,
-  authorizationPhraseDetected,
+  commandReferencesCredentialPath,
   isCredentialsPath,
+  projectHasCredentialSentinel,
   scan,
 };

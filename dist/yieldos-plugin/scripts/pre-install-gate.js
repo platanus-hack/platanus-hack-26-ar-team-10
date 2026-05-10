@@ -8,10 +8,10 @@ const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const ui = require('./ui');
 const credentialsScanner = require('./credentials-scanner');
+const credentialAuth = require('./credential-auth');
 const terminalArt = require('./terminal-art');
 
 const DEFAULTS = require(path.join(__dirname, '..', 'config', 'defaults.json'));
-const AUTH_TTL_MS = 30 * 60 * 1000;
 
 function readStdinSync() {
   try {
@@ -203,6 +203,13 @@ function emitDecision(verdict, message, exitCode) {
 async function handleSelfDefense(input, projectRoot) {
   const tool = input.tool_name;
   const ti = input.tool_input || {};
+  if (tool === 'Read') {
+    const target = ti.file_path || ti.path;
+    if (target && selfDefense.isCredentialAuthProtectedPath(target)) {
+      logger.logSelfDefense(projectRoot, { action: 'Read:credential-auth-cache', target });
+      emitDecision('self-defense-block', 'yieldOS bloqueó lectura del cache de autorización de credenciales', 2);
+    }
+  }
   if (tool === 'Write' || tool === 'Edit') {
     const target = ti.file_path || ti.path;
     if (target && selfDefense.isProtectedPath(target)) {
@@ -212,6 +219,28 @@ async function handleSelfDefense(input, projectRoot) {
   }
   if (tool === 'Bash') {
     const cmd = ti.command || '';
+    if (credentialsScanner.commandReferencesCredentialPath(cmd, projectRoot)) {
+      logger.appendEntry(projectRoot, 'Credentials Bash Blocked (credential path referenced)', {
+        Command: cmd,
+        Reason: 'Bash referenced a credential-looking path; use the Read tool credential authorization flow instead',
+      });
+      process.stderr.write(`${terminalArt.alertLine('bash bloqueado: el comando referencia una ruta de credenciales')}\n`);
+      process.stderr.write('[yieldOS:verdict] credentials-read-blocked\n');
+      emitDecision('credentials-read-blocked', 'yieldOS bloqueó Bash porque el comando referencia credenciales; usá el flujo Read con nonce', 2);
+    }
+    if (credentialsScanner.projectHasCredentialSentinel(projectRoot)) {
+      logger.appendEntry(projectRoot, 'Credentials Bash Blocked (credential sentinel present)', {
+        Command: cmd,
+        Reason: 'Bash has unrestricted filesystem access; use the Read tool credential authorization flow instead',
+      });
+      process.stderr.write(`${terminalArt.alertLine('bash bloqueado: el proyecto contiene archivos de credenciales')}\n`);
+      process.stderr.write('[yieldOS:verdict] credentials-read-blocked\n');
+      emitDecision('credentials-read-blocked', 'yieldOS bloqueó Bash porque el proyecto contiene credenciales; usá el flujo Read con nonce', 2);
+    }
+    if (credentialAuth.commandReferencesCredentialAuth(cmd)) {
+      logger.logSelfDefense(projectRoot, { action: 'Bash:credential-auth-cache', target: cmd });
+      emitDecision('self-defense-block', 'yieldOS bloqueó acceso al cache de autorización de credenciales', 2);
+    }
     if (/rm\s+-rf\s+.*\.claude(?:-plugin)?[\/\\]/.test(cmd)) {
       logger.logSelfDefense(projectRoot, { action: 'Bash:rm', target: cmd });
       emitDecision('self-defense-block', 'yieldOS bloqueó eliminación de archivos protegidos', 2);
@@ -233,7 +262,7 @@ function isProtectedBashMutation(command, projectRoot = process.cwd()) {
 
 function referencesProtectedSecurityPath(command, projectRoot) {
   const cmd = String(command || '').replace(/\\/g, '/');
-  const protectedLeaf = '(?:oracles/|code-audit-state\\.json|code-audit-events\\.md|dependency-events\\.md|audit-events\\.md|yieldos-rewrites\\.json)';
+  const protectedLeaf = '(?:oracles/|code-audit-state\\.json|code-audit-events\\.md|dependency-events\\.md|audit-events\\.md|yieldos-rewrites\\.json|\\.yieldos-credentials-authorized)';
   const boundary = '(?:^|[\\s"\'`=:(])';
   const relativePattern = new RegExp(`${boundary}(?:\\./)?security/${protectedLeaf}`);
   if (relativePattern.test(cmd)) return true;
@@ -278,25 +307,7 @@ async function handleInstructionEdit(input, projectRoot, policy) {
   return false;
 }
 
-function authFlagPath(projectRoot) {
-  return path.join(projectRoot, 'security', '.yieldos-credentials-authorized');
-}
-
-function isAuthorizationActive(projectRoot) {
-  const filePath = authFlagPath(projectRoot);
-  if (!fs.existsSync(filePath)) return false;
-
-  try {
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    const authorizedAt = new Date(data.authorized_at).getTime();
-    const ttl = Number(data.ttl_ms || AUTH_TTL_MS);
-    return Number.isFinite(authorizedAt) && Number.isFinite(ttl) && Date.now() - authorizedAt < ttl;
-  } catch (_) {
-    return false;
-  }
-}
-
-function buildCredentialsReadWarning() {
+function buildCredentialsReadWarning(authorizationPhrase) {
   const art = terminalArt.randomAlertArt();
   return [
     '```diff',
@@ -312,9 +323,9 @@ function buildCredentialsReadWarning() {
     '-   - Esos valores pueden quedar en el contexto del modelo.',
     '-   - Un prompt-injection posterior podría exfiltrarlas.',
     '-',
-    '- Para autorizar la lectura por 30 minutos en este proyecto, respondé',
+    '- Para autorizar la lectura por 30 minutos para esta ruta, respondé',
     '- EXACTAMENTE con esta frase, sin nada antes ni después:',
-    '+   AUTORIZO A LEER LAS CREDENCIALES',
+    `+   ${authorizationPhrase}`,
     '-',
     '- Si no querés autorizar, seguí la conversación normalmente.',
     '```',
@@ -325,15 +336,32 @@ function writeJsonAndExit(payload, exitCode) {
   process.stdout.write(JSON.stringify(payload), () => process.exit(exitCode));
 }
 
+function readTargetForCredentialsCheck(target) {
+  if (credentialsScanner.isCredentialsPath(target)) return target;
+  try {
+    const realTarget = fs.realpathSync.native(target);
+    return credentialsScanner.isCredentialsPath(realTarget) ? realTarget : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function handleCredentialsRead(input, projectRoot) {
   const tool = input.tool_name;
   const toolInput = input.tool_input || {};
   if (tool !== 'Read') return false;
 
   const target = toolInput.file_path || toolInput.path || '';
-  if (!credentialsScanner.isCredentialsPath(target)) return false;
+  const credentialTarget = readTargetForCredentialsCheck(target);
+  if (!credentialTarget) return false;
 
-  if (isAuthorizationActive(projectRoot)) {
+  if (credentialAuth.isCredentialReadAuthorized({
+    projectRoot,
+    targetPath: credentialTarget,
+    sessionId: input.session_id,
+    transcriptPath: input.transcript_path,
+    nowMs: Date.now(),
+  })) {
     logger.appendEntry(projectRoot, 'Credentials Read Allowed (under active authorization)', {
       File: target,
       Note: 'agent read a credentials file with active user authorization',
@@ -354,10 +382,15 @@ async function handleCredentialsRead(input, projectRoot) {
     return true;
   }
 
+  const challenge = credentialAuth.createCredentialChallenge({
+    projectRoot,
+    targetPath: credentialTarget,
+    sessionId: input.session_id,
+  });
   logger.appendEntry(projectRoot, 'Credentials Read Blocked (no authorization)', {
     File: target,
-    'Required action': 'user must reply with the exact phrase "AUTORIZO A LEER LAS CREDENCIALES"',
-    'Authorization TTL': '30 minutes once granted',
+    'Required action': 'user must reply with the exact nonce phrase shown in hook output',
+    'Authorization proof': 'matching latest user prompt in the Claude transcript',
   });
   process.stderr.write(`${terminalArt.alertLine(`lectura bloqueada: ${path.basename(target)} requiere autorización explícita`)}\n`);
   process.stderr.write('[yieldOS:verdict] credentials-read-blocked\n');
@@ -370,12 +403,12 @@ async function handleCredentialsRead(input, projectRoot) {
         'Verdict: credentials-read-blocked.',
         'Surface this warning to the user verbatim:',
         '',
-        buildCredentialsReadWarning(),
+        buildCredentialsReadWarning(challenge.expectedResponse),
         '',
         'Then append this yieldOS stamp on a separate final block:',
         STAMP_BY_VERDICT['credentials-read-blocked'],
         '',
-        'Do not retry the Read until the user replies with the exact phrase: AUTORIZO A LEER LAS CREDENCIALES',
+        `Do not retry the Read until the user replies with the exact phrase: ${challenge.expectedResponse}`,
       ].join('\n'),
     },
   }, 2);

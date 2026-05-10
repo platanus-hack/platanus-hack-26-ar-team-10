@@ -119,6 +119,31 @@ test('protected via symlink to a target that does not exist yet', () => {
   );
 });
 
+test('protected via parent symlink into runtime credential auth cache', () => {
+  const dir = tmpDir();
+  const runtimeRoot = path.join(dir, 'credential-auth');
+  fs.mkdirSync(runtimeRoot, { recursive: true });
+  const previousRoot = process.env.YIELDOS_CREDENTIAL_AUTH_ROOT;
+  process.env.YIELDOS_CREDENTIAL_AUTH_ROOT = runtimeRoot;
+
+  const link = path.join(dir, 'runtime-link');
+  fs.symlinkSync(runtimeRoot, link, 'dir');
+
+  try {
+    assert.equal(
+      sd.isProtectedPath(path.join(link, 'signing-key')),
+      true,
+      'symlinks pointing into the credential auth cache must be detected via realpath',
+    );
+  } finally {
+    if (previousRoot === undefined) {
+      delete process.env.YIELDOS_CREDENTIAL_AUTH_ROOT;
+    } else {
+      process.env.YIELDOS_CREDENTIAL_AUTH_ROOT = previousRoot;
+    }
+  }
+});
+
 test('not protected: regular file under /tmp (sanity check, no false positives from realpath)', () => {
   const dir = tmpDir();
   const fp = path.join(dir, 'normal-file.txt');

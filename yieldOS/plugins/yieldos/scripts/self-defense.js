@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const credentialAuth = require('./credential-auth');
 
 const PROTECTED_PATTERNS = [
   /(?:^|\/)\.claude\/plugins\/yieldos\//,
@@ -14,6 +15,7 @@ const PROTECTED_PATTERNS = [
   /(?:^|\/)security\/audit-events\.md$/,
   /(?:^|\/)security\/yieldos-rewrites\.json$/,
   /(?:^|\/)security\/\.yieldos-instruction-hashes\.json$/,
+  /(?:^|\/)security\/\.yieldos-credentials-authorized$/,
 ];
 
 function matchesProtectedPattern(filepath) {
@@ -57,6 +59,7 @@ function realpathSafe(filepath) {
 
 function isProtectedPath(filepath) {
   if (typeof filepath !== 'string') return false;
+  if (isCredentialAuthProtectedPath(filepath)) return true;
   // Two-pass check: (1) raw match catches obvious cases, (2) realpath match
   // catches symlinks and `../` traversal that would otherwise sneak past the
   // first regex. A path is protected if EITHER pass matches.
@@ -64,6 +67,13 @@ function isProtectedPath(filepath) {
   const real = realpathSafe(filepath);
   if (real !== filepath && matchesProtectedPattern(real)) return true;
   return false;
+}
+
+function isCredentialAuthProtectedPath(filepath) {
+  if (typeof filepath !== 'string') return false;
+  if (credentialAuth.isCredentialAuthPath(filepath)) return true;
+  const real = realpathSafe(filepath);
+  return real !== filepath && credentialAuth.isCredentialAuthPath(real);
 }
 
 function isYieldosOwnRoot(filepath, pluginRoot) {
@@ -78,4 +88,4 @@ function isYieldosPolicyAccessLegitimate(callerPath, targetPath) {
   return typeof callerPath === 'string' && typeof targetPath === 'string' && callerPath.includes('/yieldos/');
 }
 
-module.exports = { isProtectedPath, isYieldosOwnRoot, isYieldosPolicyAccessLegitimate, PROTECTED_PATTERNS };
+module.exports = { isProtectedPath, isCredentialAuthProtectedPath, isYieldosOwnRoot, isYieldosPolicyAccessLegitimate, PROTECTED_PATTERNS };

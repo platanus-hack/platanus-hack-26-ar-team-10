@@ -448,8 +448,8 @@ If you are an AI coding agent operating in a project protected by yieldOS:
    | `code-audit-fix-applied`      | A security fix was applied to staged code. Review the change and rerun `git commit`. |
    | `code-audit-blocked`          | Source-code audit found unresolved blocking risk. Fix it before committing/pushing.  |
    | `code-audit-clean`            | The audited commit or push diff passed. Continue.                                    |
-   | `credentials-read-blocked`    | Do not read the credential file unless the user grants the exact authorization phrase. |
-   | `credentials-read-authorized` | The credential read is inside an active project-local authorization window.          |
+   | `credentials-read-blocked`    | Do not read credential files through `Read` or `Bash` unless yieldOS gives a target nonce and the user sends it exactly. |
+   | `credentials-read-authorized` | The structured `Read` retry has transcript proof of the target-bound nonce.          |
 
 3. **The rewrite flow (Category A)**: when yieldOS blocks with `category-a-rewrite`, follow the `dependency-gate` skill that's loaded automatically.
 

@@ -18,6 +18,7 @@ yieldOS is an agent-action security firewall. The current hard-enforced adapter 
 
 - Local hook decisions stay on the machine.
 - Policy fetch reads public policy JSON and falls back to the shipped policy cache.
+- Credential read authorization does not trust writable cache grants. The cache may hold challenge hints, but allow decisions require transcript proof that the latest user prompt exactly matched the target-bound nonce; `Bash` is blocked when recursive project credential sentinels are present because shell access cannot be path-scoped by the hook.
 - Provider repair workflows use model/provider credentials only when the user configures those workflows.
 - Audit events are written locally unless the user configures export.
 

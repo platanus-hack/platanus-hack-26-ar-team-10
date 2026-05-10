@@ -178,9 +178,12 @@ PreToolUse hook
   │
   ├─► credentials-scanner.isCredentialsPath() → yes
   │
-  ├─► authorization flag active?
-  │       yes → allow, log credentials-read-authorized
-  │       no  → block, tell the user the exact local authorization phrase
+  ├─► latest transcript user prompt exactly matches target nonce?
+  │       yes → allow structured Read, log credentials-read-authorized
+  │       no  → block, create a nonce challenge hint in the runtime cache
+  │
+  ├─► Bash with credential sentinels present?
+  │       yes → block; Bash cannot be target-bound safely
   │
   └─► exit 2 unless user has explicitly authorized the read
 ```
