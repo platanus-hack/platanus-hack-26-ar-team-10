@@ -39,7 +39,7 @@ const charts: Chart[] = [
         swatchColor: AGENT_SWATCH,
       },
       {
-        label: "yieldOS oracle",
+        label: "Oracle",
         value: "150 ms",
         percent: 1.25,
         barColor: "rgba(58, 92, 196, 0.9)",
@@ -64,7 +64,7 @@ const charts: Chart[] = [
         swatchColor: AGENT_SWATCH,
       },
       {
-        label: "yieldOS oracle",
+        label: "Oracle",
         value: "$0",
         percent: 0,
         barColor: "rgba(22, 140, 88, 0.9)",

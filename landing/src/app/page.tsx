@@ -172,7 +172,7 @@ export default function Home() {
                 </strong>{" "}
                 reviewing your changes vs the{" "}
                 <strong className="font-semibold text-zinc-950">
-                  yieldOS oracle
+                  Oracle
                 </strong>{" "}
                 running deterministic rules. Same task, very different bill.
               </p>
