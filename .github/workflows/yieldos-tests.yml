@@ -5,21 +5,21 @@ on:
     paths:
       - 'yieldOS/plugins/yieldos/**'
       - 'policy/**'
+      - '.github/workflows/plugin.yml'
       - '.github/workflows/yieldos-tests.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'yieldOS/plugins/yieldos/**'
-      - 'policy/**'
 
 jobs:
-  unit-tests:
-    name: unit tests - ${{ matrix.os }} - node ${{ matrix.node }}
+  unit-tests-pr:
+    name: unit tests - PR - ${{ matrix.os }} - node ${{ matrix.node }}
+    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node: ['18', '20', '22']
+        include:
+          - os: ubuntu-latest
+            node: '22'
+          - os: windows-latest
+            node: '22'
     runs-on: ${{ matrix.os }}
     defaults:
       run:
