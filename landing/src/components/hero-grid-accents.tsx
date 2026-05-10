@@ -69,7 +69,7 @@ export function HeroGridAccents() {
         zIndex: 0,
         pointerEvents: "none",
       }}
-      className="hidden md:block"
+      className="hidden min-[1700px]:block"
     >
       {CLUSTERS.map((cluster, ci) => {
         // Top-left corner del 2x2 en SVG coords:
