@@ -11,8 +11,8 @@
 // =============================================================================
 
 const GRID = 72;
-const SVG_COLS = 28;
-const SVG_ROWS = 24;
+const SVG_COLS = 20; // 1440 px de ancho — alcanza para los clusters
+const SVG_ROWS = 14; // 1008 px de alto — entra dentro de un hero 100vh típico
 // Ciclo largo + alertas espaciadas. Cada celda tiene un delay distinto y
 // los 12 delays están separados por 4 s para que JAMÁS haya dos celdas en
 // alerta al mismo tiempo (la alerta dura ~2.4 s).
@@ -30,22 +30,21 @@ type Cluster = {
 // Cada paso = 3 cols a la derecha (col más bajo) + 3 rows hacia arriba.
 // Los 12 delays están separados ≥4 s entre sí para que NUNCA haya dos
 // celdas en alerta al mismo tiempo (la alerta dura ~2.4 s).
-// Staircase ajustado para que los 3 clusters entren en pantallas
-// medianas (≈1700 px) sin que el wrapper responsive recorte ninguno.
-// Cols 7 → 4 → 1 (de abajo hacia arriba), step de 3 cols + 3 rows.
+// Staircase compacto que entra en cualquier viewport ≥ 1280 px sin clipping.
+// Cols 4 → 2 → 0 (de abajo hacia arriba), step de 2 cols + 3 rows.
 const CLUSTERS: Cluster[] = [
   {
-    col: 7,
+    col: 4,
     row: 1,
     delays: [0, 16, 32, 8],
   },
   {
-    col: 4,
+    col: 2,
     row: 4,
     delays: [28, 4, 20, 36],
   },
   {
-    col: 1,
+    col: 0,
     row: 7,
     delays: [12, 40, 24, 44],
   },
