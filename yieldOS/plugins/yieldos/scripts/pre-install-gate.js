@@ -4,13 +4,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const classifiers = require('./classifiers');
-const policyFetcher = require('./policy-fetcher');
-const decide = require('./decide').decide;
 const logger = require('./logger');
 const selfDefense = require('./self-defense');
-const injectionScanner = require('./injection-scanner');
-const codeAudit = require('./code-audit');
 const ui = require('./ui');
 const credentialsScanner = require('./credentials-scanner');
 const terminalArt = require('./terminal-art');
@@ -148,6 +143,26 @@ function readFileIfExists(filePath) {
   catch (_) { return ''; }
 }
 
+function getClassifiers() {
+  return require('./classifiers');
+}
+
+function getPolicyFetcher() {
+  return require('./policy-fetcher');
+}
+
+function getDecide() {
+  return require('./decide').decide;
+}
+
+function getInjectionScanner() {
+  return require('./injection-scanner');
+}
+
+function getCodeAudit() {
+  return require('./code-audit');
+}
+
 function contentForWriteOrEdit(tool, toolInput) {
   const filePath = toolInput.file_path || toolInput.path || '';
   if (tool === 'Write') {
@@ -248,6 +263,7 @@ async function handleInstructionEdit(input, projectRoot, policy) {
   const edit = contentForWriteOrEdit(tool, ti);
   const content = edit.newContent || '';
   if (typeof content !== 'string' || content.length === 0) return false;
+  const injectionScanner = getInjectionScanner();
   const findings = injectionScanner.scan(content, (policy['injection-patterns.json'] || {}).patterns);
   if (findings.length === 0) return false;
   const tier = injectionScanner.tierFromInjectionFindings(findings);
@@ -369,6 +385,7 @@ async function handleCredentialsRead(input, projectRoot) {
 async function processCandidates(candidates, projectRoot, policy) {
   let anyBlocked = false;
   const interventions = [];
+  const decide = getDecide();
 
   for (const candidate of candidates) {
     const decision = await decide(candidate, policy, {
@@ -423,6 +440,7 @@ async function processCandidates(candidates, projectRoot, policy) {
 }
 
 function handleCodeAuditCommand(projectRoot, command) {
+  const codeAudit = getCodeAudit();
   if (!codeAudit.isGitAuditCommand(command)) return false;
 
   let audit;
@@ -475,6 +493,34 @@ function handleCodeAuditCommand(projectRoot, command) {
   process.exit(audit.action === 'block' ? 2 : 0);
 }
 
+function classifyRelevantToolCall(tool, toolInput) {
+  if (tool === 'Bash') {
+    return {
+      candidates: getClassifiers().classifyBashCommand(toolInput.command || ''),
+      edit: null,
+    };
+  }
+
+  if (tool === 'Write' || tool === 'Edit') {
+    const edit = contentForWriteOrEdit(tool, toolInput);
+    return {
+      candidates: getClassifiers().classifyWriteOrEdit(edit.filePath, edit.newContent, edit.oldContent),
+      edit,
+    };
+  }
+
+  return { candidates: [], edit: null };
+}
+
+async function loadPolicyForRelevantCall() {
+  try {
+    return await getPolicyFetcher().getPolicy({ forceRefresh: false });
+  } catch (err) {
+    ui.writeMessage(`policy fetch failed: ${err.message}`);
+    return { source: 'unavailable', policy: null };
+  }
+}
+
 async function main() {
   const raw = readStdinSync();
   const input = parseInput(raw);
@@ -489,29 +535,15 @@ async function main() {
     handleCodeAuditCommand(projectRoot, ti.command || '');
   }
 
-  let policyResult;
-  try {
-    policyResult = await policyFetcher.getPolicy({ forceRefresh: false });
-  } catch (err) {
-    ui.writeMessage(`policy fetch failed: ${err.message}`);
-    policyResult = { source: 'unavailable', policy: null };
-  }
-  const policy = policyResult.policy || {};
-
-  const handled = await handleInstructionEdit(input, projectRoot, policy);
-  if (handled) return;
-
-  let candidates = [];
-  if (tool === 'Bash') {
-    candidates = classifiers.classifyBashCommand(ti.command || '');
-  } else if (tool === 'Write' || tool === 'Edit') {
-    const edit = contentForWriteOrEdit(tool, ti);
-    candidates = classifiers.classifyWriteOrEdit(edit.filePath, edit.newContent, edit.oldContent);
-  }
-
+  const { candidates } = classifyRelevantToolCall(tool, ti);
   if (candidates.length === 0) {
     process.exit(0);
   }
+
+  const policyResult = await loadPolicyForRelevantCall();
+  const policy = policyResult.policy || {};
+  const handled = await handleInstructionEdit(input, projectRoot, policy);
+  if (handled) return;
 
   const { anyBlocked, interventions } = await processCandidates(candidates, projectRoot, policy);
   emitHookOutput(interventions);
