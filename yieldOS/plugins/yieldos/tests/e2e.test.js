@@ -9,6 +9,8 @@ const os = require('node:os');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const HOOK_PATH = path.join(PLUGIN_ROOT, 'scripts', 'pre-install-gate.js');
+const auditEventCheckpoint = require('../scripts/audit-event-checkpoint');
+const TEST_AUDIT_EVENTS_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-e2e-checkpoints-'));
 
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-e2e-'));
@@ -18,7 +20,7 @@ function runHook(input, options = {}) {
   const r = spawnSync('node', [HOOK_PATH], {
     input: JSON.stringify(input),
     encoding: 'utf8',
-    env: { ...process.env, ...(options.env || {}) },
+    env: { ...process.env, YIELDOS_AUDIT_EVENTS_ROOT: TEST_AUDIT_EVENTS_ROOT, ...(options.env || {}) },
     timeout: 10000,
   });
   return { code: r.status, stderr: r.stderr || '', stdout: r.stdout || '' };
@@ -276,6 +278,60 @@ test('Write to protected file is blocked by self-defense', () => {
   assert.equal(r.code, 2);
   assert.equal(r.stderr.toLowerCase().includes('protegido') || r.stderr.toLowerCase().includes('protected'), true);
   assert.equal(hookContext(r).includes('- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido'), true);
+});
+
+test('Bash writes to structured event log are blocked by self-defense', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: {
+      command: 'echo "{}" >> security/yieldos-events.jsonl',
+    },
+    cwd: root,
+  });
+  assert.equal(r.code, 2);
+  assert.equal(r.stderr.includes('modificación de evidencia protegida'), true);
+  assert.equal(hookContext(r).includes('- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido'), true);
+});
+
+test('Bash writes to structured event checkpoint are blocked by self-defense', () => {
+  const root = tmpProject();
+  const checkpointRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-audit-checkpoints-'));
+  const checkpointPath = auditEventCheckpoint.checkpointPath({ runtimeRoot: checkpointRoot, projectRoot: root });
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: {
+      command: `echo "{}" > ${checkpointPath}`,
+    },
+    cwd: root,
+  }, { env: { YIELDOS_AUDIT_EVENTS_ROOT: checkpointRoot } });
+  assert.equal(r.code, 2);
+  assert.equal(r.stderr.includes('checkpoint de audit event'), true);
+  assert.equal(hookContext(r).includes('- ▎ 🛡  yieldOS  ·  Bloqueado · archivo protegido'), true);
+});
+
+test('Bash commands mentioning yieldOS checkpoint prose are not blocked', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: {
+      command: 'echo "yieldOS checkpoint design"',
+    },
+    cwd: root,
+  });
+  assert.equal(r.code, 0);
+});
+
+test('Bash commands running source audit-event tests are not blocked', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: {
+      command: 'node --test yieldOS/plugins/yieldos/tests/audit-events.test.js',
+    },
+    cwd: root,
+  });
+  assert.equal(r.code, 0);
 });
 
 test('CLAUDE.md edit with injection pattern blocks', () => {

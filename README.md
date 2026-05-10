@@ -12,6 +12,7 @@ AI coding agents can install dependencies, add tools, edit instruction files, re
 - Pre-action gating for package installs, skill installs, direct MCP additions, manifest dependency edits, vendored code, remote shell installers, instruction-file edits, protected yieldOS evidence, and credential-file reads.
 - Credential protection: reads of `.env`, `.ssh`, `.aws`, `.kube`, and similar paths require explicit local authorization.
 - Commit/push source-code audit with red-team findings, deterministic blue-team fixes when safe, and commit-bound `security/code-audit-state.json`.
+- Tamper-evident local audit events in `security/yieldos-events.jsonl`, with secret redaction, hash-chain verification, and an outside-repo tail checkpoint for review.
 - Counterexample-driven security contracts: define the invariant, replay the unsafe baseline, replay the fixed runtime, and store scoped proof artifacts.
 - Oracle runner with scoped `pass`, `fail`, and `unknown` results. Oracles execute contracts; for sensitive actions, `unknown` blocks by default.
 - Team agent packs that validate approved skills, MCPs, playbooks, profiles, oracles, generated files, and pack locks.

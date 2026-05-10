@@ -8,6 +8,9 @@ const os = require('node:os');
 
 const logger = require('../scripts/logger');
 
+process.env.YIELDOS_AUDIT_EVENTS_ROOT = process.env.YIELDOS_AUDIT_EVENTS_ROOT
+  || fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-log-checkpoints-'));
+
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-log-'));
 }

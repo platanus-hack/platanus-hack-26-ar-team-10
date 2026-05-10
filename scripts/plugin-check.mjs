@@ -136,6 +136,8 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/agent-pack-command.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-playbooks.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-yaml.js',
+  'yieldOS/plugins/yieldos/scripts/audit-event-checkpoint.js',
+  'yieldOS/plugins/yieldos/scripts/audit-events.js',
   'yieldOS/plugins/yieldos/scripts/oracle-command.js',
   'yieldOS/plugins/yieldos/scripts/oracles/demo-command.js',
   'yieldOS/plugins/yieldos/scripts/init-command.js',
@@ -208,6 +210,8 @@ try {
     'policy-cache/manifest.json',
     'scripts/policy-manifest.js',
     'scripts/pre-install-gate.js',
+    'scripts/audit-event-checkpoint.js',
+    'scripts/audit-events.js',
     'scripts/oracle-command.js',
     'skills/dependency-gate/SKILL.md',
   ]) {

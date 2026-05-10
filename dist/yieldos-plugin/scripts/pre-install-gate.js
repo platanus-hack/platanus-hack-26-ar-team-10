@@ -7,6 +7,7 @@ const path = require('node:path');
 const logger = require('./logger');
 const selfDefense = require('./self-defense');
 const ui = require('./ui');
+const auditEventCheckpoint = require('./audit-event-checkpoint');
 const credentialsScanner = require('./credentials-scanner');
 const credentialAuth = require('./credential-auth');
 const terminalArt = require('./terminal-art');
@@ -241,6 +242,10 @@ async function handleSelfDefense(input, projectRoot) {
       logger.logSelfDefense(projectRoot, { action: 'Bash:credential-auth-cache', target: cmd });
       emitDecision('self-defense-block', 'yieldOS bloqueó acceso al cache de autorización de credenciales', 2);
     }
+    if (auditEventCheckpoint.commandReferencesAuditEventCheckpoint(cmd)) {
+      logger.logSelfDefense(projectRoot, { action: 'Bash:audit-event-checkpoint', target: cmd });
+      emitDecision('self-defense-block', 'yieldOS bloqueó acceso al checkpoint de audit event', 2);
+    }
     if (/rm\s+-rf\s+.*\.claude(?:-plugin)?[\/\\]/.test(cmd)) {
       logger.logSelfDefense(projectRoot, { action: 'Bash:rm', target: cmd });
       emitDecision('self-defense-block', 'yieldOS bloqueó eliminación de archivos protegidos', 2);
@@ -262,7 +267,7 @@ function isProtectedBashMutation(command, projectRoot = process.cwd()) {
 
 function referencesProtectedSecurityPath(command, projectRoot) {
   const cmd = String(command || '').replace(/\\/g, '/');
-  const protectedLeaf = '(?:oracles/|code-audit-state\\.json|code-audit-events\\.md|dependency-events\\.md|audit-events\\.md|yieldos-rewrites\\.json|\\.yieldos-credentials-authorized)';
+  const protectedLeaf = '(?:oracles/|code-audit-state\\.json|code-audit-events\\.md|dependency-events\\.md|audit-events\\.md|yieldos-events\\.jsonl|\\.yieldos-events\\.lock|yieldos-rewrites\\.json|\\.yieldos-credentials-authorized)';
   const boundary = '(?:^|[\\s"\'`=:(])';
   const relativePattern = new RegExp(`${boundary}(?:\\./)?security/${protectedLeaf}`);
   if (relativePattern.test(cmd)) return true;

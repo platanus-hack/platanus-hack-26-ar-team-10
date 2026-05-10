@@ -37,6 +37,8 @@ plugins/yieldos/
 │   ├── policy-manifest.js             Policy bundle integrity verifier
 │   ├── policy-lookup.js               Allowlist/denylist/native lookups
 │   ├── logger.js                      Append-only log writer w/ secret redaction
+│   ├── audit-event-checkpoint.js      Outside-repo event tail anchor
+│   ├── audit-events.js                Tamper-evident structured event writer
 │   ├── self-defense.js                Protected-path detection
 │   ├── instruction-watcher.js         Hash-check on CLAUDE.md/AGENTS.md
 │   ├── injection-scanner.js           Prompt-injection patterns
@@ -117,6 +119,10 @@ UserPromptSubmit                       → on-prompt-submit.js
                           ↓
                   ┌──────────────────┐
                   │   logger.js      │ (used by all paths)
+                  └────────┬─────────┘
+                           ↓
+                  ┌──────────────────┐
+                  │ audit-events.js  │ (structured hash chain)
                   └──────────────────┘
 ```
 
@@ -222,6 +228,7 @@ PreToolUse hook
 
 Every hook can append to `<project>/security/dependency-events.md`. Format: markdown sections, append-only, secret-redacted.
 Code audit also appends human-readable events to `<project>/security/code-audit-events.md` and writes the latest machine-verifiable state to `<project>/security/code-audit-state.json`.
+All logger paths also append redacted structured events to `<project>/security/yieldos-events.jsonl`. Each JSONL event has a sequence number, previous-event hash, and current-event hash. The latest sequence/hash is anchored outside the repo in `~/.cache/yieldos/audit-events/`, so local mutation or tail truncation causes later appends to fail closed with a checkpoint mismatch. The writer uses a short-lived lock file at `<project>/security/.yieldos-events.lock` to keep concurrent hook writes ordered.
 
 ```
 ## YYYY-MM-DD HH:mm - <Heading>
@@ -266,6 +273,8 @@ Paths protected from agent edit:
 /security/dependency-events.md
 /security/code-audit-events.md
 /security/code-audit-state.json
+/security/yieldos-events.jsonl
+/security/.yieldos-events.lock
 /security/yieldos-rewrites.json
 /security/.yieldos-instruction-hashes.json
 ```

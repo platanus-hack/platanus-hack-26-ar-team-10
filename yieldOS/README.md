@@ -384,6 +384,8 @@ plugins/yieldos/
 │   ├── policy-fetcher.js       ← manifest-pinned policy cache
 │   ├── policy-lookup.js        ← lists/categories lookups
 │   ├── logger.js               ← append-only, secret-redacted
+│   ├── audit-event-checkpoint.js ← outside-repo event tail anchor
+│   ├── audit-events.js         ← structured event hash chain
 │   ├── self-defense.js         ← protected-path detection
 │   ├── injection-scanner.js    ← prompt-injection patterns
 │   ├── instruction-watcher.js  ← hash CLAUDE.md/AGENTS.md
@@ -410,7 +412,7 @@ You don't have to do anything. yieldOS works in the background:
 - **Critical packages (crypto, auth, frameworks, ORMs) require official approval.** yieldOS will ask you to update the reviewed root `policy/` files through a normal PR.
 - **CVEs in transitive dependencies are flagged** post-install — you'll see `[yieldOS] BLOCK CVE detectado en transitiva: {cve_id}`.
 
-Everything is logged to `<project>/security/dependency-events.md`. You can read it any time to audit what yieldOS decided and why.
+Everything is logged to `<project>/security/dependency-events.md`; structured, hash-chained events are also written to `<project>/security/yieldos-events.jsonl`, with the latest sequence/hash checkpointed outside the repo under `~/.cache/yieldos/audit-events/`. You can read either project file any time to audit what yieldOS decided and why.
 
 When stderr is an interactive terminal, yieldOS colorizes the status label. In
 non-interactive agent runs, CI, or `NO_COLOR=1`, output stays plain text. The
@@ -479,7 +481,7 @@ If you are an AI coding agent operating in a project protected by yieldOS:
 - `Required Settings Applied` — yieldOS inserted missing manager settings.
 - `Code Audit` — commit/push source-code audit result in `security/code-audit-events.md`.
 
-Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacted before being written.
+Sensitive values (tokens, bearer headers, private keys, sk-*, ghp_*) are redacted before being written. The structured log uses sequence numbers, previous/current event hashes, and an outside-repo checkpoint to make local tampering or tail truncation visible during review.
 
 ---
 
@@ -499,6 +501,7 @@ Zero external dependencies (uses `node:test`). Coverage:
 - `injection-scanner.test.js` — prompt-injection patterns against fixtures and shipped patterns.
 - `instruction-watcher.test.js` — hash-based change detection on `CLAUDE.md`/`AGENTS.md`.
 - `logger.test.js` — log entry shape and secret redaction.
+- `audit-events.test.js` — structured JSONL event chain, redaction, lock ordering, and protected event paths.
 - `self-defense.test.js` — protected path matching.
 - `code-audit.test.js` — staged/push diff collection, red/blue loop, audit state, CI verification, hook routing.
 - `code-audit-agents.test.js` — optional local Claude/Codex agent boundary and patch validation.
