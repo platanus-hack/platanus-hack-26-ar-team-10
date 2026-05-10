@@ -73,14 +73,22 @@ Lo que pasa:
 
 ## Cómo se instala
 
+Una sola línea:
+
 ```bash
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt
-shasum -a 256 -c checksums.txt --ignore-missing
-sh install.sh
+curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh -s -- --source platanus-hack/platanus-hack-26-ar-team-10
 ```
 
-Verificación con checksums antes de ejecutar — y `sh install.sh --dry-run` permite revisar el flujo antes de aplicarlo.
+O con verificación de checksums antes de ejecutar:
+
+```bash
+curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.13.0/install.sh
+curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.13.0/checksums.txt
+shasum -a 256 -c checksums.txt --ignore-missing
+sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10
+```
+
+`--dry-run` permite revisar el flujo antes de aplicarlo.
 
 ## Stack
 

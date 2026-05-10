@@ -10,9 +10,9 @@ import { ViewReadmeButton } from "@/components/view-readme-button";
 import Link from "next/link";
 
 const installCommand =
-  "curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh && curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt && shasum -a 256 -c checksums.txt --ignore-missing && sh install.sh";
+  "curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh -s -- --source platanus-hack/platanus-hack-26-ar-team-10";
 const repoUrl =
-  "https://github.com/yieldos/yieldos";
+  "https://github.com/platanus-hack/platanus-hack-26-ar-team-10";
 const readmeUrl = `${repoUrl}#readme`;
 const landingUrl = "https://landing-yield.vercel.app/";
 const heroTitle = "Unlock safe coding for technical and non-technical talent";

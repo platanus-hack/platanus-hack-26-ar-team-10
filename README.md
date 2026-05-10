@@ -75,14 +75,13 @@ yieldOS makes those decisions **before** risky work is accepted, against policy 
 
 ## Quickstart
 
-Once Claude Code is installed and you have shell access:
+Once Claude Code is installed and you have shell access, install yieldOS with one curl:
 
 ```bash
-git clone https://github.com/platanus-hack/platanus-hack-26-ar-team-10.git
-cd platanus-hack-26-ar-team-10
-sh install.sh --dry-run
-sh install.sh
+curl -fsSL https://raw.githubusercontent.com/platanus-hack/platanus-hack-26-ar-team-10/main/install.sh | sh -s -- --source platanus-hack/platanus-hack-26-ar-team-10
 ```
+
+The `--source platanus-hack/platanus-hack-26-ar-team-10` flag tells the installer where the marketplace lives during the hackathon (the `yieldos/yieldos` org will publish the same plugin once it's up).
 
 After install, restart Claude Code (or `/reload-plugins`) and yieldOS will gate `Bash`, `Write`, `Edit`, and `Read` tool calls automatically.
 
@@ -137,8 +136,8 @@ Enterprise install flow verifies release files before execution:
 curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.13.0/install.sh
 curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.13.0/checksums.txt
 shasum -a 256 -c checksums.txt --ignore-missing
-sh install.sh --dry-run
-sh install.sh
+sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10 --dry-run
+sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10
 ```
 
 The public install uses the clean package at [`dist/yieldos-plugin/`](./dist/yieldos-plugin). It ships hooks, commands, policy cache, dashboard runtime, skills, and oracle contracts. It does **not** ship tests, mocks, or intentionally vulnerable demo fixtures.
