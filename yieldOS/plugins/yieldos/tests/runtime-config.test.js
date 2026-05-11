@@ -74,3 +74,48 @@ test('enterprise mode raises local mode to org overlay minimum', () => {
   assert.equal(resolved.config.orgOverlay.path, 'org.yieldos-overlay.json');
   assert.equal(resolved.config.orgOverlay.minimumMode, 'enterprise');
 });
+
+test('org overlay rejects malformed restrict-only fields instead of silently ignoring them', () => {
+  const root = tmpProject();
+  const overlayPath = path.join(root, 'org.yieldos-overlay.json');
+  fs.writeFileSync(overlayPath, `${JSON.stringify({
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    requireOracles: ['agent-pack-lock', 42],
+    disableSkills: 'skill:dependency-gate',
+    denyRules: { match: 'src/legacy/**' },
+  }, null, 2)}\n`);
+
+  const result = runtimeConfig.validateRuntimeConfig({
+    version: 1,
+    mode: 'enterprise',
+    orgOverlay: 'org.yieldos-overlay.json',
+  }, { projectRoot: root });
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /orgOverlay requireOracles must contain only strings/);
+  assert.match(result.errors.join('\n'), /orgOverlay disableSkills must be an array/);
+  assert.match(result.errors.join('\n'), /orgOverlay denyRules must be an array/);
+});
+
+test('org overlay path rejects symlink traversal outside the project', () => {
+  if (process.platform === 'win32') return;
+  const root = tmpProject();
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-runtime-config-outside-'));
+  fs.writeFileSync(path.join(outside, 'overlay.json'), `${JSON.stringify({
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+  }, null, 2)}\n`);
+  fs.symlinkSync(path.join(outside, 'overlay.json'), path.join(root, 'overlay-link.json'));
+
+  const result = runtimeConfig.validateRuntimeConfig({
+    version: 1,
+    mode: 'enterprise',
+    orgOverlay: 'overlay-link.json',
+  }, { projectRoot: root });
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /orgOverlay path must not traverse a symlink/);
+});

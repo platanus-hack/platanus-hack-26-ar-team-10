@@ -118,6 +118,11 @@ function loadOrgOverlay(projectRoot, relativePath) {
     return { ok: false, errors: ['orgOverlay path must stay inside the project'] };
   }
   try {
+    assertNoSymlinkTraversal(root, target, 'orgOverlay path');
+  } catch (err) {
+    return { ok: false, errors: [err.message] };
+  }
+  try {
     const content = fs.readFileSync(target, 'utf8');
     const parsed = JSON.parse(content);
     const validation = validateOrgOverlay(parsed);
@@ -144,7 +149,16 @@ function validateOrgOverlay(value) {
   if (value.kind !== 'yieldos.org-overlay') errors.push('orgOverlay kind must be yieldos.org-overlay');
   const minimumMode = normalizeMode(value.minimumMode || value.minimum_mode || 'enterprise');
   if (!minimumMode) errors.push(`unsupported orgOverlay minimumMode: ${value.minimumMode || value.minimum_mode}`);
+
+  const requireProfiles = stringListField(value, 'requireProfiles', 'require_profiles', errors);
+  const requirePlaybooks = stringListField(value, 'requirePlaybooks', 'require_playbooks', errors);
+  const requireOracles = stringListField(value, 'requireOracles', 'require_oracles', errors);
+  const disableSkills = stringListField(value, 'disableSkills', 'disable_skills', errors);
+  const disableMcps = stringListField(value, 'disableMcps', 'disable_mcps', errors);
+  const denyRules = objectListField(value, 'denyRules', 'deny_rules', errors);
+
   if (errors.length > 0) return { ok: false, errors };
+
   return {
     ok: true,
     errors: [],
@@ -152,12 +166,12 @@ function validateOrgOverlay(value) {
       kind: value.kind,
       version: value.version,
       minimumMode,
-      requireProfiles: arrayOfStrings(value.requireProfiles || value.require_profiles),
-      requirePlaybooks: arrayOfStrings(value.requirePlaybooks || value.require_playbooks),
-      requireOracles: arrayOfStrings(value.requireOracles || value.require_oracles),
-      disableSkills: arrayOfStrings(value.disableSkills || value.disable_skills),
-      disableMcps: arrayOfStrings(value.disableMcps || value.disable_mcps),
-      denyRules: Array.isArray(value.denyRules || value.deny_rules) ? value.denyRules || value.deny_rules : [],
+      requireProfiles,
+      requirePlaybooks,
+      requireOracles,
+      disableSkills,
+      disableMcps,
+      denyRules,
     },
   };
 }
@@ -194,8 +208,47 @@ function isAtLeastMode(mode, minimum) {
   return MODE_RANK[normalizeMode(mode) || DEFAULT_RUNTIME_CONFIG.mode] >= MODE_RANK[normalizeMode(minimum) || DEFAULT_RUNTIME_CONFIG.mode];
 }
 
-function arrayOfStrings(value) {
-  return Array.isArray(value) ? value.filter((item) => typeof item === 'string') : [];
+function stringListField(value, camelName, snakeName, errors) {
+  const raw = value[camelName] !== undefined ? value[camelName] : value[snakeName];
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) {
+    errors.push(`orgOverlay ${camelName} must be an array`);
+    return [];
+  }
+  if (raw.some((item) => typeof item !== 'string')) {
+    errors.push(`orgOverlay ${camelName} must contain only strings`);
+    return [];
+  }
+  return raw;
+}
+
+function objectListField(value, camelName, snakeName, errors) {
+  const raw = value[camelName] !== undefined ? value[camelName] : value[snakeName];
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) {
+    errors.push(`orgOverlay ${camelName} must be an array`);
+    return [];
+  }
+  if (raw.some((item) => !item || typeof item !== 'object' || Array.isArray(item))) {
+    errors.push(`orgOverlay ${camelName} must contain objects`);
+    return [];
+  }
+  return raw;
+}
+
+function assertNoSymlinkTraversal(root, target, label) {
+  const relative = path.relative(root, target);
+  if (!relative) return;
+  let current = root;
+  for (const part of relative.split(path.sep).filter(Boolean)) {
+    current = path.join(current, part);
+    try {
+      if (fs.lstatSync(current).isSymbolicLink()) throw new Error(`${label} must not traverse a symlink`);
+    } catch (err) {
+      if (err.code === 'ENOENT') break;
+      throw err;
+    }
+  }
 }
 
 function sha256(content) {
