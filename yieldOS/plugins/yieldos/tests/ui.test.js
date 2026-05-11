@@ -12,7 +12,7 @@ test('formatDecision keeps plain hook output when color is disabled', () => {
     message: 'yieldOS bloqueó event-stream: malicious package',
   }, { color: false });
 
-  assert.equal(out, '[yieldOS] BLOCK bloqueó event-stream: malicious package');
+  assert.equal(out, '[yieldOS] BLOCKED bloqueó event-stream: malicious package');
 });
 
 test('formatDecision adds ansi color only when color is enabled', () => {
@@ -39,6 +39,26 @@ test('formatDecision labels dependency rewrites as rewrites', () => {
   }, { color: false });
 
   assert.equal(out, '[yieldOS] REWRITE realizó una optimización de la instalación de classnames');
+});
+
+test('formatDecision labels review actions as review', () => {
+  const out = ui.formatDecision({
+    verdict: 'skill-review',
+    action: 'review',
+    message: 'yieldOS requiere revisión para unknown-skill',
+  }, { color: false });
+
+  assert.equal(out, '[yieldOS] REVIEW requiere revisión para unknown-skill');
+});
+
+test('formatDecision labels explicit code-audit success as passed', () => {
+  const out = ui.formatDecision({
+    verdict: 'code-audit-clean',
+    action: 'allow',
+    message: 'yieldOS code-audit: clean',
+  }, { color: false });
+
+  assert.equal(out, '[yieldOS] PASSED code-audit: clean');
 });
 
 test('formatAuditFindings shows a small bounded finding summary', () => {

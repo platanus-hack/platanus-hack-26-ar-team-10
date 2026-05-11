@@ -80,8 +80,10 @@ function writeAudit(audit, stream = process.stderr) {
 function verdictLabel(decision) {
   if (decision.verdict && decision.verdict.includes('fix-applied')) return { text: 'FIXED', color: 'green' };
   if (decision.verdict === 'category-a-rewrite') return { text: 'REWRITE', color: 'cyan' };
-  if ((decision.action || '').startsWith('block') || (decision.verdict || '').includes('blocked')) return { text: 'BLOCK', color: 'red' };
+  if ((decision.action || '').startsWith('block') || (decision.verdict || '').includes('blocked')) return { text: 'BLOCKED', color: 'red' };
+  if (decision.action === 'review' || (decision.verdict || '').includes('review')) return { text: 'REVIEW', color: 'yellow' };
   if ((decision.verdict || '').includes('warning')) return { text: 'WARN', color: 'yellow' };
+  if (decision.verdict === 'code-audit-clean' || decision.verdict === 'oracle-pass') return { text: 'PASSED', color: 'green' };
   if (decision.action === 'allow') return { text: 'ALLOW', color: 'green' };
   return { text: 'INFO', color: 'cyan' };
 }

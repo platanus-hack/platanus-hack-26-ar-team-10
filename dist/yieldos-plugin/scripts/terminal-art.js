@@ -1,5 +1,7 @@
 'use strict';
 
+const ui = require('./ui');
+
 const ALERT_ARTS = [
   [
     '       _____',
@@ -116,7 +118,10 @@ function boxPanel(title, lines) {
   return out.join('\n');
 }
 
-function color(state, text) {
+function color(state, text, options = {}) {
+  const stream = options.stream || process.stderr;
+  const env = options.env || process.env;
+  if (!ui.shouldColor(stream, env)) return text;
   const prefix = {
     idle: ANSI.dim,
     running: ANSI.yellow,
@@ -142,12 +147,15 @@ function statusLine(message, state = 'info') {
   return `${color(state, symbol)} ${message}`;
 }
 
-function alertLine(message) {
-  return color('error', `${ANSI.bold}🛡  yieldOS${ANSI.reset}${ANSI.red} · ${message}`);
+function alertLine(message, options = {}) {
+  const stream = options.stream || process.stderr;
+  const env = options.env || process.env;
+  if (!ui.shouldColor(stream, env)) return `yieldOS · ${message}`;
+  return color('error', `${ANSI.bold}🛡  yieldOS${ANSI.reset}${ANSI.red} · ${message}`, { stream, env });
 }
 
 function renderStatus(message, state = 'idle') {
-  process.stdout.write(`${ANSI.clearLine}\r${color(state, '●')} ${message}\n`);
+  process.stdout.write(`${ui.shouldColor(process.stdout) ? ANSI.clearLine : ''}\r${color(state, '●', { stream: process.stdout })} ${message}\n`);
 }
 
 function renderPanel(title, lines) {

@@ -98,7 +98,7 @@ test('parallel hooks: a denied attempt and an allowed attempt do not interfere',
   assert.equal(d.code, 2);
   assert.equal(a.code, 0);
   assert.equal(d.stderr.includes('denylist-match'), true);
-  assert.equal(a.stderr.includes('allowlist-match'), true);
+  assert.equal(a.stderr.includes('denylist-match'), false);
 });
 
 function extractNoncePhrase(context) {

@@ -63,6 +63,7 @@ async function runOracleCommand(projectRoot, argv = process.argv.slice(2), optio
   return {
     exitCode,
     message: parsed.options.json ? `${JSON.stringify(result, null, 2)}\n` : renderResult(result, { color: options.color }),
+    json: Boolean(parsed.options.json),
     result,
   };
 }
@@ -153,7 +154,7 @@ async function main() {
   const result = await runOracleCommand(process.cwd(), process.argv.slice(2), {
     color: ui.shouldColor(process.stderr),
   });
-  const stream = result.exitCode === 0 ? process.stdout : process.stderr;
+  const stream = result.json || result.exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${result.message.trimEnd()}\n`);
   process.exit(result.exitCode);
 }

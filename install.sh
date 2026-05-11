@@ -23,8 +23,8 @@ Options:
   -h, --help                   Show this help
 
 Examples:
-  curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/install.sh
-  curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.12.0/checksums.txt
+  curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.15.0/install.sh
+  curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.15.0/checksums.txt
   shasum -a 256 -c checksums.txt --ignore-missing
   sh install.sh --dry-run
   sh install.sh

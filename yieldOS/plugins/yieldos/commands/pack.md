@@ -22,4 +22,4 @@ yieldos-pack write --pack yield.agent-pack.yaml
 yieldos-pack write --pack yield.agent-pack.yaml --force
 ```
 
-Generated output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. It validates referenced skills and MCP tool surfaces against yieldOS policy before writing.
+Generated output can include `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, repo-local skill folders, `.yield/pack-report.md`, and `yield.agent-pack.lock.json`. It validates referenced skills and MCP tool surfaces against yieldOS policy before writing. Optional `orgOverlay` references are restrict-only and are recorded in the pack lock hash metadata.

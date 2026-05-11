@@ -129,10 +129,11 @@ test('npm install of allowlisted package passes (exit 0)', () => {
   });
   // react@18.3.1 IS in shipped allowlist
   assert.equal(r.code, 0, `expected allow but got exit ${r.code}, stderr: ${r.stderr}`);
+  assert.equal(r.stderr, '');
   assert.equal(hookContext(r).includes('+ ▎ 🛡  yieldOS  ·  Validado · allowlist'), true);
 });
 
-test('approved-name direct MCP add is blocked until source and tools are verified', () => {
+test('standard mode reviews approved-name direct MCP add without blocking', () => {
   const root = tmpProject();
   const r = runHook({
     tool_name: 'Bash',
@@ -140,16 +141,40 @@ test('approved-name direct MCP add is blocked until source and tools are verifie
     cwd: root,
   });
 
-  assert.equal(r.code, 2, `expected block but got exit ${r.code}, stderr: ${r.stderr}`);
-  assert.equal(r.stderr.includes('[yieldOS:verdict] mcp-blocked'), true);
-  assert.equal(hookContext(r).includes('mcp:filesystem@latest -> mcp-blocked'), true);
+  assert.equal(r.code, 0, `expected review but got exit ${r.code}, stderr: ${r.stderr}`);
+  assert.equal(r.stderr.includes('[yieldOS:verdict] mcp-review'), true);
+  assert.equal(hookContext(r).includes('mcp:filesystem@latest -> mcp-review'), true);
 });
 
-test('unapproved MCP add is blocked by default', () => {
+test('strict mode blocks approved-name direct MCP add until source and tools are verified', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'claude mcp add filesystem npx @modelcontextprotocol/server-filesystem /tmp' },
+    cwd: root,
+  }, { env: { YIELDOS_MODE: 'strict' } });
+
+  assert.equal(r.code, 2, `expected block but got exit ${r.code}, stderr: ${r.stderr}`);
+  assert.equal(r.stderr.includes('[yieldOS:verdict] mcp-blocked'), true);
+});
+
+test('standard mode reviews unapproved low-risk MCP add without blocking', () => {
   const root = tmpProject();
   const r = runHook({
     tool_name: 'Bash',
     tool_input: { command: 'claude mcp add not-approved node server.js' },
+    cwd: root,
+  });
+
+  assert.equal(r.code, 0, `expected review but got exit ${r.code}, stderr: ${r.stderr}`);
+  assert.equal(r.stderr.includes('[yieldOS:verdict] mcp-review'), true);
+});
+
+test('standard mode still blocks dangerous unapproved MCP add', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'claude mcp add shell-helper --tools shell,execute,write_file' },
     cwd: root,
   });
 
@@ -166,16 +191,29 @@ test('approved skill add passes through skills policy', () => {
   });
 
   assert.equal(r.code, 0, `expected allow but got exit ${r.code}, stderr: ${r.stderr}`);
-  assert.equal(r.stderr.includes('[yieldOS:verdict] skill-approved'), true);
+  assert.equal(r.stderr, '');
+  assert.equal(hookContext(r).includes('skill-approved'), true);
 });
 
-test('unapproved skill add is blocked by default', () => {
+test('standard mode reviews unapproved skill add without blocking', () => {
   const root = tmpProject();
   const r = runHook({
     tool_name: 'Bash',
     tool_input: { command: 'npx skills add evil-skill' },
     cwd: root,
   });
+
+  assert.equal(r.code, 0, `expected review but got exit ${r.code}, stderr: ${r.stderr}`);
+  assert.equal(r.stderr.includes('[yieldOS:verdict] skill-review'), true);
+});
+
+test('strict mode preserves unapproved skill block behavior', () => {
+  const root = tmpProject();
+  const r = runHook({
+    tool_name: 'Bash',
+    tool_input: { command: 'npx skills add evil-skill' },
+    cwd: root,
+  }, { env: { YIELDOS_MODE: 'strict' } });
 
   assert.equal(r.code, 2, `expected block but got exit ${r.code}, stderr: ${r.stderr}`);
   assert.equal(r.stderr.includes('[yieldOS:verdict] skill-blocked'), true);
@@ -249,7 +287,7 @@ test('Edit to package.json reconstructs full manifest and validates added depend
   });
 
   assert.equal(r.code, 0, `expected allow but got exit ${r.code}, stderr: ${r.stderr}`);
-  assert.equal(r.stderr.includes('[yieldOS:verdict] allowlist-match'), true);
+  assert.equal(r.stderr, '');
   assert.equal(hookContext(r).includes('react@18.3.1 -> allowlist-match'), true);
 });
 

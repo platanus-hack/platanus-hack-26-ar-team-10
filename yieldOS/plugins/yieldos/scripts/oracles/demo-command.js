@@ -101,8 +101,8 @@ function renderDemo(root, result, options = {}) {
     return [
       'yieldOS oracle proof demo: missing-auth',
       '',
-      card('UNKNOWN proof incomplete', result.summary || 'Proof manifest was not created.'),
-      result.blocking_reason ? card('REASON', result.blocking_reason) : '',
+      card('UNKNOWN proof incomplete', result.summary || 'Proof manifest was not created.', options),
+      result.blocking_reason ? card('REASON', result.blocking_reason, options) : '',
       '',
       `Artifacts: ${path.join(root, 'security/oracles/missing-auth-demo')}`,
       'Scope: this route and replay only, not the whole repo.',
@@ -118,12 +118,12 @@ function renderDemo(root, result, options = {}) {
   return [
     'yieldOS oracle proof demo: missing-auth',
     '',
-    card('FAIL missing-authz', `Unauthenticated GET /admin/users returned ${baselineStatus}.`),
-    card('CONTRACT created', 'Unauthenticated request must receive 401 or 403.'),
-    card('REPLAY baseline got 200', `Observed ${baselineStatus} on vulnerable runtime.`),
-    card('FIX applied', 'Auth middleware rejects requests without Authorization.'),
-    card('REPLAY fixed got 401', `Observed ${fixedStatus} on fixed runtime.`),
-    card('PASS scoped acceptance', result.status === 'pass' ? 'Baseline failed and fixed replay passed.' : `Proof status: ${result.status}.`),
+    card('BLOCKED missing-authz', `Unauthenticated GET /admin/users returned ${baselineStatus}.`, options),
+    card('CONTRACT created', 'Unauthenticated request must receive 401 or 403.', options),
+    card('REPLAY baseline got 200', `Observed ${baselineStatus} on vulnerable runtime.`, options),
+    card('FIX applied', 'Auth middleware rejects requests without Authorization.', options),
+    card('REPLAY fixed got 401', `Observed ${fixedStatus} on fixed runtime.`, options),
+    card('PASSED scoped acceptance', result.status === 'pass' ? 'Baseline failed and fixed replay passed.' : `Proof status: ${result.status}.`, options),
     '',
     ...artifactLines,
     `Artifacts: ${path.join(root, 'security/oracles/missing-auth-demo')}`,
@@ -131,8 +131,22 @@ function renderDemo(root, result, options = {}) {
   ].join('\n');
 }
 
-function card(title, body) {
-  return `[${title}] ${body}`;
+function card(title, body, options = {}) {
+  return `[${colorTitle(title, options.color)}] ${body}`;
+}
+
+function colorTitle(title, enabled) {
+  if (!enabled) return title;
+  const first = String(title).split(/\s+/)[0];
+  const color = first === 'BLOCKED'
+    ? '\u001b[31m'
+    : first === 'PASSED' || first === 'FIX'
+      ? '\u001b[32m'
+      : first === 'UNKNOWN' || first === 'REASON'
+        ? '\u001b[33m'
+        : '';
+  if (!color) return title;
+  return `${color}${title}\u001b[0m`;
 }
 
 function openDemoRoute(url) {

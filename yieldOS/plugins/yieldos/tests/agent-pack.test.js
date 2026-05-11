@@ -6,6 +6,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const agentPack = require('../scripts/agent-pack-command');
 
@@ -106,6 +107,124 @@ skills:
 
   assert.equal(result.exitCode, 2);
   assert.equal(result.message.includes('skill:not-approved is not approved'), true);
+});
+
+test('yieldos-pack writes human errors to stderr', () => {
+  const root = tmpProject();
+  const result = spawnSync(process.execPath, [path.join(PLUGIN_ROOT, 'scripts', 'agent-pack-command.js'), 'unknown'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 2);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /yieldOS pack error/);
+});
+
+test('runPack rejects org overlays that restrict an allowed skill', () => {
+  const root = tmpProject();
+  writeJson(path.join(root, 'org-overlay.json'), {
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    disableSkills: ['skill:dependency-gate'],
+  });
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: restricted-skill
+orgOverlay: org-overlay.json
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+skills:
+  allow:
+    - key: skill:dependency-gate
+`);
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('org overlay disables skill: skill:dependency-gate'), true);
+});
+
+test('pack lock records org overlay and effective enterprise metadata', () => {
+  const root = tmpProject();
+  writeJson(path.join(root, 'org-overlay.json'), {
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    requireProfiles: ['secrets-safe'],
+    requirePlaybooks: ['agent-pack-review'],
+    requireOracles: ['agent-pack-lock'],
+  });
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: org-pack
+orgOverlay: org-overlay.json
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+playbooks:
+  include:
+    - agent-pack-review
+oracles:
+  include:
+    - agent-pack-lock
+`);
+
+  const result = agentPack.runPack(root, ['preview', '--pack', 'yield.agent-pack.yaml']);
+  const lockFile = result.files.find((file) => file.path === 'yield.agent-pack.lock.json');
+  const lock = JSON.parse(lockFile.content);
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(lock.base_policy_manifest_sha256, 'sha256:779a1edd7a20b20c2b4cb7a0b4f7aa81642ee3b0b064099c0726f36a3f3e0731');
+  assert.equal(lock.org_overlay_sha256.startsWith('sha256:'), true);
+  assert.equal(lock.effective_mode, 'enterprise');
+  assert.deepEqual(lock.required_oracles, ['agent-pack-lock']);
+});
+
+test('runPack verify fails when org overlay hash changes', () => {
+  const root = tmpProject();
+  writeJson(path.join(root, 'org-overlay.json'), {
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    requireOracles: ['agent-pack-lock'],
+  });
+  writePack(root, `
+version: 0.1
+kind: yield.agent-pack
+name: org-pack-stale
+orgOverlay: org-overlay.json
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+oracles:
+  include:
+    - agent-pack-lock
+`);
+  const written = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+  writeJson(path.join(root, 'org-overlay.json'), {
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    requireOracles: ['agent-pack-lock'],
+    denyRules: [{ match: 'src/legacy/**' }],
+  });
+
+  const result = agentPack.runPack(root, ['verify', '--pack', 'yield.agent-pack.yaml']);
+
+  assert.equal(written.exitCode, 0);
+  assert.equal(result.exitCode, 2);
+  assert.equal(result.message.includes('pack lock metadata mismatch'), true);
 });
 
 test('runPack ignores unverified project-local policy files', () => {

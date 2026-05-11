@@ -155,6 +155,27 @@ test('unlisted MCP candidate is blocked by default', async () => {
   assert.equal(d.action, 'block');
 });
 
+test('standard mode reviews unlisted low-risk MCPs instead of blocking', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:read-only-helper', version: 'latest', command: 'claude mcp add read-only-helper node server.js' };
+  const d = await decide(candidate, policy, { ...opts, runtimeConfig: { mode: 'standard' } });
+  assert.equal(d.verdict, VERDICT.REVIEW_MCP);
+  assert.equal(d.action, 'review');
+});
+
+test('standard mode still blocks dangerous unlisted MCP surfaces', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:shell-helper', version: 'latest', command: 'claude mcp add shell-helper --tools shell,execute' };
+  const d = await decide(candidate, policy, { ...opts, runtimeConfig: { mode: 'standard' } });
+  assert.equal(d.verdict, VERDICT.BLOCK_MCP);
+  assert.equal(d.action, 'block');
+});
+
+test('strict mode preserves unlisted MCP block behavior', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:not-approved', version: 'latest', command: 'claude mcp add not-approved' };
+  const d = await decide(candidate, policy, { ...opts, runtimeConfig: { mode: 'strict' } });
+  assert.equal(d.verdict, VERDICT.BLOCK_MCP);
+  assert.equal(d.action, 'block');
+});
+
 test('approved skill candidate is allowed from skills policy', async () => {
   const candidate = { type: 'skill', manager: 'skills', name: 'init', version: 'latest', command: 'npx skills add init' };
   const d = await decide(candidate, policy, opts);
@@ -162,11 +183,55 @@ test('approved skill candidate is allowed from skills policy', async () => {
   assert.equal(d.action, 'allow');
 });
 
+test('org overlay can disable a globally approved skill', async () => {
+  const candidate = { type: 'skill', manager: 'skills', name: 'dependency-gate', version: 'latest', command: 'npx skills add dependency-gate' };
+  const d = await decide(candidate, policy, {
+    ...opts,
+    runtimeConfig: {
+      mode: 'enterprise',
+      orgOverlay: { disableSkills: ['skill:dependency-gate'] },
+    },
+  });
+
+  assert.equal(d.verdict, VERDICT.BLOCK_SKILL);
+  assert.equal(d.action, 'block');
+  assert.equal(d.meta.reason, 'org-overlay-disabled-skill');
+});
+
+test('org overlay can disable a globally approved MCP', async () => {
+  const candidate = { type: 'mcp', manager: 'mcp', name: 'mcp:filesystem', version: 'latest', command: 'claude mcp add filesystem' };
+  const d = await decide(candidate, policy, {
+    ...opts,
+    runtimeConfig: {
+      mode: 'enterprise',
+      orgOverlay: { disableMcps: ['mcp:filesystem'] },
+    },
+  });
+
+  assert.equal(d.verdict, VERDICT.BLOCK_MCP);
+  assert.equal(d.action, 'block');
+  assert.equal(d.meta.reason, 'org-overlay-disabled-mcp');
+});
+
 test('unlisted skill candidate is blocked by default', async () => {
   const candidate = { type: 'skill', manager: 'skills', name: 'evil-skill', version: 'latest', command: 'npx skills add evil-skill' };
   const d = await decide(candidate, policy, opts);
   assert.equal(d.verdict, VERDICT.BLOCK_SKILL);
   assert.equal(d.action, 'block');
+});
+
+test('standard mode reviews unlisted skills instead of blocking', async () => {
+  const candidate = { type: 'skill', manager: 'skills', name: 'unknown-review-helper', version: 'latest', command: 'npx skills add unknown-review-helper' };
+  const d = await decide(candidate, policy, { ...opts, runtimeConfig: { mode: 'standard' } });
+  assert.equal(d.verdict, VERDICT.REVIEW_SKILL);
+  assert.equal(d.action, 'review');
+});
+
+test('monitor mode reviews native suggestions without blocking', async () => {
+  const candidate = { manager: 'npm', name: 'uuid', version: '9.0.0', command: 'npm install uuid' };
+  const d = await decide(candidate, policy, { ...opts, runtimeConfig: { mode: 'monitor' } });
+  assert.equal(d.verdict, VERDICT.ALLOW_NATIVE);
+  assert.equal(d.action, 'review');
 });
 
 test('Allowlist beats native', async () => {

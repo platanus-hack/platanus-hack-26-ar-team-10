@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const init = require('../scripts/init-command');
 const injectionScanner = require('../scripts/injection-scanner');
@@ -101,6 +102,18 @@ test('runInit rejects an empty profile list', () => {
 
   assert.equal(result.exitCode, 2);
   assert.equal(result.message.includes('at least one profile'), true);
+});
+
+test('yieldos-init writes human errors to stderr', () => {
+  const root = tmpProject();
+  const result = spawnSync(process.execPath, [path.join(PLUGIN_ROOT, 'scripts', 'init-command.js'), '--profile', ','], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 2);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /yieldOS init error/);
 });
 
 test('runInit keeps local scope Claude-only and previews the local target', () => {

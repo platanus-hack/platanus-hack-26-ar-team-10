@@ -210,6 +210,7 @@ Minimum shape:
 version: 0.1
 kind: yield.agent-pack
 name: company-safe-defaults
+orgOverlay: org-overlay.json
 profiles:
   - non-technical-safe
   - secrets-safe
@@ -217,9 +218,6 @@ profiles:
 agents:
   claude-code:
     enabled: true
-    outputs:
-      - AGENTS.md
-      - CLAUDE.md
 skills:
   allow:
     - key: skill:dependency-gate
@@ -250,11 +248,13 @@ evidence:
 Rules:
 
 - Pack entries must reference `policy/` keys or reviewed yieldOS playbooks.
+- `orgOverlay` is optional and restrict-only. It can disable globally allowed skills or MCPs, require profiles/playbooks/oracles, require pack lock/oracle checks, and add deny rules. It cannot override the global denylist or approve new skills/MCPs outside global policy.
 - Packs may generate `AGENTS.md`, `CLAUDE.md`, Cursor rules, GitHub Copilot instructions, Windsurf rules, skills, reports, and lockfiles.
 - Packs must not silently install unreviewed skills or MCPs.
 - Packs may declare approved oracles, but they do not execute them by themselves.
 - `oracles.include` must reference reviewed yieldOS oracle IDs only.
 - The pack lock records oracle IDs and registry version; it does not prove those oracles ran.
+- The pack lock also records `base_policy_manifest_sha256`, `org_overlay_sha256`, `effective_mode`, and `required_oracles` so org overlay drift invalidates active generated files.
 - Runtime enforcement strength must be explicit per target agent.
 - Generated outputs should be previewed before writing, tracked by a pack lock, and verified against that lock metadata plus file hashes when the files are active in the repo.
 - Vector retrieval can recommend pack entries, but reviewed manifest entries decide what becomes active.

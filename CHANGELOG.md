@@ -1,5 +1,12 @@
 # Changelog
 
+## yieldOS v0.15.0 - 2026-05-11
+
+- Add repo runtime config with `monitor`, `standard`, `strict`, and `enterprise` modes.
+- Make `standard` the default so low-risk unlisted skills and MCPs review instead of blocking.
+- Centralize quiet/pass/review/block CLI output and keep native Git hooks human-readable.
+- Add `yieldos-config`, `yieldos-doctor`, and restrict-only org overlay support for B2B packs.
+
 ## yieldOS v0.14.0 - 2026-05-10
 
 - Add native Git hook enforcement for Codex, shells, and other non-Claude hosts.

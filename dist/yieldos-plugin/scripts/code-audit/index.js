@@ -13,7 +13,12 @@ const { attachCdscArtifacts } = require('../oracles/cdsc/missing-auth-contract')
 
 const MAX_FIX_ITERATIONS = 3;
 const PATCHABLE_SEVERITIES = ['critical', 'high', 'medium'];
-const PUSH_BLOCKING_SEVERITIES = ['critical', 'high', 'medium'];
+const BLOCKING_BY_RUNTIME_MODE = {
+  monitor: ['critical'],
+  standard: ['critical', 'high'],
+  strict: ['critical', 'high', 'medium'],
+  enterprise: ['critical', 'high', 'medium'],
+};
 
 function isGitCommit(command) {
   return gitSubcommand(command) === 'commit';
@@ -210,13 +215,13 @@ function auditGitCommand(projectRoot, command, options = {}) {
   }
 
   if (mode === 'push') {
-    return attachCdscArtifacts(auditRoot, auditPush(auditRoot, input, agentOptions, agentMeta, auditRoot));
+    return attachCdscArtifacts(auditRoot, auditPush(auditRoot, input, agentOptions, agentMeta, auditRoot, options));
   }
 
   return attachCdscArtifacts(auditRoot, auditCommit(auditRoot, input, options, agentOptions, agentMeta, auditRoot));
 }
 
-function auditPush(projectRoot, input, agentOptions, agentMeta, auditRoot = projectRoot) {
+function auditPush(projectRoot, input, agentOptions, agentMeta, auditRoot = projectRoot, options = {}) {
   const findings = collectFindings(projectRoot, input, agentOptions, agentMeta);
   if (agentAuditFailed(agentMeta)) {
     return result('code-audit-verification-failed', 'block', 'push', input, findings, null, agentFailureMessage(agentMeta), null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
@@ -226,7 +231,7 @@ function auditPush(projectRoot, input, agentOptions, agentMeta, auditRoot = proj
   }
 
   const highest = highestSeverity(findings);
-  if (PUSH_BLOCKING_SEVERITIES.includes(highest)) {
+  if (blockingSeveritiesForRuntime(options.runtimeConfig).includes(highest)) {
     return result('code-audit-blocked', 'block', 'push', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code before push`, null, { maxIterations: 0, agent: agentMeta, projectRoot: auditRoot });
   }
 
@@ -274,7 +279,7 @@ function auditCommit(projectRoot, initialInput, options, agentOptions, agentMeta
   }
 
   const highest = highestSeverity(findings);
-  if (highest === 'critical' || highest === 'high') {
+  if (blockingSeveritiesForRuntime(options.runtimeConfig).includes(highest)) {
     return result('code-audit-blocked', 'block', 'commit', input, findings, null, `yieldOS code-audit blocked unresolved ${highest}-risk code`, null, { maxIterations, agent: agentMeta, projectRoot: auditRoot });
   }
 
@@ -327,6 +332,10 @@ function highestSeverity(findings) {
   return findings.reduce((highest, finding) => (
     order.indexOf(finding.severity) > order.indexOf(highest) ? finding.severity : highest
   ), 'info');
+}
+
+function blockingSeveritiesForRuntime(runtimeConfig = {}) {
+  return BLOCKING_BY_RUNTIME_MODE[runtimeConfig?.mode] || BLOCKING_BY_RUNTIME_MODE.standard;
 }
 
 function combinePatches(patches) {
@@ -424,6 +433,7 @@ module.exports = {
   resolveGitAuditProjectRoot,
   stripQuotedText,
   redTeam,
+  blockingSeveritiesForRuntime,
   MAX_FIX_ITERATIONS,
   writeAuditState,
   readAuditState,

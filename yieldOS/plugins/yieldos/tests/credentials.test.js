@@ -66,7 +66,7 @@ test('UserPromptSubmit detects credentials without decision:block and never echo
 
   assert.equal(result.code, 0);
   assert.equal(result.stderr.includes('[yieldOS:verdict] prompt-credentials-detected'), true);
-  assert.equal(result.stderr.includes('\x1b[31m'), true);
+  assert.equal(result.stderr.includes('\x1b[31m'), false);
   assert.equal(result.stdout.includes(key), false);
 
   const parsed = parseStdout(result);
@@ -365,7 +365,7 @@ test('PreToolUse blocks Read of .env without credentials authorization', () => {
 
   assert.equal(result.code, 2);
   assert.equal(result.stderr.includes('[yieldOS:verdict] credentials-read-blocked'), true);
-  assert.equal(result.stderr.includes('\x1b[31m'), true);
+  assert.equal(result.stderr.includes('\x1b[31m'), false);
 
   const parsed = parseStdout(result);
   const context = parsed.hookSpecificOutput.additionalContext;

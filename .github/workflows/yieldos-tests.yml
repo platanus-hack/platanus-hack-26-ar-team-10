@@ -101,7 +101,12 @@ jobs:
             cat /tmp/err.txt
             exit 1
           fi
-          grep -q 'allowlist-match' /tmp/err.txt || (echo "::error::allowlist-match verdict missing" && cat /tmp/err.txt && exit 1)
+          if [ -s /tmp/err.txt ]; then
+            echo "::error::allowlist success should stay quiet on stderr"
+            cat /tmp/err.txt
+            exit 1
+          fi
+          grep -q 'allowlist-match' /tmp/out.json || (echo "::error::allowlist-match hook verdict missing" && cat /tmp/out.json && exit 1)
       - name: Smoke test credentials read blocked (must exit 2)
         working-directory: yieldOS/plugins/yieldos
         run: |
