@@ -106,7 +106,7 @@ test('runInit rejects an empty profile list', () => {
 
 test('yieldos-init writes human errors to stderr', () => {
   const root = tmpProject();
-  const result = spawnSync(path.join(PLUGIN_ROOT, 'bin', 'yieldos-init'), ['--profile', ','], {
+  const result = spawnSync(process.execPath, [path.join(PLUGIN_ROOT, 'scripts', 'init-command.js'), '--profile', ','], {
     cwd: root,
     encoding: 'utf8',
   });

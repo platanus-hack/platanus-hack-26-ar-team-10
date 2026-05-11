@@ -10,6 +10,7 @@ const { execFileSync } = require('node:child_process');
 const doctor = require('../scripts/doctor-command');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
+const PLUGIN_VERSION = require('../.claude-plugin/plugin.json').version;
 
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-doctor-'));
@@ -35,7 +36,7 @@ test('doctor reports default mode, missing hooks, and absent pack lock', () => {
   const result = doctor.runDoctor(root, [], { pluginRoot: PLUGIN_ROOT, env: {} });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.message, /plugin version: 0\.14\.0/);
+  assert.match(result.message, new RegExp(`plugin version: ${PLUGIN_VERSION.replaceAll('.', '\\.')}`));
   assert.match(result.message, /global policy version: 0\.5\.0/);
   assert.match(result.message, /effective mode: standard/);
   assert.match(result.message, /org overlay: none/);

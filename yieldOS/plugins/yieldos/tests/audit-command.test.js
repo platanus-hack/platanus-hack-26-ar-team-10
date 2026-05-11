@@ -110,7 +110,7 @@ test('runAudit prints setup guidance when deepsec is missing', () => {
 
 test('yieldos-audit writes human errors to stderr', () => {
   const root = tmpProject();
-  const result = spawnSync(path.join(PLUGIN_ROOT, 'bin', 'yieldos-audit'), ['--not-real'], {
+  const result = spawnSync(process.execPath, [path.join(PLUGIN_ROOT, 'scripts', 'audit-command.js'), '--not-real'], {
     cwd: root,
     encoding: 'utf8',
   });

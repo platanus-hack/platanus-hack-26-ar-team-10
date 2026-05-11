@@ -111,7 +111,7 @@ skills:
 
 test('yieldos-pack writes human errors to stderr', () => {
   const root = tmpProject();
-  const result = spawnSync(path.join(PLUGIN_ROOT, 'bin', 'yieldos-pack'), ['unknown'], {
+  const result = spawnSync(process.execPath, [path.join(PLUGIN_ROOT, 'scripts', 'agent-pack-command.js'), 'unknown'], {
     cwd: root,
     encoding: 'utf8',
   });

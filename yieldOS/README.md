@@ -24,8 +24,8 @@ yieldOS makes trust decisions **before** risky work is accepted, against policy 
 
 ```bash
 # 1. Download and verify the pinned release installer
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.14.0/install.sh
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.14.0/checksums.txt
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.15.0/install.sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.15.0/checksums.txt
 shasum -a 256 -c checksums.txt --ignore-missing
 sh install.sh --dry-run
 sh install.sh

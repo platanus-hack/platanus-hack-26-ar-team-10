@@ -59,7 +59,7 @@ test('yieldos-config writes human validation errors to stderr', () => {
   const root = tmpProject();
   writeConfig(root, { version: 1, mode: 'off' });
 
-  const result = spawnSync(path.join(PLUGIN_ROOT, 'bin', 'yieldos-config'), ['validate'], {
+  const result = spawnSync(process.execPath, [path.join(PLUGIN_ROOT, 'scripts', 'config-command.js'), 'validate'], {
     cwd: root,
     encoding: 'utf8',
   });

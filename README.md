@@ -143,8 +143,8 @@ Walk-through detail and what each output line means: [`yieldOS/docs/22-oracle-de
 Enterprise install flow verifies release files before execution:
 
 ```bash
-curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.14.0/install.sh
-curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.14.0/checksums.txt
+curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.15.0/install.sh
+curl -fsSLO https://github.com/platanus-hack/platanus-hack-26-ar-team-10/releases/download/yieldos--v0.15.0/checksums.txt
 shasum -a 256 -c checksums.txt --ignore-missing
 sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10 --dry-run
 sh install.sh --source platanus-hack/platanus-hack-26-ar-team-10
