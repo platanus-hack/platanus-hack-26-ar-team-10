@@ -71,6 +71,7 @@ version: 0.1
 kind: yield.agent-pack
 name: company-safe-defaults
 description: Safe coding defaults for team agent work.
+orgOverlay: org-overlay.json
 
 profiles:
   - non-technical-safe
@@ -120,6 +121,8 @@ evidence:
 
 The pack references policy entries instead of redefining policy. This keeps `policy/` as the deterministic authority and keeps the pack as the deployment surface.
 
+`orgOverlay` is optional and restrict-only. It can require profiles, playbooks, pack lock verification, and oracle checks; disable globally allowed skills or MCPs; and add org or repo deny rules. It cannot override the global denylist or approve new skills or MCPs outside global policy.
+
 ## Pack Lock
 
 Every generated pack should produce a lockfile:
@@ -130,6 +133,10 @@ Every generated pack should produce a lockfile:
   "pack": "company-safe-defaults",
   "generated_at": "2026-05-09T00:00:00Z",
   "policy_version": "0.4.0",
+  "base_policy_manifest_sha256": "sha256:...",
+  "org_overlay_sha256": "sha256:...",
+  "effective_mode": "enterprise",
+  "required_oracles": ["agent-pack-lock"],
   "profiles": ["secrets-safe", "dependency-safe", "code-audit", "git-safe"],
   "skills": [
     {
