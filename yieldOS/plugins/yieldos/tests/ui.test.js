@@ -12,7 +12,7 @@ test('formatDecision keeps plain hook output when color is disabled', () => {
     message: 'yieldOS bloqueó event-stream: malicious package',
   }, { color: false });
 
-  assert.equal(out, '[yieldOS] BLOCK bloqueó event-stream: malicious package');
+  assert.equal(out, '[yieldOS] BLOCKED bloqueó event-stream: malicious package');
 });
 
 test('formatDecision adds ansi color only when color is enabled', () => {
