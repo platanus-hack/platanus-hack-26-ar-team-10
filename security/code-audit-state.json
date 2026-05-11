@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "mode": "commit",
-  "diff_source": "staged",
+  "mode": "push",
+  "diff_source": "merge-base",
   "diff_hash": "sha256:6f62a9450abbc712aa170f97910f62edfe5762f189321385d8e44e855c444b43",
-  "range": "--cached",
+  "range": "55398da819c767b04ab5cf07a40ca31a816f813c..HEAD",
   "files": [
     ".claude-plugin/marketplace.json",
     ".github/workflows/yieldos-tests.yml",
@@ -25,7 +25,7 @@
   ],
   "verdict": "code-audit-clean",
   "action": "allow",
-  "max_iterations": 3,
+  "max_iterations": 0,
   "iterations": 0,
   "agent_mode": "deterministic",
   "agent_provider": "auto",
