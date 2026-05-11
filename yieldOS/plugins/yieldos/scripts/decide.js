@@ -12,8 +12,10 @@ const VERDICT = {
   BLOCK_DENYLIST: 'denylist-match',
   ALLOW_SKILL: 'skill-approved',
   BLOCK_SKILL: 'skill-blocked',
+  REVIEW_SKILL: 'skill-review',
   ALLOW_MCP: 'mcp-approved',
   BLOCK_MCP: 'mcp-blocked',
+  REVIEW_MCP: 'mcp-review',
   BLOCK_CATEGORY_D: 'category-d-blocked',
   REWRITE_CATEGORY_A: 'category-a-rewrite',
   ALLOW_VERIFIED: 'verification-passed',
@@ -73,11 +75,11 @@ async function versionExistsOnRegistry(candidate, timeoutMs = 4000) {
 
 async function decide(candidate, policy, opts = {}) {
   if (candidate.type === 'skill' || candidate.manager === 'skills') {
-    return decideSkill(candidate, policy['skills.json']);
+    return decideSkill(candidate, policy['skills.json'], opts);
   }
 
   if (candidate.type === 'mcp' || candidate.manager === 'mcp') {
-    return decideMcp(candidate, policy['mcps.json']);
+    return decideMcp(candidate, policy['mcps.json'], opts);
   }
 
   const denyEntry = lookup.isDenylisted(candidate, policy['denylist.json']);
@@ -92,9 +94,10 @@ async function decide(candidate, policy, opts = {}) {
 
   const native = lookup.nativeEquivalent(candidate, policy['native-equivalents.json']);
   if (native) {
+    const action = isStrictRuntime(opts) ? 'block-with-suggestion' : 'review';
     return {
       verdict: VERDICT.ALLOW_NATIVE,
-      action: 'block-with-suggestion',
+      action,
       message: `yieldOS sustituyó ${candidate.name} por API nativa: ${native.native}`,
       meta: { native },
     };
@@ -187,6 +190,14 @@ async function decide(candidate, policy, opts = {}) {
         meta: { ...analysis, build_script_approved: true },
       };
     }
+    if (!isStrictRuntime(opts)) {
+      return {
+        verdict: VERDICT.BLOCK_BUILD_SCRIPT,
+        action: 'review',
+        message: `yieldOS detectó build scripts en ${candidate.name}; requiere revisión`,
+        meta: analysis,
+      };
+    }
     return {
       verdict: VERDICT.BLOCK_BUILD_SCRIPT,
       action: 'block',
@@ -196,6 +207,14 @@ async function decide(candidate, policy, opts = {}) {
   }
 
   if (analysis.tier === 'tier3') {
+    if (isStrictRuntime(opts)) {
+      return {
+        verdict: VERDICT.BLOCK_VERIFICATION,
+        action: 'block',
+        message: `yieldOS bloqueó ${candidate.name}: señales de revisión en modo strict`,
+        meta: analysis,
+      };
+    }
     return {
       verdict: VERDICT.ALLOW_VERIFIED,
       action: 'allow',
@@ -212,9 +231,27 @@ async function decide(candidate, policy, opts = {}) {
   };
 }
 
-function decideSkill(candidate, skillPolicy = {}) {
+function decideSkill(candidate, skillPolicy = {}, opts = {}) {
+  const disabled = overlayDisabledSkill(candidate, opts);
+  if (disabled) {
+    return {
+      verdict: VERDICT.BLOCK_SKILL,
+      action: 'block',
+      message: `yieldOS bloqueó ${candidate.name}: org overlay deshabilita ${disabled}`,
+      meta: { reason: 'org-overlay-disabled-skill', disabled },
+    };
+  }
+
   const entry = findSkillEntry(candidate, skillPolicy);
   if (!entry) {
+    if (!isStrictRuntime(opts)) {
+      return {
+        verdict: VERDICT.REVIEW_SKILL,
+        action: 'review',
+        message: `yieldOS requiere revisión para ${candidate.name}: skill no aprobada en policy/skills.json`,
+        meta: { reason: 'skill-unlisted' },
+      };
+    }
     return {
       verdict: VERDICT.BLOCK_SKILL,
       action: 'block',
@@ -242,9 +279,27 @@ function findSkillEntry(candidate, skillPolicy = {}) {
   return skillPolicy.entries.find((entry) => entry.key === key || entry.key?.startsWith(`${key}@`)) || null;
 }
 
-function decideMcp(candidate, mcpPolicy = {}) {
+function decideMcp(candidate, mcpPolicy = {}, opts = {}) {
+  const disabled = overlayDisabledMcp(candidate, opts);
+  if (disabled) {
+    return {
+      verdict: VERDICT.BLOCK_MCP,
+      action: 'block',
+      message: `yieldOS bloqueó ${candidate.name}: org overlay deshabilita ${disabled}`,
+      meta: { reason: 'org-overlay-disabled-mcp', disabled },
+    };
+  }
+
   const entry = findMcpEntry(candidate, mcpPolicy);
   if (!entry) {
+    if (!isStrictRuntime(opts) && !candidateHasDangerousMcpSurface(candidate)) {
+      return {
+        verdict: VERDICT.REVIEW_MCP,
+        action: 'review',
+        message: `yieldOS requiere revisión para ${candidate.name}: MCP no aprobado en policy/mcps.json`,
+        meta: { reason: 'mcp-unlisted' },
+      };
+    }
     return {
       verdict: VERDICT.BLOCK_MCP,
       action: 'block',
@@ -263,6 +318,17 @@ function decideMcp(candidate, mcpPolicy = {}) {
   }
 
   if (!entry.allow_direct_add) {
+    if (!isStrictRuntime(opts) && !entryHasDangerousMcpSurface(entry)) {
+      return {
+        verdict: VERDICT.REVIEW_MCP,
+        action: 'review',
+        message: `yieldOS requiere revisión para ${candidate.name}: MCP debe validarse vía yieldos-pack`,
+        meta: {
+          reason: 'mcp-direct-add-requires-tool-surface-verification',
+          scope: entry.scope || 'unknown',
+        },
+      };
+    }
     return {
       verdict: VERDICT.BLOCK_MCP,
       action: 'block',
@@ -302,6 +368,43 @@ function normalizeMetadataForEval(metadata, candidate) {
     return metadata.versions[metadata['dist-tags'].latest];
   }
   return metadata;
+}
+
+function runtimeMode(opts = {}) {
+  return opts.runtimeConfig?.mode || 'strict';
+}
+
+function isStrictRuntime(opts = {}) {
+  const mode = runtimeMode(opts);
+  return mode === 'strict' || mode === 'enterprise';
+}
+
+function overlayDisabledSkill(candidate = {}, opts = {}) {
+  const key = policyKey(candidate.name, 'skill');
+  const disabled = opts.runtimeConfig?.orgOverlay?.disableSkills || [];
+  return disabled.includes(key) ? key : null;
+}
+
+function overlayDisabledMcp(candidate = {}, opts = {}) {
+  const key = policyKey(candidate.name, 'mcp');
+  const disabled = opts.runtimeConfig?.orgOverlay?.disableMcps || [];
+  return disabled.includes(key) ? key : null;
+}
+
+function policyKey(name, prefix) {
+  const raw = String(name || '').trim();
+  return raw.startsWith(`${prefix}:`) ? raw : `${prefix}:${raw}`;
+}
+
+function candidateHasDangerousMcpSurface(candidate = {}) {
+  const text = [candidate.name, candidate.command, candidate.source].filter(Boolean).join(' ').toLowerCase();
+  return /\b(?:write|delete|move|shell|exec|execute|bash|terminal|credential|secret|browser|chrome|navigate|database-write|db-write|deploy|deployment|push)\b/.test(text);
+}
+
+function entryHasDangerousMcpSurface(entry = {}) {
+  if (entry.scope && /write|browser|network|db|deploy|shell/.test(String(entry.scope).toLowerCase())) return true;
+  const tools = [...(entry.approved_tools || []), ...(entry.denied_tools || [])].join(' ').toLowerCase();
+  return /\b(?:write|delete|move|shell|exec|execute|browser|navigate|query|mutation|deploy|push)\b/.test(tools);
 }
 
 module.exports = { decide, VERDICT, hasConcreteRegistryVersion, versionExistsOnRegistry, decideSkill, decideMcp };

@@ -9,6 +9,7 @@ const credentialReadGate = require('./gates/credential-read-gate');
 const instructionFileGate = require('./gates/instruction-file-gate');
 const dependencyCommandGate = require('./gates/dependency-command-gate');
 const codeAuditGate = require('./gates/code-audit-gate');
+const runtimeConfig = require('./runtime-config');
 
 function readStdinSync() {
   try {
@@ -45,8 +46,10 @@ const STAMP_BY_VERDICT = {
   'build-script-not-approved': shieldBlock('-', 'Bloqueado · build script no aprobado'),
   'skill-approved': shieldBlock('+', 'Validado · skill aprobada'),
   'skill-blocked': shieldBlock('-', 'Bloqueado · skill no aprobada'),
+  'skill-review': shieldBlock('!', 'Revisión · skill no aprobada'),
   'mcp-approved': shieldBlock('+', 'Validado · MCP aprobado'),
   'mcp-blocked': shieldBlock('-', 'Bloqueado · MCP no aprobado'),
+  'mcp-review': shieldBlock('!', 'Revisión · MCP no aprobado'),
   'native-suggest': shieldBlock('!', 'Sugerencia · usar API nativa'),
   'category-a-rewrite': shieldBlock('+', 'Optimizado · rewrite local'),
   'injection-blocked': shieldBlock('-', 'Bloqueado · inyección detectada'),
@@ -76,6 +79,8 @@ const VERDICT_PRIORITY = [
   'category-a-rewrite',
   'code-audit-warning',
   'native-suggest',
+  'skill-review',
+  'mcp-review',
   'credentials-read-authorized',
   'skill-approved',
   'mcp-approved',
@@ -219,14 +224,24 @@ async function main() {
   const projectRoot = projectCwd(input);
   const tool = input.tool_name;
   const ti = input.tool_input || {};
+  const resolvedRuntimeConfig = runtimeConfig.resolveRuntimeConfig(projectRoot);
+  for (const warning of resolvedRuntimeConfig.warnings) {
+    ui.writeMessage(`runtime config warning: ${warning}`);
+  }
 
-  await selfDefenseGate.handleSelfDefense(input, projectRoot, { emitDecision });
+  await selfDefenseGate.handleSelfDefense(input, projectRoot, {
+    emitDecision,
+    runtimeConfig: resolvedRuntimeConfig.config,
+  });
   if (await credentialReadGate.handleCredentialsRead(input, projectRoot, {
     stampByVerdict: STAMP_BY_VERDICT,
   })) return;
 
   if (tool === 'Bash') {
-    codeAuditGate.handleCodeAuditCommand(projectRoot, ti.command || '', { emitHookOutput });
+    codeAuditGate.handleCodeAuditCommand(projectRoot, ti.command || '', {
+      emitHookOutput,
+      runtimeConfig: resolvedRuntimeConfig.config,
+    });
   }
 
   const { candidates } = classifyRelevantToolCall(tool, ti);
@@ -242,7 +257,9 @@ async function main() {
   });
   if (handled) return;
 
-  const { anyBlocked, interventions } = await dependencyCommandGate.processCandidates(candidates, projectRoot, policy);
+  const { anyBlocked, interventions } = await dependencyCommandGate.processCandidates(candidates, projectRoot, policy, {
+    runtimeConfig: resolvedRuntimeConfig.config,
+  });
   emitHookOutput(interventions);
   process.exit(anyBlocked ? 2 : 0);
 }

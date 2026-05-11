@@ -1308,6 +1308,47 @@ test('code audit resolves git -C target before collecting staged diff', () => {
   assert.equal(result.findings.some((finding) => finding.ruleId === 'hardcoded-secret'), true);
 });
 
+test('standard code audit allows medium commit findings as warnings', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'server.js'), 'app.get("/x", (req, res) => res.status(500).json({ error: err.message }));\n');
+  sh(root, ['add', 'server.js']);
+
+  const result = codeAudit.auditGitCommand(root, 'git commit -m audit-test', {
+    runtimeConfig: { mode: 'standard' },
+  });
+
+  assert.equal(result.verdict, 'code-audit-warning');
+  assert.equal(result.action, 'allow');
+});
+
+test('strict code audit blocks medium commit findings', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'server.js'), 'app.get("/x", (req, res) => res.status(500).json({ error: err.message }));\n');
+  sh(root, ['add', 'server.js']);
+
+  const result = codeAudit.auditGitCommand(root, 'git commit -m audit-test', {
+    runtimeConfig: { mode: 'strict' },
+  });
+
+  assert.equal(result.verdict, 'code-audit-blocked');
+  assert.equal(result.action, 'block');
+  assert.equal(result.findings.some((finding) => finding.severity === 'medium'), true);
+});
+
+test('monitor code audit still blocks critical commit findings', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'config.js'), 'module.exports = { apiKey: "sk-test-12345678901234567890" };\n');
+  sh(root, ['add', 'config.js']);
+
+  const result = codeAudit.auditGitCommand(root, 'git commit -m audit-test', {
+    runtimeConfig: { mode: 'monitor' },
+  });
+
+  assert.equal(result.verdict, 'code-audit-blocked');
+  assert.equal(result.action, 'block');
+  assert.equal(result.findings.some((finding) => finding.severity === 'critical'), true);
+});
+
 test('pre-install hook writes audit state in git -C target repo', () => {
   const outer = tmpRepo();
   const inner = tmpRepo();
