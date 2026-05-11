@@ -284,7 +284,8 @@ function main() {
       process.stdout.write(`${message}\n`);
     },
   });
-  process.stdout.write(`${result.message}\n`);
+  const stream = result.exitCode === 0 ? process.stdout : process.stderr;
+  stream.write(`${result.message}\n`);
   process.exit(result.exitCode);
 }
 

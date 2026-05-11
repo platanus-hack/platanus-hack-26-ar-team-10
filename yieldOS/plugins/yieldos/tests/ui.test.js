@@ -41,6 +41,26 @@ test('formatDecision labels dependency rewrites as rewrites', () => {
   assert.equal(out, '[yieldOS] REWRITE realizó una optimización de la instalación de classnames');
 });
 
+test('formatDecision labels review actions as review', () => {
+  const out = ui.formatDecision({
+    verdict: 'skill-review',
+    action: 'review',
+    message: 'yieldOS requiere revisión para unknown-skill',
+  }, { color: false });
+
+  assert.equal(out, '[yieldOS] REVIEW requiere revisión para unknown-skill');
+});
+
+test('formatDecision labels explicit code-audit success as passed', () => {
+  const out = ui.formatDecision({
+    verdict: 'code-audit-clean',
+    action: 'allow',
+    message: 'yieldOS code-audit: clean',
+  }, { color: false });
+
+  assert.equal(out, '[yieldOS] PASSED code-audit: clean');
+});
+
 test('formatAuditFindings shows a small bounded finding summary', () => {
   const out = ui.formatAuditFindings({
     findings: [

@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+const { execFileSync, spawnSync } = require('node:child_process');
 
 const audit = require('../scripts/audit-command');
 
@@ -106,6 +106,18 @@ test('runAudit prints setup guidance when deepsec is missing', () => {
   assert.equal(result.exitCode, 2);
   assert.equal(result.message.includes('yieldOS audit needs Deepsec setup'), true);
   assert.equal(result.message.includes('npx deepsec init'), true);
+});
+
+test('yieldos-audit writes human errors to stderr', () => {
+  const root = tmpProject();
+  const result = spawnSync(path.join(PLUGIN_ROOT, 'bin', 'yieldos-audit'), ['--not-real'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 2);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /yieldOS audit error/);
 });
 
 test('findDeepsec ignores repo-local Deepsec unless explicitly trusted', () => {

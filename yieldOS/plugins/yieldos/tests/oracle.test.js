@@ -189,6 +189,20 @@ test('yieldos-oracle list command is registered and executable', async () => {
   }
 });
 
+test('yieldos-oracle --json writes failed results to stdout', () => {
+  const root = tmpRepo();
+  const bin = path.join(PLUGIN_ROOT, 'bin', 'yieldos-oracle');
+  const spawned = process.platform === 'win32'
+    ? spawnSync('sh', [bin, 'run', 'code-audit-state', '--mode', 'commit', '--json'], { cwd: root, encoding: 'utf8' })
+    : spawnSync(bin, ['run', 'code-audit-state', '--mode', 'commit', '--json'], { cwd: root, encoding: 'utf8' });
+
+  assert.equal(spawned.status, 2);
+  assert.equal(spawned.stderr, '');
+  const parsed = JSON.parse(spawned.stdout);
+  assert.equal(parsed.status, 'unknown');
+  assert.equal(parsed.blocking_reason, 'state-missing');
+});
+
 test('oracle contract catalog covers current red-team rules and researched standards', () => {
   const catalog = oracleTemplates.listTemplates();
   const ids = new Set(catalog.map((item) => item.id));
@@ -334,6 +348,44 @@ test('agent-pack oracle passes checked files and fails tampered generated files'
   assert.equal(ok.evidence.some((item) => item.type === 'generated-file-count'), true);
   assert.equal(tampered.status, 'fail');
   assert.equal(tampered.blocking_reason, 'agent-pack-verification-failed');
+});
+
+test('agent-pack oracle fails when org overlay hash changes', () => {
+  const root = tmpProject();
+  writeJson(path.join(root, 'org-overlay.json'), {
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    requireOracles: ['agent-pack-lock'],
+  });
+  fs.writeFileSync(path.join(root, 'yield.agent-pack.yaml'), `
+version: 0.1
+kind: yield.agent-pack
+name: oracle-org-pack
+orgOverlay: org-overlay.json
+profiles:
+  - secrets-safe
+agents:
+  claude-code:
+    enabled: true
+oracles:
+  include:
+    - agent-pack-lock
+`);
+  const write = agentPack.runPack(root, ['write', '--pack', 'yield.agent-pack.yaml']);
+  writeJson(path.join(root, 'org-overlay.json'), {
+    version: 1,
+    kind: 'yieldos.org-overlay',
+    minimumMode: 'enterprise',
+    requireOracles: ['agent-pack-lock'],
+    denyRules: [{ match: 'scripts/legacy/**' }],
+  });
+
+  const oracle = agentPackOracle.run(root, { packPath: 'yield.agent-pack.yaml' });
+
+  assert.equal(write.exitCode, 0);
+  assert.equal(oracle.status, 'fail');
+  assert.equal(oracle.blocking_reason, 'agent-pack-verification-failed');
 });
 
 test('code-audit-state oracle maps verified, stale, missing, and blocking findings', () => {
