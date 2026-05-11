@@ -24,7 +24,8 @@ This directory captures every design decision behind yieldOS, why it exists, and
 18. [Oracle demo script](22-oracle-demo-script.md) — *visible demo flow for non-technical viewers*
 19. [Oracle evals](23-oracle-evals.md) — *cost, flake, and deterministic-resolution metrics*
 20. [Oracle contract catalog](25-oracle-contract-catalog.md) — *research-backed oracle cases for validation and benchmarks*
-21. [Enterprise boundaries](enterprise-boundaries.md) — *current enforcement levels, data flows, and claim rules*
+21. [Runtime config](24-runtime-config.md) — *standard default mode, strictness levels, and org overlays*
+22. [Enterprise boundaries](enterprise-boundaries.md) — *current enforcement levels, data flows, and claim rules*
 
 ## Planning docs (not yet implemented)
 

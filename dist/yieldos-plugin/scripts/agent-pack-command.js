@@ -15,11 +15,13 @@ const {
 const { parseManifest } = require('./agent-pack-yaml');
 const { knownOracleIds } = require('./oracles/registry');
 const policyFetcher = require('./policy-fetcher');
+const runtimeConfig = require('./runtime-config');
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
+const DEFAULTS = require(path.join(PLUGIN_ROOT, 'config', 'defaults.json'));
 const VALID_ACTIONS = new Set(['preview', 'write', 'verify']);
 const VALID_TARGETS = new Set(['claude-code', 'codex', 'cursor', 'github-copilot', 'windsurf', 'universal']);
-const PACK_FIELDS = new Set(['version', 'kind', 'name', 'description', 'profiles', 'agents', 'skills', 'mcps', 'playbooks', 'oracles', 'evidence']);
+const PACK_FIELDS = new Set(['version', 'kind', 'name', 'description', 'orgOverlay', 'profiles', 'agents', 'skills', 'mcps', 'playbooks', 'oracles', 'evidence']);
 const AGENT_FIELDS = new Set(['enabled']);
 const SKILLS_FIELDS = new Set(['allow']);
 const SKILL_ITEM_FIELDS = new Set(['key', 'source']);
@@ -106,7 +108,8 @@ function compilePack(projectRoot, packPath, options = {}) {
   const absolutePackPath = safeProjectPath(projectRoot, packPath, 'pack path');
   const pack = parseManifest(fs.readFileSync(absolutePackPath, 'utf8'));
   const policy = loadPolicy(projectRoot, options);
-  const validation = validatePack(pack, policy);
+  const orgOverlay = loadPackOrgOverlay(projectRoot, pack.orgOverlay);
+  const validation = validatePack(pack, policy, orgOverlay);
   const instructionFiles = renderInstructionFiles(pack, validation);
   const adapterFiles = renderAdapterFiles(pack, validation);
   const generatedFiles = [...instructionFiles, ...adapterFiles];
@@ -158,7 +161,7 @@ function loadVerifiedPolicyBundle(projectRoot, options = {}) {
   throw new Error('verified policy bundle not found');
 }
 
-function validatePack(pack, policy) {
+function validatePack(pack, policy, orgOverlay = null) {
   if (!pack || typeof pack !== 'object' || Array.isArray(pack)) throw new Error('pack must be an object');
   assertSupportedPackFields(pack);
   if (pack.kind !== 'yield.agent-pack') throw new Error('kind must be yield.agent-pack');
@@ -176,7 +179,7 @@ function validatePack(pack, policy) {
     .filter((agent) => TARGET_STRENGTH[agent] === 'guidance-only')
     .map((agent) => `${agent} output is guidance-only; runtime enforcement depends on that host.`);
 
-  return {
+  const validation = {
     profiles,
     agents,
     skills,
@@ -185,7 +188,56 @@ function validatePack(pack, policy) {
     oracles,
     warnings,
     policyVersion: policy.skills.version || policy.mcps.version || 'unknown',
+    basePolicyManifestSha256: policy.basePolicyManifestSha256 || DEFAULTS.policy.manifest_sha256 || null,
+    orgOverlay: null,
+    orgOverlaySha256: null,
+    effectiveMode: 'standard',
+    requiredOracles: [],
   };
+  return applyOrgOverlay(validation, orgOverlay);
+}
+
+function loadPackOrgOverlay(projectRoot, orgOverlay) {
+  if (orgOverlay == null) return null;
+  const validation = runtimeConfig.validateRuntimeConfig({
+    version: 1,
+    mode: 'standard',
+    orgOverlay,
+  }, { projectRoot });
+  if (!validation.ok) throw new Error(validation.errors.join('; '));
+  return validation.config.orgOverlay;
+}
+
+function applyOrgOverlay(validation, overlay) {
+  if (!overlay) return validation;
+
+  requireIncluded(validation.profiles, overlay.requireProfiles, 'profile');
+  requireIncluded(validation.playbooks, overlay.requirePlaybooks, 'playbook');
+  requireIncluded(validation.oracles, overlay.requireOracles, 'oracle');
+  assertNoDisabled(validation.skills.map((skill) => skill.key), overlay.disableSkills, 'skill');
+  assertNoDisabled(validation.mcps.map((mcp) => mcp.key), overlay.disableMcps, 'MCP');
+
+  return {
+    ...validation,
+    orgOverlay: overlay,
+    orgOverlaySha256: overlay.sha256 || sha256(JSON.stringify(overlay)),
+    effectiveMode: runtimeConfig.maxMode('standard', overlay.minimumMode),
+    requiredOracles: overlay.requireOracles || [],
+  };
+}
+
+function requireIncluded(actual, required = [], label) {
+  const actualSet = new Set(actual);
+  for (const item of required || []) {
+    if (!actualSet.has(item)) throw new Error(`org overlay requires ${label}: ${item}`);
+  }
+}
+
+function assertNoDisabled(actual, disabled = [], label) {
+  const actualSet = new Set(actual);
+  for (const item of disabled || []) {
+    if (actualSet.has(item)) throw new Error(`org overlay disables ${label}: ${item}`);
+  }
 }
 
 function assertSupportedPackFields(pack) {
@@ -537,6 +589,10 @@ function renderReport(pack, validation, files) {
     '## Approved Oracles',
     ...(validation.oracles.length ? validation.oracles.map((oracle) => `- ${oracle}`) : ['- none']),
     '',
+    '## Runtime Policy',
+    `- Effective mode: ${validation.effectiveMode}`,
+    `- Org overlay: ${validation.orgOverlaySha256 || 'none'}`,
+    '',
     'This pack declares approved oracles. Run yieldos-oracle or CI to execute them.',
     '',
     '## Generated Files',
@@ -554,6 +610,10 @@ function renderLock(pack, validation, files) {
     pack: pack.name,
     generated_at: new Date().toISOString(),
     policy_version: validation.policyVersion,
+    base_policy_manifest_sha256: validation.basePolicyManifestSha256,
+    org_overlay_sha256: validation.orgOverlaySha256,
+    effective_mode: validation.effectiveMode,
+    required_oracles: validation.requiredOracles,
     profiles: validation.profiles,
     agents: validation.agents.map((agent) => ({ name: agent, enforcement: TARGET_STRENGTH[agent] })),
     skills: validation.skills.map((skill) => {
@@ -623,6 +683,10 @@ function lockMetadata(lock) {
     version: lock.version ?? null,
     pack: lock.pack ?? null,
     policy_version: lock.policy_version ?? null,
+    base_policy_manifest_sha256: lock.base_policy_manifest_sha256 ?? null,
+    org_overlay_sha256: lock.org_overlay_sha256 ?? null,
+    effective_mode: lock.effective_mode ?? null,
+    required_oracles: Array.isArray(lock.required_oracles) ? lock.required_oracles : null,
     profiles: Array.isArray(lock.profiles) ? lock.profiles : null,
     agents: Array.isArray(lock.agents) ? lock.agents : null,
     skills: Array.isArray(lock.skills) ? lock.skills : null,
@@ -735,7 +799,8 @@ function usage() {
 
 function main() {
   const result = runPack(process.cwd());
-  process.stdout.write(`${result.message}\n`);
+  const stream = result.exitCode === 0 ? process.stdout : process.stderr;
+  stream.write(`${result.message}\n`);
   process.exit(result.exitCode);
 }
 

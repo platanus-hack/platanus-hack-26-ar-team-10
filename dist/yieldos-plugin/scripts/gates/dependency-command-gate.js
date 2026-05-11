@@ -11,7 +11,7 @@ function getDecide() {
   return require('../decide').decide;
 }
 
-async function processCandidates(candidates, projectRoot, policy) {
+async function processCandidates(candidates, projectRoot, policy, options = {}) {
   let anyBlocked = false;
   const interventions = [];
   const decide = getDecide();
@@ -22,6 +22,7 @@ async function processCandidates(candidates, projectRoot, policy) {
       minAgeDays: DEFAULTS.audit.transitive_min_age_days,
       osv: true,
       ttlSeconds: DEFAULTS.audit.osv_cache_ttl_seconds,
+      runtimeConfig: options.runtimeConfig,
     });
 
     interventions.push({ candidate, decision });
@@ -30,9 +31,9 @@ async function processCandidates(candidates, projectRoot, policy) {
       case 'allow':
         if (decision.verdict === 'allowlist-match') logger.logAllowed(projectRoot, candidate);
         else logger.logVerified(projectRoot, candidate, decision.meta?.findings || []);
-        // Always emit machine-readable verdict so downstream tools can identify
-        // what happened, even when the human-facing message is intentionally silent.
-        ui.writeDecision(decision);
+        if (options.runtimeConfig?.ui?.verbosity === 'verbose') {
+          ui.writeDecision(decision);
+        }
         break;
 
       case 'block-with-suggestion':
@@ -62,6 +63,21 @@ async function processCandidates(candidates, projectRoot, policy) {
         anyBlocked = true;
         break;
       }
+
+      case 'review':
+        logger.appendEntry(projectRoot, 'Review Required', {
+          Type: candidate.type,
+          Name: candidate.name,
+          Version: candidate.version,
+          Source: candidate.source,
+          'Requested by': candidate.requested_by || 'agent',
+          Command: candidate.command,
+          Verdict: decision.verdict,
+          Reason: decision.message,
+          Mode: options.runtimeConfig?.mode || 'standard',
+        });
+        ui.writeDecision({ ...decision, message: decision.message || 'review required' });
+        break;
     }
   }
   return { anyBlocked, interventions };

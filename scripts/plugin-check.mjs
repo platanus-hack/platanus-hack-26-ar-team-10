@@ -118,6 +118,8 @@ for (const relativePath of [
   'policy/manifest.json',
   'yieldOS/plugins/yieldos/hooks/hooks.json',
   'yieldOS/plugins/yieldos/commands/audit.md',
+  'yieldOS/plugins/yieldos/commands/config.md',
+  'yieldOS/plugins/yieldos/commands/doctor.md',
   'yieldOS/plugins/yieldos/commands/init.md',
   'yieldOS/plugins/yieldos/commands/oracle.md',
   'yieldOS/plugins/yieldos/commands/oracle-demo.md',
@@ -125,6 +127,8 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/commands/pentest.md',
   'yieldOS/plugins/yieldos/commands/update.md',
   'yieldOS/plugins/yieldos/bin/yieldos-audit',
+  'yieldOS/plugins/yieldos/bin/yieldos-config',
+  'yieldOS/plugins/yieldos/bin/yieldos-doctor',
   'yieldOS/plugins/yieldos/bin/yieldos-init',
   'yieldOS/plugins/yieldos/bin/yieldos-oracle',
   'yieldOS/plugins/yieldos/bin/yieldos-oracle-demo',
@@ -136,12 +140,15 @@ for (const relativePath of [
   'yieldOS/plugins/yieldos/scripts/agent-pack-command.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-playbooks.js',
   'yieldOS/plugins/yieldos/scripts/agent-pack-yaml.js',
+  'yieldOS/plugins/yieldos/scripts/config-command.js',
+  'yieldOS/plugins/yieldos/scripts/doctor-command.js',
   'yieldOS/plugins/yieldos/scripts/audit-event-checkpoint.js',
   'yieldOS/plugins/yieldos/scripts/audit-events.js',
   'yieldOS/plugins/yieldos/scripts/oracle-command.js',
   'yieldOS/plugins/yieldos/scripts/oracles/demo-command.js',
   'yieldOS/plugins/yieldos/scripts/init-command.js',
   'yieldOS/plugins/yieldos/scripts/init-profiles.js',
+  'yieldOS/plugins/yieldos/scripts/runtime-config.js',
   'yieldOS/plugins/yieldos/scripts/pre-install-gate.js',
   'yieldOS/plugins/yieldos/scripts/policy-manifest.js',
   'yieldOS/plugins/yieldos/scripts/post-install-audit.js',
@@ -189,6 +196,8 @@ for (const file of policyFiles) {
 
 assertExecutable('install.sh');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-audit');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-config');
+assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-doctor');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-init');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-oracle');
 assertExecutable('yieldOS/plugins/yieldos/bin/yieldos-oracle-demo');
@@ -204,11 +213,16 @@ try {
   for (const relativePath of [
     '.claude-plugin/plugin.json',
     'commands/audit.md',
+    'commands/config.md',
+    'commands/doctor.md',
     'commands/oracle.md',
     'hooks/hooks.json',
     'policy-cache/allowlist.json',
     'policy-cache/manifest.json',
     'scripts/policy-manifest.js',
+    'scripts/runtime-config.js',
+    'scripts/config-command.js',
+    'scripts/doctor-command.js',
     'scripts/pre-install-gate.js',
     'scripts/audit-event-checkpoint.js',
     'scripts/audit-events.js',

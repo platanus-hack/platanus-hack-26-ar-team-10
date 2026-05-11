@@ -13,6 +13,7 @@ function handleCodeAuditCommand(projectRoot, command, options = {}) {
   try {
     audit = codeAudit.auditGitCommand(projectRoot, command, {
       agent: codeAudit.agentOptionsFromEnv(process.env),
+      runtimeConfig: options.runtimeConfig,
     });
   } catch (err) {
     audit = {

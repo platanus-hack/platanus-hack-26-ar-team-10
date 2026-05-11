@@ -163,6 +163,8 @@ For supported adapters, data flows, and claim boundaries, see [`yieldOS/docs/ent
 | Command | What it does | Detail |
 | --- | --- | --- |
 | `/yieldos:audit` | On-demand changed-code source review (Deepsec PR mode by default; `--staged`, `--working`, `--base <ref>`, `--full` available). | [`docs/13-audit-command.md`](./yieldOS/docs/13-audit-command.md) |
+| `/yieldos:config` | Initialize, show, or validate `.yieldos/config.json`; default runtime mode is `standard`. | [`docs/24-runtime-config.md`](./yieldOS/docs/24-runtime-config.md) |
+| `/yieldos:doctor` | Show plugin version, global policy version, effective mode, org overlay hash, hook status, and pack lock status. | [`docs/24-runtime-config.md`](./yieldOS/docs/24-runtime-config.md) |
 | `/yieldos:init` | Preview-first generation of `AGENTS.md` and `CLAUDE.md` safety instructions. Writes only with `--write`. | [`docs/14-custom-instructions.md`](./yieldOS/docs/14-custom-instructions.md) |
 | `/yieldos:pack` | Compile a reviewed `yield.agent-pack.yaml` into host-native guidance (Claude Code, Codex, Cursor, Copilot, Windsurf), with pack lock and verification. | [`docs/17-team-agent-packs.md`](./yieldOS/docs/17-team-agent-packs.md) |
 | `/yieldos:oracle` | Discover and run scoped oracle checks. Returns `pass`, `fail`, or `unknown`. | [`docs/19-oracle-driven-harness.md`](./yieldOS/docs/19-oracle-driven-harness.md) |

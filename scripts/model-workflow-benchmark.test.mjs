@@ -112,6 +112,7 @@ test('model workflow benchmark applies model output and lets yieldOS block it', 
     tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
     maxCases: 1,
     providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    loadDotEnv: false,
     config: singleOpenAIConfig(),
     costs: singleOpenAICosts(),
     fetchImpl: async () => {
@@ -262,6 +263,7 @@ test('model workflow benchmark records provider errors without aborting', async 
     tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
     maxCases: 1,
     providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    loadDotEnv: false,
     config: singleOpenAIConfig(),
     costs: singleOpenAICosts(),
     fetchImpl: async () => {
@@ -287,6 +289,7 @@ test('model workflow provider error without API key records no repository conten
     tempRoot: fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-runs-')),
     maxCases: 1,
     providerEgressEnv: { YIELDOS_ALLOW_PROVIDER_EGRESS: '1' },
+    loadDotEnv: false,
     config: singleOpenAIConfig(),
     costs: singleOpenAICosts(),
     fetchImpl: async () => {

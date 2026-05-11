@@ -240,7 +240,8 @@ function usage() {
 
 function main() {
   const result = runInit(process.cwd());
-  process.stdout.write(`${result.message}\n`);
+  const stream = result.exitCode === 0 ? process.stdout : process.stderr;
+  stream.write(`${result.message}\n`);
   process.exit(result.exitCode);
 }
 

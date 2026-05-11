@@ -24,8 +24,8 @@ yieldOS makes trust decisions **before** risky work is accepted, against policy 
 
 ```bash
 # 1. Download and verify the pinned release installer
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/install.sh
-curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.11.1/checksums.txt
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.14.0/install.sh
+curl -fsSLO https://github.com/yieldos/yieldos/releases/download/yieldos--v0.14.0/checksums.txt
 shasum -a 256 -c checksums.txt --ignore-missing
 sh install.sh --dry-run
 sh install.sh
@@ -45,6 +45,30 @@ node --test tests/*.test.js
 That's it. yieldOS auto-runs on `SessionStart`, `UserPromptSubmit`, and on every `Bash` / `Write` / `Edit` / `Read` tool call.
 
 Requires Node.js 18+ for `fetch` and `node:test`.
+
+---
+
+## Runtime config
+
+yieldOS defaults to `standard` mode. Standard mode still blocks credentials, protected yieldOS evidence, denylist hits, critical dependency categories, untrusted binaries or vendored code, and high-confidence code-audit findings, but it routes lower-risk unknown skills and read-only MCPs to review instead of making normal coding unusable.
+
+Create and inspect repo config with:
+
+```bash
+yieldos-config init --write
+yieldos-config show
+yieldos-config validate
+yieldos-doctor
+```
+
+Modes:
+
+- `monitor`: logs or reviews most lower-risk findings, but still blocks credentials, protected evidence, denylist hits, and critical code findings.
+- `standard`: default. Blocks high-confidence risky actions and reviews lower-confidence friction.
+- `strict`: block-first posture, including medium code-audit findings and stricter credential sentinel behavior.
+- `enterprise`: strict plus verified pack lock and restrict-only org overlay requirements.
+
+`YIELDOS_MODE` overrides repo config for local testing. Invalid repo config fails closed for `yieldos-config validate`; hooks degrade to `standard` with one warning so a bad config does not brick coding.
 
 ---
 

@@ -145,7 +145,7 @@ async function runModelWorkflowBenchmark(options = {}) {
   const costs = options.costs || readJson(options.costFile || DEFAULT_COSTS);
   const tempRoot = options.tempRoot || fs.mkdtempSync(path.join(os.tmpdir(), 'yieldos-model-workflow-'));
   fs.mkdirSync(tempRoot, { recursive: true });
-  loadDotEnv(path.join(REPO_ROOT, '.env'));
+  if (options.loadDotEnv !== false) loadDotEnv(path.join(REPO_ROOT, '.env'));
   const subjects = buildSubjects(options, config);
   if (!subjects.length) throw new Error('at least one --repo or --repo-spec is required');
   const ledger = createBudgetLedger(config, costs);
